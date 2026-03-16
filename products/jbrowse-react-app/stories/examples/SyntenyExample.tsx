@@ -18,10 +18,7 @@ export const SyntenyExample = () => {
             id: 'synteny_view',
             type: 'LinearSyntenyView',
             init: {
-              views: [
-                { assembly: 'volvox' },
-                { assembly: 'volvox_del' },
-              ],
+              views: [{ assembly: 'volvox' }, { assembly: 'volvox_del' }],
               tracks: ['volvox_del.paf'],
             },
           },
