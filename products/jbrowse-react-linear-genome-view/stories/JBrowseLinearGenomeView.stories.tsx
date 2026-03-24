@@ -1,6 +1,9 @@
 export {
   DefaultSession,
   DisableAddTrack,
+  HorizontallyFlippedViaLocstring,
+  HorizontallyFlippedViaButton,
+  HorizontallyFlippedViaDisplayedRegions,
   ExternalNavigateLocstring,
   ExternalNavigateObject,
   HumanExomeExample,

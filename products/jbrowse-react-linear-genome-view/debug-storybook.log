@@ -1,0 +1,49 @@
+[13:34:46.319] [INFO] storybook v10.2.14
+[13:34:48.031] [DEBUG] Getting package.json info for /home/cdiesh/src/jbrowse-components2/package.json...
+[13:34:48.808] [DEBUG] Serving static files from [36mproducts/jbrowse-react-linear-genome-view/public[39m at [36m/[39m
+[13:34:48.808] [INFO] Starting...
+[13:34:48.816] [INFO] Storybook collects completely anonymous usage telemetry. We use it to shape Storybook's roadmap and prioritize features. You can learn more, including how to opt out, at https://storybook.js.org/telemetry
+[13:34:48.839] [WARN] unable to find package.json for @mui/icons-material
+[13:34:49.057] [DEBUG] Starting preview..
+[13:34:49.094] [INFO] Addon-docs: using MDX3
+[13:34:49.150] [INFO] Using implicit CSS loaders
+[13:34:49.163] [INFO] Using default Webpack5 setup
+[13:34:50.292] [DEBUG] Using tsconfig paths for react-docgen
+[13:35:55.354] [WARN] export 'RpcClient' (imported as 'RpcClient') was not found in '../util/librpc.ts' (module has no exports)
+[13:35:55.355] [WARN] export 'deserializeError' (imported as 'deserializeError') was not found in '../util/librpc.ts' (module has no exports)
+[13:35:55.356] [WARN] export 'RpcServer' (imported as 'RpcServer') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.356] [WARN] export 'serializeError' (imported as 'serializeError') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.356] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.356] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.357] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.357] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.357] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.357] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.358] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.358] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.358] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.358] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.359] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.359] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.359] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.359] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.359] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.360] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.360] [WARN] export 'rpcResult' (imported as 'rpcResult') was not found in '@jbrowse/core/util/librpc' (module has no exports)
+[13:35:55.361] [ERROR] Failed to build the preview
+[13:35:55.363] [WARN] Force closed preview build
+[13:35:55.364] [ERROR] [38;2;241;97;97mSB_BUILDER-WEBPACK5_0003 (WebpackCompilationError): There were problems when compiling your code with Webpack.
+Run Storybook with --debug-webpack for more information.[39m
+    at starter (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/@storybook+builder-webpack5@10.2.14_esbuild@0.27.3_storybook@10.2.14_@testing-library+d_9ade3234fce82d1a5c1cd62d5e868a90/node_modules/@storybook/builder-webpack5/dist/index.js:799:11)
+    at starter.next (<anonymous>)
+    at Module.start (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/@storybook+builder-webpack5@10.2.14_esbuild@0.27.3_storybook@10.2.14_@testing-library+d_9ade3234fce82d1a5c1cd62d5e868a90/node_modules/@storybook/builder-webpack5/dist/index.js:857:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async storybookDevServer (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:7241:83)
+    at async buildOrThrow (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:4504:12)
+    at async buildDevStandalone (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/core-server/index.js:7611:66)
+    at async withTelemetry (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/_node-chunks/chunk-DTZLXIO2.js:218:12)
+    at async dev (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/bin/core.js:2734:3)
+    at async _Command.<anonymous> (file:///home/cdiesh/src/jbrowse-components2/node_modules/.pnpm/storybook@10.2.14_@testing-library+dom@10.4.1_prettier@3.8.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/storybook/dist/bin/core.js:2804:92)
+[13:35:55.366] [WARN] Broken build, fix the error above.
+You may need to refresh the browser.
+[13:36:21.762] [PROMPT] Would you like to send anonymous crash reports to improve Storybook and fix bugs faster? {"choice":false}
