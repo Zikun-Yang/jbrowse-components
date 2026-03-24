@@ -90,6 +90,7 @@ export const WithInit = () => {
         view: {
           type: 'LinearGenomeView',
           showCytobandsSetting: true,
+          showGridlines: false,
           colorByCDS: true,
           init: {
             loc: 'chr1:11,106,077-11,261,675',
