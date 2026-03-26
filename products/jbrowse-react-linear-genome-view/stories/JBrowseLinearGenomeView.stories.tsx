@@ -20,6 +20,7 @@ export {
   WithInit,
   WithInlinePlugins,
   WithInternetAccounts,
+  WithMultipleDisplayedRegionsFlipped,
   WithObserveVisibleFeatures,
   WithObserveVisibleRegions,
   WithOutsideStyling,
