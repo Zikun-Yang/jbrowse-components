@@ -6,7 +6,6 @@
     "outDir": "dist",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "noUncheckedIndexedAccess": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,7 +15,6 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "isolatedModules": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "allowImportingTsExtensions": true,
@@ -28,17 +26,10 @@
     "**/docs/",
     "**/dist/",
     "**/esm/",
-    "**/lib/",
-    "**/umd/",
-    "**/esm/",
-    "**/tmp/",
     "**/config/jest/",
     "**/embedded_demos/",
     "**/component_tests/",
-    "**/plugin-development-tools/",
-    "**/webpack.config.js",
     "**/website",
-    "**/auth_test_utils",
     "products/jbrowse-desktop/test"
   ]
 }
