@@ -1853,8 +1853,8 @@ importers:
         specifier: 41.1.0
         version: 41.1.0
       electron-chromedriver:
-        specifier: ^40.8.5
-        version: 40.8.5
+        specifier: ^41.1.1
+        version: 41.1.1
       esbuild:
         specifier: ^0.27.4
         version: 0.27.4
@@ -5733,8 +5733,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-chromedriver@40.8.5:
-    resolution: {integrity: sha512-CNsnPvnEPsGwT/BfrBBfVEJGPNTo4NQpaMXYgHG9rwQdZth/japmcgXUbY2wP8bAE6wNzJ/9YG5XxBQQMosoyg==}
+  electron-chromedriver@41.1.1:
+    resolution: {integrity: sha512-cXwFpaT5G7wqpSCbL93eznIQu9ZYkIUKJDJY9Jxue69T43IyeF9rH44qZEOhhC0tXPQ0nqm3ULCG3obe36Yzhw==}
     engines: {node: '>=10.12.0'}
     hasBin: true
 
@@ -13180,7 +13180,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-chromedriver@40.8.5:
+  electron-chromedriver@41.1.1:
     dependencies:
       '@electron/get': 2.0.3
       extract-zip: 2.0.1
