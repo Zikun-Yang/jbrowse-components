@@ -56,8 +56,8 @@
     "@jbrowse/plugin-wiggle": "workspace:^",
     "@jbrowse/product-core": "workspace:^",
     "@jbrowse/web-core": "workspace:^",
-    "@mui/icons-material": "^7.3.9",
-    "@mui/material": "^7.3.9",
+    "@mui/icons-material": "^7.3.10",
+    "@mui/material": "^7.3.10",
     "@node-oauth/oauth2-server": "^5.2.1",
     "@types/body-parser": "^1.19.6",
     "@types/file-saver-es": "^2.0.3",
@@ -74,8 +74,8 @@
     "pako-esm2": "^2.0.2",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "browserslist": {
     "production": [
