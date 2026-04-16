@@ -17,4 +17,5 @@ export JB2TMP=~/jb2tmp
 ./clone_demos.sh
 ./update_all.sh
 ```
+
 Verify at [jbrowse.org/demos/lgv](https://jbrowse.org/demos/lgv).
