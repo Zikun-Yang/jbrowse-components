@@ -15,7 +15,7 @@ exports[`renders with the available plugins 1`] = `
         Filter plugins
       </label>
       <div
-        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1eo3eah-MuiInputBase-root-MuiInput-root"
+        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1513hoe-MuiInputBase-root-MuiInput-root"
       >
         <input
           aria-invalid="false"

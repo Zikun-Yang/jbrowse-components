@@ -80,7 +80,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                       stringTest
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_5_-helper-text"
@@ -224,7 +224,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                         class="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-jqmkbu-MuiFormControl-root-MuiTextField-root"
                       >
                         <div
-                          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1xu0vz9-MuiInputBase-root-MuiInput-root"
+                          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1wh9lly-MuiInputBase-root-MuiInput-root"
                         >
                           <input
                             aria-invalid="false"
@@ -264,7 +264,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                         class="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-jqmkbu-MuiFormControl-root-MuiTextField-root"
                       >
                         <div
-                          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1xu0vz9-MuiInputBase-root-MuiInput-root"
+                          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1wh9lly-MuiInputBase-root-MuiInput-root"
                         >
                           <input
                             aria-invalid="false"
@@ -336,7 +336,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                       class="MuiCardHeader-root css-149tc0y-MuiCardHeader-root"
                     >
                       <div
-                        class="MuiCardHeader-content css-16o2p3x-MuiCardHeader-content"
+                        class="MuiCardHeader-content css-1jkp9bu-MuiCardHeader-content"
                       >
                         <span
                           class="MuiTypography-root MuiTypography-h5 MuiCardHeader-title css-w2zoog-MuiTypography-root"
@@ -384,7 +384,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                             class="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-jqmkbu-MuiFormControl-root-MuiTextField-root"
                           >
                             <div
-                              class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1xu0vz9-MuiInputBase-root-MuiInput-root"
+                              class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1wh9lly-MuiInputBase-root-MuiInput-root"
                             >
                               <input
                                 aria-invalid="false"
@@ -424,7 +424,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                             class="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-jqmkbu-MuiFormControl-root-MuiTextField-root"
                           >
                             <div
-                              class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1xu0vz9-MuiInputBase-root-MuiInput-root"
+                              class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1wh9lly-MuiInputBase-root-MuiInput-root"
                             >
                               <input
                                 aria-invalid="false"
@@ -481,13 +481,13 @@ exports[`renders all the different types of built-in slots 1`] = `
                       class="MuiCardHeader-root css-149tc0y-MuiCardHeader-root"
                     >
                       <div
-                        class="MuiCardHeader-content css-16o2p3x-MuiCardHeader-content"
+                        class="MuiCardHeader-content css-1jkp9bu-MuiCardHeader-content"
                       >
                         <div
                           class="MuiFormControl-root MuiFormControl-marginDense MuiFormControl-fullWidth MuiTextField-root css-xanwcj-MuiFormControl-root-MuiTextField-root"
                         >
                           <div
-                            class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                            class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-adornedEnd css-1513hoe-MuiInputBase-root-MuiInput-root"
                           >
                             <input
                               aria-invalid="false"
@@ -553,7 +553,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                       numberTest
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_k_-helper-text"
@@ -597,7 +597,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                       integerTest
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_l_-helper-text"
@@ -644,7 +644,7 @@ exports[`renders all the different types of built-in slots 1`] = `
                         colorTest
                       </label>
                       <div
-                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                       >
                         <input
                           aria-describedby="_r_m_-helper-text"
@@ -821,7 +821,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                       maxFeatureScreenDensity
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_p_-helper-text"
@@ -865,7 +865,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                       fetchSizeLimit
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_q_-helper-text"
@@ -909,7 +909,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                       height
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_r_-helper-text"
@@ -948,7 +948,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                       class="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-1lzfcik-MuiFormControl-root-MuiTextField-root"
                     >
                       <div
-                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-multiline css-14gvx6g-MuiInputBase-root-MuiInput-root"
+                        class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiInputBase-multiline css-1wsh4qa-MuiInputBase-root-MuiInput-root"
                       >
                         <textarea
                           aria-invalid="false"
@@ -1121,7 +1121,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                   Type
                                 </label>
                                 <div
-                                  class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                  class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1513hoe-MuiInputBase-root-MuiInput-root"
                                 >
                                   <div
                                     aria-describedby="_r_11_-helper-text"
@@ -1188,7 +1188,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                       color
                                     </label>
                                     <div
-                                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                     >
                                       <input
                                         aria-describedby="_r_13_-helper-text"
@@ -1262,7 +1262,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     orientationType
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <div
                                       aria-describedby="_r_15_-helper-text"
@@ -1328,7 +1328,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     displayMode
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <div
                                       aria-describedby="_r_17_-helper-text"
@@ -1394,7 +1394,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     minSubfeatureWidth
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <input
                                       aria-describedby="_r_19_-helper-text"
@@ -1588,7 +1588,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     maxHeight
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <input
                                       aria-describedby="_r_1a_-helper-text"
@@ -1632,7 +1632,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     maxClippingSize
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <input
                                       aria-describedby="_r_1b_-helper-text"
@@ -1676,7 +1676,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     height
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <input
                                       aria-describedby="_r_1c_-helper-text"
@@ -1789,7 +1789,7 @@ exports[`renders with defaults of the PileupTrack schema 1`] = `
                                     largeInsertionIndicatorScale
                                   </label>
                                   <div
-                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                                    class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                                   >
                                     <input
                                       aria-describedby="_r_1e_-helper-text"
@@ -1961,7 +1961,7 @@ exports[`renders with just the required model elements 1`] = `
                       foo
                     </label>
                     <div
-                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1eo3eah-MuiInputBase-root-MuiInput-root"
+                      class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-sizeSmall css-1513hoe-MuiInputBase-root-MuiInput-root"
                     >
                       <input
                         aria-describedby="_r_2_-helper-text"
