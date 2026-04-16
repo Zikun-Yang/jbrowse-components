@@ -84,6 +84,6 @@ pnpm format
 git add .
 git commit --message "$RELEASE_TAG"
 git tag -a "$RELEASE_TAG" -m "$RELEASE_TAG"
-git push && git push --tags
+git push --follow-tags
 
 echo "✓ Released $RELEASE_TAG"
