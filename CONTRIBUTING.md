@@ -13,50 +13,48 @@ cd products/jbrowse-web
 pnpm start
 ```
 
-## Prerequisites
+## Setup & Prerequisites
 
-- **pnpm**: We use [pnpm](https://pnpm.io/) for package management.
-- **Windows**: Use `git clone -c core.symlinks=true` to handle symlinks
-  correctly (requires admin or Developer Mode).
-- **Native Dependencies**: `node-canvas` (used in tests) may require system
-  libraries if it can't find prebuilt binaries for your node version:
+- **Package Manager**: [pnpm](https://pnpm.io/)
+- **Windows**: Use `git clone -c core.symlinks=true` (setting up symlinks on
+  windowws is awkward this way, sorry. requires admin/Developer Mode on
+  windows).
+- **Native Deps**: `node-canvas` (tests) requires system libs:
   - **macOS**: `brew install pkg-config cairo pango libpng jpeg giflib librsvg`
   - **Ubuntu**:
     `sudo apt install python3 make gcc libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev`
-  - If errors persist, run `pnpm rebuild canvas`.
+  - If it fails, run `pnpm rebuild canvas`.
 
-## Development Commands
+## Development
 
-Run these from the root directory:
+Run from root:
 
-- **Lint**: `pnpm lint` (use `--fix` to auto-fix)
-- **Typecheck**: `pnpm typecheck`
+- **Lint**: `pnpm lint` (`--fix` to auto-fix)
+- **Types**: `pnpm typecheck`
 - **Format**: `pnpm format`
 - **Test**: `pnpm test`
 
-### Running Products
+### Products
 
-- **JBrowse Web**: `cd products/jbrowse-web && pnpm start`
-- **JBrowse Desktop**:
-  - Dev Server: `cd products/jbrowse-desktop && pnpm start`
-  - Electron App: `cd products/jbrowse-desktop && pnpm electron` (in a second
-    terminal)
+- **Web**: `cd products/jbrowse-web && pnpm start`
+- **Desktop**: Run `pnpm start` then `pnpm electron` in
+  `products/jbrowse-desktop`.
 - **Storybook**:
   `cd products/jbrowse-react-linear-genome-view && pnpm storybook`
 
-## Monorepo Structure
+## Project Structure
 
-- `packages/`: Core libraries and utilities.
-- `plugins/`: Feature-specific code (Alignments, Variants, Wiggle, etc.). Most
-  development happens here.
-- `products/`: User-facing apps (Web, Desktop, CLI) and embedded components.
-- `website/`: Docusaurus documentation and blog.
+- `packages/`: Core libraries.
+- `plugins/`: Feature code (Alignments, Variants, etc.). Main dev area.
+- `products/`: Apps (Web, Desktop, CLI).
+- `website/`: Docusaurus site.
 
 ## Documentation
 
-- **Run Website**: `cd website && pnpm install && pnpm start`
-- **Images**: Use a compressor (e.g., `pngquant`). In Markdown, add a caption on
-  the line immediately following the image:
-  ```markdown
-  ![](image.png) Your caption here
-  ```
+Run
+
+```bash
+cd website
+pnpm install
+pnpm start
+```
