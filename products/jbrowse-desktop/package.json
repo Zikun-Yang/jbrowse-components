@@ -95,7 +95,7 @@
     "cross-env": "^10.1.0",
     "electron": "41.1.0",
     "electron-chromedriver": "^41.2.0",
-    "esbuild": "^0.27.7",
+    "esbuild": "^0.28.0",
     "selenium-webdriver": "^4.43.0"
   },
   "browserslist": [
