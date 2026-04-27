@@ -39,11 +39,7 @@ describe('LinearSyntenyViewInit type', () => {
 
   test('init type accepts per-level tracks for multi-way', () => {
     const init: LinearSyntenyViewInit = {
-      views: [
-        { assembly: 'hg38' },
-        { assembly: 'mm39' },
-        { assembly: 'rn7' },
-      ],
+      views: [{ assembly: 'hg38' }, { assembly: 'mm39' }, { assembly: 'rn7' }],
       tracks: [['hg38_vs_mm39'], ['mm39_vs_rn7']],
     }
     expect(init.tracks?.length).toBe(2)

@@ -12,7 +12,10 @@ function setup() {
   let handler: ((args: unknown) => Promise<void>) | undefined
 
   const pluginManager = {
-    addToExtensionPoint: (_name: string, fn: (args: unknown) => Promise<void>) => {
+    addToExtensionPoint: (
+      _name: string,
+      fn: (args: unknown) => Promise<void>,
+    ) => {
       handler = fn
     },
   } as unknown as PluginManager
