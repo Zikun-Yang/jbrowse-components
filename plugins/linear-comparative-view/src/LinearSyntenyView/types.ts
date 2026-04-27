@@ -16,7 +16,9 @@ export interface LinearSyntenyViewInit {
     assembly: string
     tracks?: string[]
   }[]
-  tracks?: string[]
+  // synteny track ids per level: tracks[i] is shown between views[i] and
+  // views[i+1]. 2-way view has one entry; 3-way has two; etc.
+  tracks?: string[][]
 }
 
 export interface ExportSvgOptions {

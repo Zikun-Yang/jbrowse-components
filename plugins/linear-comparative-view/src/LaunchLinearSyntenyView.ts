@@ -23,12 +23,12 @@ export default function LaunchLinearSyntenyView(pluginManager: PluginManager) {
       views: ViewData[]
       tracks?: string[] | string[][]
     }) => {
-      // Flatten tracks array if it's 2D (for backwards compatibility)
-      const flatTracks = Array.isArray(tracks[0])
-        ? (tracks as string[][]).flat()
-        : (tracks as string[])
+      // Normalize 1D tracks to 2D — flat array goes to level 0. The 2D form
+      // targets one entry per level (between views[i] and views[i+1]).
+      const tracks2D: string[][] = Array.isArray(tracks[0])
+        ? (tracks as string[][])
+        : [tracks as string[]]
 
-      // Use the init property to let the model handle initialization
       session.addView('LinearSyntenyView', {
         init: {
           views: views.map(v => ({
@@ -36,7 +36,7 @@ export default function LaunchLinearSyntenyView(pluginManager: PluginManager) {
             assembly: v.assembly,
             tracks: v.tracks,
           })),
-          tracks: flatTracks,
+          tracks: tracks2D,
         },
       }) as LSV
     },

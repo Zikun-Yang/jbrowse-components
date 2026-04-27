@@ -29,12 +29,26 @@ describe('LinearSyntenyViewInit type', () => {
     expect(init.views[0]?.tracks).toEqual(['genes', 'repeats'])
   })
 
-  test('init type accepts synteny tracks at top level', () => {
+  test('init type accepts synteny tracks at top level (per-level)', () => {
     const init: LinearSyntenyViewInit = {
       views: [{ assembly: 'hg38' }, { assembly: 'mm39' }],
-      tracks: ['hg38_vs_mm39_synteny'],
+      tracks: [['hg38_vs_mm39_synteny']],
     }
-    expect(init.tracks).toEqual(['hg38_vs_mm39_synteny'])
+    expect(init.tracks).toEqual([['hg38_vs_mm39_synteny']])
+  })
+
+  test('init type accepts per-level tracks for multi-way', () => {
+    const init: LinearSyntenyViewInit = {
+      views: [
+        { assembly: 'hg38' },
+        { assembly: 'mm39' },
+        { assembly: 'rn7' },
+      ],
+      tracks: [['hg38_vs_mm39'], ['mm39_vs_rn7']],
+    }
+    expect(init.tracks?.length).toBe(2)
+    expect(init.tracks?.[0]).toEqual(['hg38_vs_mm39'])
+    expect(init.tracks?.[1]).toEqual(['mm39_vs_rn7'])
   })
 
   test('init type accepts full configuration', () => {
@@ -43,9 +57,9 @@ describe('LinearSyntenyViewInit type', () => {
         { loc: 'chr1:1-10000000', assembly: 'hg38', tracks: ['genes'] },
         { loc: 'chr1:1-10000000', assembly: 'mm39', tracks: ['genes'] },
       ],
-      tracks: ['synteny_track_1', 'synteny_track_2'],
+      tracks: [['synteny_track_1', 'synteny_track_2']],
     }
     expect(init.views.length).toBe(2)
-    expect(init.tracks?.length).toBe(2)
+    expect(init.tracks?.[0]?.length).toBe(2)
   })
 })
