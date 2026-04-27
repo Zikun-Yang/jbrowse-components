@@ -559,8 +559,14 @@ https://jbrowse.org/code/jb2/main/?config=test_data/volvox/config.json&session=s
   "layout": {
     "direction": "horizontal",
     "children": [
-      { "views": [0], "size": 70 },
-      { "views": [1], "size": 30 }
+      {
+        "views": [0],
+        "size": 70
+      },
+      {
+        "views": [1],
+        "size": 30
+      }
     ]
   }
 }
