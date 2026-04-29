@@ -43,15 +43,14 @@ const ImportForm = observer(function ImportForm({
         </Grid>
         <Grid>
           <Button
-            disabled={!datasetUri}
+            disabled={!datasetUri || model.loading}
             onClick={() => {
-              model.setError(undefined)
-              model.setDataset(datasetUri)
+              model.loadDataset(datasetUri)
             }}
             variant="contained"
             color="primary"
           >
-            Open
+            {model.loading ? 'Loading...' : 'Open'}
           </Button>
         </Grid>
       </Grid>
