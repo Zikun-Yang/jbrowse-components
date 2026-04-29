@@ -14,6 +14,7 @@ interface SNPCoverageDisplayModel {
   skipFeatures: Feature[]
   height: number
   showArcsSetting: boolean
+  showArcCountsSetting: boolean
 }
 
 const YSCALEBAR_LABEL_OFFSET = 5
@@ -22,7 +23,8 @@ function renderSashimiArcsSvg(
   self: SNPCoverageDisplayModel,
   view: LinearGenomeViewModel,
 ) {
-  const { id, skipFeatures, height, showArcsSetting } = self
+  const { id, skipFeatures, height, showArcsSetting, showArcCountsSetting } =
+    self
 
   if (!showArcsSetting || skipFeatures.length === 0) {
     return null
@@ -69,6 +71,23 @@ function renderSashimiArcsSvg(
               fill="none"
             />
           ))}
+          {showArcCountsSetting &&
+            arcs.map(arc => {
+              const fontSize = 11
+              return (
+                <text
+                  key={`${arc.id}-count`}
+                  x={arc.labelX}
+                  y={arc.labelY}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize={fontSize}
+                  fill="black"
+                >
+                  {arc.score}
+                </text>
+              )
+            })}
         </g>
       </g>
     </>

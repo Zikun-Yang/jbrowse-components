@@ -36,6 +36,14 @@ const SNPCoverageRenderer = ConfigurationSchema(
     /**
      * #slot
      */
+    showArcCounts: {
+      type: 'boolean',
+      description: 'Draw read counts on sashimi arcs',
+      defaultValue: true,
+    },
+    /**
+     * #slot
+     */
     showInterbaseCounts: {
       type: 'boolean',
       description:

@@ -12,6 +12,8 @@ export interface ArcData {
   refName: string
   score: number
   strand: number
+  labelX: number
+  labelY: number
 }
 
 export function getArcColor(strand: number) {
@@ -67,5 +69,7 @@ export function featureToArcData(
     refName,
     score,
     strand,
+    labelX: (left + right) / 2,
+    labelY: effectiveHeight * 0.3,
   }
 }

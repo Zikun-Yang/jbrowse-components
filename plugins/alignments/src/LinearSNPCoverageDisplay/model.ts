@@ -74,6 +74,10 @@ function stateModelFactory(
         /**
          * #property
          */
+        showArcCounts: types.maybe(types.boolean),
+        /**
+         * #property
+         */
         minArcScore: types.optional(types.number, 0),
         /**
          * #property
@@ -149,8 +153,12 @@ function stateModelFactory(
          * #getter
          */
         get rendererConfig() {
-          const { showArcs, showInterbaseCounts, showInterbaseIndicators } =
-            self
+          const {
+            showArcs,
+            showArcCounts,
+            showInterbaseCounts,
+            showInterbaseIndicators,
+          } = self
           // @ts-ignore
           const conf = self.configuration.renderers?.[self.rendererTypeName]
           return {
@@ -159,6 +167,7 @@ function stateModelFactory(
             showInterbaseIndicators:
               showInterbaseIndicators ?? conf?.showInterbaseIndicators?.value,
             showArcs: showArcs ?? conf?.showArcs?.value,
+            showArcCounts: showArcCounts ?? conf?.showArcCounts?.value,
           }
         },
         /**
@@ -166,6 +175,12 @@ function stateModelFactory(
          */
         get showArcsSetting() {
           return this.rendererConfig.showArcs
+        },
+        /**
+         * #getter
+         */
+        get showArcCountsSetting() {
+          return this.rendererConfig.showArcCounts
         },
         /**
          * #getter
@@ -252,6 +267,12 @@ function stateModelFactory(
        */
       setShowArcs(arg: boolean) {
         self.showArcs = arg
+      },
+      /**
+       * #action
+       */
+      setShowArcCounts(arg: boolean) {
+        self.showArcCounts = arg
       },
       /**
        * #action
@@ -452,6 +473,14 @@ function stateModelFactory(
                     self.setShowArcs(!self.showArcsSetting)
                   },
                 },
+                {
+                  label: 'Arc counts',
+                  type: 'checkbox',
+                  checked: self.showArcCountsSetting,
+                  onClick: () => {
+                    self.setShowArcCounts(!self.showArcCountsSetting)
+                  },
+                },
               ],
             },
             {
@@ -510,6 +539,7 @@ function stateModelFactory(
         showInterbaseCounts,
         showInterbaseIndicators,
         showArcs,
+        showArcCounts,
         minArcScore,
         filterBySetting,
         colorBySetting,
@@ -523,6 +553,7 @@ function stateModelFactory(
           ? { showInterbaseIndicators }
           : {}),
         ...(showArcs !== undefined ? { showArcs } : {}),
+        ...(showArcCounts !== undefined ? { showArcCounts } : {}),
         ...(minArcScore ? { minArcScore } : {}),
         ...(!isDefaultFilterFlags(filterBySetting) ? { filterBySetting } : {}),
         ...(colorBySetting !== undefined ? { colorBySetting } : {}),

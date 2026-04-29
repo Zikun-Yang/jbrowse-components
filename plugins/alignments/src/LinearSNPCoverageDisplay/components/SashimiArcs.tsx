@@ -22,6 +22,7 @@ const SVGNS = 'http://www.w3.org/2000/svg'
 
 export interface ArcDisplayModel {
   showArcsSetting: boolean
+  showArcCountsSetting: boolean
   height: number
   skipFeatures: Feature[]
 }
@@ -31,7 +32,7 @@ const SashimiArcs = observer(function SashimiArcs({
 }: {
   model: ArcDisplayModel
 }) {
-  const { showArcsSetting, height, skipFeatures } = model
+  const { showArcsSetting, showArcCountsSetting, height, skipFeatures } = model
   const view = getContainingView(model) as LinearGenomeViewModel
   const { assemblyManager } = getSession(model)
   const [hoverInfo, setHoverInfo] = useState<{
@@ -163,6 +164,7 @@ const SashimiArcs = observer(function SashimiArcs({
 
     // Create paths directly in DOM (sorted by score so high-scoring arcs render on top)
     const sortedArcs = [...arcs].sort((a, b) => a.score - b.score)
+    const fontSize = 11
     for (const arc of sortedArcs) {
       arcMap.set(arc.id, arc)
       const path = document.createElementNS(SVGNS, 'path')
@@ -179,6 +181,19 @@ const SashimiArcs = observer(function SashimiArcs({
       path.addEventListener('click', handleClick)
       pathMap.set(arc.id, path)
       svg.append(path)
+
+      if (showArcCountsSetting) {
+        const text = document.createElementNS(SVGNS, 'text')
+        text.setAttribute('x', String(arc.labelX))
+        text.setAttribute('y', String(arc.labelY))
+        text.setAttribute('text-anchor', 'middle')
+        text.setAttribute('dominant-baseline', 'middle')
+        text.setAttribute('font-size', String(fontSize))
+        text.setAttribute('fill', 'black')
+        text.setAttribute('pointer-events', 'none')
+        text.textContent = String(arc.score)
+        svg.append(text)
+      }
     }
 
     arcMapRef.current = arcMap
@@ -194,7 +209,7 @@ const SashimiArcs = observer(function SashimiArcs({
         child.remove()
       }
     }
-  }, [arcs, model])
+  }, [arcs, model, showArcCountsSetting])
 
   // Update selected arc styling when selection changes
   useEffect(() => {
