@@ -35,8 +35,10 @@
     "@jbrowse/mobx-state-tree": "^5.6.0",
     "@mui/icons-material": "^7.3.10",
     "@mui/material": "^7.3.10",
+    "gl-matrix": "^3.4.3",
     "mobx": "^6.15.0",
     "mobx-react": "^9.2.1",
+    "regl": "^2.1.1",
     "zarr": "^0.6.3"
   },
   "peerDependencies": {

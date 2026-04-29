@@ -1,9 +1,12 @@
 import { LoadingEllipses } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import { Chip, Paper, Typography } from '@mui/material'
+import { Paper, Typography } from '@mui/material'
 import { observer } from 'mobx-react'
 
+import EmbeddingCanvas from './EmbeddingCanvas.tsx'
 import ImportForm from './ImportForm.tsx'
+import LassoOverlay from './LassoOverlay.tsx'
+import Toolbar from './Toolbar.tsx'
 
 import type { SingleCellViewModel } from '../model.ts'
 
@@ -15,17 +18,15 @@ const useStyles = makeStyles()(theme => ({
     backgroundColor: theme.palette.background.default,
   },
   viewContainer: {
-    padding: theme.spacing(2),
-  },
-  infoPanel: {
-    padding: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-  },
-  chipRow: {
     display: 'flex',
-    gap: theme.spacing(1),
-    flexWrap: 'wrap',
-    marginTop: theme.spacing(1),
+    flexDirection: 'column',
+    padding: theme.spacing(2),
+  },
+  canvasWrapper: {
+    position: 'relative',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
   },
 }))
 
@@ -63,71 +64,28 @@ const SingleCellViewLoaded = observer(function SingleCellViewLoaded({
     return <div>No data loaded</div>
   }
 
-  const categoricalCols = Object.entries(data.metadata).filter(
-    ([_, col]) => col.type === 'categorical',
-  ) as [string, import('../../SingleCellAdapter/SingleCellZarrAdapter.ts').CategoricalColumn][]
-
   return (
     <div className={classes.root}>
       <div className={classes.viewContainer}>
-        <Paper className={classes.infoPanel} variant="outlined">
-          <Typography variant="h6">Single Cell Dataset</Typography>
-          <Typography variant="body2" color="textSecondary">
-            {dataset}
+        <Paper variant="outlined" sx={{ mb: 1, p: 1 }}>
+          <Typography variant="subtitle1">
+            {dataset} — {data.nObs.toLocaleString()} cells, {data.nVar.toLocaleString()} genes
           </Typography>
-
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            Cells: <strong>{data.nObs.toLocaleString()}</strong> | Genes:{' '}
-            <strong>{data.nVar.toLocaleString()}</strong>
+          <Typography variant="body2" color="text.secondary">
+            Embedding: <strong>{embedding}</strong> | Color by: <strong>{colorBy}</strong>
           </Typography>
-
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            Embedding: <strong>{embedding}</strong> | Color by:{' '}
-            <strong>{colorBy}</strong>
-          </Typography>
-
-          {data.embeddings.length > 0 ? (
-            <>
-              <Typography variant="subtitle2" sx={{ mt: 2 }}>
-                Available embeddings:
-              </Typography>
-              <div className={classes.chipRow}>
-                {data.embeddings.map(emb => (
-                  <Chip
-                    key={emb}
-                    label={emb}
-                    size="small"
-                    color={emb === embedding ? 'primary' : 'default'}
-                    onClick={() => model.setEmbedding(emb)}
-                  />
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          {categoricalCols.length > 0 ? (
-            <>
-              <Typography variant="subtitle2" sx={{ mt: 2 }}>
-                Categorical metadata:
-              </Typography>
-              <div className={classes.chipRow}>
-                {categoricalCols.map(([name, col]) => (
-                  <Chip
-                    key={name}
-                    label={`${name} (${col.categories.length} categories)`}
-                    size="small"
-                    color={name === colorBy ? 'secondary' : 'default'}
-                    onClick={() => model.setColorBy(name)}
-                  />
-                ))}
-              </div>
-            </>
-          ) : null}
         </Paper>
 
-        <Typography variant="body2" color="textSecondary">
-          WebGL UMAP rendering will be implemented in Phase 2
-        </Typography>
+        <Toolbar model={model} />
+
+        <div className={classes.canvasWrapper} style={{ width: model.width, height: model.height - 100 }}>
+          <EmbeddingCanvas model={model} />
+          <LassoOverlay
+            model={model}
+            onLassoEnd={selected => model.setSelectedCells(selected)}
+            onRectEnd={selected => model.setSelectedCells(selected)}
+          />
+        </div>
       </div>
     </div>
   )

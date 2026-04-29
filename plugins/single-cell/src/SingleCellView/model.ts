@@ -59,6 +59,15 @@ function stateModelFactory(_pluginManager: PluginManager) {
          * #property
          */
         error: types.maybe(types.string),
+
+        /**
+         * #property
+         * Selection tool mode
+         */
+        selectionTool: types.optional(
+          types.enumeration(['pan', 'lasso', 'rect']),
+          'pan',
+        ),
       }),
     )
     .volatile(() => ({
@@ -79,6 +88,16 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * Loaded dataset data (frozen to avoid MST deep observation overhead)
        */
       data: undefined as SingleCellDataset | undefined,
+      /**
+       * #property
+       * Selected cell indices
+       */
+      selectedCells: new Set<number>() as Set<number>,
+      /**
+       * #property
+       * Highlighted cell indices (hover)
+       */
+      highlightedCells: new Set<number>() as Set<number>,
     }))
     .views(self => ({
       /**
@@ -148,6 +167,30 @@ function stateModelFactory(_pluginManager: PluginManager) {
        */
       setLoading(loading: boolean) {
         self.loading = loading
+      },
+      /**
+       * #action
+       */
+      setSelectionTool(tool: 'pan' | 'lasso' | 'rect') {
+        self.selectionTool = tool
+      },
+      /**
+       * #action
+       */
+      setSelectedCells(cells: Set<number>) {
+        self.selectedCells = cells
+      },
+      /**
+       * #action
+       */
+      clearSelection() {
+        self.selectedCells = new Set()
+      },
+      /**
+       * #action
+       */
+      setHighlightedCells(cells: Set<number>) {
+        self.highlightedCells = cells
       },
       /**
        * #action
