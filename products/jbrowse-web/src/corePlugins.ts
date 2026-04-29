@@ -22,6 +22,7 @@ import Lollipop from '@jbrowse/plugin-lollipop'
 import Menus from '@jbrowse/plugin-menus'
 import RDF from '@jbrowse/plugin-rdf'
 import Sequence from '@jbrowse/plugin-sequence'
+import SingleCell from '@jbrowse/plugin-single-cell'
 import SpreadsheetViewPlugin from '@jbrowse/plugin-spreadsheet-view'
 import SvInspectorPlugin from '@jbrowse/plugin-sv-inspector'
 import TrixPlugin from '@jbrowse/plugin-trix'
@@ -47,6 +48,7 @@ const corePlugins = [
   Menus,
   RDF,
   Sequence,
+  SingleCell,
   Variants,
   Wiggle,
   GCContent,
