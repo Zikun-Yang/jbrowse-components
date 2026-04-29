@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useReducer } from 'react'
 
 import type { SingleCellViewModel } from '../model.ts'
 
@@ -13,6 +13,14 @@ export default function LassoOverlay({ model, onLassoEnd, onRectEnd }: LassoOver
   const isDrawingRef = useRef(false)
   const pointsRef = useRef<[number, number][]>([])
   const startPosRef = useRef({ x: 0, y: 0 })
+  const [, forceRerender] = useReducer(x => x + 1, 0)
+
+  useEffect(() => {
+    updateCallback = forceRerender
+    return () => {
+      updateCallback = null
+    }
+  }, [forceRerender])
 
   const getPointsInPolygon = useCallback(
     (polygon: [number, number][]): Set<number> => {
