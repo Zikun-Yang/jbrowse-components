@@ -1,6 +1,6 @@
 import { BaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
 import { getConf } from '@jbrowse/core/configuration'
-import { types } from '@jbrowse/mobx-state-tree'
+import { flow, types } from '@jbrowse/mobx-state-tree'
 
 import SingleCellZarrAdapter from '../SingleCellAdapter/SingleCellZarrAdapter.ts'
 
@@ -196,7 +196,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * #action
        * Load dataset using SingleCellZarrAdapter
        */
-      async loadDataset(uri: string) {
+      loadDataset: flow(function* (uri: string) {
         self.loading = true
         self.error = undefined
         try {
@@ -206,7 +206,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
             } as unknown as ReturnType<typeof import('../SingleCellAdapter/configSchema.ts').default.create>,
           )
 
-          await adapter.init()
+          yield adapter.init()
 
           // Load default embedding
           const embeddings = adapter.embeddings
@@ -216,7 +216,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
 
           let embeddingData: Float32Array | undefined
           if (defaultEmbedding) {
-            embeddingData = await adapter.getEmbedding(defaultEmbedding)
+            embeddingData = yield adapter.getEmbedding(defaultEmbedding)
           }
 
           // Load metadata columns (first few for performance)
@@ -224,7 +224,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
           const columnsToLoad = adapter.obsColumns.slice(0, 10)
           for (const col of columnsToLoad) {
             try {
-              metadata[col] = await adapter.getObsColumn(col)
+              metadata[col] = yield adapter.getObsColumn(col)
             } catch {
               // skip columns that fail to load
             }
@@ -254,7 +254,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
         } finally {
           self.loading = false
         }
-      },
+      }),
     }))
 }
 
