@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renderFeatureChart renders a single chart into an abstract canvas 1`] = `
+{
+  "features": [
+    {
+      "contextData": {
+        "data": {
+          "tissues": {
+            "Brain": [
+              1,
+              2,
+              3,
+              4,
+              5,
+            ],
+          },
+        },
+        "name": "GENE1",
+      },
+      "end": 200,
+      "name": "GENE1",
+      "refName": "chr1",
+      "start": 100,
+      "uniqueId": "f1",
+    },
+  ],
+  "height": 200,
+  "imageData": Any<Object>,
+  "width": 1000,
+}
+`;
