@@ -1,82 +1,116 @@
 import { useEffect, useRef, useCallback } from 'react'
+import { observer } from 'mobx-react'
 import { mat3, vec2 } from 'gl-matrix'
 import createRegl from 'regl'
 
 import Camera from './camera.ts'
 import createDrawPointsRegl from './drawPointsRegl.ts'
+import {
+  FRACTION_TO_USE,
+  normalizeEmbedding,
+  createModelTF,
+  createProjectionTF,
+} from './embeddingUtils.ts'
+import { getCategoricalColorRGB, getContinuousRGB } from './colorUtils.ts'
 
-import type { SingleCellViewModel } from '../model.ts'
-import type { CategoricalColumn, ContinuousColumn } from '../../SingleCellAdapter/SingleCellZarrAdapter.ts'
+import type { SingleCellViewModel, Transform } from '../model.ts'
+import type {
+  CategoricalColumn,
+  ContinuousColumn,
+  StringColumn,
+} from '../../SingleCellAdapter/SingleCellZarrAdapter.ts'
 
-// Normalize embedding coordinates to [0, 1] range
-function normalizeEmbedding(positions: Float32Array): Float32Array {
-  const n = positions.length / 2
-  let minX = Infinity, maxX = -Infinity
-  let minY = Infinity, maxY = -Infinity
-
-  for (let i = 0; i < n; i++) {
-    const x = positions[i * 2]!
-    const y = positions[i * 2 + 1]!
-    minX = Math.min(minX, x)
-    maxX = Math.max(maxX, x)
-    minY = Math.min(minY, y)
-    maxY = Math.max(maxY, y)
+function applyXTransform(
+  values: Float32Array,
+  transform: 'linear' | 'log',
+): Float32Array {
+  if (transform === 'linear') return values
+  let min = Infinity
+  for (const v of values) {
+    if (v < min) min = v
   }
-
-  const scaleX = maxX - minX || 1
-  const scaleY = maxY - minY || 1
-  const out = new Float32Array(positions.length)
-
-  for (let i = 0; i < n; i++) {
-    out[i * 2] = (positions[i * 2]! - minX) / scaleX
-    out[i * 2 + 1] = (positions[i * 2 + 1]! - minY) / scaleY
+  if (!Number.isFinite(min)) return values
+  const shift = min < 0 ? -min : 0
+  const out = new Float32Array(values.length)
+  for (let i = 0; i < values.length; i++) {
+    out[i] = Math.log1p(values[i]! + shift)
   }
-
   return out
 }
 
-// Compute colors based on colorBy column
+interface EmbeddingCanvasProps {
+  model: SingleCellViewModel
+  width: number
+  height: number
+}
+
+// Pre-transform normalized [0,1] positions by the model matrix.
+function applyModelTF(positions: Float32Array, modelTF: mat3): Float32Array {
+  const n = positions.length / 2
+  const out = new Float32Array(positions.length)
+  const p = vec2.create()
+  for (let i = 0; i < n; i++) {
+    vec2.transformMat3(
+      p,
+      vec2.fromValues(positions[i * 2]!, positions[i * 2 + 1]!),
+      modelTF,
+    )
+    out[i * 2] = p[0]
+    out[i * 2 + 1] = p[1]
+  }
+  return out
+}
+
+// Compute colors based on colorBy column and selected palettes
 function computeColors(
   colorBy: string,
-  metadata: Record<string, CategoricalColumn | ContinuousColumn>,
+  metadata: Record<string, CategoricalColumn | ContinuousColumn | StringColumn>,
+  nPoints: number,
+  categoricalPalette: string,
+  continuousPalette: string,
+  xTransform: Transform = 'linear',
 ): Float32Array {
   const col = metadata[colorBy]
+  const colors = new Float32Array(nPoints * 3)
+
   if (!col) {
-    // Default: all black
-    return new Float32Array(3)
+    // Default: medium gray when the colorBy column failed to load
+    colors.fill(0.5)
+    return colors
   }
 
-  const n = col.type === 'categorical' ? col.codes.length : col.values.length
-  const colors = new Float32Array(n * 3)
-
   if (col.type === 'categorical') {
-    // Use d3-like categorical colors
-    const palette = [
-      [0.12, 0.47, 0.71], // blue
-      [1.0, 0.5, 0.05],   // orange
-      [0.17, 0.63, 0.17], // green
-      [0.84, 0.15, 0.16], // red
-      [0.58, 0.4, 0.74],  // purple
-      [0.55, 0.34, 0.29], // brown
-      [0.89, 0.47, 0.76], // pink
-      [0.5, 0.5, 0.5],    // gray
-      [0.74, 0.74, 0.13], // olive
-      [0.09, 0.75, 0.81], // cyan
-    ]
-    for (let i = 0; i < n; i++) {
-      const code = col.codes[i] ?? 0
-      const color = palette[code % palette.length]!
-      colors[i * 3] = color[0]!
-      colors[i * 3 + 1] = color[1]!
-      colors[i * 3 + 2] = color[2]!
+    for (let i = 0; i < nPoints; i++) {
+      const [r, g, b] = getCategoricalColorRGB(
+        col.codes[i] ?? 0,
+        categoricalPalette,
+      )
+      colors[i * 3] = r
+      colors[i * 3 + 1] = g
+      colors[i * 3 + 2] = b
+    }
+  } else if (col.type === 'string') {
+    const valueToCode = new Map<string, number>()
+    let nextCode = 0
+    for (let i = 0; i < nPoints; i++) {
+      const value = col.values[i] ?? ''
+      let code = valueToCode.get(value)
+      if (code === undefined) {
+        code = nextCode++
+        valueToCode.set(value, code)
+      }
+      const [r, g, b] = getCategoricalColorRGB(code, categoricalPalette)
+      colors[i * 3] = r
+      colors[i * 3 + 1] = g
+      colors[i * 3 + 2] = b
     }
   } else {
-    // Continuous: viridis-like grayscale to blue-green
-    const { min, max } = getMinMax(col.values)
+    const values = applyXTransform(col.values, xTransform)
+    const { min, max } = getMinMax(values)
     const range = max - min || 1
-    for (let i = 0; i < n; i++) {
-      const v = (col.values[i]! - min) / range
-      const [r, g, b] = viridis(v)
+    for (let i = 0; i < nPoints; i++) {
+      const v = (values[i]! - min) / range
+      const [r, g, b] = getContinuousRGB(v, continuousPalette)
       colors[i * 3] = r
       colors[i * 3 + 1] = g
       colors[i * 3 + 2] = b
@@ -87,7 +121,8 @@ function computeColors(
 }
 
 function getMinMax(arr: Float32Array): { min: number; max: number } {
-  let min = Infinity, max = -Infinity
+  let min = Infinity,
+    max = -Infinity
   for (const v of arr) {
     min = Math.min(min, v)
     max = Math.max(max, v)
@@ -95,21 +130,12 @@ function getMinMax(arr: Float32Array): { min: number; max: number } {
   return { min, max }
 }
 
-function viridis(t: number): [number, number, number] {
-  // Simplified viridis colormap
-  t = Math.max(0, Math.min(1, t))
-  return [
-    Math.max(0, Math.min(1, 0.267 + 0.105 * t + 0.63 * t * t - 0.213 * t * t * t)),
-    Math.max(0, Math.min(1, 0.004 + 0.898 * t + 0.05 * t * t)),
-    Math.max(0, Math.min(1, 0.329 + 0.644 * t - 0.867 * t * t + 0.27 * t * t * t)),
-  ]
-}
-
-// Compute flags based on selection
+// Compute flags based on selection and label overlay mode
 function computeFlags(
   n: number,
   selectedCells: Set<number>,
   highlightedCells: Set<number>,
+  showLabels: boolean,
 ): Uint8Array {
   const flags = new Uint8Array(n)
   for (let i = 0; i < n; i++) {
@@ -117,41 +143,112 @@ function computeFlags(
       flags[i] = 4 // FLAG_HIGHLIGHT
     } else if (selectedCells.has(i)) {
       flags[i] = 1 // FLAG_SELECTED
-    } else if (selectedCells.size > 0) {
-      flags[i] = 2 // FLAG_BACKGROUND (dim unselected)
+    } else if (selectedCells.size > 0 || showLabels) {
+      flags[i] = 2 // FLAG_BACKGROUND (dim)
     }
   }
   return flags
 }
 
-interface EmbeddingCanvasProps {
-  model: SingleCellViewModel
-}
-
-export default function EmbeddingCanvas({ model }: EmbeddingCanvasProps) {
+export default observer(function EmbeddingCanvas({
+  model,
+  width,
+  height,
+}: EmbeddingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const reglRef = useRef<ReturnType<typeof createRegl> | undefined>(undefined)
-  const drawPointsRef = useRef<ReturnType<typeof createDrawPointsRegl> | undefined>(undefined)
+  const drawPointsRef = useRef<
+    ReturnType<typeof createDrawPointsRegl> | undefined
+  >(undefined)
   const cameraRef = useRef(new Camera())
   const animFrameRef = useRef<number | undefined>(undefined)
   const isDraggingRef = useRef(false)
   const mousePosRef = useRef({ x: 0, y: 0 })
 
-  const { data, colorBy } = model
+  const {
+    data,
+    colorBy,
+    pointSize,
+    showLabels,
+    categoricalPalette,
+    continuousPalette,
+  } = model
+  const colorByKind = model.colorBy?.kind
+  const colorByName = model.colorBy?.name
 
-  // Prepare geometry data
-  const normPositions = useRef<Float32Array | undefined>(undefined)
+  // Prepare geometry data. worldPositions are in the [-1,1] square after
+  // applying the fixed 1:1 model transform.
+  const worldPositionsRef = useRef<Float32Array | undefined>(undefined)
   const colorsRef = useRef<Float32Array | undefined>(undefined)
+  const modelTFRef = useRef<mat3>(createModelTF())
 
   useEffect(() => {
     if (!data?.embeddingData) return
-    normPositions.current = normalizeEmbedding(data.embeddingData)
-  }, [data?.embeddingData])
+    const { data: normed, bounds } = normalizeEmbedding(data.embeddingData)
+    model.setEmbeddingBounds(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+    worldPositionsRef.current = applyModelTF(normed, modelTFRef.current)
+  }, [data?.embeddingData, model])
 
   useEffect(() => {
-    if (!data?.metadata || !colorBy) return
-    colorsRef.current = computeColors(colorBy, data.metadata)
-  }, [data?.metadata, colorBy])
+    if (!data?.embeddingData) return
+    const nPoints = data.embeddingData.length / 2
+    const rawValues =
+      colorByKind === 'feature'
+        ? model.featureValues.get(colorByName ?? '')
+        : colorByKind === 'geneSet'
+          ? model.geneSetValues.get(colorByName ?? '')
+          : undefined
+    if (rawValues) {
+      const transform =
+        colorByKind === 'feature'
+          ? (model.featureTransforms.get(colorByName ?? '')?.x ?? 'linear')
+          : colorByKind === 'geneSet'
+            ? (model.geneSetTransforms.get(colorByName ?? '')?.x ?? 'linear')
+            : 'linear'
+      const values = applyXTransform(rawValues, transform)
+      const { min, max } = getMinMax(values)
+      const range = max - min || 1
+      const colors = new Float32Array(nPoints * 3)
+      for (let i = 0; i < nPoints; i++) {
+        const v = (values[i]! - min) / range
+        const [r, g, b] = getContinuousRGB(v, continuousPalette)
+        colors[i * 3] = r
+        colors[i * 3 + 1] = g
+        colors[i * 3 + 2] = b
+      }
+      colorsRef.current = colors
+      return
+    }
+    const xTransform =
+      colorByKind === 'obs'
+        ? (model.obsTransforms.get(colorByName ?? '')?.x ?? 'linear')
+        : 'linear'
+    colorsRef.current = computeColors(
+      colorByName ?? '',
+      data.metadata,
+      nPoints,
+      categoricalPalette,
+      continuousPalette,
+      xTransform,
+    )
+  }, [
+    data,
+    colorBy,
+    colorByKind,
+    colorByName,
+    categoricalPalette,
+    continuousPalette,
+    model.featureValues,
+    model.geneSetValues,
+    model.featureTransforms,
+    model.geneSetTransforms,
+    model.obsTransforms,
+  ])
+
+  // Reset camera when switching embeddings so the new plot starts centered.
+  useEffect(() => {
+    cameraRef.current.reset()
+  }, [model.embedding])
 
   // Initialize regl
   useEffect(() => {
@@ -176,21 +273,35 @@ export default function EmbeddingCanvas({ model }: EmbeddingCanvasProps) {
     const regl = reglRef.current
     const drawPoints = drawPointsRef.current
     const camera = cameraRef.current
-    const positions = normPositions.current
+    const positions = worldPositionsRef.current
     const colors = colorsRef.current
 
     if (!canvas || !regl || !drawPoints || !positions || !colors) return
 
-    // Scale normalized [0,1] to WebGL [-1,1]
-    const modelTF = mat3.create()
-    mat3.fromScaling(modelTF, vec2.fromValues(2, 2))
-    mat3.translate(modelTF, modelTF, vec2.fromValues(-0.5, -0.5))
+    // Sync camera view to model for coordinate transform in LassoOverlay
+    model.setCameraView(new Float32Array(camera.view()))
 
+    // Regl caches the viewport from context creation time; since the canvas
+    // resizes after creation, poll() updates viewportWidth/Height before drawing.
+    regl.poll()
+
+    const projectionTF = createProjectionTF(width, height)
+    const cameraTF = camera.view()
     const projView = mat3.create()
-    mat3.multiply(projView, camera.view(), modelTF)
+    mat3.multiply(projView, projectionTF, cameraTF)
 
     const nPoints = positions.length / 2
-    const flags = computeFlags(nPoints, model.selectedCells, model.highlightedCells)
+    if (colors.length !== nPoints * 3) {
+      // Color buffer size mismatch: fallback to gray and skip this frame
+      colorsRef.current = new Float32Array(nPoints * 3).fill(0.5)
+      return
+    }
+    const flags = computeFlags(
+      nPoints,
+      model.selectedCells,
+      model.highlightedCells,
+      showLabels,
+    )
 
     regl.clear({ color: [1, 1, 1, 1] })
     drawPoints({
@@ -201,8 +312,17 @@ export default function EmbeddingCanvas({ model }: EmbeddingCanvasProps) {
       projView: new Float32Array(projView),
       nPoints,
       minViewportDimension: Math.min(canvas.width, canvas.height),
+      pointSize,
     })
-  }, [model.selectedCells, model.highlightedCells])
+  }, [
+    model.selectedCells,
+    model.highlightedCells,
+    model,
+    pointSize,
+    showLabels,
+    width,
+    height,
+  ])
 
   // Animation loop
   useEffect(() => {
@@ -219,46 +339,77 @@ export default function EmbeddingCanvas({ model }: EmbeddingCanvasProps) {
   }, [render])
 
   // Mouse handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button !== 0) return
-    isDraggingRef.current = true
-    mousePosRef.current = { x: e.clientX, y: e.clientY }
-    cameraRef.current.onMouseDown(e.clientX, e.clientY)
-  }, [])
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.button !== 0) return
+      if (model.selectionTool !== 'pan') return
+      const canvas = canvasRef.current
+      if (!canvas) return
+      isDraggingRef.current = true
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      mousePosRef.current = { x, y }
+      cameraRef.current.onMouseDown(x, y)
+    },
+    [model.selectionTool],
+  )
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    const canvas = canvasRef.current
-    if (!canvas || !isDraggingRef.current) return
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const canvas = canvasRef.current
+      if (!canvas || !isDraggingRef.current) return
+      if (model.selectionTool !== 'pan') return
 
-    cameraRef.current.onMouseMove(
-      e.clientX,
-      e.clientY,
-      canvas.width,
-      canvas.height,
-    )
-  }, [])
+      const rect = canvas.getBoundingClientRect()
+      const projectionTF = createProjectionTF(width, height)
+      cameraRef.current.onMouseMove(
+        e.clientX - rect.left,
+        e.clientY - rect.top,
+        canvas.width,
+        canvas.height,
+        projectionTF,
+      )
+    },
+    [model.selectionTool, width, height],
+  )
 
   const handleMouseUp = useCallback(() => {
     isDraggingRef.current = false
   }, [])
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault()
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault()
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      const projectionTF = createProjectionTF(width, height)
+
+      cameraRef.current.onWheel(
+        e.deltaY,
+        x,
+        y,
+        canvas.width,
+        canvas.height,
+        projectionTF,
+      )
+    },
+    [width, height],
+  )
+
+  // Attach wheel listener as active (non-passive) so preventDefault works.
+  useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    cameraRef.current.onWheel(
-      e.deltaY,
-      x,
-      y,
-      canvas.width,
-      canvas.height,
-    )
-  }, [])
+    canvas.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel)
+    }
+  }, [handleWheel])
 
   const handleDoubleClick = useCallback(() => {
     cameraRef.current.reset()
@@ -271,20 +422,25 @@ export default function EmbeddingCanvas({ model }: EmbeddingCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      width={model.width}
-      height={model.height - 100}
+      width={width}
+      height={height}
       style={{
-        width: model.width,
-        height: model.height - 100,
-        cursor: isDraggingRef.current ? 'grabbing' : 'grab',
+        width,
+        height,
+        cursor:
+          model.selectionTool === 'pan'
+            ? isDraggingRef.current
+              ? 'grabbing'
+              : 'grab'
+            : 'crosshair',
         display: 'block',
+        pointerEvents: model.selectionTool === 'pan' ? 'auto' : 'none',
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      onWheel={handleWheel}
       onDoubleClick={handleDoubleClick}
     />
   )
-}
+})

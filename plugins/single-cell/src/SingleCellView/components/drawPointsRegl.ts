@@ -16,6 +16,7 @@ attribute float flag;
 uniform mat3 projView;
 uniform float nPoints;
 uniform float minViewportDimension;
+uniform float pointSize;
 
 varying lowp vec4 fragColor;
 
@@ -26,10 +27,11 @@ void main() {
   f = floor(f / 2.0);
   bool isHighlight = mod(f, 2.0) > 0.5;
 
-  // Dynamic point size based on density
+  // Density-aware fallback scale, but user can override with pointSize
   float density = nPoints / (minViewportDimension * minViewportDimension);
-  float baseSize = max(1.5, 8.0 - log(density + 1.0) * 2.0);
-  float size = isHighlight ? baseSize * 2.0 : (isSelected ? baseSize * 1.3 : baseSize * 0.8);
+  float autoSize = max(1.5, 8.0 - log(density + 1.0) * 2.0);
+  float baseSize = pointSize > 0.0 ? pointSize : autoSize;
+  float size = isHighlight ? baseSize * 2.0 : (isSelected ? baseSize * 1.3 : baseSize);
   gl_PointSize = size;
 
   // Z-order: background behind, highlight in front
@@ -64,6 +66,7 @@ export interface DrawPointsProps {
   projView: Float32Array
   nPoints: number
   minViewportDimension: number
+  pointSize: number
 }
 
 export default function createDrawPointsRegl(regl: import('regl').Regl) {
@@ -88,6 +91,7 @@ export default function createDrawPointsRegl(regl: import('regl').Regl) {
       projView: regl.prop('projView' as never),
       nPoints: regl.prop('nPoints' as never),
       minViewportDimension: regl.prop('minViewportDimension' as never),
+      pointSize: regl.prop('pointSize' as never),
     },
     count: regl.prop('count' as never),
     primitive: 'points',

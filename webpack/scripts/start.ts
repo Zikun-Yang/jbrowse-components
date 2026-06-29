@@ -49,7 +49,14 @@ export default function startWebpack(config: webpack.Configuration) {
         urls,
       })
 
-      const devServer = new WebpackDevServer({ host: HOST, port }, compiler)
+      const devServer = new WebpackDevServer(
+        {
+          ...config.devServer,
+          host: HOST,
+          port,
+        },
+        compiler,
+      )
       devServer.startCallback(() => {
         open(urls.localUrlForBrowser).catch(() => {})
       })

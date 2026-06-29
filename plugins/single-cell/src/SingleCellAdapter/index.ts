@@ -1,5 +1,7 @@
 import AdapterType from '@jbrowse/core/pluggableElementTypes/AdapterType'
 
+import SingleCellBamAdapter from './SingleCellBamAdapter.ts'
+import SingleCellBamAdapterConfigSchema from './SingleCellBamAdapterConfigSchema.ts'
 import SingleCellZarrAdapter from './SingleCellZarrAdapter.ts'
 import configSchema from './configSchema.ts'
 
@@ -12,6 +14,16 @@ export default function SingleCellAdapterF(pluginManager: PluginManager) {
         name: 'SingleCellZarrAdapter',
         configSchema,
         AdapterClass: SingleCellZarrAdapter,
+      }),
+  )
+
+  pluginManager.addAdapterType(
+    () =>
+      new AdapterType({
+        name: 'SingleCellBamAdapter',
+        configSchema: SingleCellBamAdapterConfigSchema,
+        getAdapterClass: () =>
+          import('./SingleCellBamAdapter.ts').then(r => r.default),
       }),
   )
 }

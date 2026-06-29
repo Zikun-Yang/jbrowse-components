@@ -44,6 +44,14 @@ const singleCellZarrAdapterConfigSchema = ConfigurationSchema(
       type: 'string',
       defaultValue: 'index',
     },
+    /**
+     * #slot
+     * Column in var that contains the gene/feature identifier
+     */
+    varIndexColumn: {
+      type: 'string',
+      defaultValue: 'index',
+    },
   },
 )
 

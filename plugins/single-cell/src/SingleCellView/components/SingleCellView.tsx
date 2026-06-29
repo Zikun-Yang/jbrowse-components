@@ -1,32 +1,67 @@
-import { LoadingEllipses } from '@jbrowse/core/ui'
+import { LoadingEllipses, ResizeHandle } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { Paper, Typography } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import EmbeddingCanvas from './EmbeddingCanvas.tsx'
+import CenterPlot from './CenterPlot.tsx'
 import ImportForm from './ImportForm.tsx'
-import LassoOverlay from './LassoOverlay.tsx'
+import ObsSidebar from './ObsSidebar.tsx'
+import RightSidebar from './RightSidebar.tsx'
 import Toolbar from './Toolbar.tsx'
 
 import type { SingleCellViewModel } from '../model.ts'
 
 const useStyles = makeStyles()(theme => ({
   root: {
-    position: 'relative',
-    marginBottom: theme.spacing(1),
+    display: 'flex',
+    flexDirection: 'column',
     overflow: 'hidden',
     backgroundColor: theme.palette.background.default,
   },
-  viewContainer: {
+  header: {
     display: 'flex',
     flexDirection: 'column',
-    padding: theme.spacing(2),
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
-  canvasWrapper: {
-    position: 'relative',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: theme.shape.borderRadius,
+  infoRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing(0.5, 1),
+    gap: theme.spacing(1),
+    flexWrap: 'wrap',
+  },
+  toolbarRow: {
+    padding: theme.spacing(0.5, 1),
+  },
+  mainRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
     overflow: 'hidden',
+  },
+  resizeHandle: {
+    width: 4,
+    background: 'transparent',
+    zIndex: 2,
+    '&:hover': {
+      background: theme.palette.divider,
+    },
+  },
+  rightSidebar: {
+    backgroundColor: theme.palette.background.paper,
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    height: '100%',
+  },
+  bottomResizeHandle: {
+    height: 4,
+    width: '100%',
+    background: 'transparent',
+    cursor: 'row-resize',
+    zIndex: 2,
+    '&:hover': {
+      background: theme.palette.divider,
+    },
   },
 }))
 
@@ -58,35 +93,61 @@ const SingleCellViewLoaded = observer(function SingleCellViewLoaded({
   model: SingleCellViewModel
 }) {
   const { classes } = useStyles()
-  const { data, dataset, embedding, colorBy } = model
+  const { data, dataset } = model
 
   if (!data) {
     return <div>No data loaded</div>
   }
 
   return (
-    <div className={classes.root}>
-      <div className={classes.viewContainer}>
-        <Paper variant="outlined" sx={{ mb: 1, p: 1 }}>
-          <Typography variant="subtitle1">
-            {dataset} — {data.nObs.toLocaleString()} cells, {data.nVar.toLocaleString()} genes
+    <div className={classes.root} style={{ height: model.height }}>
+      <Paper variant="outlined" className={classes.header}>
+        <div className={classes.infoRow}>
+          <Typography variant="subtitle2">
+            {dataset} — {data.nObs.toLocaleString()} cells,{' '}
+            {data.nVar.toLocaleString()} genes
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Embedding: <strong>{embedding}</strong> | Color by: <strong>{colorBy}</strong>
-          </Typography>
-        </Paper>
-
-        <Toolbar model={model} />
-
-        <div className={classes.canvasWrapper} style={{ width: model.width, height: model.height - 100 }}>
-          <EmbeddingCanvas model={model} />
-          <LassoOverlay
-            model={model}
-            onLassoEnd={selected => model.setSelectedCells(selected)}
-            onRectEnd={selected => model.setSelectedCells(selected)}
-          />
         </div>
+        <div className={classes.toolbarRow}>
+          <Toolbar model={model} />
+        </div>
+      </Paper>
+
+      <div className={classes.mainRow}>
+        <ObsSidebar model={model} />
+        <ResizeHandle
+          vertical
+          flexbox
+          onDrag={lastFrameDistance => {
+            model.setLeftSidebarWidth(
+              Math.max(150, model.leftSidebarWidth + lastFrameDistance),
+            )
+            return lastFrameDistance
+          }}
+          className={classes.resizeHandle}
+        />
+        <CenterPlot model={model} />
+        <ResizeHandle
+          vertical
+          flexbox
+          onDrag={lastFrameDistance => {
+            model.setRightSidebarWidth(
+              Math.max(150, model.rightSidebarWidth - lastFrameDistance),
+            )
+            return lastFrameDistance
+          }}
+          className={classes.resizeHandle}
+        />
+        <RightSidebar model={model} />
       </div>
+
+      <ResizeHandle
+        onDrag={lastFrameDistance => {
+          model.setHeight(Math.max(200, model.height + lastFrameDistance))
+          return lastFrameDistance
+        }}
+        className={classes.bottomResizeHandle}
+      />
     </div>
   )
 })
