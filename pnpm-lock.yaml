@@ -994,6 +994,48 @@ importers:
         specifier: '>=18.0.0'
         version: 19.2.5(react@19.2.5)
 
+  plugins/feature-chart:
+    dependencies:
+      '@gmod/tabix':
+        specifier: ^3.3.1
+        version: 3.3.1
+      '@jbrowse/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@jbrowse/mobx-state-tree':
+        specifier: ^5.6.0
+        version: 5.6.0(mobx@6.15.0)
+      '@jbrowse/plugin-linear-genome-view':
+        specifier: workspace:^
+        version: link:../linear-genome-view
+      '@mui/icons-material':
+        specifier: ^7.3.10
+        version: 7.3.10(@mui/material@7.3.10(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@types/react@19.2.14)(react@19.2.5)
+      '@mui/material':
+        specifier: ^7.3.10
+        version: 7.3.10(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      d3-scale:
+        specifier: ^4.0.2
+        version: 4.0.2
+      mobx:
+        specifier: ^6.15.0
+        version: 6.15.0
+      mobx-react:
+        specifier: ^9.2.1
+        version: 9.2.1(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react:
+        specifier: '>=18.0.0'
+        version: 19.2.5
+      react-dom:
+        specifier: '>=18.0.0'
+        version: 19.2.5(react@19.2.5)
+      react-markdown:
+        specifier: ^10.1.0
+        version: 10.1.0(@types/react@19.2.14)(react@19.2.5)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+
   plugins/gccontent:
     dependencies:
       '@jbrowse/core':
@@ -1407,9 +1449,6 @@ importers:
 
   plugins/single-cell:
     dependencies:
-      '@gmod/tabix':
-        specifier: ^3.3.1
-        version: 3.3.1
       '@jbrowse/core':
         specifier: workspace:^
         version: link:../../packages/core
@@ -1428,12 +1467,6 @@ importers:
       '@mui/material':
         specifier: ^7.3.10
         version: 7.3.10(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      d3-array:
-        specifier: ^3.2.4
-        version: 3.2.4
-      d3-scale:
-        specifier: ^4.0.2
-        version: 4.0.2
       gl-matrix:
         specifier: ^3.4.3
         version: 3.4.4
@@ -1449,9 +1482,6 @@ importers:
       react-dom:
         specifier: '>=18.0.0'
         version: 19.2.5(react@19.2.5)
-      react-markdown:
-        specifier: ^10.1.0
-        version: 10.1.0(@types/react@19.2.14)(react@19.2.5)
       regl:
         specifier: ^2.1.1
         version: 2.1.1

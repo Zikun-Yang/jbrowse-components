@@ -11,11 +11,6 @@ import SingleCellPileupDisplayF from './SingleCellView/SingleCellPileupDisplay/i
 import SingleCellSNPCoverageDisplayF from './SingleCellView/SingleCellSNPCoverageDisplay/index.ts'
 import { SingleCellSelection } from './SessionExtension.ts'
 import LinearGenomeViewExtensionF from './LinearGenomeViewExtension.ts'
-import FeatureChartAdapterF from './FeatureChartAdapter/index.ts'
-import FeatureChartRendererF from './FeatureChartRenderer/index.ts'
-import LinearFeatureChartDisplayF from './LinearFeatureChartDisplay/index.ts'
-import FeatureChartTrackF from './FeatureChartTrack/index.ts'
-import { initBuiltInDrawers } from './FeatureChartDrawer/drawerRegistry.ts'
 
 import type { IAnyModelType } from '@jbrowse/mobx-state-tree'
 
@@ -48,12 +43,6 @@ export default class SingleCellPlugin extends Plugin {
     SingleCellAlignmentsTrackF(pluginManager)
     LinearGenomeViewExtensionF(pluginManager)
 
-    FeatureChartAdapterF(pluginManager)
-    FeatureChartRendererF(pluginManager)
-    LinearFeatureChartDisplayF(pluginManager)
-    FeatureChartTrackF(pluginManager)
-    initBuiltInDrawers()
-
     pluginManager.addToExtensionPoint(
       'Core-extendSession',
       (sessionModel: IAnyModelType) => {
@@ -80,8 +69,3 @@ export default class SingleCellPlugin extends Plugin {
 }
 
 export { type SingleCellViewModel } from './SingleCellView/model.ts'
-export {
-  registerFeatureChartDrawer,
-  getFeatureChartDrawer,
-} from './FeatureChartDrawer/drawerRegistry.ts'
-export type { DrawerFunction, DrawerProps } from './FeatureChartDrawer/types.ts'

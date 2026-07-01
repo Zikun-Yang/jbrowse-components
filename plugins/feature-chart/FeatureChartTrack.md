@@ -62,21 +62,103 @@ tabix -p bed expression.tsv.gz
 `data`
 列的 JSON 内部结构由具体 drawer 决定，adapter 不做解析，原样透传给 drawer。
 
-**原始值数组（适合 box/violin）：**
+目前内置五个 drawer：
+
+| Drawer               | 输入格式       | 说明                                   |
+| -------------------- | -------------- | -------------------------------------- |
+| `precomputedBoxPlot` | `data.boxes`   | 处理后数据：预计算 boxplot 统计量      |
+| `rawBoxPlot`         | `data.tissues` | 原始数据：boxplot，自动计算五数概括    |
+| `rawViolinPlot`      | `data.tissues` | 原始数据：violin plot，用 KDE 估计分布 |
+| `barPlot`            | `data.bars`    | 每个分类一个柱子                       |
+| `histogram`          | `data.values`  | 单组数值的频数直方图                   |
+
+#### `precomputedBoxPlot`：标准 boxplot 模板格式（推荐）
+
+直接提供每个 box 的预计算统计量，格式通用、可复现：
 
 ```json
-{ "tissues": { "Brain": [1, 2, 3, 4, 5], "Liver": [0.5, 1, 1.5] } }
+{
+  "boxes": [
+    { "name": "Brain", "min": 0.1, "q1": 1, "median": 2, "q3": 3, "max": 5 },
+    {
+      "name": "Liver",
+      "min": 0.2,
+      "q1": 1.2,
+      "median": 2.2,
+      "q3": 3.2,
+      "max": 5.2,
+      "color": "#e15759"
+    }
+  ]
+}
 ```
 
-**预聚合统计量（适合直接画）：**
+字段说明：
+
+- `name`：X 轴分类标签
+- `min` / `q1` / `median` / `q3` /
+  `max`： whisker 下端、下四分位、中位、上四分位、whisker 上端
+- `color`（可选）：自定义颜色，例如 `"#e15759"`
+
+#### `rawBoxPlot`：原始值数组
+
+如果只有原始观测值，`rawBoxPlot` 会自动按组计算五数概括：
 
 ```json
 {
   "tissues": {
-    "Brain": { "min": 0.1, "q1": 1, "median": 2, "q3": 3, "max": 5 }
+    "Brain": [1, 2, 3, 4, 5],
+    "Liver": [0.5, 1, 1.5]
   }
 }
 ```
+
+#### `rawViolinPlot`：原始值数组 violin plot
+
+输入格式与 `rawBoxPlot` 完全相同，但 `rawViolinPlot`
+会用高斯核密度估计（KDE）画出每个组的分布形状：
+
+```json
+{
+  "tissues": {
+    "Brain": [1, 2, 3, 4, 5],
+    "Liver": [0.5, 1, 1.5, 2, 2.5]
+  }
+}
+```
+
+每组会画成一个左右对称的 violin，中心用短横线标出中位数。
+
+#### `barPlot`：柱状图
+
+每个分类提供一个数值，画成柱子：
+
+```json
+{
+  "bars": [
+    { "name": "Brain", "value": 12.5 },
+    { "name": "Liver", "value": 8.3, "color": "#e15759" }
+  ]
+}
+```
+
+- `name`：X 轴分类标签
+- `value`：柱子高度
+- `color`（可选）：自定义颜色
+
+#### `histogram`：直方图
+
+传入一组数值，自动分 bin 画直方图：
+
+```json
+{
+  "values": [1, 2, 2, 3, 3, 3, 4, 4, 5],
+  "bins": 4
+}
+```
+
+- `values`：原始数值数组
+- `bins`（可选）：bin 数量，默认 10
 
 **自定义 drawer 可以定义自己的 schema。**
 
@@ -105,11 +187,15 @@ tabix -p bed expression.tsv.gz
 
 不同图表类型使用不同 track 和不同数据文件：
 
-| Track             | 数据文件                | Drawer          |
-| ----------------- | ----------------------- | --------------- |
-| 组织表达 box plot | `expression.tsv.gz`     | `tissueBoxPlot` |
-| 突变计数柱状图    | `mutation_count.tsv.gz` | `barPlot`       |
-| 剪接 PSI violin   | `splicing_psi.tsv.gz`   | `violinPlot`    |
+| Track                | 数据文件                | Drawer               |
+| -------------------- | ----------------------- | -------------------- |
+| 组织表达 box plot    | `expression.tsv.gz`     | `precomputedBoxPlot` |
+| 组织表达 box plot    | `expression.tsv.gz`     | `rawBoxPlot`         |
+| 组织表达 violin plot | `expression.tsv.gz`     | `rawViolinPlot`      |
+| 组织表达柱状图       | `expression_mean.tsv`   | `barPlot`            |
+| 表达量分布直方图     | `expression_values.tsv` | `histogram`          |
+| 突变计数柱状图       | `mutation_count.tsv.gz` | `barPlot`            |
+| 剪接 PSI violin      | `splicing_psi.tsv.gz`   | `violinPlot`         |
 
 ---
 
@@ -166,10 +252,14 @@ export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
 
 内置 drawer：
 
-- `tissueBoxPlot`
+- `precomputedBoxPlot`
+- `rawBoxPlot`
+- `rawViolinPlot`
+- `barPlot`
+- `histogram`
 
 第三方插件通过
-`import { registerFeatureChartDrawer } from '@jbrowse/plugin-single-cell'`
+`import { registerFeatureChartDrawer } from '@jbrowse/plugin-feature-chart'`
 注册自定义 drawer。
 
 ---
@@ -201,7 +291,7 @@ export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
       "type": "LinearFeatureChartDisplay",
       "renderer": {
         "type": "FeatureChartRenderer",
-        "drawer": "tissueBoxPlot",
+        "drawer": "rawBoxPlot",
         "chartHeight": 180,
         "chartWidth": 120,
         "align": "center"
