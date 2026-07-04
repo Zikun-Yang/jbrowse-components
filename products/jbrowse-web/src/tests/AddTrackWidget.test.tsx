@@ -17,6 +17,7 @@ test('adds a PAF via the add track workflow', async () => {
     getAllByTestId,
     findByText,
     findByRole,
+    findAllByRole,
     findAllByTestId,
     view,
   } = await createView()
@@ -35,11 +36,14 @@ test('adds a PAF via the add track workflow', async () => {
       value: 'volvox_del vs volvox',
     },
   })
-  const selectors = await findAllByTestId('assembly-selector-textfield')
+  const inputs = await findAllByTestId('assembly-selector')
 
   // change query assembly
-  fireEvent.mouseDown(await within(selectors[0]!).findByText('volvox'))
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  fireEvent.mouseDown(inputs[0]!)
+  const listboxes = await findAllByRole('listbox')
+  const listbox = within(listboxes[listboxes.length - 1]!)
+  fireEvent.click(listbox.getByText('volvox_del'))
+  fireEvent.keyDown(document, { key: 'Escape' })
   fireEvent.click(getAllByTestId('addTrackNextButton')[0]!)
 
   const res = await findAllByTestId(/prerendered_canvas/, ...opts)

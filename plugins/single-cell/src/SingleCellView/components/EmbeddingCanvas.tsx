@@ -175,6 +175,29 @@ export default observer(function EmbeddingCanvas({
   } = model
   const colorByKind = model.colorBy?.kind
   const colorByName = model.colorBy?.name
+  // Read the active x-transform during render so mobx-react tracks it; using
+  // the whole MST map as a useEffect dependency does not work because the map
+  // reference does not change when a value is mutated in place.
+  const xTransform =
+    colorByKind === 'feature'
+      ? (model.featureTransforms.get(colorByName ?? '')?.x ?? 'linear')
+      : colorByKind === 'geneSet'
+        ? (model.geneSetTransforms.get(colorByName ?? '')?.x ?? 'linear')
+        : colorByKind === 'obs'
+          ? (model.obsTransforms.get(colorByName ?? '')?.x ?? 'linear')
+          : 'linear'
+
+  // Read the active color-by values during render so only changes to the
+  // specific feature/gene set trigger the color effect, not unrelated map
+  // entries. The maps are also replaced wholesale on updates.
+  const colorByFeatureValues =
+    colorByKind === 'feature'
+      ? model.featureValues.get(colorByName ?? '')
+      : undefined
+  const colorByGeneSetValues =
+    colorByKind === 'geneSet'
+      ? model.geneSetValues.get(colorByName ?? '')
+      : undefined
 
   // Prepare geometry data. worldPositions are in the [-1,1] square after
   // applying the fixed 1:1 model transform.
@@ -194,18 +217,12 @@ export default observer(function EmbeddingCanvas({
     const nPoints = data.embeddingData.length / 2
     const rawValues =
       colorByKind === 'feature'
-        ? model.featureValues.get(colorByName ?? '')
+        ? colorByFeatureValues
         : colorByKind === 'geneSet'
-          ? model.geneSetValues.get(colorByName ?? '')
+          ? colorByGeneSetValues
           : undefined
     if (rawValues) {
-      const transform =
-        colorByKind === 'feature'
-          ? (model.featureTransforms.get(colorByName ?? '')?.x ?? 'linear')
-          : colorByKind === 'geneSet'
-            ? (model.geneSetTransforms.get(colorByName ?? '')?.x ?? 'linear')
-            : 'linear'
-      const values = applyXTransform(rawValues, transform)
+      const values = applyXTransform(rawValues, xTransform)
       const { min, max } = getMinMax(values)
       const range = max - min || 1
       const colors = new Float32Array(nPoints * 3)
@@ -219,10 +236,6 @@ export default observer(function EmbeddingCanvas({
       colorsRef.current = colors
       return
     }
-    const xTransform =
-      colorByKind === 'obs'
-        ? (model.obsTransforms.get(colorByName ?? '')?.x ?? 'linear')
-        : 'linear'
     colorsRef.current = computeColors(
       colorByName ?? '',
       data.metadata,
@@ -238,11 +251,9 @@ export default observer(function EmbeddingCanvas({
     colorByName,
     categoricalPalette,
     continuousPalette,
-    model.featureValues,
-    model.geneSetValues,
-    model.featureTransforms,
-    model.geneSetTransforms,
-    model.obsTransforms,
+    xTransform,
+    colorByFeatureValues,
+    colorByGeneSetValues,
   ])
 
   // Reset camera when switching embeddings so the new plot starts centered.

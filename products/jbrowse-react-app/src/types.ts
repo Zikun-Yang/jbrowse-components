@@ -23,4 +23,5 @@ export interface Config {
   aggregateTextSearchAdapters?: TextSearchAdapterConfig[]
   configuration?: Record<string, unknown>
   defaultSession?: SessionSnapshot
+  includes?: string[]
 }

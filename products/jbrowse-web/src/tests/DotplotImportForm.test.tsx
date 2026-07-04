@@ -21,13 +21,11 @@ test('open tracklist file', async () => {
   fireEvent.click(await findByText('Add'))
   fireEvent.click(await findByText('Dotplot view'))
   expect(session.views.length).toBe(2)
-  const r = await findAllByTestId('assembly-selector-textfield')
+  const assemblyInputs = await findAllByTestId('assembly-selector')
 
-  expect(r.length).toBe(2)
+  expect(assemblyInputs.length).toBe(2)
 
-  const combo = within(r[1]!)
-  const entry = await combo.findByText('volvox')
-  fireEvent.mouseDown(entry)
+  fireEvent.mouseDown(assemblyInputs[1]!)
 
   const listbox = within(await findByRole('listbox'))
   fireEvent.click(listbox.getByText('volvox_del'))
@@ -45,8 +43,8 @@ test('open local paf', async () => {
   fireEvent.click(await findByText('Dotplot view'))
   expect(session.views.length).toBe(2)
 
-  const r = await findAllByTestId('assembly-selector-textfield')
-  fireEvent.mouseDown(await within(r[0]!).findByText('volvox'))
+  const assemblyInputs = await findAllByTestId('assembly-selector')
+  fireEvent.mouseDown(assemblyInputs[0]!)
   fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
 
   fireEvent.click(await findByText('New track'))
@@ -71,8 +69,8 @@ test('open local pif', async () => {
   fireEvent.click(await findByText('Dotplot view'))
   expect(session.views.length).toBe(2)
 
-  const r = await findAllByTestId('assembly-selector-textfield')
-  fireEvent.mouseDown(await within(r[0]!).findByText('volvox'))
+  const assemblyInputs = await findAllByTestId('assembly-selector')
+  fireEvent.mouseDown(assemblyInputs[0]!)
   fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
 
   fireEvent.click(await findByText('New track'))

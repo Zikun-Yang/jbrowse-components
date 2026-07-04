@@ -1,6 +1,7 @@
-import { lazy } from 'react'
+import { lazy, useState } from 'react'
 
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
+import { SpeciesSelector } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import Delete from '@mui/icons-material/Delete'
@@ -50,6 +51,8 @@ const GridBookmarkWidget = observer(function GridBookmarkWidget({
   model: GridBookmarkModel
 }) {
   const { classes } = useStyles()
+  const session = getSession(model)
+  const [selectedSpecies, setSelectedSpecies] = useState('')
   return (
     <div>
       <Alert severity="info">
@@ -125,7 +128,14 @@ const GridBookmarkWidget = observer(function GridBookmarkWidget({
           <Menu />
         </CascadingMenuButton>
 
-        <AssemblySelector model={model} />
+        <SpeciesSelector
+          session={session}
+          selected={selectedSpecies}
+          onChange={val => {
+            setSelectedSpecies(val)
+          }}
+        />
+        <AssemblySelector model={model} species={selectedSpecies} />
       </div>
       <BookmarkGrid model={model} />
     </div>

@@ -128,21 +128,6 @@ export function filterSessionInPlace(node: IAnyStateTreeNode, type: IAnyType) {
   }
 }
 
-export function addRelativeUris(
-  config: Record<string, unknown> | null,
-  base: URL,
-) {
-  if (typeof config === 'object' && config !== null) {
-    for (const key of Object.keys(config)) {
-      if (typeof config[key] === 'object' && config[key] !== null) {
-        addRelativeUris(config[key] as Record<string, unknown>, base)
-      } else if (key === 'uri') {
-        config.baseUri = config.baseUri ?? base.href
-      }
-    }
-  }
-}
-
 export interface Root {
   configuration?: Record<string, unknown>
 }
@@ -152,6 +137,7 @@ export function readConf({ configuration }: Root, attr: string, def: string) {
   return configuration?.[attr] || def
 }
 
+export { addRelativeUris } from '@jbrowse/core/util'
 export { checkPlugins, fetchPlugins } from './checkPlugins.ts'
 
 export function removeAttr(obj: Record<string, unknown>, attr: string) {

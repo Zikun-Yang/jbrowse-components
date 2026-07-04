@@ -63,6 +63,14 @@ test('errors with config in URL that does not exist', async () => {
   await findByText(/HTTP 404 fetching doesNotExist.json/)
 })
 
+test('can use config with includes', async () => {
+  const { findByText } = render(
+    <App search="?config=test_data/includes/config.json" />,
+  )
+
+  await findByText('Help', {}, delay)
+}, 20000)
+
 test('can use config from a url with session param+sessionStorage', async () => {
   sessionStorage.setItem('current', `{"id": "abcdefg", "name": "testSession"}`)
   const { findByText } = render(

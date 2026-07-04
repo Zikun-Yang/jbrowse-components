@@ -7,6 +7,7 @@ import { reaction } from 'mobx'
 import SingleCellZarrAdapter from '../SingleCellAdapter/SingleCellZarrAdapter.ts'
 import singleCellZarrAdapterConfigSchema from '../SingleCellAdapter/configSchema.ts'
 import { isSessionWithSingleCellSelection } from '../SessionExtension.ts'
+import { DEFAULT_CATEGORICAL_PALETTE } from './components/colorUtils.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { Instance } from '@jbrowse/mobx-state-tree'
@@ -91,7 +92,9 @@ export function applyYTransform(count: number, transform: Transform): number {
  * Mean aggregator: for each cell, averages all finite gene values. Missing
  * genes are ignored entirely.
  */
-export function meanGeneSetAggregator(valuesPerGene: Float32Array[]): Float32Array {
+export function meanGeneSetAggregator(
+  valuesPerGene: Float32Array[],
+): Float32Array {
   if (valuesPerGene.length === 0) {
     return new Float32Array(0)
   }
@@ -122,7 +125,9 @@ const defaultGeneSetAggregator: GeneSetAggregator = meanGeneSetAggregator
  * Sum aggregator: for each cell, sums all finite gene values. Missing genes
  * contribute 0.
  */
-export function sumGeneSetAggregator(valuesPerGene: Float32Array[]): Float32Array {
+export function sumGeneSetAggregator(
+  valuesPerGene: Float32Array[],
+): Float32Array {
   if (valuesPerGene.length === 0) {
     return new Float32Array(0)
   }
@@ -143,7 +148,9 @@ export function sumGeneSetAggregator(valuesPerGene: Float32Array[]): Float32Arra
  * Median aggregator: for each cell, takes the median of all finite gene
  * values. Robust against outlier genes.
  */
-export function medianGeneSetAggregator(valuesPerGene: Float32Array[]): Float32Array {
+export function medianGeneSetAggregator(
+  valuesPerGene: Float32Array[],
+): Float32Array {
   if (valuesPerGene.length === 0) {
     return new Float32Array(0)
   }
@@ -176,7 +183,9 @@ export function medianGeneSetAggregator(valuesPerGene: Float32Array[]): Float32A
  * Max aggregator: for each cell, uses the maximum finite gene value. Useful
  * for detecting cells where any gene in the set is highly expressed.
  */
-export function maxGeneSetAggregator(valuesPerGene: Float32Array[]): Float32Array {
+export function maxGeneSetAggregator(
+  valuesPerGene: Float32Array[],
+): Float32Array {
   if (valuesPerGene.length === 0) {
     return new Float32Array(0)
   }
@@ -436,7 +445,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * #property
        * Selected categorical color palette name
        */
-      categoricalPalette: 'tab10',
+      categoricalPalette: DEFAULT_CATEGORICAL_PALETTE,
       /**
        * #property
        * Selected continuous color palette name
@@ -630,7 +639,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
         delete next[name]
         self.customCategoricalPalettes = next
         if (self.categoricalPalette === name) {
-          self.categoricalPalette = 'tab10'
+          self.categoricalPalette = DEFAULT_CATEGORICAL_PALETTE
         }
       },
       /**
@@ -933,9 +942,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * Remove a feature from the active list and clear its cache/selection.
        */
       removeFeature(name: string) {
-        self.activeFeatures.replace(
-          self.activeFeatures.filter(n => n !== name),
-        )
+        self.activeFeatures.replace(self.activeFeatures.filter(n => n !== name))
         self.loadingFeatures = self.loadingFeatures.filter(n => n !== name)
         self.expandedFeatures = self.expandedFeatures.filter(n => n !== name)
         if (self.selectedFeature === name) {
@@ -958,7 +965,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
         if (self.expandedFeatures.includes(name)) {
           self.expandedFeatures = self.expandedFeatures.filter(n => n !== name)
         } else {
-          self.expandedFeatures.push(name)
+          self.expandedFeatures = [...self.expandedFeatures, name]
         }
       },
       /**
@@ -1179,26 +1186,30 @@ function stateModelFactory(_pluginManager: PluginManager) {
             }
           }
 
-          // Reload cached values for restored active items.
+          // Reload cached values for restored active items. Build new Maps and
+          // replace the volatile state so mobx observes the update.
+          const nextFeatureValues = new Map(self.featureValues)
           for (const name of self.activeFeatures) {
             try {
               const values = yield adapter.getExpression(name)
-              self.featureValues.set(name, values)
+              nextFeatureValues.set(name, values)
             } catch {
               // Ignore missing features.
             }
           }
+
+          const nextGeneSetValues = new Map(self.geneSetValues)
           for (const name of self.activeGeneSets) {
             const genes = self.geneSets.get(name)
             if (!genes || genes.length === 0) continue
             const valuesPerGene: Float32Array[] = []
             for (const gene of genes) {
-              let values = self.featureValues.get(gene)
+              let values = nextFeatureValues.get(gene)
               if (!values) {
                 try {
                   values = yield adapter.getExpression(gene)
                   if (values) {
-                    self.featureValues.set(gene, values)
+                    nextFeatureValues.set(gene, values)
                   }
                 } catch {
                   continue
@@ -1211,12 +1222,14 @@ function stateModelFactory(_pluginManager: PluginManager) {
             if (valuesPerGene.length > 0) {
               const aggregatorKey =
                 self.geneSetAggregatorKeys.get(name) ?? defaultAggregatorKey
-              const aggregated = getGeneSetAggregator(aggregatorKey)(
-                valuesPerGene,
-              )
-              self.geneSetValues.set(name, aggregated)
+              const aggregated =
+                getGeneSetAggregator(aggregatorKey)(valuesPerGene)
+              nextGeneSetValues.set(name, aggregated)
             }
           }
+
+          self.featureValues = nextFeatureValues
+          self.geneSetValues = nextGeneSetValues
 
           self.recomputeSelectedCells()
         } catch (e) {
@@ -1314,11 +1327,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * #action
        * Set the X or Y axis transform for a feature histogram.
        */
-      setFeatureTransform(
-        name: string,
-        axis: 'x' | 'y',
-        transform: Transform,
-      ) {
+      setFeatureTransform(name: string, axis: 'x' | 'y', transform: Transform) {
         const current = self.featureTransforms.get(name) ?? {
           x: 'linear',
           y: 'linear',
@@ -1344,9 +1353,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * is preserved so it can be re-added later.
        */
       removeGeneSetFromSidebar(name: string) {
-        self.activeGeneSets.replace(
-          self.activeGeneSets.filter(n => n !== name),
-        )
+        self.activeGeneSets.replace(self.activeGeneSets.filter(n => n !== name))
         self.loadingGeneSets = self.loadingGeneSets.filter(n => n !== name)
         self.expandedGeneSets = self.expandedGeneSets.filter(n => n !== name)
         const prefix = `${name}:`
@@ -1475,7 +1482,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
         if (self.expandedGeneSets.includes(name)) {
           self.expandedGeneSets = self.expandedGeneSets.filter(n => n !== name)
         } else {
-          self.expandedGeneSets.push(name)
+          self.expandedGeneSets = [...self.expandedGeneSets, name]
           void self.loadGeneSetFeatures(name)
         }
       },
@@ -1662,11 +1669,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * #action
        * Set the X or Y axis transform for a gene set histogram.
        */
-      setGeneSetTransform(
-        name: string,
-        axis: 'x' | 'y',
-        transform: Transform,
-      ) {
+      setGeneSetTransform(name: string, axis: 'x' | 'y', transform: Transform) {
         const current = self.geneSetTransforms.get(name) ?? {
           x: 'linear',
           y: 'linear',
@@ -1681,11 +1684,7 @@ function stateModelFactory(_pluginManager: PluginManager) {
        * #action
        * Set the X or Y axis transform for an obs continuous column histogram.
        */
-      setObsTransform(
-        column: string,
-        axis: 'x' | 'y',
-        transform: Transform,
-      ) {
+      setObsTransform(column: string, axis: 'x' | 'y', transform: Transform) {
         const current = self.obsTransforms.get(column) ?? {
           x: 'linear',
           y: 'linear',

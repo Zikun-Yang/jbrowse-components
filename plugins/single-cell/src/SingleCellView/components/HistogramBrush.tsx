@@ -72,6 +72,14 @@ export default function HistogramBrush({
   const [dragCurrent, setDragCurrent] = useState<number | null>(null)
   const [width, setWidth] = useState(220)
 
+  // Sync internal range when the parent clears or resets it (e.g. on transform
+  // change), without overwriting an in-progress drag.
+  useEffect(() => {
+    if (dragStart === null) {
+      setRange(initialRange ?? null)
+    }
+  }, [initialRange, dragStart])
+
   useEffect(() => {
     const el = rootRef.current
     if (!el) return

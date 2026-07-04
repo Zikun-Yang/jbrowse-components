@@ -44,10 +44,14 @@ export default observer(function PalettePicker({
   // rendering components (EmbeddingCanvas, histograms, etc.) can resolve custom
   // palette names without receiving them as props.
   useEffect(() => {
-    for (const [name, colors] of Object.entries(model.customCategoricalPalettes)) {
+    for (const [name, colors] of Object.entries(
+      model.customCategoricalPalettes,
+    )) {
       registerCustomCategoricalPalette(name, colors)
     }
-    for (const [name, stops] of Object.entries(model.customContinuousPalettes)) {
+    for (const [name, stops] of Object.entries(
+      model.customContinuousPalettes,
+    )) {
       registerCustomContinuousPalette(name, stops)
     }
   }, [model.customCategoricalPalettes, model.customContinuousPalettes])
@@ -73,7 +77,8 @@ export default observer(function PalettePicker({
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {catPalettes.map(name => {
               const palette =
-                CATEGORICAL_PALETTES[name] ?? model.customCategoricalPalettes[name]
+                CATEGORICAL_PALETTES[name] ??
+                model.customCategoricalPalettes[name]
               const selected = model.categoricalPalette === name
               const isCustom = !presetCatNames.has(name)
               return (

@@ -62,6 +62,15 @@ IMaybe<ISimpleType<boolean>>
 showArcs: types.maybe(types.boolean)
 ```
 
+#### property: showArcCounts
+
+```js
+// type signature
+IMaybe<ISimpleType<boolean>>
+// code
+showArcCounts: types.maybe(types.boolean)
+```
+
 #### property: minArcScore
 
 ```js
@@ -129,10 +138,18 @@ any
   showInterbaseCounts: any
   showInterbaseIndicators: any
   showArcs: any
+  showArcCounts: any
 }
 ```
 
 #### getter: showArcsSetting
+
+```js
+// type
+any
+```
+
+#### getter: showArcCountsSetting
 
 ```js
 // type
@@ -238,7 +255,7 @@ renderProps: () => any
 
 ```js
 // type signature
-renderingProps: () => { displayModel: { id: string; type: never; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; userByteSizeLimit: number | undefined; ... 24 more ...; jexlFilters: IMSTArray<...> & IStateTreeNode<...>; } & ... 46 more ... & IStateTreeNode<...>; }
+renderingProps: () => { displayModel: { id: string; type: never; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; userByteSizeLimit: number | undefined; ... 25 more ...; jexlFilters: IMSTArray<...> & IStateTreeNode<...>; } & ... 46 more ... & IStateTreeNode<...>; }
 ```
 
 #### method: renderSvg
@@ -322,6 +339,13 @@ setShowInterbaseCounts: (arg: boolean) => void
 ```js
 // type signature
 setShowArcs: (arg: boolean) => void
+```
+
+#### action: setShowArcCounts
+
+```js
+// type signature
+setShowArcCounts: (arg: boolean) => void
 ```
 
 #### action: setMinArcScore

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   AssemblySelector,
   Dialog,
   ErrorMessage,
   FileSelector,
+  SpeciesSelector,
 } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
@@ -106,11 +107,25 @@ const ImportBookmarksDialog = observer(function ImportBookmarksDialog({
   const [error, setError] = useState<unknown>()
   const [shareLink, setShareLink] = useState('')
   const session = getSession(model)
-  const { assemblyNames } = session
+  const { assemblyNames, assemblyManager } = session
   const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+  const [selectedSpecies, setSelectedSpecies] = useState('')
   const [expanded, setExpanded] = useState<
     'shareLinkAccordion' | 'fileAccordion'
   >('shareLinkAccordion')
+
+  useEffect(() => {
+    const assembly = assemblyManager.get(selectedAsm)
+    if (selectedSpecies && assembly?.species !== selectedSpecies) {
+      const first = assemblyNames.find(
+        name => assemblyManager.get(name)?.species === selectedSpecies,
+      )
+      const next = first || ''
+      if (next !== selectedAsm) {
+        setSelectedAsm(next)
+      }
+    }
+  }, [selectedSpecies, selectedAsm, assemblyNames, assemblyManager])
 
   return (
     <Dialog open onClose={onClose} maxWidth="xl" title="Import bookmarks">
@@ -164,10 +179,18 @@ const ImportBookmarksDialog = observer(function ImportBookmarksDialog({
               name="File"
               description={`Choose a BED or TSV format file to import. Required TSV column headers are "chrom, start, end, label, assembly_name".`}
             />
+            <SpeciesSelector
+              session={session}
+              selected={selectedSpecies}
+              onChange={val => {
+                setSelectedSpecies(val)
+              }}
+            />
             <AssemblySelector
               onChange={val => {
                 setSelectedAsm(val)
               }}
+              species={selectedSpecies}
               helperText={'Select the assembly for BED file.'}
               session={session}
               selected={selectedAsm}

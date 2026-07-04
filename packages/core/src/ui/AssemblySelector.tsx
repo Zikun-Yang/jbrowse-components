@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
-import { MenuItem, TextField } from '@mui/material'
+import { Autocomplete, TextField } from '@mui/material'
 import { observer } from 'mobx-react'
 
+import { readConfObject } from '../configuration/index.ts'
 import { useLocalStorage } from '../util/index.ts'
 import { makeStyles } from '../util/tss-react/index.ts'
 
@@ -20,6 +21,7 @@ const AssemblySelector = observer(function AssemblySelector({
   onChange,
   label = 'Assembly',
   selected,
+  species,
   InputProps,
   TextFieldProps,
   localStorageKey,
@@ -30,12 +32,13 @@ const AssemblySelector = observer(function AssemblySelector({
   helperText?: string
   onChange: (arg: string) => void
   selected?: string
+  species?: string
   localStorageKey?: string
   InputProps?: IIP
   TextFieldProps?: TFP
 }) {
   const { classes } = useStyles()
-  const { assemblyNames, assemblyManager } = session
+  const { assemblies, assemblyNames } = session
 
   // constructs a localstorage key based on host/path/config to help
   // remember. non-config assists usage with e.g. embedded apps
@@ -50,45 +53,93 @@ const AssemblySelector = observer(function AssemblySelector({
     typeof jest === 'undefined' && Boolean(localStorageKey),
   )
 
-  const selection = assemblyNames.includes(lastSelected || '')
-    ? lastSelected
-    : selected
+  const assemblyMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { name: string; displayName: string; species: string }
+    >()
+    for (const assembly of assemblies) {
+      const name = readConfObject(assembly, 'name') as string
+      const displayName =
+        (readConfObject(assembly, 'displayName') as string) || name
+      const species = (readConfObject(assembly, 'species') as string) || ''
+      map.set(name, { name, displayName, species })
+    }
+    return map
+  }, [assemblies])
+
+  const options = useMemo(
+    () =>
+      assemblyNames
+        .filter(name => {
+          const asm = assemblyMap.get(name)
+          return !species || asm?.species === species
+        })
+        .map(name => {
+          const asm = assemblyMap.get(name)!
+          return {
+            name: asm.name,
+            displayName: asm.displayName,
+          }
+        }),
+    [assemblyNames, assemblyMap, species],
+  )
+
+  const selection =
+    options.find(o => o.name === (lastSelected || selected || ''))?.name ||
+    options[0]?.name
 
   useEffect(() => {
     if (selection && selection !== selected) {
       onChange(selection)
     }
-  }, [selection, onChange, selected])
+  }, [selection, selected, onChange])
 
   const error = assemblyNames.length ? '' : 'No configured assemblies'
+  const value = options.find(o => o.name === selection) || null
+  const { slotProps: consumerSlotProps, ...consumerTextFieldProps } =
+    TextFieldProps || {}
+
   return (
-    <TextField
-      select
+    <Autocomplete
       data-testid="assembly-selector-textfield"
-      label={label}
-      variant="outlined"
-      helperText={error || helperText}
-      value={selection || ''}
-      onChange={event => {
-        setLastSelected(event.target.value)
-      }}
-      error={!!error}
       disabled={!!error}
-      className={classes.importFormEntry}
-      {...TextFieldProps}
-      slotProps={{
-        input: InputProps,
-        htmlInput: {
-          'data-testid': 'assembly-selector',
-        },
+      options={options}
+      getOptionLabel={option => option.displayName}
+      isOptionEqualToValue={(option, val) => option.name === val.name}
+      value={value}
+      onChange={(_event, newValue) => {
+        if (newValue) {
+          setLastSelected(newValue.name)
+          onChange(newValue.name)
+        }
       }}
-    >
-      {assemblyNames.map(name => (
-        <MenuItem key={name} value={name}>
-          {assemblyManager.get(name)?.displayName || name}
-        </MenuItem>
-      ))}
-    </TextField>
+      className={classes.importFormEntry}
+      renderInput={params => (
+        <TextField
+          {...params}
+          {...consumerTextFieldProps}
+          label={label}
+          variant="outlined"
+          helperText={error || helperText}
+          error={!!error}
+          disabled={!!error}
+          className={classes.importFormEntry}
+          slotProps={{
+            input: {
+              ...params.InputProps,
+              ...InputProps,
+              ...consumerSlotProps?.input,
+            },
+            htmlInput: {
+              'data-testid': 'assembly-selector',
+              ...params.inputProps,
+              ...consumerSlotProps?.htmlInput,
+            },
+          }}
+        />
+      )}
+    />
   )
 })
 

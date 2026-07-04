@@ -22,16 +22,16 @@ const LabelOverlay = observer(function LabelOverlay({
   width,
   height,
 }: LabelOverlayProps) {
-  const {
-    data,
-    colorByObsColumn,
-    showLabels,
-    embeddingBounds,
-    cameraView,
-  } = model
+  const { data, colorByObsColumn, showLabels, embeddingBounds, cameraView } =
+    model
 
   const labels = useMemo(() => {
-    if (!showLabels || !data?.embeddingData || !embeddingBounds || !colorByObsColumn) {
+    if (
+      !showLabels ||
+      !data?.embeddingData ||
+      !embeddingBounds ||
+      !colorByObsColumn
+    ) {
       return []
     }
 
@@ -63,7 +63,15 @@ const LabelOverlay = observer(function LabelOverlay({
       result.push({ text: label, x: sx, y: sy })
     }
     return result
-  }, [data, colorByObsColumn, showLabels, embeddingBounds, cameraView, width, height])
+  }, [
+    data,
+    colorByObsColumn,
+    showLabels,
+    embeddingBounds,
+    cameraView,
+    width,
+    height,
+  ])
 
   if (labels.length === 0) return null
 

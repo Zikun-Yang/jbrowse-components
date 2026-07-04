@@ -275,18 +275,9 @@ const RightSidebar = observer(function RightSidebar({
               isColorBy={colorBy?.kind === 'feature' && colorBy.name === name}
               range={featureRanges.get(name) ?? null}
               palette={continuousPalette}
-              transform={
-                model.featureTransforms.get(name) ?? {
-                  x: 'linear',
-                  y: 'linear',
-                }
-              }
               onToggleExpand={() => model.toggleFeatureExpanded(name)}
               onColorBy={() => void model.setColorByFeature(name)}
               onOpenMenu={e => openMenu(e, name, 'feature')}
-              onTransformChange={(axis, transform) =>
-                model.setFeatureTransform(name, axis, transform)
-              }
               showInfo
             />
           ))
@@ -332,12 +323,7 @@ const RightSidebar = observer(function RightSidebar({
                 isColorBy={isColorBy}
                 range={geneSetRanges.get(name) ?? null}
                 palette={continuousPalette}
-                transform={
-                  model.geneSetTransforms.get(name) ?? {
-                    x: 'linear',
-                    y: 'linear',
-                  }
-                }
+                transformKind="geneSet"
                 onToggleExpand={() => model.toggleGeneSetExpanded(name)}
                 onColorBy={() => void model.setColorByGeneSet(name)}
                 onOpenMenu={e => openMenu(e, name, 'geneSet')}
@@ -346,16 +332,6 @@ const RightSidebar = observer(function RightSidebar({
                   setAddGeneSetName(name)
                   setAddGeneQuery('')
                 }}
-                onRangeChange={range => {
-                  if (range) {
-                    model.setGeneSetRange(name, range.min, range.max)
-                  } else {
-                    model.clearGeneSetRange(name)
-                  }
-                }}
-                onTransformChange={(axis, transform) =>
-                  model.setGeneSetTransform(name, axis, transform)
-                }
                 histogramLabel={name}
                 colorTooltip="Color by this gene set"
                 expandedHeader={
@@ -419,12 +395,6 @@ const RightSidebar = observer(function RightSidebar({
                           }
                           range={featureRanges.get(gene) ?? null}
                           palette={continuousPalette}
-                          transform={
-                            model.featureTransforms.get(gene) ?? {
-                              x: 'linear',
-                              y: 'linear',
-                            }
-                          }
                           onToggleExpand={() =>
                             model.toggleGeneSetFeatureExpanded(name, gene)
                           }
@@ -433,9 +403,6 @@ const RightSidebar = observer(function RightSidebar({
                           }
                           onOpenMenu={e =>
                             openMenu(e, gene, 'geneSetFeature', name)
-                          }
-                          onTransformChange={(axis, transform) =>
-                            model.setFeatureTransform(gene, axis, transform)
                           }
                           showInfo
                         />

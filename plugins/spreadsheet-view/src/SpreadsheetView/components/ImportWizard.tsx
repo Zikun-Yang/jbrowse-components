@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   AssemblySelector,
   ErrorMessage,
   FileSelector,
   LoadingEllipses,
+  SpeciesSelector,
 } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
@@ -45,7 +46,22 @@ const ImportWizard = observer(function ImportWizard({
   const { loading, fileType, fileSource, isReadyToOpen, fileTypes, error } =
     model
   const [selectedAssembly, setSelectedAssembly] = useState(assemblyNames[0])
+  const [selectedSpecies, setSelectedSpecies] = useState('')
   const [selectorType, setSelectorType] = useState('custom')
+
+  useEffect(() => {
+    const assembly = assemblyManager.get(selectedAssembly!)
+    if (selectedSpecies && assembly?.species !== selectedSpecies) {
+      const first = assemblyNames.find(
+        name => assemblyManager.get(name)?.species === selectedSpecies,
+      )
+      const next = first || ''
+      if (next !== selectedAssembly) {
+        setSelectedAssembly(next)
+      }
+    }
+  }, [selectedSpecies, selectedAssembly, assemblyNames, assemblyManager])
+
   const err = assemblyManager.get(selectedAssembly!)?.error || error
   const rootModel = getRoot(model)
 
@@ -126,9 +142,17 @@ const ImportWizard = observer(function ImportWizard({
         </div>
 
         <div>
+          <SpeciesSelector
+            session={session}
+            selected={selectedSpecies}
+            onChange={val => {
+              setSelectedSpecies(val)
+            }}
+          />
           <AssemblySelector
             session={session}
             selected={selectedAssembly}
+            species={selectedSpecies}
             onChange={val => {
               setSelectedAssembly(val)
             }}

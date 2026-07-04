@@ -1,4 +1,5 @@
 import PluginLoader from '@jbrowse/core/PluginLoader'
+import { resolveIncludes } from '@jbrowse/app-core'
 import { openLocation } from '@jbrowse/core/util/io'
 import { createElementId } from '@jbrowse/core/util/types/mst'
 import { addDisposer, types } from '@jbrowse/mobx-state-tree'
@@ -352,22 +353,26 @@ const SessionLoader = types
         const config = JSON.parse(text)
         const configUri = new URL(configPath, window.location.href)
         addRelativeUris(config, configUri)
+        const mergedConfig = await resolveIncludes(config, configUri)
 
         // cross origin config check
         if (configUri.hostname !== window.location.hostname) {
-          const configPlugins = config.plugins || []
+          const configPlugins = (mergedConfig.plugins ||
+            []) as PluginDefinition[]
           const configPluginsAllowed = await checkPlugins(configPlugins)
           if (!configPluginsAllowed) {
             self.setSessionTriaged({
-              snap: config,
+              snap: mergedConfig,
               origin: 'config',
               reason: configPlugins,
             })
             return
           }
         }
-        await this.fetchPlugins(config)
-        self.setConfigSnapshot(config)
+        await this.fetchPlugins(
+          mergedConfig as { plugins?: PluginDefinition[] },
+        )
+        self.setConfigSnapshot(mergedConfig)
       } else {
         self.setConfigSnapshot({})
       }
@@ -385,8 +390,9 @@ const SessionLoader = types
         unknown
       >
       addRelativeUris(config, configUri)
-      self.setConfigSnapshot(config)
-      await this.fetchPlugins(config)
+      const mergedConfig = await resolveIncludes(config, configUri)
+      self.setConfigSnapshot(mergedConfig)
+      await this.fetchPlugins(mergedConfig)
     },
     /**
      * #action

@@ -1,7 +1,8 @@
 import PluginLoader from '@jbrowse/core/PluginLoader'
 import PluginManager from '@jbrowse/core/PluginManager'
+import { resolveIncludes } from '@jbrowse/app-core'
 import { readConfObject } from '@jbrowse/core/configuration'
-import { dedupe } from '@jbrowse/core/util'
+import { addRelativeUris, dedupe } from '@jbrowse/core/util'
 import {
   writeAWSAnalytics,
   writeGAAnalytics,
@@ -17,9 +18,24 @@ import type { JBrowseConfig } from './types.ts'
 
 const { ipcRenderer } = window.require('electron')
 
+function pathToFileUrl(path: string) {
+  const normalized = path.replace(/\\/g, '/')
+  const withSlash = normalized.startsWith('/') ? normalized : `/${normalized}`
+  return new URL(`file://${withSlash}`)
+}
+
 export async function loadPluginManager(configPath: string) {
-  const snap = await ipcRenderer.invoke('loadSession', configPath)
-  const pm = await createPluginManager(snap)
+  const snap = (await ipcRenderer.invoke('loadSession', configPath)) as Record<
+    string,
+    unknown
+  >
+  const configUri = pathToFileUrl(configPath)
+  addRelativeUris(snap, configUri)
+  const mergedConfig = (await resolveIncludes(
+    snap,
+    configUri,
+  )) as unknown as JBrowseConfig
+  const pm = await createPluginManager(mergedConfig)
   // @ts-expect-error
   pm.rootModel?.setSessionPath(configPath)
   return pm
@@ -120,19 +136,4 @@ export async function fetchjson(url: string) {
     throw new Error(`HTTP ${res.status} fetching ${url}`)
   }
   return res.json() as Promise<unknown>
-}
-
-export function addRelativeUris(
-  config: Record<string, unknown> | null,
-  base: URL,
-) {
-  if (typeof config === 'object' && config !== null) {
-    for (const key of Object.keys(config)) {
-      if (typeof config[key] === 'object' && config[key] !== null) {
-        addRelativeUris(config[key] as Record<string, unknown>, base)
-      } else if (key === 'uri') {
-        config.baseUri = base.href
-      }
-    }
-  }
 }

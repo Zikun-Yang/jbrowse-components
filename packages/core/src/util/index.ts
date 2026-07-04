@@ -53,6 +53,8 @@ export * from './types/index.ts'
 export * from './when.ts'
 export * from './range.ts'
 export * from './dedupe.ts'
+export * from './addRelativeUris.ts'
+export * from './useSpeciesFilteredAssembly.ts'
 export * from './coarseStripHTML.ts'
 
 export * from './offscreenCanvasPonyfill.tsx'

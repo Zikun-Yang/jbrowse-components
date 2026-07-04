@@ -78,6 +78,13 @@ string[]
 string
 ```
 
+#### getter: species
+
+```js
+// type
+string
+```
+
 #### getter: allAliases
 
 ```js

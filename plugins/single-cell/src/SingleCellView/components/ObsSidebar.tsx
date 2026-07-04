@@ -19,11 +19,18 @@ import HistogramTransformToggle from './HistogramTransformToggle.tsx'
 import MiniHistogram from './MiniHistogram.tsx'
 import MiniStackedBar from './MiniStackedBar.tsx'
 
-import type { SingleCellViewModel, Transform } from '../model.ts'
+import type {
+  SingleCellViewModel,
+  Transform,
+  AxisTransforms,
+} from '../model.ts'
 import type {
   CategoricalColumn,
   ContinuousColumn,
 } from '../../SingleCellAdapter/SingleCellZarrAdapter.ts'
+
+const DEFAULT_TRANSFORM: AxisTransforms = { x: 'linear', y: 'linear' }
+const EMPTY_ARRAY: string[] = []
 
 function applyXTransform(
   values: Float32Array,
@@ -155,7 +162,7 @@ const CategoricalCategory = observer(function CategoricalCategory({
   column: string
   col: CategoricalColumn
   isColorBy: boolean
-  selectedLabels: Set<string>
+  selectedLabels: string[]
 }) {
   const { classes } = useStyles()
   const [expanded, setExpanded] = useState(false)
@@ -164,11 +171,16 @@ const CategoricalCategory = observer(function CategoricalCategory({
     ? data?.metadata[colorByObsColumn]
     : undefined
 
+  const selectedLabelsSet = useMemo(
+    () => new Set(selectedLabels),
+    [selectedLabels],
+  )
+
   const colMap = data?.labelToIndices.get(column)
 
   const allLabels = col.categories
   const allCount = allLabels.length
-  const selectedCount = selectedLabels.size
+  const selectedCount = selectedLabelsSet.size
   const checked = selectedCount === allCount && allCount > 0
   const indeterminate = selectedCount > 0 && selectedCount < allCount
 
@@ -234,7 +246,7 @@ const CategoricalCategory = observer(function CategoricalCategory({
       {expanded ? (
         <div className={classes.details}>
           {labelEntries.map(({ label, count }) => {
-            const isSelected = selectedLabels.has(label)
+            const isSelected = selectedLabelsSet.has(label)
             const indices = colMap?.get(label)
 
             const handleMouseEnter = () => {
@@ -270,13 +282,13 @@ const CategoricalCategory = observer(function CategoricalCategory({
                     xTransform={
                       colorByCol?.type === 'continuous'
                         ? (model.obsTransforms.get(colorByObsColumn ?? '')?.x ??
-                            'linear')
+                          'linear')
                         : 'linear'
                     }
                     yTransform={
                       colorByCol?.type === 'continuous'
                         ? (model.obsTransforms.get(colorByObsColumn ?? '')?.y ??
-                            'linear')
+                          'linear')
                         : 'linear'
                     }
                   />
@@ -313,10 +325,7 @@ const ContinuousCategory = observer(function ContinuousCategory({
 }) {
   const { classes } = useStyles()
   const [expanded, setExpanded] = useState(false)
-  const transform = model.obsTransforms.get(column) ?? {
-    x: 'linear',
-    y: 'linear',
-  }
+  const transform = model.obsTransforms.get(column) ?? DEFAULT_TRANSFORM
 
   let min = Infinity
   let max = -Infinity
@@ -459,7 +468,7 @@ const ObsSidebar = observer(function ObsSidebar({
                 column={column}
                 col={col}
                 isColorBy={colorBy?.kind === 'obs' && colorBy.name === column}
-                selectedLabels={new Set(selectedLabels.get(column) ?? [])}
+                selectedLabels={selectedLabels.get(column) ?? EMPTY_ARRAY}
               />
             )
           }

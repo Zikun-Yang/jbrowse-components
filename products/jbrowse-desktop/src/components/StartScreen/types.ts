@@ -20,6 +20,7 @@ export interface JBrowseConfig {
   tracks: { trackId: string }[]
   plugins?: PluginDefinition[]
   defaultSession?: Record<string, unknown>
+  includes?: string[]
 }
 
 export type LaunchCallback = (

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { ErrorMessage, LoadingEllipses } from '@jbrowse/core/ui'
-import { useLocalStorage } from '@jbrowse/core/util'
+import { useLocalStorage, addRelativeUris } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import deepmerge from 'deepmerge'
 
@@ -9,7 +9,7 @@ import FavoriteGenomesPanel from './FavoriteGenomesPanel.tsx'
 import OpenSequencePanel from './OpenSequencePanel.tsx'
 import QuickstartPanel from './QuickstartPanel.tsx'
 import defaultFavs from '../defaultFavs.ts'
-import { addRelativeUris, fetchjson, loadPluginManager } from '../util.tsx'
+import { fetchjson, loadPluginManager } from '../util.tsx'
 
 import type { Fav, JBrowseConfig } from '../types.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
@@ -30,8 +30,7 @@ async function fetchData(sel: { shortName: string; jbrowseConfig: string }[]) {
     sel.map(async r => {
       const ret = (await fetchjson(r.jbrowseConfig)) as JBrowseConfig
       addRelativeUris(
-        // @ts-expect-error
-        ret as Record<string, unknown>,
+        ret as unknown as Record<string, unknown>,
         new URL(r.jbrowseConfig),
       )
       return ret

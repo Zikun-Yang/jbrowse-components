@@ -1,4 +1,6 @@
-import { AssemblySelector } from '@jbrowse/core/ui'
+import { useEffect, useState } from 'react'
+
+import { AssemblySelector, SpeciesSelector } from '@jbrowse/core/ui'
 import { getSession, notEmpty } from '@jbrowse/core/util'
 import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
@@ -56,6 +58,47 @@ const AssemblyRows = observer(function AssemblyRows({
 }) {
   const { classes } = useStyles()
   const session = getSession(model)
+  const { assemblyNames, assemblyManager } = session
+  const [selectedSpecies, setSelectedSpecies] = useState<string[]>(
+    selectedAssemblyNames.map(() => ''),
+  )
+
+  useEffect(() => {
+    setSelectedSpecies(prev => {
+      const next = [...prev]
+      while (next.length < selectedAssemblyNames.length) {
+        next.push('')
+      }
+      return next.slice(0, selectedAssemblyNames.length)
+    })
+  }, [selectedAssemblyNames.length])
+
+  useEffect(() => {
+    selectedAssemblyNames.forEach((assemblyName, idx) => {
+      const species = selectedSpecies[idx]
+      const assembly = assemblyManager.get(assemblyName)
+      if (species && assembly?.species !== species) {
+        const first = assemblyNames.find(
+          name => assemblyManager.get(name)?.species === species,
+        )
+        const next = first || ''
+        if (next !== assemblyName) {
+          setSelectedAssemblyNames(
+            selectedAssemblyNames.map((asm, idx2) =>
+              idx2 === idx ? next : asm,
+            ),
+          )
+        }
+      }
+    })
+  }, [
+    selectedSpecies,
+    selectedAssemblyNames,
+    assemblyNames,
+    assemblyManager,
+    setSelectedAssemblyNames,
+  ])
+
   return selectedAssemblyNames.map((assemblyName, idx) => (
     <div key={`${assemblyName}-${idx}`} className={classes.rel}>
       <span>Row {idx + 1}: </span>
@@ -69,6 +112,7 @@ const AssemblyRows = observer(function AssemblyRows({
               .map((asm, idx2) => (idx2 === idx ? undefined : asm))
               .filter(notEmpty),
           )
+          setSelectedSpecies(prev => prev.filter((_, idx2) => idx2 !== idx))
           if (selectedRow >= selectedAssemblyNames.length - 2) {
             setSelectedRow(0)
           }
@@ -76,8 +120,18 @@ const AssemblyRows = observer(function AssemblyRows({
       >
         <CloseIcon />
       </IconButton>
+      <SpeciesSelector
+        session={session}
+        selected={selectedSpecies[idx]}
+        onChange={val => {
+          setSelectedSpecies(prev =>
+            prev.map((s, idx2) => (idx2 === idx ? val : s)),
+          )
+        }}
+      />
       <AssemblySelector
         helperText=""
+        species={selectedSpecies[idx]}
         selected={assemblyName}
         onChange={newAssembly => {
           setSelectedAssemblyNames(

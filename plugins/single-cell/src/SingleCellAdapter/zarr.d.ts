@@ -21,9 +21,7 @@ declare module 'zarr' {
     }
     chunkKey(chunkCoords: number[]): string
     decodeChunk(chunkData: Uint8Array | Buffer): Promise<ArrayBuffer>
-    get(
-      selection?: (number | ZarrSlice | null)[],
-    ): Promise<
+    get(selection?: (number | ZarrSlice | null)[]): Promise<
       | {
           data:
             | Int8Array
@@ -45,7 +43,10 @@ declare module 'zarr' {
     store: {
       keys(): Promise<string[]> | string[]
     }
-    attrs: { [key: string]: unknown; asObject(): Promise<Record<string, unknown>> }
+    attrs: {
+      [key: string]: unknown
+      asObject(): Promise<Record<string, unknown>>
+    }
     getItem(name: string): Promise<ZarrGroup | ZarrArray | undefined | null>
     containsItem(name: string): Promise<boolean>
   }

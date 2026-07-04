@@ -51,6 +51,16 @@ showArcs: {
     }
 ```
 
+#### slot: showArcCounts
+
+```js
+showArcCounts: {
+      type: 'boolean',
+      description: 'Draw read counts on sashimi arcs',
+      defaultValue: true,
+    }
+```
+
 #### slot: showInterbaseCounts
 
 ```js

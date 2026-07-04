@@ -117,91 +117,92 @@ function createMockZarr(contents: {
     containsItem: jest.fn(),
   }
 
-  ;(openGroup as jest.Mock).mockImplementation(async (
-    storeOrUri: unknown,
-    path?: string,
-  ) => {
-    if (path === 'X') {
-      return xGroup
-    }
-    return rootGroup
-  })
-  ;(openArray as jest.Mock).mockImplementation(async ({ path }: { path: string }) => {
-    const arr = arrays.get(path)
-    if (!arr) {
-      throw new Error(`Array not found: ${path}`)
-    }
+  ;(openGroup as jest.Mock).mockImplementation(
+    async (storeOrUri: unknown, path?: string) => {
+      if (path === 'X') {
+        return xGroup
+      }
+      return rootGroup
+    },
+  )
+  ;(openArray as jest.Mock).mockImplementation(
+    async ({ path }: { path: string }) => {
+      const arr = arrays.get(path)
+      if (!arr) {
+        throw new Error(`Array not found: ${path}`)
+      }
 
-    function isSlice(
-      value: unknown,
-    ): value is { _slice: true; start: number | null; stop: number | null } {
-      return typeof value === 'object' && value !== null && '_slice' in value
-    }
+      function isSlice(
+        value: unknown,
+      ): value is { _slice: true; start: number | null; stop: number | null } {
+        return typeof value === 'object' && value !== null && '_slice' in value
+      }
 
-    return {
-      shape: arr.shape,
-      get: async (
-        selection?: (
-          | number
-          | { _slice: true; start: number | null; stop: number | null }
-          | null
-        )[],
-      ) => {
-        let data = arr.data
-        let shape = arr.shape
+      return {
+        shape: arr.shape,
+        get: async (
+          selection?: (
+            | number
+            | { _slice: true; start: number | null; stop: number | null }
+            | null
+          )[],
+        ) => {
+          let data = arr.data
+          let shape = arr.shape
 
-        if (selection && selection.length > 0) {
-          // Normalize the selection to a list of [start, stop] pairs using the
-          // original array shape. null / undefined means full extent.
-          const nDims = shape.length
-          const ranges: [number, number][] = []
-          for (let d = 0; d < nDims; d++) {
-            const sel = selection[d]
-            const dimSize = shape[d] ?? 0
-            if (sel === null || sel === undefined) {
-              ranges.push([0, dimSize])
-            } else if (isSlice(sel)) {
-              const start = sel.start ?? 0
-              const stop = sel.stop ?? dimSize
-              ranges.push([start, stop])
-            } else if (typeof sel === 'number') {
-              ranges.push([sel, sel + 1])
-            } else {
-              ranges.push([0, dimSize])
-            }
-          }
-
-          const [rowStart, rowStop] = ranges[0]!
-          const nRows = shape[0] ?? 0
-          const nCols = shape[1] ?? 1
-
-          if (shape.length === 1) {
-            // 1D slice
-            const [start, stop] = ranges[0]!
-            const sliced: number[] = []
-            for (let i = start; i < stop && i < nRows; i++) {
-              sliced.push((data as number[])[i] ?? 0)
-            }
-            data = sliced
-            shape = [sliced.length]
-          } else if (shape.length === 2) {
-            const [colStart, colStop] = ranges[1]!
-            const sliced: number[] = []
-            for (let r = rowStart; r < rowStop && r < nRows; r++) {
-              for (let c = colStart; c < colStop && c < nCols; c++) {
-                const idx = r * nCols + c
-                sliced.push((data as number[])[idx] ?? 0)
+          if (selection && selection.length > 0) {
+            // Normalize the selection to a list of [start, stop] pairs using the
+            // original array shape. null / undefined means full extent.
+            const nDims = shape.length
+            const ranges: [number, number][] = []
+            for (let d = 0; d < nDims; d++) {
+              const sel = selection[d]
+              const dimSize = shape[d] ?? 0
+              if (sel === null || sel === undefined) {
+                ranges.push([0, dimSize])
+              } else if (isSlice(sel)) {
+                const start = sel.start ?? 0
+                const stop = sel.stop ?? dimSize
+                ranges.push([start, stop])
+              } else if (typeof sel === 'number') {
+                ranges.push([sel, sel + 1])
+              } else {
+                ranges.push([0, dimSize])
               }
             }
-            data = sliced
-            shape = [rowStop - rowStart, colStop - colStart]
-          }
-        }
 
-        return { data, shape }
-      },
-    }
-  })
+            const [rowStart, rowStop] = ranges[0]!
+            const nRows = shape[0] ?? 0
+            const nCols = shape[1] ?? 1
+
+            if (shape.length === 1) {
+              // 1D slice
+              const [start, stop] = ranges[0]!
+              const sliced: number[] = []
+              for (let i = start; i < stop && i < nRows; i++) {
+                sliced.push((data as number[])[i] ?? 0)
+              }
+              data = sliced
+              shape = [sliced.length]
+            } else if (shape.length === 2) {
+              const [colStart, colStop] = ranges[1]!
+              const sliced: number[] = []
+              for (let r = rowStart; r < rowStop && r < nRows; r++) {
+                for (let c = colStart; c < colStop && c < nCols; c++) {
+                  const idx = r * nCols + c
+                  sliced.push((data as number[])[idx] ?? 0)
+                }
+              }
+              data = sliced
+              shape = [rowStop - rowStart, colStop - colStart]
+            }
+          }
+
+          return { data, shape }
+        },
+      }
+    },
+  )
 
   return { rootGroup }
 }
@@ -273,9 +274,18 @@ describe('SingleCellZarrAdapter', () => {
       obsm: {
         X_pca: {
           data: [
-            1, 2, 9, 9, // cell 0: PC1=1, PC2=2, PC3=9, PC4=9
-            3, 4, 9, 9, // cell 1
-            5, 6, 9, 9, // cell 2
+            1,
+            2,
+            9,
+            9, // cell 0: PC1=1, PC2=2, PC3=9, PC4=9
+            3,
+            4,
+            9,
+            9, // cell 1
+            5,
+            6,
+            9,
+            9, // cell 2
           ],
           shape: [3, 4],
         },

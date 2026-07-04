@@ -23,11 +23,46 @@ config.json) and is structured as follows
   ],
   "defaultSession": {
     /* optional default session */
-  }
+  },
+  "includes": [
+    /* optional list of paths or URLs to additional config files to merge */
+  ]
 }
 ```
 
 The most important thing to configure are your assemblies and your tracks.
+
+## Splitting config across multiple files
+
+You can use the `includes` field to split a large config into smaller files. For
+example, you can keep global settings in the root `config.json` and put each
+assembly's tracks in a separate file:
+
+```json
+// config.json
+{
+  "configuration": {
+    /* global settings */
+  },
+  "includes": ["assemblies/hg19.json", "assemblies/hg38.json"],
+  "defaultSession": { "name": "New Session" }
+}
+```
+
+```json
+// assemblies/hg19.json
+{
+  "assemblies": [{ "name": "hg19" /* ... */ }],
+  "tracks": [
+    /* tracks for hg19 */
+  ]
+}
+```
+
+Paths in `includes` are resolved relative to the config file that declares them,
+and `includes` can be nested. If the same `trackId` or assembly `name` appears
+in multiple files, the first occurrence (with the root config having highest
+priority) is used.
 
 :::info
 

@@ -134,9 +134,7 @@ export default function CustomPaletteDialog({
           size="small"
           error={isDuplicate}
           helperText={
-            isDuplicate
-              ? 'A palette with this name already exists'
-              : undefined
+            isDuplicate ? 'A palette with this name already exists' : undefined
           }
           sx={{ mb: 2 }}
         />

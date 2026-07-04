@@ -62,7 +62,9 @@ describe('SingleCellBamAdapter', () => {
     ])
     const adapter = createAdapter(inner)
     const features = await firstValueFrom(
-      adapter.getFeatures({ refName: 'chr1', start: 0, end: 1000 }).pipe(toArray()),
+      adapter
+        .getFeatures({ refName: 'chr1', start: 0, end: 1000 })
+        .pipe(toArray()),
     )
     expect(features.map(f => f.id())).toEqual(['a', 'b', 'c'])
   })

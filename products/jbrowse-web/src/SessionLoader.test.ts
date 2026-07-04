@@ -3,6 +3,13 @@ import { getSnapshot } from '@jbrowse/mobx-state-tree'
 import SessionLoader from './SessionLoader.ts'
 
 // Mock dependencies
+jest.mock('@jbrowse/core/PluginLoader', () => {
+  return jest.fn().mockImplementation(() => ({
+    installGlobalReExports: jest.fn(),
+    load: jest.fn().mockResolvedValue([]),
+  }))
+})
+
 jest.mock('@jbrowse/core/util/io', () => ({
   openLocation: jest.fn().mockReturnValue({
     readFile: jest.fn().mockResolvedValue('{}'),
@@ -427,6 +434,140 @@ describe('SessionLoader', () => {
       expect(snap.configPath).toBe('/path/to/config.json')
       expect(snap.sessionQuery).toBe('local-abc123')
       expect(snap.hubURL).toEqual(['https://example.com/hub.txt'])
+    })
+  })
+
+  describe('config includes', () => {
+    function mockConfigs(configs: Record<string, Record<string, unknown>>) {
+      const { openLocation } = jest.requireMock('@jbrowse/core/util/io') as {
+        openLocation: jest.Mock
+      }
+      openLocation.mockImplementation(({ uri }: { uri: string }) => {
+        const url = new URL(uri, 'http://localhost/')
+        const key = url.pathname.split('/').pop() ?? url.pathname
+        return {
+          readFile: jest.fn().mockResolvedValue(JSON.stringify(configs[key])),
+        }
+      })
+    }
+
+    async function waitForConfig(
+      loader: ReturnType<typeof SessionLoader.create>,
+    ) {
+      for (let i = 0; i < 100; i++) {
+        if (loader.isConfigLoaded) {
+          return
+        }
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise(r => setTimeout(r, 10))
+      }
+      throw new Error('Timeout waiting for config to load')
+    }
+
+    it('merges a single included config', async () => {
+      mockConfigs({
+        'config.json': {
+          configuration: {
+            theme: { palette: { primary: { main: '#000000' } } },
+          },
+          includes: ['assembly.json'],
+        },
+        'assembly.json': {
+          assemblies: [{ name: 'hg19' }],
+          tracks: [{ trackId: 'genes', assemblyNames: ['hg19'] }],
+        },
+      })
+
+      const loader = SessionLoader.create({
+        initialTimestamp: Date.now(),
+      })
+      await waitForConfig(loader)
+
+      expect(loader.configSnapshot).toEqual({
+        configuration: {
+          theme: { palette: { primary: { main: '#000000' } } },
+        },
+        assemblies: [{ name: 'hg19' }],
+        tracks: [{ trackId: 'genes', assemblyNames: ['hg19'] }],
+      })
+    })
+
+    it('merges multiple included configs and resolves duplicate IDs', async () => {
+      mockConfigs({
+        'config.json': {
+          includes: ['a.json', 'b.json'],
+        },
+        'a.json': {
+          tracks: [{ trackId: 't1', name: 'A' }],
+          assemblies: [{ name: 'a' }],
+        },
+        'b.json': {
+          tracks: [{ trackId: 't1', name: 'B' }],
+          assemblies: [{ name: 'b' }],
+        },
+      })
+
+      const loader = SessionLoader.create({
+        initialTimestamp: Date.now(),
+      })
+      await waitForConfig(loader)
+
+      expect(loader.configSnapshot?.tracks).toEqual([
+        { trackId: 't1', name: 'A' },
+      ])
+      expect(loader.configSnapshot?.assemblies).toEqual([
+        { name: 'a' },
+        { name: 'b' },
+      ])
+    })
+
+    it('supports recursive includes', async () => {
+      mockConfigs({
+        'config.json': {
+          includes: ['a.json'],
+        },
+        'a.json': {
+          includes: ['b.json'],
+          assemblies: [{ name: 'a' }],
+        },
+        'b.json': {
+          assemblies: [{ name: 'b' }],
+        },
+      })
+
+      const loader = SessionLoader.create({
+        initialTimestamp: Date.now(),
+      })
+      await waitForConfig(loader)
+
+      expect(loader.configSnapshot?.assemblies).toEqual([
+        { name: 'a' },
+        { name: 'b' },
+      ])
+    })
+
+    it('detects circular includes', async () => {
+      mockConfigs({
+        'config.json': {
+          includes: ['a.json'],
+        },
+        'a.json': {
+          includes: ['b.json'],
+        },
+        'b.json': {
+          includes: ['a.json'],
+        },
+      })
+
+      const loader = SessionLoader.create({
+        initialTimestamp: Date.now(),
+      })
+      await waitForConfig(loader)
+
+      expect(loader.configError).toBeTruthy()
+      expect(String(loader.configError)).toContain(
+        'Circular config include detected',
+      )
     })
   })
 })

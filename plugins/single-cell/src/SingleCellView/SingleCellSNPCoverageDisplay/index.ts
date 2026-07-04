@@ -10,7 +10,9 @@ export default function SingleCellSNPCoverageDisplayF(
 ) {
   pluginManager.addDisplayType(() => {
     const stateModel = modelFactory(pluginManager)
-    const baseDisplayType = pluginManager.getDisplayType('LinearSNPCoverageDisplay')!
+    const baseDisplayType = pluginManager.getDisplayType(
+      'LinearSNPCoverageDisplay',
+    )!
     return new DisplayType({
       name: 'SingleCellSNPCoverageDisplay',
       displayName: 'Single-cell SNPCoverage display',

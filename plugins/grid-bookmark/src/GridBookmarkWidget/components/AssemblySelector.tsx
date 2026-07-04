@@ -7,21 +7,40 @@ import {
   OutlinedInput,
   Select,
 } from '@mui/material'
+import { readConfObject } from '@jbrowse/core/configuration'
+import { getSession } from '@jbrowse/core/util'
 import { observer } from 'mobx-react'
 
 import type { GridBookmarkModel } from '../model.ts'
+import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 
 const AssemblySelector = observer(function AssemblySelector({
   model,
+  species,
 }: {
   model: GridBookmarkModel
+  species?: string
 }) {
   const { validAssemblies, selectedAssemblies } = model
-  const noAssemblies = validAssemblies.size === 0
+  const session = getSession(model)
+  const filteredAssemblies = species
+    ? [...validAssemblies].filter(name => {
+        const assembly = session.assemblies.find(
+          asm => (readConfObject(asm, 'name') as string) === name,
+        )
+        return (
+          (readConfObject(
+            assembly as AnyConfigurationModel,
+            'species',
+          ) as string) === species
+        )
+      })
+    : [...validAssemblies]
+  const noAssemblies = filteredAssemblies.length === 0
   const label = 'Select assemblies'
   const id = 'select-assemblies-label'
   const selectedSet = new Set(selectedAssemblies)
-  const isAllSelected = [...validAssemblies].every(e => selectedSet.has(e))
+  const isAllSelected = filteredAssemblies.every(e => selectedSet.has(e))
 
   return (
     <FormControl disabled={noAssemblies} fullWidth>
@@ -44,7 +63,7 @@ const AssemblySelector = observer(function AssemblySelector({
           onClickCapture={event => {
             // onClickCapture allows us to avoid the parent Select onChange
             // from triggering
-            model.setSelectedAssemblies(isAllSelected ? [] : undefined)
+            model.setSelectedAssemblies(isAllSelected ? [] : filteredAssemblies)
             event.preventDefault()
           }}
         >
@@ -54,7 +73,7 @@ const AssemblySelector = observer(function AssemblySelector({
           />
           <ListItemText primary="Select all" />
         </MenuItem>
-        {[...validAssemblies].map(name => (
+        {filteredAssemblies.map(name => (
           <MenuItem key={name} value={name}>
             <Checkbox checked={selectedAssemblies.includes(name)} />
             <ListItemText primary={name} />

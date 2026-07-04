@@ -90,7 +90,8 @@
 - [x] **obs/var 列探测兜底**：HTTPStore 不支持 `keys()` 且无 `.zattrs`
       时，用常见列名候选列表通过 `containsItem` 探测。
 - [x] **PCA 等多维 embedding 只取前两维**：`getEmbedding` 在 `shape[1] > 2`
-      时自动切片 `[:, 0:2]`（使用 zarr.js 的 `slice(0, 2)` 对象），避免把多个 PC 当成额外细胞点渲染。
+      时自动切片 `[:, 0:2]`（使用 zarr.js 的 `slice(0, 2)`
+      对象），避免把多个 PC 当成额外细胞点渲染。
 
 ### 已添加测试
 
@@ -119,19 +120,21 @@
       by 选择、选择计数、Apply 按钮
 - [x] **Embedding 切换仅重绘画布**：`setEmbedding` 不再设置全局
       `loading`，只更新 `self.data.embeddingData`，侧边栏和工具栏保持不变
-- [x] **Toolbar 精简 + 标签覆盖层按钮 + tooltip + 色盘选择器**：移除 Toolbar 中的
-      "Color: xxx" 显示；embedding 选择器左侧新增独立 `Segment` 图标按钮，切换
-      `showLabels`；`Palette` 图标按钮打开 popover，可选择分类/连续变量色盘预设；
-      所有图标按钮添加 MUI `Tooltip` 提示功能。
-- [x] **类别标签覆盖层**：`LabelOverlay` 在分类 colorBy 开启标签模式时，
-      于每类中心绘制黑色描边文字标签；同时所有点变为半透明（background
+- [x] **Toolbar 精简 + 标签覆盖层按钮 +
+      tooltip + 色盘选择器**：移除 Toolbar 中的 "Color:
+      xxx" 显示；embedding 选择器左侧新增独立 `Segment` 图标按钮，切换
+      `showLabels`；`Palette`
+      图标按钮打开 popover，可选择分类/连续变量色盘预设；所有图标按钮添加 MUI
+      `Tooltip` 提示功能。
+- [x] **类别标签覆盖层**：`LabelOverlay`
+      在分类 colorBy 开启标签模式时，于每类中心绘制黑色描边文字标签；同时所有点变为半透明（background
       dim）。连续变量开启标签模式时只 dim 点，不画标签。
-- [x] **embedding/color-by 信息移到绘图区右上角**：`CenterPlot` 右上角显示
-      "Embedding: X_umap | Color by: general_cell_type"，无边框。
-- [x] **连续变量分布图 CellXGene 风格重绘**：`HistogramBrush` 增高到 110px，
-      默认灰色柱，color-by 变量时按 viridis 着色；鼠标左键按下为下界、松开为上界
-      框选范围；min / max 分别放在分布图左下/右下角；智能数字格式；新增 X 轴刻度
-      标签；Y 轴放右侧；左右 margin 留足避免刻度/数字被截断；SVG 宽度自适应父容器。
+- [x] **embedding/color-by 信息移到绘图区右上角**：`CenterPlot`
+      右上角显示 "Embedding: X_umap | Color by: general_cell_type"，无边框。
+- [x] **连续变量分布图 CellXGene 风格重绘**：`HistogramBrush`
+      增高到 110px，默认灰色柱，color-by 变量时按 viridis 着色；鼠标左键按下为下界、松开为上界框选范围；min
+      /
+      max 分别放在分布图左下/右下角；智能数字格式；新增 X 轴刻度标签；Y 轴放右侧；左右 margin 留足避免刻度/数字被截断；SVG 宽度自适应父容器。
 - [x] `ImportForm` 组件：输入 Zarr URL 并加载
 - [x] `SingleCellView.tsx` 容器：处理 loading / import / loaded 三种状态
 - [x] `LassoOverlay.tsx` 实现 Lasso 与矩形选择（含射线法多边形检测）
@@ -282,11 +285,13 @@ Cell 核心联动已实现，待补覆盖度视图与 UI 反馈。
 
 ### 状态
 
-**进行中** — 右侧面板基因表达功能已确定方案，开始实现。ATAC peak 作为后续扩展先留空。
+**进行中** — 右侧面板基因表达功能已确定方案，开始实现。ATAC
+peak 作为后续扩展先留空。
 
 ### 已确定设计
 
-右侧面板（Gene/ATAC Peak Expression Panel）复用当前空白右栏，宽度通过 `rightSidebarWidth` 拖拽调整。
+右侧面板（Gene/ATAC Peak Expression Panel）复用当前空白右栏，宽度通过
+`rightSidebarWidth` 拖拽调整。
 
 #### 基因表达面板（Gene Panel）
 
@@ -316,9 +321,12 @@ Cell 核心联动已实现，待补覆盖度视图与 UI 反馈。
 
 `colorBy` 需要区分 obs 列与基因 feature：
 
-- 方案：将 `colorBy` 从 `string` 扩展为 `{ kind: 'obs' | 'feature', name: string } | undefined`。
-- `EmbeddingCanvas` 与 `LabelOverlay` 根据 `kind` 分别读取 `metadata[colorBy.name]` 或 `featureValues[colorBy.name]`。
-- `ObsSidebar` 中判断 `isColorBy` 时改用 `colorBy?.kind === 'obs' && colorBy.name === column`。
+- 方案：将 `colorBy` 从 `string` 扩展为
+  `{ kind: 'obs' | 'feature', name: string } | undefined`。
+- `EmbeddingCanvas` 与 `LabelOverlay` 根据 `kind` 分别读取
+  `metadata[colorBy.name]` 或 `featureValues[colorBy.name]`。
+- `ObsSidebar` 中判断 `isColorBy` 时改用
+  `colorBy?.kind === 'obs' && colorBy.name === column`。
 
 ### 涉及文件
 
@@ -346,8 +354,15 @@ Cell 核心联动已实现，待补覆盖度视图与 UI 反馈。
 
 ### 已修复
 
-- [x] 右侧面板基因搜索无下拉列表：已增强 `SingleCellZarrAdapter` 对 `var` 列名的探测（增加 `gene_name`/`symbol`/`feature_id`/`features`/`index`/`_index` 等候选），并在 `_buildVarNameIndex` 中增加直接尝试已知列路径的兜底逻辑；`RightSidebar` 增加无匹配/未检测到基因名的提示、Enter 快捷添加、下拉列表背景和层级。
-- [x] obs continuous 列 X/Y 变换点击后当前展开项不更新：已改为标准 `observer(function Component(...))` 写法，确保 MobX 正确追踪 `model.obsTransforms`。
+- [x] 右侧面板基因搜索无下拉列表：已增强 `SingleCellZarrAdapter` 对 `var`
+      列名的探测（增加
+      `gene_name`/`symbol`/`feature_id`/`features`/`index`/`_index`
+      等候选），并在 `_buildVarNameIndex`
+      中增加直接尝试已知列路径的兜底逻辑；`RightSidebar`
+      增加无匹配/未检测到基因名的提示、Enter 快捷添加、下拉列表背景和层级。
+- [x] obs continuous 列 X/Y 变换点击后当前展开项不更新：已改为标准
+      `observer(function Component(...))` 写法，确保 MobX 正确追踪
+      `model.obsTransforms`。
 
 ### 待实现
 

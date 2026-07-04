@@ -98,6 +98,16 @@ function assemblyConfigSchema(pluginManager: PluginManager) {
         description:
           'A human readable display name for the assembly e.g. "Homo sapiens (hg38)" while the assembly name may just be "hg38"',
       },
+
+      /**
+       * #slot
+       */
+      species: {
+        type: 'string',
+        defaultValue: '',
+        description:
+          'Species or organism name for the assembly, used to group and filter assemblies in selectors',
+      },
     },
     {
       /**

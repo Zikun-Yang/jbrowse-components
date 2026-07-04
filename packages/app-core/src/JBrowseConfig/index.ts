@@ -92,6 +92,15 @@ export function JBrowseConfigF({
      */
     preConfiguredSessions: types.array(types.frozen()),
 
+    /**
+     * #slot
+     * list of paths or URLs to additional JBrowse 2 config files to merge into
+     * this config at load time. Paths are resolved relative to this config file.
+     */
+    includes: types.optional(types.array(types.string), []),
+
     ...pluginManager.pluginConfigurationRootSchemas(),
   })
 }
+
+export { mergeConfigs, resolveIncludes } from './resolveIncludes.ts'

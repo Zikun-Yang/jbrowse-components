@@ -105,3 +105,12 @@ defaultSession: types.optional(types.frozen(), {
 ```js
 preConfiguredSessions: types.array(types.frozen())
 ```
+
+#### slot: includes
+
+list of paths or URLs to additional JBrowse 2 config files to merge into this
+config at load time. Paths are resolved relative to this config file.
+
+```js
+includes: types.optional(types.array(types.string), [])
+```

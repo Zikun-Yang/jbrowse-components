@@ -1,7 +1,108 @@
 /**
- * Categorical palettes matching common matplotlib / CellXGene defaults.
+ * Categorical palettes. The default is Polychrome 36 because it is designed
+ * for maximum distinguishability with many categories. Paul Tol presets are
+ * kept for users who prefer that aesthetic with fewer clusters.
  */
+const paulTolBright = [
+  '#4477AA',
+  '#EE6677',
+  '#228833',
+  '#CCBB44',
+  '#66CCEE',
+  '#AA3377',
+  '#BBBBBB',
+]
+
+const paulTolMuted = [
+  '#CC6677',
+  '#332288',
+  '#DDCC77',
+  '#117733',
+  '#88CCEE',
+  '#882255',
+  '#44AA99',
+  '#999933',
+  '#AA4499',
+]
+
+const paulTolLight = [
+  '#77AADD',
+  '#EE8866',
+  '#EEDD88',
+  '#FFAABB',
+  '#99DDFF',
+  '#44BB99',
+  '#BBCC33',
+  '#AAAA00',
+  '#DDDDDD',
+]
+
+// Interleave Bright/Muted so the first categories get a mix of saturation
+// levels. Light is kept as a separate preset because its colors are too close
+// to Muted and confuse adjacent clusters.
+const paulTolComposite: string[] = []
+const paulTolMaxLen = Math.max(paulTolBright.length, paulTolMuted.length)
+for (let i = 0; i < paulTolMaxLen; i++) {
+  if (paulTolBright[i]) paulTolComposite.push(paulTolBright[i]!)
+  if (paulTolMuted[i]) paulTolComposite.push(paulTolMuted[i]!)
+}
+
+const polychrome36 = [
+  '#5A5156',
+  '#E4E1E3',
+  '#F6222E',
+  '#FE00FA',
+  '#16FF32',
+  '#3283FE',
+  '#FEAF16',
+  '#B00068',
+  '#1CFFCE',
+  '#90AD1C',
+  '#2ED9FF',
+  '#DEA0FD',
+  '#AA0DFE',
+  '#F8A19F',
+  '#325A9B',
+  '#C4451C',
+  '#1C8356',
+  '#85660D',
+  '#B10DA1',
+  '#FBE426',
+  '#1CBE4F',
+  '#FA0087',
+  '#FC1CBF',
+  '#F7E1A0',
+  '#C075A6',
+  '#782AB6',
+  '#AAF400',
+  '#BDCDFF',
+  '#822E1C',
+  '#B5EFB5',
+  '#7ED7D1',
+  '#1C7F93',
+  '#D85FF7',
+  '#683B79',
+  '#66B0FF',
+  '#3B00FB',
+]
+
 export const CATEGORICAL_PALETTES: Record<string, string[]> = {
+  polychrome36,
+  paulTol: paulTolComposite,
+  paulTolBright,
+  paulTolMuted,
+  paulTolLight,
+  okabeIto: [
+    '#E69F00',
+    '#56B4E9',
+    '#009E73',
+    '#F0E442',
+    '#0072B2',
+    '#D55E00',
+    '#CC79A7',
+    '#999999',
+    '#000000',
+  ],
   tab10: [
     '#1f77b4',
     '#ff7f0e',
@@ -97,11 +198,14 @@ export const CATEGORICAL_PALETTES: Record<string, string[]> = {
   ],
 }
 
-export const DEFAULT_CATEGORICAL_PALETTE = 'tab10'
+export const DEFAULT_CATEGORICAL_PALETTE = 'polychrome36'
 
 let customCategoricalPalettes: Record<string, string[]> = {}
 
-export function registerCustomCategoricalPalette(name: string, colors: string[]) {
+export function registerCustomCategoricalPalette(
+  name: string,
+  colors: string[],
+) {
   customCategoricalPalettes = { ...customCategoricalPalettes, [name]: colors }
 }
 
@@ -125,7 +229,7 @@ export function getCategoricalColor(
   const palette =
     CATEGORICAL_PALETTES[paletteName] ??
     customCategoricalPalettes[paletteName] ??
-    CATEGORICAL_PALETTES.tab10!
+    CATEGORICAL_PALETTES[DEFAULT_CATEGORICAL_PALETTE]!
   return palette[index % palette.length]!
 }
 
@@ -153,9 +257,15 @@ export const CONTINUOUS_PALETTES: Record<string, ContinuousColormap> = {
   viridis(t) {
     t = clamp(t)
     return [
-      Math.max(0, Math.min(1, 0.267 + 0.105 * t + 0.63 * t * t - 0.213 * t * t * t)),
+      Math.max(
+        0,
+        Math.min(1, 0.267 + 0.105 * t + 0.63 * t * t - 0.213 * t * t * t),
+      ),
       Math.max(0, Math.min(1, 0.004 + 0.898 * t + 0.05 * t * t)),
-      Math.max(0, Math.min(1, 0.329 + 0.644 * t - 0.867 * t * t + 0.27 * t * t * t)),
+      Math.max(
+        0,
+        Math.min(1, 0.329 + 0.644 * t - 0.867 * t * t + 0.27 * t * t * t),
+      ),
     ]
   },
   plasma(t) {
@@ -169,7 +279,10 @@ export const CONTINUOUS_PALETTES: Record<string, ContinuousColormap> = {
   inferno(t) {
     t = clamp(t)
     return [
-      Math.max(0, Math.min(1, 0.0015 + 3.8 * t - 12.3 * t * t + 16.5 * t * t * t)),
+      Math.max(
+        0,
+        Math.min(1, 0.0015 + 3.8 * t - 12.3 * t * t + 16.5 * t * t * t),
+      ),
       Math.max(0, Math.min(1, 0.03 + 1.5 * t - 1.4 * t * t)),
       Math.max(0, Math.min(1, 0.15 + 1.1 * t - 0.7 * t * t)),
     ]

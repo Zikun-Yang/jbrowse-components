@@ -86,7 +86,7 @@ export default function MiniHistogram({
       ctx.fillStyle = color ?? getContinuousHex(t, palette)
       ctx.fillRect(i * binWidth, height - h, binWidth - 1, h)
     }
-  }, [values, indices, width, height, bins, palette])
+  }, [values, indices, width, height, bins, palette, yTransform])
 
   return (
     <canvas

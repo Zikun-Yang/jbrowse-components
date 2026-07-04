@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import { AssemblySelector, ErrorMessage } from '@jbrowse/core/ui'
+import {
+  AssemblySelector,
+  ErrorMessage,
+  SpeciesSelector,
+} from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import CloseIcon from '@mui/icons-material/Close'
@@ -40,8 +44,22 @@ const LinearGenomeViewImportForm = observer(
     const { assemblyNames, assemblyManager } = session
     const { initialized, error } = model
     const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+    const [selectedSpecies, setSelectedSpecies] = useState('')
     const [option, setOption] = useState<BaseResult>()
     const assembly = assemblyManager.get(selectedAsm)
+
+    useEffect(() => {
+      const assembly = assemblyManager.get(selectedAsm)
+      if (selectedSpecies && assembly?.species !== selectedSpecies) {
+        const first = assemblyNames.find(
+          name => assemblyManager.get(name)?.species === selectedSpecies,
+        )
+        const next = first || ''
+        if (next !== selectedAsm) {
+          setSelectedAsm(next)
+        }
+      }
+    }, [selectedSpecies, selectedAsm, assemblyNames, assemblyManager])
     const assemblyError = assemblyNames.length
       ? assembly?.error
       : 'No configured assemblies'
@@ -109,59 +127,88 @@ const LinearGenomeViewImportForm = observer(
                 spacing={1}
                 justifyContent="center"
                 alignItems="center"
+                direction="column"
               >
-                <FormControl>
-                  <AssemblySelector
-                    onChange={val => {
-                      setSelectedAsm(val)
-                    }}
-                    localStorageKey="lgv"
-                    session={session}
-                    selected={selectedAsm}
-                  />
-                </FormControl>
-                {selectedAsm ? (
-                  assemblyError ? (
-                    <CloseIcon style={{ color: 'red' }} />
-                  ) : assemblyLoaded ? (
+                <Grid>
+                  <Grid
+                    container
+                    spacing={1}
+                    justifyContent="center"
+                    alignItems="center"
+                  >
                     <FormControl>
-                      <ImportFormRefNameAutocomplete
-                        value={value}
-                        setValue={setValue}
-                        selectedAsm={selectedAsm}
-                        setOption={setOption}
-                        model={model}
+                      <SpeciesSelector
+                        session={session}
+                        selected={selectedSpecies}
+                        onChange={val => {
+                          setSelectedSpecies(val)
+                        }}
                       />
                     </FormControl>
-                  ) : (
-                    <CircularProgress size={20} disableShrink />
-                  )
-                ) : null}
-                <FormControl>
-                  <Button
-                    type="submit"
-                    disabled={!value}
-                    className={classes.button}
-                    variant="contained"
-                    color="primary"
+                    <FormControl>
+                      <AssemblySelector
+                        onChange={val => {
+                          setSelectedAsm(val)
+                        }}
+                        species={selectedSpecies}
+                        localStorageKey="lgv"
+                        session={session}
+                        selected={selectedAsm}
+                      />
+                    </FormControl>
+                    {selectedAsm ? (
+                      assemblyError ? (
+                        <CloseIcon style={{ color: 'red' }} />
+                      ) : assemblyLoaded ? (
+                        <FormControl>
+                          <ImportFormRefNameAutocomplete
+                            value={value}
+                            setValue={setValue}
+                            selectedAsm={selectedAsm}
+                            setOption={setOption}
+                            model={model}
+                          />
+                        </FormControl>
+                      ) : (
+                        <CircularProgress size={20} disableShrink />
+                      )
+                    ) : null}
+                  </Grid>
+                </Grid>
+                <Grid>
+                  <Grid
+                    container
+                    spacing={1}
+                    justifyContent="center"
+                    alignItems="center"
                   >
-                    Open
-                  </Button>
-                </FormControl>
-                <FormControl>
-                  <Button
-                    disabled={!value}
-                    className={classes.button}
-                    onClick={() => {
-                      model.setError(undefined)
-                      model.showAllRegionsInAssembly(selectedAsm)
-                    }}
-                    variant="contained"
-                    color="secondary"
-                  >
-                    Show all regions in assembly
-                  </Button>
-                </FormControl>
+                    <FormControl>
+                      <Button
+                        type="submit"
+                        disabled={!value}
+                        className={classes.button}
+                        variant="contained"
+                        color="primary"
+                      >
+                        Open
+                      </Button>
+                    </FormControl>
+                    <FormControl>
+                      <Button
+                        disabled={!value}
+                        className={classes.button}
+                        onClick={() => {
+                          model.setError(undefined)
+                          model.showAllRegionsInAssembly(selectedAsm)
+                        }}
+                        variant="contained"
+                        color="secondary"
+                      >
+                        Show all regions in assembly
+                      </Button>
+                    </FormControl>
+                  </Grid>
+                </Grid>
               </Grid>
             </form>
           </Container>

@@ -272,6 +272,13 @@ export default function assemblyFactory(
       get displayName(): string {
         return self.getConf('displayName') || self.getConf('name') || ''
       },
+
+      /**
+       * #getter
+       */
+      get species(): string {
+        return self.getConf('species') || ''
+      },
       /**
        * #method
        */

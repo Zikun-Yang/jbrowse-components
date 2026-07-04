@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { AssemblySelector, ErrorMessage } from '@jbrowse/core/ui'
+import {
+  AssemblySelector,
+  ErrorMessage,
+  SpeciesSelector,
+} from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { Button, Container, Grid } from '@mui/material'
@@ -24,7 +28,22 @@ const ImportForm = observer(function ImportForm({
   const { error } = model
   const { assemblyNames, assemblyManager } = session
   const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+  const [selectedSpecies, setSelectedSpecies] = useState('')
   const assembly = assemblyManager.get(selectedAsm)
+
+  useEffect(() => {
+    const assembly = assemblyManager.get(selectedAsm)
+    if (selectedSpecies && assembly?.species !== selectedSpecies) {
+      const first = assemblyNames.find(
+        name => assemblyManager.get(name)?.species === selectedSpecies,
+      )
+      const next = first || ''
+      if (next !== selectedAsm) {
+        setSelectedAsm(next)
+      }
+    }
+  }, [selectedSpecies, selectedAsm, assemblyNames, assemblyManager])
+
   const assemblyError = assemblyNames.length
     ? assembly?.error
     : 'No configured assemblies'
@@ -39,11 +58,19 @@ const ImportForm = observer(function ImportForm({
         </Grid>
       ) : null}
       <Grid container spacing={1} justifyContent="center" alignItems="center">
+        <SpeciesSelector
+          session={session}
+          selected={selectedSpecies}
+          onChange={val => {
+            setSelectedSpecies(val)
+          }}
+        />
         <AssemblySelector
           onChange={val => {
             model.setError(undefined)
             setSelectedAsm(val)
           }}
+          species={selectedSpecies}
           session={session}
           selected={selectedAsm}
         />

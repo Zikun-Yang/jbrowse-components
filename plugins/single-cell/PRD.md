@@ -1,27 +1,34 @@
 # JBrowse 2 Single Cell Visualization Plugin — PRD
 
-> Status: Planning | Target: `plugins/single-cell/`
-> Reference: CellXGene (`/home/zkyang/github_repo/dev/cellxgene/client/src`)
+> Status: Planning | Target: `plugins/single-cell/` Reference: CellXGene
+> (`/home/zkyang/github_repo/dev/cellxgene/client/src`)
 
 ---
 
 ## 0. 总体设计原则
 
-1. **JBrowse 2 原生优先**：所有代码遵循现有插件架构（MST、PluggableElementTypes、ConfigurationSchema），不引入外部状态管理（CellXGene 用 Redux，我们全部用 MST）。
-2. **CellXGene 取其精华**：参考其 `regl` WebGL 渲染管线、`AnnoMatrix` 数据代理设计、`Lasso` 选择交互，但接口全部 JBrowse 化。
-3. **Zarr 为唯一输入格式**：不直接在浏览器读 `.h5ad`（依赖复杂），要求用户预先用 CLI 将 h5ad 导出为 Zarr v2/v3。
-4. **Add 菜单一级入口**：像 `CircularView`、`DotplotView` 一样，在顶部菜单 `Add` → `Single cell view` 中展开。
+1. **JBrowse
+   2 原生优先**：所有代码遵循现有插件架构（MST、PluggableElementTypes、ConfigurationSchema），不引入外部状态管理（CellXGene 用 Redux，我们全部用 MST）。
+2. **CellXGene 取其精华**：参考其 `regl` WebGL 渲染管线、`AnnoMatrix`
+   数据代理设计、`Lasso` 选择交互，但接口全部 JBrowse 化。
+3. **Zarr 为唯一输入格式**：不直接在浏览器读
+   `.h5ad`（依赖复杂），要求用户预先用 CLI 将 h5ad 导出为 Zarr v2/v3。
+4. **Add 菜单一级入口**：像 `CircularView`、`DotplotView` 一样，在顶部菜单 `Add`
+   → `Single cell view` 中展开。
 
 ---
 
 ## Phase 0: 插件脚手架与 Add 菜单注册
 
 ### 目标
-创建 `plugins/single-cell` 目录，完成最小可编译插件，注册 `SingleCellView`，在 `Add` 菜单中显示入口。
+
+创建 `plugins/single-cell` 目录，完成最小可编译插件，注册 `SingleCellView`，在
+`Add` 菜单中显示入口。
 
 ### 需求详述
 
 #### 0.1 目录结构
+
 ```
 plugins/single-cell/
 ├── package.json              # 仿 circular-view，依赖 @jbrowse/core, regl, zarr
@@ -94,9 +101,9 @@ function stateModelFactory(pluginManager: PluginManager) {
     BaseViewModel,
     types.model({
       type: types.literal('SingleCellView'),
-      dataset: types.maybe(types.string),        // zarr path
-      embedding: types.maybe(types.string),      // e.g. 'X_umap'
-      colorBy: types.maybe(types.string),        // e.g. 'cell_type'
+      dataset: types.maybe(types.string), // zarr path
+      embedding: types.maybe(types.string), // e.g. 'X_umap'
+      colorBy: types.maybe(types.string), // e.g. 'cell_type'
       // Phase 2 再补充 selection、camera、etc.
     }),
   )
@@ -104,6 +111,7 @@ function stateModelFactory(pluginManager: PluginManager) {
 ```
 
 ### 验收标准
+
 - [ ] `pnpm build` 在 `plugins/single-cell` 中通过
 - [ ] 在 JBrowse web app 中点击 `Add` → `Single cell view`，成功创建一个空白视图
 - [ ] 视图可关闭、可 resize、有标题栏
@@ -113,13 +121,16 @@ function stateModelFactory(pluginManager: PluginManager) {
 ## Phase 1: 数据层 — Zarr/AnnData Adapter
 
 ### 目标
-实现 `SingleCellDataAdapter`，支持从 Zarr 目录读取 AnnData 的 `obs`、`var`、`obsm`、`X`，并设计一个可扩展的数据代理层。
+
+实现 `SingleCellDataAdapter`，支持从 Zarr 目录读取 AnnData 的
+`obs`、`var`、`obsm`、`X`，并设计一个可扩展的数据代理层。
 
 ### 需求详述
 
 #### 1.1 输入数据格式
 
 用户通过 CLI 预处理：
+
 ```bash
 # 未来由 jbrowse-cli 提供
 jbrowse singlecell-preprocess \
@@ -129,6 +140,7 @@ jbrowse singlecell-preprocess \
 ```
 
 Zarr 目录结构：
+
 ```
 pbmc.zarr/
 ├── obs/                    # DataFrame (cells × metadata)
@@ -154,6 +166,7 @@ pbmc.zarr/
 #### 1.2 Adapter 设计（参考 CellXGene `AnnoMatrix`）
 
 CellXGene 的 `AnnoMatrix` 是一个**不可变数据代理**，核心思想：
+
 - 所有数据访问通过 `fetch(field, query)` 异步进行
 - 内部有 `_cache` 做 LRU 缓存
 - 支持视图堆叠（`subset`, `clip` 等），但我们要简化
@@ -164,19 +177,23 @@ JBrowse 化设计：
 // src/SingleCellAdapter/SingleCellDataAdapter.ts
 interface SingleCellZarrData {
   // 元数据（小，可全量加载）
-  obsSchema: DataFrameSchema           // cell metadata schema
-  varSchema: DataFrameSchema           // feature metadata schema
+  obsSchema: DataFrameSchema // cell metadata schema
+  varSchema: DataFrameSchema // feature metadata schema
   nObs: number
   nVar: number
 
   // 数据（按需分块加载）
   getObsColumn(col: string): Promise<TypedArray>
-  getObsm(embedding: string): Promise<Float32Array>   // [x0,y0,x1,y1,...]
-  getExpression(gene: string): Promise<Float32Array>  // 某基因在所有细胞的表达
+  getObsm(embedding: string): Promise<Float32Array> // [x0,y0,x1,y1,...]
+  getExpression(gene: string): Promise<Float32Array> // 某基因在所有细胞的表达
   getVarColumn(col: string): Promise<TypedArray>
 
   // 基因组联动专用
-  getCellsInRegion(chr: string, start: number, end: number): Promise<Set<string>>
+  getCellsInRegion(
+    chr: string,
+    start: number,
+    end: number,
+  ): Promise<Set<string>>
 }
 ```
 
@@ -195,8 +212,11 @@ class SingleCellZarrLoader {
   }
 
   async getObsm(name: string): Promise<Float32Array> {
-    const arr = await openArray({ store: this.root.store, path: `obsm/${name}` })
-    const data = await arr.get() as TypedArray
+    const arr = await openArray({
+      store: this.root.store,
+      path: `obsm/${name}`,
+    })
+    const data = (await arr.get()) as TypedArray
     return new Float32Array(data.buffer)
   }
 
@@ -213,15 +233,17 @@ class SingleCellZarrLoader {
 ```typescript
 // src/SingleCellAdapter/index.ts
 pluginManager.addAdapterType(
-  () => new AdapterType({
-    name: 'SingleCellZarrAdapter',
-    configSchema: singleCellAdapterConfigSchema,
-    AdapterClass: SingleCellZarrAdapter,
-  })
+  () =>
+    new AdapterType({
+      name: 'SingleCellZarrAdapter',
+      configSchema: singleCellAdapterConfigSchema,
+      AdapterClass: SingleCellZarrAdapter,
+    }),
 )
 ```
 
 配置 Schema：
+
 ```typescript
 const singleCellAdapterConfigSchema = ConfigurationSchema(
   'SingleCellZarrAdapter',
@@ -229,7 +251,7 @@ const singleCellAdapterConfigSchema = ConfigurationSchema(
     zarrLocation: { type: 'fileLocation', defaultValue: { uri: '' } },
     defaultEmbedding: { type: 'string', defaultValue: 'X_umap' },
     defaultColorBy: { type: 'string', defaultValue: 'cell_type' },
-    obsIndexColumn: { type: 'string', defaultValue: 'index' },  // cell barcode column
+    obsIndexColumn: { type: 'string', defaultValue: 'index' }, // cell barcode column
   },
 )
 ```
@@ -262,7 +284,9 @@ actions: {
 ```
 
 ### 验收标准
-- [ ] 能成功加载一个公开单细胞 Zarr 数据集（如 10x PBMC 3k），读取 `obs` 和 `X_umap`
+
+- [ ] 能成功加载一个公开单细胞 Zarr 数据集（如 10x PBMC 3k），读取 `obs` 和
+      `X_umap`
 - [ ] `obs` 中的 categorical 列正确解码为字符串标签
 - [ ] 加载过程有 loading spinner，失败有 error message
 - [ ] 单元测试：mock zarr 内存 store，验证 `getObsm`、`getObsColumn` 正确性
@@ -272,17 +296,22 @@ actions: {
 ## Phase 2: SingleCellView WebGL UMAP 核心
 
 ### 目标
-在 `SingleCellView` 中实现高性能 WebGL 散点图渲染，支持平移缩放、Lasso/矩形选择、Color by 分类/连续值。
+
+在 `SingleCellView`
+中实现高性能 WebGL 散点图渲染，支持平移缩放、Lasso/矩形选择、Color
+by 分类/连续值。
 
 ### 需求详述
 
 #### 2.1 渲染管线（参考 CellXGene `drawPointsRegl`）
 
 CellXGene 的渲染核心非常精炼：
+
 - **一个 `regl` draw call**：`primitive: 'points'`
 - **三个 attribute**：`position` (vec2), `color` (vec3), `flag` (float)
 - **一个 camera transform**：`projView` 矩阵处理平移缩放
-- **Shader 中处理三种状态**：background (灰色半透明) / selected (正常大小) / highlight (放大)
+- **Shader 中处理三种状态**：background (灰色半透明) / selected (正常大小) /
+  highlight (放大)
 
 我们复刻这个管线，但用 TypeScript + React hooks：
 
@@ -338,6 +367,7 @@ function EmbeddingCanvas({
 ```
 
 **Vertex Shader**（直接翻译 CellXGene）：
+
 ```glsl
 precision mediump float;
 attribute vec2 position;
@@ -371,6 +401,7 @@ void main() {
 ```
 
 **Fragment Shader**（画圆点）：
+
 ```glsl
 precision mediump float;
 varying lowp vec4 fragColor;
@@ -386,8 +417,8 @@ void main() {
 
 ```typescript
 interface Camera {
-  view(): mat3           // 返回 projView 矩阵
-  distance(): number     // 缩放距离，用于动态点大小
+  view(): mat3 // 返回 projView 矩阵
+  distance(): number // 缩放距离，用于动态点大小
   pan(dx: number, dy: number): void
   zoom(factor: number, cx: number, cy: number): void
   reset(): void
@@ -426,6 +457,7 @@ function LassoOverlay({
 ```
 
 CellXGene 的 Lasso 细节：
+
 - 拖拽过程中实时画虚线路径
 - 终点距离起点 < 75px 时自动闭合，路径变绿色
 - 支持取消（未闭合时释放鼠标）
@@ -434,11 +466,11 @@ CellXGene 的 Lasso 细节：
 
 支持三种 Color Mode：
 
-| Mode | 数据来源 | 色标 |
-|---|---|---|
-| `categorical metadata` | `obs.{column}` | D3 `scaleOrdinal` (Table10/20) |
-| `continuous metadata` | `obs.{column}` | D3 `scaleSequential` (viridis) |
-| `expression` | `X[:, gene_index]` | D3 `scaleSequential` (viridis) |
+| Mode                   | 数据来源           | 色标                           |
+| ---------------------- | ------------------ | ------------------------------ |
+| `categorical metadata` | `obs.{column}`     | D3 `scaleOrdinal` (Table10/20) |
+| `continuous metadata`  | `obs.{column}`     | D3 `scaleSequential` (viridis) |
+| `expression`           | `X[:, gene_index]` | D3 `scaleSequential` (viridis) |
 
 实现：
 
@@ -464,10 +496,12 @@ function computeColors(
     }
     case 'continuous':
     case 'expression': {
-      const values = mode === 'expression'
-        ? data.getExpression(accessor)
-        : data.getObsColumn(accessor)
-      const scale = d3.scaleSequential(d3.interpolateViridis)
+      const values =
+        mode === 'expression'
+          ? data.getExpression(accessor)
+          : data.getObsColumn(accessor)
+      const scale = d3
+        .scaleSequential(d3.interpolateViridis)
         .domain([d3.min(values)!, d3.max(values)!])
       // ... 同上填充 rgb
     }
@@ -496,46 +530,48 @@ function computeColors(
 #### 2.6 Model 扩展
 
 ```typescript
-types.model({
-  // ...Phase 0/1 fields...
+types
+  .model({
+    // ...Phase 0/1 fields...
 
-  // 渲染状态
-  embedding: types.optional(types.string, 'X_umap'),
-  colorMode: types.optional(
-    types.enumeration(['categorical', 'continuous', 'expression']),
-    'categorical',
-  ),
-  colorBy: types.optional(types.string, 'cell_type'),
-  colorByGene: types.maybe(types.string),     // expression mode 时用的基因名
+    // 渲染状态
+    embedding: types.optional(types.string, 'X_umap'),
+    colorMode: types.optional(
+      types.enumeration(['categorical', 'continuous', 'expression']),
+      'categorical',
+    ),
+    colorBy: types.optional(types.string, 'cell_type'),
+    colorByGene: types.maybe(types.string), // expression mode 时用的基因名
 
-  // 交互状态
-  selectedCells: types.frozen<Set<string>>(new Set()),
-  highlightedCluster: types.maybe(types.string),
-  selectionTool: types.optional(
-    types.enumeration(['pan', 'lasso', 'rect']),
-    'pan',
-  ),
+    // 交互状态
+    selectedCells: types.frozen<Set<string>>(new Set()),
+    highlightedCluster: types.maybe(types.string),
+    selectionTool: types.optional(
+      types.enumeration(['pan', 'lasso', 'rect']),
+      'pan',
+    ),
 
-  // Camera（不存整个矩阵，只存可序列化的参数）
-  cameraOffset: types.optional(types.array(types.number), [0, 0]),
-  cameraScale: types.optional(types.number, 1),
-})
-.actions(self => ({
-  setSelectedCells(cells: Set<string>) {
-    self.selectedCells = cells as unknown as typeof self.selectedCells
-  },
-  setColorBy(mode, accessor, gene?) {
-    self.colorMode = mode
-    self.colorBy = accessor
-    self.colorByGene = gene
-  },
-  setSelectionTool(tool: 'pan' | 'lasso' | 'rect') {
-    self.selectionTool = tool
-  },
-}))
+    // Camera（不存整个矩阵，只存可序列化的参数）
+    cameraOffset: types.optional(types.array(types.number), [0, 0]),
+    cameraScale: types.optional(types.number, 1),
+  })
+  .actions(self => ({
+    setSelectedCells(cells: Set<string>) {
+      self.selectedCells = cells as unknown as typeof self.selectedCells
+    },
+    setColorBy(mode, accessor, gene?) {
+      self.colorMode = mode
+      self.colorBy = accessor
+      self.colorByGene = gene
+    },
+    setSelectionTool(tool: 'pan' | 'lasso' | 'rect') {
+      self.selectionTool = tool
+    },
+  }))
 ```
 
 ### 验收标准
+
 - [ ] 10 万细胞 UMAP 在 60fps 下平移缩放
 - [ ] Lasso 选择后，选中细胞高亮，其余变半透明（flag 系统工作）
 - [ ] Color by `cell_type` 显示正确分类颜色
@@ -548,43 +584,50 @@ types.model({
 ## Phase 3: 基因组 ↔ 单细胞双向联动
 
 ### 目标
+
 实现两个方向的实时联动：
-1. **Genome → Single Cell**：在 LinearGenomeView 中选择区域 → UMAP 中只高亮在该区域有信号的细胞
-2. **Single Cell → Genome**：在 UMAP 中 Lasso 选细胞 → 现有 Track（如 ATAC coverage）只显示这些细胞的信号
+
+1. **Genome → Single Cell**：在 LinearGenomeView 中选择区域 →
+   UMAP 中只高亮在该区域有信号的细胞
+2. **Single Cell → Genome**：在 UMAP 中 Lasso 选细胞 → 现有 Track（如 ATAC
+   coverage）只显示这些细胞的信号
 
 ### 需求详述
 
 #### 3.1 共享状态设计：Session 级 `SingleCellSelection`
 
-在 MST session model 中新增一个共享状态节点（不污染现有 session，通过 plugin 的 `configure` 扩展）：
+在 MST session model 中新增一个共享状态节点（不污染现有 session，通过 plugin 的
+`configure` 扩展）：
 
 ```typescript
 // src/SessionExtension.ts
 import { types } from '@jbrowse/mobx-state-tree'
 
-export const SingleCellSelection = types.model('SingleCellSelection', {
-  selectedCells: types.frozen<Set<string>>(new Set()),
-  selectedRegion: types.maybe(types.frozen<Region>()),
-  activeSingleCellViewId: types.maybe(types.string),
-})
-.actions(self => ({
-  setSelectedCells(cells: Set<string>) {
-    self.selectedCells = cells as unknown as typeof self.selectedCells
-  },
-  setSelectedRegion(region?: Region) {
-    self.selectedRegion = region
-  },
-  setActiveSingleCellViewId(id?: string) {
-    self.activeSingleCellViewId = id
-  },
-}))
+export const SingleCellSelection = types
+  .model('SingleCellSelection', {
+    selectedCells: types.frozen<Set<string>>(new Set()),
+    selectedRegion: types.maybe(types.frozen<Region>()),
+    activeSingleCellViewId: types.maybe(types.string),
+  })
+  .actions(self => ({
+    setSelectedCells(cells: Set<string>) {
+      self.selectedCells = cells as unknown as typeof self.selectedCells
+    },
+    setSelectedRegion(region?: Region) {
+      self.selectedRegion = region
+    },
+    setActiveSingleCellViewId(id?: string) {
+      self.activeSingleCellViewId = id
+    },
+  }))
 
 // 在 plugin.configure() 中通过 pluginManager.rootModel 的 extend() 注入
 ```
 
 #### 3.2 方向 A: Genome Region → Cell Filtering
 
-**场景**: 用户在 ATAC track 上框选了一个 peak 区域，UMAP 上高亮在该区域有 reads 的细胞。
+**场景**: 用户在 ATAC
+track 上框选了一个 peak 区域，UMAP 上高亮在该区域有 reads 的细胞。
 
 **数据准备**: 需要在 Zarr 中预计算或存储 `cell × region` 的关联：
 
@@ -598,7 +641,8 @@ pbmc.zarr/
 └── cell_barcodes.json      # 细胞 barcode 列表（与 obs index 对齐）
 ```
 
-或者更简单：在 `var` 中存储 ATAC peak 坐标，通过 `X_atac` 矩阵（cell × peak）查询：
+或者更简单：在 `var` 中存储 ATAC peak 坐标，通过 `X_atac` 矩阵（cell ×
+peak）查询：
 
 ```typescript
 // 给定基因组 region，找出覆盖它的 peaks
@@ -632,32 +676,38 @@ EmbeddingCanvas flags updated:
   不在 selectedCells 中的细胞 → flag |= BACKGROUND
 ```
 
-**性能考虑**: 
-- 如果实时查询 `X` 矩阵太慢，预先将 `obs` 中增加一列 `peak_regions`（每个细胞覆盖的 peak 列表），但这会很大。
-- **推荐**：在数据预处理阶段，按染色体窗口（如 100kb bins）预计算每个细胞的 signal，存储为 `uns/genome_bins_signal/`。查询时只需查几个 bins。
+**性能考虑**:
+
+- 如果实时查询 `X` 矩阵太慢，预先将 `obs` 中增加一列
+  `peak_regions`（每个细胞覆盖的 peak 列表），但这会很大。
+- **推荐**：在数据预处理阶段，按染色体窗口（如 100kb
+  bins）预计算每个细胞的 signal，存储为
+  `uns/genome_bins_signal/`。查询时只需查几个 bins。
 
 #### 3.3 方向 B: Cell Selection → Track Filtering
 
-**场景**: 用户在 UMAP 上 Lasso 选了 500 个 Microglia 细胞，ATAC Coverage track 只显示这群细胞的 pileup。
+**场景**: 用户在 UMAP 上 Lasso 选了 500 个 Microglia 细胞，ATAC Coverage
+track 只显示这群细胞的 pileup。
 
-**核心挑战**: 现有 `WiggleTrack` / `AlignmentsTrack` 的 `getFeatures` 没有 `cellIds` 过滤参数。
+**核心挑战**: 现有 `WiggleTrack` / `AlignmentsTrack` 的 `getFeatures` 没有
+`cellIds` 过滤参数。
 
 **方案**：扩展 `BaseOptions` + 适配器层面过滤
 
 ```typescript
 // 扩展 BaseOptions（在 plugin 中扩展类型）
 interface SingleCellOptions extends BaseOptions {
-  cellBarcodes?: string[]     // 允许传入细胞 barcode 白名单
+  cellBarcodes?: string[] // 允许传入细胞 barcode 白名单
 }
 ```
 
 对于不同 track 类型的过滤策略：
 
-| Track 类型 | 过滤方式 | 实现位置 |
-|---|---|---|
-| **Alignments (BAM/CRAM)** | 读取时过滤 `CB` tag（10x 格式） | `CramAdapter` / `BamAdapter` 扩展 |
-| **Coverage (BigWig)** | 如果 bigWig 是 per-cluster 的，切换 source | 新增 `SingleCellBigWigAdapter` |
-| **Coverage (预聚合)** | 实时从原始 scBAM 重新聚合 | Web Worker 中处理 |
+| Track 类型                | 过滤方式                                   | 实现位置                          |
+| ------------------------- | ------------------------------------------ | --------------------------------- |
+| **Alignments (BAM/CRAM)** | 读取时过滤 `CB` tag（10x 格式）            | `CramAdapter` / `BamAdapter` 扩展 |
+| **Coverage (BigWig)**     | 如果 bigWig 是 per-cluster 的，切换 source | 新增 `SingleCellBigWigAdapter`    |
+| **Coverage (预聚合)**     | 实时从原始 scBAM 重新聚合                  | Web Worker 中处理                 |
 
 **最实用的 MVP 实现**：预聚合 per-cluster Coverage
 
@@ -672,6 +722,7 @@ jbrowse singlecell-preprocess \
 ```
 
 然后在 JBrowse 配置中：
+
 ```json
 {
   "type": "SingleCellWiggleTrack",
@@ -688,8 +739,8 @@ jbrowse singlecell-preprocess \
 
 当用户在 UMAP 上选择细胞后，根据选择细胞的聚类分布，动态合并对应的 bigWig（加权平均）。
 
-**更灵活的实现（Phase 3.5）**：
-对任意细胞子集，在 Web Worker 中从 scBAM 实时过滤 `CB` tag 并计算 coverage。这需要一个专门的 `SingleCellCoverageRenderer`。
+**更灵活的实现（Phase 3.5）**：对任意细胞子集，在 Web Worker 中从 scBAM 实时过滤
+`CB` tag 并计算 coverage。这需要一个专门的 `SingleCellCoverageRenderer`。
 
 #### 3.4 UI 联动反馈
 
@@ -698,16 +749,20 @@ jbrowse singlecell-preprocess \
 - 提供一个 "Clear selection" 按钮，双向清除
 
 ### 验收标准
+
 - [ ] 在 LGV 中框选区域后，UMAP 上对应细胞 200ms 内高亮
-- [ ] 在 UMAP 上 Lasso 选细胞后，ATAC coverage track 自动刷新（显示仅选中细胞的信号）
+- [ ] 在 UMAP 上 Lasso 选细胞后，ATAC coverage
+      track 自动刷新（显示仅选中细胞的信号）
 - [ ] 选择状态在 session 关闭/恢复时正确序列化
-- [ ] 多个 SingleCellView 实例之间不互相干扰（通过 `activeSingleCellViewId` 区分）
+- [ ] 多个 SingleCellView 实例之间不互相干扰（通过 `activeSingleCellViewId`
+      区分）
 
 ---
 
 ## Phase 4: 基因表达面板与统计图表
 
 ### 目标
+
 添加基因搜索、Dot plot、Violin plot 面板，支持与 UMAP 的联动。
 
 ### 需求详述
@@ -727,6 +782,7 @@ jbrowse singlecell-preprocess \
 ```
 
 参考 CellXGene `quickGene.js`：
+
 - 输入时从 `var` 索引中搜索基因名
 - 支持多选，形成 "active gene set"
 
@@ -746,12 +802,14 @@ interface DotPlotData {
 ```
 
 用 `Observable Plot` 或 `visx` 渲染：
+
 - X 轴：基因
 - Y 轴：聚类
 - 颜色：平均表达量（viridis）
 - 点大小：表达比例
 
 交互：
+
 - Hover dot → 显示数值
 - Click 聚类标签 → 在 UMAP 中高亮该聚类
 
@@ -771,10 +829,12 @@ pbmc.zarr/uns/violin_data/{gene_name}.json
 #### 4.4 与 UMAP 的联动
 
 - **Color by gene**: 搜索并选择基因 → UMAP 自动切换为 `colorMode: 'expression'`
-- **Hover cluster in dot plot** → UMAP 临时高亮该聚类（hover 状态，不写入 selectedCells）
+- **Hover cluster in dot plot** →
+  UMAP 临时高亮该聚类（hover 状态，不写入 selectedCells）
 - **Gene set average**: 选择多个基因 → 计算 mean expression → UMAP color by 均值
 
 ### 验收标准
+
 - [ ] 基因搜索支持前缀匹配，100ms 内返回结果
 - [ ] Dot plot 正确展示预计算的聚类均值
 - [ ] 点击 Dot plot 上的聚类 → UMAP 上临时高亮对应细胞
@@ -785,28 +845,34 @@ pbmc.zarr/uns/violin_data/{gene_name}.json
 ## Phase 5: 性能优化与产品化
 
 ### 目标
+
 处理 >50 万细胞的大规模数据集，确保流畅交互。
 
 ### 需求详述
 
 #### 5.1 超大规模渲染（>50万细胞）
 
-| 细胞数 | 策略 |
-|---|---|
-| < 10万 | 原生 WebGL points，全部渲染 |
-| 10-50万 | WebGL points + frustum culling（只渲染 viewport 内细胞） |
-| > 50万 | **Datashader 策略**：降采样为密度热图，zoom in 后切换为 points |
+| 细胞数  | 策略                                                           |
+| ------- | -------------------------------------------------------------- |
+| < 10万  | 原生 WebGL points，全部渲染                                    |
+| 10-50万 | WebGL points + frustum culling（只渲染 viewport 内细胞）       |
+| > 50万  | **Datashader 策略**：降采样为密度热图，zoom in 后切换为 points |
 
 **Datashader 简化实现**：
+
 - 在 Web Worker 中将 viewport 分为 512×512 bins
 - 每个 bin 计算细胞数量和最常见聚类
-- 主线程用 WebGL 画一个 fullscreen quad，fragment shader 根据 density texture 着色
+- 主线程用 WebGL 画一个 fullscreen quad，fragment shader 根据 density
+  texture 着色
 
 #### 5.2 数据流优化
 
-- **Zarr chunking**: 确保 `obsm/X_umap` 的 chunk size 为 [8192, 2]（一行一个 cell，每 chunk 8192 cells）
-- **Lazy expression**: `X` 矩阵只加载用户查询的基因列（如果 zarr 按 gene 分块）；否则需要 rechunk
-- **BitSet**: `selectedCells` 用 `bitset.js` 替代 `Set<string>`（100万细胞 → 125KB vs 数MB）
+- **Zarr chunking**: 确保 `obsm/X_umap` 的 chunk size 为 [8192,
+  2]（一行一个 cell，每 chunk 8192 cells）
+- **Lazy expression**: `X`
+  矩阵只加载用户查询的基因列（如果 zarr 按 gene 分块）；否则需要 rechunk
+- **BitSet**: `selectedCells` 用 `bitset.js` 替代 `Set<string>`（100万细胞 →
+  125KB vs 数MB）
 
 #### 5.3 预聚合 Coverage（ATAC 联动关键）
 
@@ -841,11 +907,14 @@ scatac_coverage.zarr/
   - `SingleCellZarrLoader.test.ts`：mock zarr memory store
   - `EmbeddingCanvas.test.ts`：验证 shader 编译、buffer 更新
   - `LassoOverlay.test.ts`：mock 鼠标事件，验证多边形检测
-- **Image snapshot**：在 `products/jbrowse-web/src/tests/` 中添加单细胞视图的截图测试
-- **Storybook**：在 `products/jbrowse-react-linear-genome-view` 或单独 storybook 中添加 SingleCellView stories
+- **Image snapshot**：在 `products/jbrowse-web/src/tests/`
+  中添加单细胞视图的截图测试
+- **Storybook**：在 `products/jbrowse-react-linear-genome-view`
+  或单独 storybook 中添加 SingleCellView stories
 - **文档**：`website/docs/single_cell.md`
 
 ### 验收标准
+
 - [ ] 100 万细胞数据集能在 30 秒内完成初始加载（metadata + UMAP 坐标）
 - [ ] 平移缩放保持 30fps 以上
 - [ ] 所有 Phase 1-4 功能在 100 万细胞下正常工作
@@ -856,30 +925,30 @@ scatac_coverage.zarr/
 
 ## 附录 A: CellXGene 代码参考速查
 
-| 功能 | CellXGene 文件 | 关键设计 |
-|---|---|---|
-| 数据代理 | `annoMatrix/annoMatrix.js` | 不可变对象，`_cache` 分层缓存，`fetch()` 异步解析 |
-| 交叉筛选 | `annoMatrix/crossfilter.js` | 与 AnnoMatrix 同步的 Crossfilter 封装 |
-| 数据加载 | `annoMatrix/loader.js` | HTTP 代理，PromiseLimit 并发控制 |
-| WebGL 渲染 | `components/graph/drawPointsRegl.js` | 单 draw call，flag + color + position attribute |
-| Lasso | `components/graph/setupLasso.js` | D3 drag，SVG 覆盖层，自动闭合距离 75px |
-| Camera | `util/camera.js` | gl-matrix mat3，wheel 缩放，drag 平移 |
-| 颜色系统 | `util/stateManager/colorHelpers.js` | categorical/continuous/expression 三模式，memoize 缓存 |
-| 全局常量 | `globals.js` | 颜色、字体、布局尺寸常量 |
-| 散点图 | `components/scatterplot/scatterplot.js` | 类似 Graph 但 x/y 轴用不同 scale |
+| 功能       | CellXGene 文件                          | 关键设计                                               |
+| ---------- | --------------------------------------- | ------------------------------------------------------ |
+| 数据代理   | `annoMatrix/annoMatrix.js`              | 不可变对象，`_cache` 分层缓存，`fetch()` 异步解析      |
+| 交叉筛选   | `annoMatrix/crossfilter.js`             | 与 AnnoMatrix 同步的 Crossfilter 封装                  |
+| 数据加载   | `annoMatrix/loader.js`                  | HTTP 代理，PromiseLimit 并发控制                       |
+| WebGL 渲染 | `components/graph/drawPointsRegl.js`    | 单 draw call，flag + color + position attribute        |
+| Lasso      | `components/graph/setupLasso.js`        | D3 drag，SVG 覆盖层，自动闭合距离 75px                 |
+| Camera     | `util/camera.js`                        | gl-matrix mat3，wheel 缩放，drag 平移                  |
+| 颜色系统   | `util/stateManager/colorHelpers.js`     | categorical/continuous/expression 三模式，memoize 缓存 |
+| 全局常量   | `globals.js`                            | 颜色、字体、布局尺寸常量                               |
+| 散点图     | `components/scatterplot/scatterplot.js` | 类似 Graph 但 x/y 轴用不同 scale                       |
 
 ---
 
 ## 附录 B: JBrowse 2 插件注册参考
 
-| 元素 | 参考文件 | 注册方式 |
-|---|---|---|
-| ViewType | `plugins/circular-view/src/CircularView/index.ts` | `pluginManager.addViewType()` |
-| 菜单项 | `plugins/circular-view/src/index.ts:configure()` | `rootModel.appendToSubMenu(['Add'], ...)` |
-| AdapterType | `plugins/wiggle/src/BigWigAdapter/BigWigAdapter.ts` | `pluginManager.addAdapterType()` |
-| DisplayType | `plugins/wiggle/src/XYPlotDisplay/index.ts` | `pluginManager.addDisplayType()` |
-| RendererType | `plugins/wiggle/src/XYPlotRenderer/index.ts` | `pluginManager.addRendererType()` |
-| WidgetType | 任意 plugin 的 `src/Widget/` | `pluginManager.addWidgetType()` |
+| 元素         | 参考文件                                            | 注册方式                                  |
+| ------------ | --------------------------------------------------- | ----------------------------------------- |
+| ViewType     | `plugins/circular-view/src/CircularView/index.ts`   | `pluginManager.addViewType()`             |
+| 菜单项       | `plugins/circular-view/src/index.ts:configure()`    | `rootModel.appendToSubMenu(['Add'], ...)` |
+| AdapterType  | `plugins/wiggle/src/BigWigAdapter/BigWigAdapter.ts` | `pluginManager.addAdapterType()`          |
+| DisplayType  | `plugins/wiggle/src/XYPlotDisplay/index.ts`         | `pluginManager.addDisplayType()`          |
+| RendererType | `plugins/wiggle/src/XYPlotRenderer/index.ts`        | `pluginManager.addRendererType()`         |
+| WidgetType   | 任意 plugin 的 `src/Widget/`                        | `pluginManager.addWidgetType()`           |
 
 ---
 
@@ -920,4 +989,4 @@ if __name__ == '__main__':
 
 ---
 
-*PRD 版本: 1.0 | 最后更新: 2026-04-29*
+_PRD 版本: 1.0 | 最后更新: 2026-04-29_

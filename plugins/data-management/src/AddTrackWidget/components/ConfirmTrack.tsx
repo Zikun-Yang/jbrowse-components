@@ -1,6 +1,6 @@
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
-import { AssemblySelector } from '@jbrowse/core/ui'
+import { AssemblySelector, SpeciesSelector } from '@jbrowse/core/ui'
 import {
   getEnv,
   getSession,
@@ -81,25 +81,53 @@ const ConfirmTrack = observer(function ConfirmTrack({
     const { pluginManager } = getEnv(model)
     const Component = pluginManager.evaluateExtensionPoint(
       'Core-addTrackComponent',
-      ({ model }: { model: AddTrackModel }) => (
-        <AssemblySelector
-          session={session}
-          helperText="Select assembly to add track to"
-          selected={model.assembly}
-          onChange={asm => {
-            model.setAssembly(asm)
-          }}
-          TextFieldProps={{
-            fullWidth: true,
-            SelectProps: {
-              SelectDisplayProps: {
-                // @ts-expect-error
-                'data-testid': 'assemblyNameSelect',
-              },
-            },
-          }}
-        />
-      ),
+      ({ model }: { model: AddTrackModel }) => {
+        const session = getSession(model)
+        const { assemblyNames, assemblyManager } = session
+        const [selectedSpecies, setSelectedSpecies] = useState('')
+
+        useEffect(() => {
+          const assembly = assemblyManager.get(model.assembly)
+          if (selectedSpecies && assembly?.species !== selectedSpecies) {
+            const first = assemblyNames.find(
+              name => assemblyManager.get(name)?.species === selectedSpecies,
+            )
+            const next = first || ''
+            if (next !== model.assembly) {
+              model.setAssembly(next)
+            }
+          }
+        }, [selectedSpecies, model, assemblyNames, assemblyManager])
+
+        return (
+          <>
+            <SpeciesSelector
+              session={session}
+              selected={selectedSpecies}
+              onChange={val => {
+                setSelectedSpecies(val)
+              }}
+            />
+            <AssemblySelector
+              session={session}
+              helperText="Select assembly to add track to"
+              selected={model.assembly}
+              species={selectedSpecies}
+              onChange={asm => {
+                model.setAssembly(asm)
+              }}
+              TextFieldProps={{
+                fullWidth: true,
+                slotProps: {
+                  htmlInput: {
+                    'data-testid': 'assemblyNameSelect',
+                  },
+                },
+              }}
+            />
+          </>
+        )
+      },
       { model },
     ) as React.FC<any>
     return (

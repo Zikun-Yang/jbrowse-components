@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { AssemblySelector, ErrorMessage } from '@jbrowse/core/ui'
+import {
+  AssemblySelector,
+  ErrorMessage,
+  SpeciesSelector,
+} from '@jbrowse/core/ui'
 import { getSession, isSessionWithAddTracks } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
@@ -61,10 +65,38 @@ const DotplotImportForm = observer(function DotplotImportForm({
 }) {
   const { classes } = useStyles()
   const session = getSession(model)
-  const { assemblyNames } = session
+  const { assemblyNames, assemblyManager } = session
   const [assembly2, setAssembly2] = useState(assemblyNames[0] || '')
   const [assembly1, setAssembly1] = useState(assemblyNames[0] || '')
+  const [species2, setSpecies2] = useState('')
+  const [species1, setSpecies1] = useState('')
   const [error, setError] = useState<unknown>()
+
+  useEffect(() => {
+    const assembly = assemblyManager.get(assembly2)
+    if (species2 && assembly?.species !== species2) {
+      const first = assemblyNames.find(
+        name => assemblyManager.get(name)?.species === species2,
+      )
+      const next = first || ''
+      if (next !== assembly2) {
+        setAssembly2(next)
+      }
+    }
+  }, [species2, assembly2, assemblyNames, assemblyManager])
+
+  useEffect(() => {
+    const assembly = assemblyManager.get(assembly1)
+    if (species1 && assembly?.species !== species1) {
+      const first = assemblyNames.find(
+        name => assemblyManager.get(name)?.species === species1,
+      )
+      const next = first || ''
+      if (next !== assembly1) {
+        setAssembly1(next)
+      }
+    }
+  }, [species1, assembly1, assemblyNames, assemblyManager])
 
   // this is a combination of any displayed error message we have
   const displayError = error || model.error
@@ -77,17 +109,33 @@ const DotplotImportForm = observer(function DotplotImportForm({
           Select assemblies for dotplot view
         </Typography>
         <Grid container spacing={1} justifyContent="center" alignItems="center">
+          <SpeciesSelector
+            session={session}
+            selected={species2}
+            onChange={val => {
+              setSpecies2(val)
+            }}
+          />
           <AssemblySelector
             helperText="x-axis assembly"
             selected={assembly2}
+            species={species2}
             session={session}
             onChange={val => {
               setAssembly2(val)
             }}
           />
+          <SpeciesSelector
+            session={session}
+            selected={species1}
+            onChange={val => {
+              setSpecies1(val)
+            }}
+          />
           <AssemblySelector
             helperText="y-axis assembly"
             selected={assembly1}
+            species={species1}
             session={session}
             onChange={val => {
               setAssembly1(val)

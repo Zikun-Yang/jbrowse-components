@@ -7,9 +7,7 @@ import {
 
 describe('normalizeEmbedding', () => {
   it('normalizes simple points to [0,1] with full percentile bounds', () => {
-    const positions = new Float32Array([
-      0, 0, 1, 0, 0, 1, 1, 1,
-    ])
+    const positions = new Float32Array([0, 0, 1, 0, 0, 1, 1, 1])
     const { data, bounds } = normalizeEmbedding(positions, 0, 1)
     expect(bounds.minX).toBe(0)
     expect(bounds.maxX).toBe(1)
@@ -27,9 +25,7 @@ describe('normalizeEmbedding', () => {
   })
 
   it('ignores extreme outliers using default percentile bounds', () => {
-    const positions = new Float32Array([
-      0, 0, 1, 0, 0, 1, 1, 1, 100, 100,
-    ])
+    const positions = new Float32Array([0, 0, 1, 0, 0, 1, 1, 1, 100, 100])
     const { data, bounds } = normalizeEmbedding(positions)
     // Default 1st/99th percentile bounds exclude most of the outlier influence.
     expect(bounds.maxX).toBeLessThan(100)

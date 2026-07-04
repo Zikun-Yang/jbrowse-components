@@ -23,7 +23,9 @@ function configSchemaFactory(pluginManager: PluginManager) {
   )
 }
 
-export default function SingleCellAlignmentsTrackF(pluginManager: PluginManager) {
+export default function SingleCellAlignmentsTrackF(
+  pluginManager: PluginManager,
+) {
   pluginManager.addTrackType(() => {
     const configSchema = configSchemaFactory(pluginManager)
     const track = new TrackType({
@@ -36,7 +38,9 @@ export default function SingleCellAlignmentsTrackF(pluginManager: PluginManager)
         configSchema,
       ),
     })
-    const pileupDisplay = pluginManager.getDisplayType('SingleCellPileupDisplay')!
+    const pileupDisplay = pluginManager.getDisplayType(
+      'SingleCellPileupDisplay',
+    )!
     const snpCoverageDisplay = pluginManager.getDisplayType(
       'SingleCellSNPCoverageDisplay',
     )!

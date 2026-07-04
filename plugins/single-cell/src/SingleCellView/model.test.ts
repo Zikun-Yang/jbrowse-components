@@ -1,3 +1,6 @@
+import { autorun } from 'mobx'
+import type PluginManager from '@jbrowse/core/PluginManager'
+
 import stateModelFactory, {
   applyXTransform,
   applyYTransform,
@@ -7,8 +10,6 @@ import stateModelFactory, {
   medianGeneSetAggregator,
   sumGeneSetAggregator,
 } from './model.ts'
-
-import type PluginManager from '@jbrowse/core/PluginManager'
 
 describe('SingleCellView persisted state', () => {
   it('round-trips feature, gene-set and obs selection state via snapshot', () => {
@@ -45,9 +46,9 @@ describe('SingleCellView persisted state', () => {
       'GENE2',
     ])
     expect(instance.geneSetAggregatorKeys.get('setA')).toBe('sum')
-    expect(Array.from(instance.selectedLabels.get('cell_type') ?? [])).toEqual(
-      ['T-cell'],
-    )
+    expect(Array.from(instance.selectedLabels.get('cell_type') ?? [])).toEqual([
+      'T-cell',
+    ])
     consoleError.mockRestore()
   })
 })
@@ -191,5 +192,39 @@ describe('getGeneSetAggregator', () => {
 
   it('falls back to mean for unknown keys', () => {
     expect(getGeneSetAggregator('unknown')).toBe(meanGeneSetAggregator)
+  })
+})
+
+describe('SingleCellView volatile reactivity', () => {
+  it('toggleFeatureExpanded notifies observers when expanding', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation()
+    const stateModel = stateModelFactory(undefined as unknown as PluginManager)
+    const instance = stateModel.create({ id: 'test', type: 'SingleCellView' })
+    const observed: boolean[] = []
+    const disposer = autorun(() => {
+      observed.push(instance.expandedFeatures.includes('GENE1'))
+    })
+    instance.toggleFeatureExpanded('GENE1')
+    disposer()
+    expect(observed).toEqual([false, true])
+    consoleError.mockRestore()
+  })
+
+  it('toggleGeneSetExpanded notifies observers when expanding', () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation()
+    const stateModel = stateModelFactory(undefined as unknown as PluginManager)
+    const instance = stateModel.create({
+      id: 'test',
+      type: 'SingleCellView',
+      geneSets: { setA: ['GENE1'] },
+    })
+    const observed: boolean[] = []
+    const disposer = autorun(() => {
+      observed.push(instance.expandedGeneSets.includes('setA'))
+    })
+    instance.toggleGeneSetExpanded('setA')
+    disposer()
+    expect(observed).toEqual([false, true])
+    consoleError.mockRestore()
   })
 })

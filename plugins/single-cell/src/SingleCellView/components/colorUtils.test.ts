@@ -20,13 +20,16 @@ describe('categorical colors', () => {
     removeCustomCategoricalPalette('custom')
   })
 
-  it('returns the default tab10 palette color by index', () => {
-    expect(getCategoricalColor(0)).toBe(CATEGORICAL_PALETTES.tab10![0])
-    expect(getCategoricalColor(9)).toBe(CATEGORICAL_PALETTES.tab10![9])
+  it('returns the default palette color by index', () => {
+    const palette = CATEGORICAL_PALETTES[DEFAULT_CATEGORICAL_PALETTE]!
+    expect(getCategoricalColor(0)).toBe(palette[0])
+    expect(getCategoricalColor(palette.length - 1)).toBe(
+      palette[palette.length - 1],
+    )
   })
 
   it('wraps around when index exceeds palette length', () => {
-    const palette = CATEGORICAL_PALETTES.tab10!
+    const palette = CATEGORICAL_PALETTES[DEFAULT_CATEGORICAL_PALETTE]!
     expect(getCategoricalColor(palette.length)).toBe(palette[0])
     expect(getCategoricalColor(palette.length + 1)).toBe(palette[1])
   })
@@ -108,7 +111,9 @@ describe('continuous colors', () => {
 
 describe('palette name helpers', () => {
   it('includes built-in categorical palettes', () => {
-    expect(getAllCategoricalPaletteNames()).toContain(DEFAULT_CATEGORICAL_PALETTE)
+    expect(getAllCategoricalPaletteNames()).toContain(
+      DEFAULT_CATEGORICAL_PALETTE,
+    )
   })
 
   it('includes built-in continuous palettes', () => {

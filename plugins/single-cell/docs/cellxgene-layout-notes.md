@@ -172,7 +172,8 @@ Continuous 列同样作为一个 Category 卡片，但展开后通常显示：
 
 ## 6. 直方图坐标轴变换
 
-所有连续变量（obs continuous 列、单个基因、基因集合）的展开直方图顶部均提供 **X / Y 轴变换切换**：
+所有连续变量（obs continuous 列、单个基因、基因集合）的展开直方图顶部均提供 **X
+/ Y 轴变换切换**：
 
 ```
 X: linear | log      Y: linear | log
@@ -186,7 +187,8 @@ X: linear | log      Y: linear | log
   - 即 `shift = min < 0 ? -min : 0`，变换后为 `log1p(value + shift)`。
   - 平移仅针对含负数的列；非负列保持原有 `log1p` 语义。
 - X 轴切换后，该列已选中的 brush range 会被清空，并重新计算 `selectedCells`。
-- `EmbeddingCanvas` 的颜色映射同步使用 X 轴变换后的值，因此 UMAP 着色会随变换立即更新。
+- `EmbeddingCanvas`
+  的颜色映射同步使用 X 轴变换后的值，因此 UMAP 着色会随变换立即更新。
 
 ### 6.2 Y 轴变换
 
@@ -196,12 +198,12 @@ X: linear | log      Y: linear | log
 
 ### 6.3 涉及的组件与状态
 
-| 目标 | 状态 | 切换组件 | 直方图组件 |
-| ---- | ---- | -------- | ---------- |
-| obs continuous 列 | `model.obsTransforms` | `ObsSidebar` 中的 `HistogramTransformToggle` | `HistogramBrush` |
-| 单个基因 | `model.featureTransforms` | `FeatureRow` 中的 `HistogramTransformToggle` | `HistogramBrush` |
-| 基因集合 | `model.geneSetTransforms` | `FeatureRow` 中的 `HistogramTransformToggle` | `HistogramBrush` |
-| categorical label 的 mini histogram | 继承当前 color-by continuous 列的 transform | — | `MiniHistogram`（位于 `MiniBar`） |
+| 目标                                | 状态                                        | 切换组件                                     | 直方图组件                        |
+| ----------------------------------- | ------------------------------------------- | -------------------------------------------- | --------------------------------- |
+| obs continuous 列                   | `model.obsTransforms`                       | `ObsSidebar` 中的 `HistogramTransformToggle` | `HistogramBrush`                  |
+| 单个基因                            | `model.featureTransforms`                   | `FeatureRow` 中的 `HistogramTransformToggle` | `HistogramBrush`                  |
+| 基因集合                            | `model.geneSetTransforms`                   | `FeatureRow` 中的 `HistogramTransformToggle` | `HistogramBrush`                  |
+| categorical label 的 mini histogram | 继承当前 color-by continuous 列的 transform | —                                            | `MiniHistogram`（位于 `MiniBar`） |
 
 ---
 
@@ -223,12 +225,12 @@ X: linear | log      Y: linear | log
 
 基因集合按当前选择的聚合方法把多个基因表达向量合并为一个向量：
 
-| 方法 | 说明 |
-| ---- | ---- |
-| `mean` | 每个细胞取所有基因的平均值，缺失基因忽略。 |
-| `sum` | 每个细胞求和，缺失基因贡献 0。 |
-| `median` | 每个细胞取中位数，抗离群值。 |
-| `max` | 每个细胞取最大值，用于检测任一基因高表达的细胞。 |
+| 方法     | 说明                                             |
+| -------- | ------------------------------------------------ |
+| `mean`   | 每个细胞取所有基因的平均值，缺失基因忽略。       |
+| `sum`    | 每个细胞求和，缺失基因贡献 0。                   |
+| `median` | 每个细胞取中位数，抗离群值。                     |
+| `max`    | 每个细胞取最大值，用于检测任一基因高表达的细胞。 |
 
 - 状态：`model.geneSetAggregatorKeys`。
 - 切换聚合方法后重新计算该集合的聚合表达向量，并清空其 brush range。
@@ -238,7 +240,9 @@ X: linear | log      Y: linear | log
 
 ## 8. 组件响应式注意事项
 
-`mobx-react` 9 在函数组件上使用 `observer` 时会内部包裹 `React.memo`。为确保 MobX 能正确追踪 `model.*Transforms` 这类 volatile Map 的变化：
+`mobx-react` 9 在函数组件上使用 `observer` 时会内部包裹
+`React.memo`。为确保 MobX 能正确追踪 `model.*Transforms` 这类 volatile
+Map 的变化：
 
 - 推荐写法：
 
@@ -257,7 +261,8 @@ X: linear | log      Y: linear | log
   const ComponentObserver = observer(Component)
   ```
 
-- 子组件如果依赖父组件读取的 observable，应自己也是 `observer`，或让父组件在渲染路径中读取对应的 observable 以强制重绘。
+- 子组件如果依赖父组件读取的 observable，应自己也是
+  `observer`，或让父组件在渲染路径中读取对应的 observable 以强制重绘。
 
 ---
 

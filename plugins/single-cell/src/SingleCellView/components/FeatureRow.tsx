@@ -9,6 +9,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import PaletteIcon from '@mui/icons-material/Palette'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import AddIcon from '@mui/icons-material/Add'
+import { useMemo } from 'react'
+import { observer } from 'mobx-react'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 
 import ExpandArrowsIcon from './ExpandArrowsIcon.tsx'
@@ -21,6 +23,8 @@ import type {
   AxisTransforms,
   Transform,
 } from '../model.ts'
+
+const DEFAULT_TRANSFORM: AxisTransforms = { x: 'linear', y: 'linear' }
 
 const useStyles = makeStyles()(theme => ({
   root: {
@@ -106,16 +110,18 @@ interface FeatureRowProps {
   onColorBy: () => void
   onOpenMenu?: (e: React.MouseEvent<HTMLElement>) => void
   onAdd?: (e: React.MouseEvent<HTMLElement>) => void
-  onRangeChange?: (range: { min: number; max: number } | null) => void
   histogramLabel?: string
   showInfo?: boolean
   colorTooltip?: string
   expandedHeader?: React.ReactNode
-  transform?: AxisTransforms
-  onTransformChange?: (axis: 'x' | 'y', transform: Transform) => void
+  /**
+   * Whether this row represents a top-level feature/gene or a gene set.
+   * Defaults to 'feature'.
+   */
+  transformKind?: 'feature' | 'geneSet'
 }
 
-export default function FeatureRow({
+export default observer(function FeatureRow({
   model,
   name,
   values,
@@ -128,16 +134,49 @@ export default function FeatureRow({
   onColorBy,
   onOpenMenu,
   onAdd,
-  onRangeChange,
   histogramLabel,
   showInfo = false,
   colorTooltip = 'Color by this gene',
   expandedHeader,
-  transform = { x: 'linear', y: 'linear' },
-  onTransformChange,
+  transformKind = 'feature',
 }: FeatureRowProps) {
   const { classes } = useStyles()
+  // Read the transform directly from the model so this row re-renders
+  // immediately when the user toggles linear/log, matching the left obs panel.
+  const transform =
+    transformKind === 'geneSet'
+      ? (model.geneSetTransforms.get(name) ?? DEFAULT_TRANSFORM)
+      : (model.featureTransforms.get(name) ?? DEFAULT_TRANSFORM)
+
   const transformedValues = applyXTransform(values, transform.x)
+  const allIndices = useMemo(
+    () => allIndicesSet(transformedValues?.length ?? 0),
+    [transformedValues?.length],
+  )
+
+  const handleTransformChange = (axis: 'x' | 'y', value: Transform) => {
+    if (transformKind === 'geneSet') {
+      model.setGeneSetTransform(name, axis, value)
+    } else {
+      model.setFeatureTransform(name, axis, value)
+    }
+  }
+
+  const handleRangeChange = (
+    nextRange: { min: number; max: number } | null,
+  ) => {
+    if (transformKind === 'geneSet') {
+      if (nextRange) {
+        model.setGeneSetRange(name, nextRange.min, nextRange.max)
+      } else {
+        model.clearGeneSetRange(name)
+      }
+    } else if (nextRange) {
+      model.setFeatureRange(name, nextRange.min, nextRange.max)
+    } else {
+      model.clearFeatureRange(name)
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -170,7 +209,7 @@ export default function FeatureRow({
             ) : transformedValues ? (
               <MiniHistogram
                 values={transformedValues}
-                indices={allIndicesSet(transformedValues.length)}
+                indices={allIndices}
                 palette={palette}
                 color={isColorBy ? undefined : '#9e9e9e'}
                 width={80}
@@ -270,13 +309,11 @@ export default function FeatureRow({
       {isExpanded && transformedValues ? (
         <div className={classes.expandedHistogram}>
           {expandedHeader}
-          {onTransformChange && (
-            <HistogramTransformToggle
-              xTransform={transform.x}
-              yTransform={transform.y}
-              onChange={onTransformChange}
-            />
-          )}
+          <HistogramTransformToggle
+            xTransform={transform.x}
+            yTransform={transform.y}
+            onChange={handleTransformChange}
+          />
           <HistogramBrush
             values={transformedValues}
             initialRange={range}
@@ -284,18 +321,10 @@ export default function FeatureRow({
             label={histogramLabel ?? name}
             palette={palette}
             yTransform={transform.y}
-            onChange={nextRange => {
-              if (onRangeChange) {
-                onRangeChange(nextRange)
-              } else if (nextRange) {
-                model.setFeatureRange(name, nextRange.min, nextRange.max)
-              } else {
-                model.clearFeatureRange(name)
-              }
-            }}
+            onChange={handleRangeChange}
           />
         </div>
       ) : null}
     </div>
   )
-}
+})
