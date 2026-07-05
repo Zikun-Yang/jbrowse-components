@@ -403,6 +403,76 @@ export function getContinuousHex(
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 
+export interface QuantileContext {
+  sorted: Float32Array
+}
+
+/**
+ * Build a context for computing quantiles of the given values.
+ * Non-finite values are ignored.
+ */
+export function buildQuantileContext(values: ArrayLike<number>): QuantileContext {
+  const n = values.length
+  const tmp = new Float32Array(n)
+  let m = 0
+  for (let i = 0; i < n; i++) {
+    const v = values[i]
+    if (Number.isFinite(v)) {
+      tmp[m] = v!
+      m++
+    }
+  }
+  const sorted = new Float32Array(m)
+  for (let i = 0; i < m; i++) {
+    sorted[i] = tmp[i]!
+  }
+  sorted.sort()
+  return { sorted }
+}
+
+/**
+ * Return the quantile (0..1) of a value within the distribution captured by
+ * the given context. Non-finite values return 0.
+ */
+export function valueToQuantile(
+  ctx: QuantileContext,
+  value: number,
+): number {
+  const { sorted } = ctx
+  const m = sorted.length
+  if (m === 0 || !Number.isFinite(value)) {
+    return 0
+  }
+  if (m === 1) {
+    return 0.5
+  }
+  let lo = 0
+  let hi = m
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1
+    if (sorted[mid]! < value) {
+      lo = mid + 1
+    } else {
+      hi = mid
+    }
+  }
+  return lo / (m - 1)
+}
+
+/**
+ * Return a per-value quantile mapping in [0, 1] for the given array.
+ * Non-finite values map to 0.
+ */
+export function getQuantileTs(values: ArrayLike<number>): Float32Array {
+  const ctx = buildQuantileContext(values)
+  const n = values.length
+  const out = new Float32Array(n)
+  for (let i = 0; i < n; i++) {
+    out[i] = valueToQuantile(ctx, values[i]!)
+  }
+  return out
+}
+
 /**
  * Backwards-compatible default helpers.
  */

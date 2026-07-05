@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 
-import { getContinuousHex } from './colorUtils.ts'
+import { buildQuantileContext, getContinuousHex, valueToQuantile } from './colorUtils.ts'
 
 import type { Transform } from '../model.ts'
 
@@ -39,6 +39,7 @@ interface HistogramBrushProps {
   label?: string
   palette?: string
   yTransform?: Transform
+  quantileMode?: boolean
   onChange: (range: { min: number; max: number } | null) => void
 }
 
@@ -60,6 +61,7 @@ export default function HistogramBrush({
   label,
   palette = 'viridis',
   yTransform = 'linear',
+  quantileMode = false,
   onChange,
 }: HistogramBrushProps) {
   const { classes } = useStyles()
@@ -96,7 +98,7 @@ export default function HistogramBrush({
   const plotWidth = Math.max(0, width - padding.left - padding.right)
   const plotHeight = height - padding.top - padding.bottom
 
-  const { min, max, counts } = useMemo(() => {
+  const { min, max, counts, quantileContext } = useMemo(() => {
     let min = Infinity
     let max = -Infinity
     for (let i = 0; i < values.length; i++) {
@@ -111,8 +113,11 @@ export default function HistogramBrush({
       const bin = Math.min(bins - 1, Math.floor(((v - min) / range) * bins))
       counts[bin] = (counts[bin] ?? 0) + 1
     }
-    return { min, max, counts }
-  }, [values, bins])
+    const quantileContext = quantileMode
+      ? buildQuantileContext(values)
+      : null
+    return { min, max, counts, quantileContext }
+  }, [values, bins, quantileMode])
 
   const maxCount = Math.max(
     ...counts.map(c => applyYTransform(c ?? 0, yTransform)),
@@ -229,7 +234,10 @@ export default function HistogramBrush({
         {counts.map((count, i) => {
           const h =
             (applyYTransform(count ?? 0, yTransform) / maxCount) * plotHeight
-          const t = (i + 0.5) / bins
+          const centerValue = min + ((i + 0.5) / bins) * (max - min || 1)
+          const t = quantileContext
+            ? valueToQuantile(quantileContext, centerValue)
+            : (i + 0.5) / bins
           return (
             <rect
               key={i}

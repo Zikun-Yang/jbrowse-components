@@ -279,6 +279,7 @@ const CategoricalCategory = observer(function CategoricalCategory({
                     indices={indices ?? new Set()}
                     categoricalPalette={model.categoricalPalette}
                     continuousPalette={model.continuousPalette}
+                    quantileMode={model.quantileColoring}
                     xTransform={
                       colorByCol?.type === 'continuous'
                         ? (model.obsTransforms.get(colorByObsColumn ?? '')?.x ??
@@ -396,6 +397,7 @@ const ContinuousCategory = observer(function ContinuousCategory({
             label={column}
             palette={palette}
             yTransform={transform.y}
+            quantileMode={model.quantileColoring}
             onChange={next => {
               if (next) {
                 model.setContinuousRange(column, next.min, next.max)
@@ -496,6 +498,7 @@ function MiniBar({
   continuousPalette,
   xTransform = 'linear',
   yTransform = 'linear',
+  quantileMode = false,
 }: {
   colorByCol:
     | { type: 'categorical'; codes: Int32Array; categories: string[] }
@@ -507,6 +510,7 @@ function MiniBar({
   continuousPalette: string
   xTransform?: Transform
   yTransform?: Transform
+  quantileMode?: boolean
 }) {
   if (!colorByCol || indices.size === 0) {
     return <div style={{ width: 100, height: 11 }} />
@@ -530,6 +534,7 @@ function MiniBar({
         indices={indices}
         palette={continuousPalette}
         yTransform={yTransform}
+        quantileMode={quantileMode}
       />
     )
   }

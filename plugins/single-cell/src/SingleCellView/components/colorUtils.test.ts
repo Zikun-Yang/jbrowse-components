@@ -3,16 +3,19 @@ import {
   CONTINUOUS_PALETTES,
   DEFAULT_CATEGORICAL_PALETTE,
   DEFAULT_CONTINUOUS_PALETTE,
+  buildQuantileContext,
   getAllCategoricalPaletteNames,
   getAllContinuousPaletteNames,
   getCategoricalColor,
   getCategoricalColorRGB,
   getContinuousHex,
   getContinuousRGB,
+  getQuantileTs,
   registerCustomCategoricalPalette,
   registerCustomContinuousPalette,
   removeCustomCategoricalPalette,
   removeCustomContinuousPalette,
+  valueToQuantile,
 } from './colorUtils.ts'
 
 describe('categorical colors', () => {
@@ -118,5 +121,46 @@ describe('palette name helpers', () => {
 
   it('includes built-in continuous palettes', () => {
     expect(getAllContinuousPaletteNames()).toContain(DEFAULT_CONTINUOUS_PALETTE)
+  })
+})
+
+describe('quantile mapping', () => {
+  it('maps evenly spaced values linearly to 0..1', () => {
+    const values = new Float32Array([0, 1, 2, 3, 4])
+    const result = getQuantileTs(values)
+    expect(result[0]).toBeCloseTo(0)
+    expect(result[1]).toBeCloseTo(0.25)
+    expect(result[2]).toBeCloseTo(0.5)
+    expect(result[3]).toBeCloseTo(0.75)
+    expect(result[4]).toBeCloseTo(1)
+  })
+
+  it('handles duplicate values', () => {
+    const values = new Float32Array([1, 1, 2, 2, 3])
+    const result = getQuantileTs(values)
+    expect(result[0]).toBeCloseTo(0)
+    expect(result[1]).toBeCloseTo(0)
+    expect(result[4]).toBeCloseTo(1)
+  })
+
+  it('ignores non-finite values', () => {
+    const values = new Float32Array([1, 2, NaN, Infinity, -Infinity, 3])
+    const result = getQuantileTs(values)
+    expect(Number.isFinite(result[0])).toBe(true)
+    expect(Number.isFinite(result[1])).toBe(true)
+    expect(result[2]).toBe(0)
+    expect(result[3]).toBe(0)
+    expect(result[4]).toBe(0)
+    expect(Number.isFinite(result[5])).toBe(true)
+  })
+
+  it('returns 0.5 for a single finite value', () => {
+    const ctx = buildQuantileContext(new Float32Array([42]))
+    expect(valueToQuantile(ctx, 42)).toBeCloseTo(0.5)
+  })
+
+  it('returns 0 for empty context', () => {
+    const ctx = buildQuantileContext(new Float32Array([]))
+    expect(valueToQuantile(ctx, 1)).toBe(0)
   })
 })

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { getContinuousHex } from './colorUtils.ts'
+import { buildQuantileContext, getContinuousHex, valueToQuantile } from './colorUtils.ts'
 import type { Transform } from '../model.ts'
 
 function applyYTransform(count: number, transform: Transform): number {
@@ -26,6 +26,7 @@ interface MiniHistogramProps {
    */
   color?: string
   yTransform?: Transform
+  quantileMode?: boolean
 }
 
 export default function MiniHistogram({
@@ -37,6 +38,7 @@ export default function MiniHistogram({
   palette = 'viridis',
   color,
   yTransform = 'linear',
+  quantileMode = false,
 }: MiniHistogramProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -77,16 +79,20 @@ export default function MiniHistogram({
     ctx.scale(dpr, dpr)
     ctx.clearRect(0, 0, width, height)
 
+    const ctxQ = quantileMode ? buildQuantileContext(subset) : null
     const binWidth = width / bins
     for (let i = 0; i < bins; i++) {
       const count = counts[i] ?? 0
       if (count === 0) continue
       const h = (applyYTransform(count, yTransform) / (maxCount || 1)) * height
-      const t = (i + 0.5) / bins
+      const centerValue = min + ((i + 0.5) / bins) * range
+      const t = ctxQ
+        ? valueToQuantile(ctxQ, centerValue)
+        : (i + 0.5) / bins
       ctx.fillStyle = color ?? getContinuousHex(t, palette)
       ctx.fillRect(i * binWidth, height - h, binWidth - 1, h)
     }
-  }, [values, indices, width, height, bins, palette, yTransform])
+  }, [values, indices, width, height, bins, palette, yTransform, quantileMode])
 
   return (
     <canvas

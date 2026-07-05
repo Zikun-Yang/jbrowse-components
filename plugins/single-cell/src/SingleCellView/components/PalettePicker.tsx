@@ -4,8 +4,10 @@ import {
   Box,
   Button,
   Divider,
+  FormControlLabel,
   IconButton,
   Popover,
+  Switch,
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -147,6 +149,20 @@ export default observer(function PalettePicker({
           </Button>
 
           <Divider sx={{ my: 1.5 }} />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={model.quantileColoring}
+                onChange={e => model.setQuantileColoring(e.target.checked)}
+                size="small"
+              />
+            }
+            label={
+              <Typography variant="body2">Color by quantile</Typography>
+            }
+            sx={{ mb: 0.5 }}
+          />
 
           <Typography variant="subtitle2" gutterBottom>
             Continuous palette

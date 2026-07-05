@@ -453,6 +453,12 @@ function stateModelFactory(_pluginManager: PluginManager) {
       continuousPalette: 'viridis',
       /**
        * #property
+       * When true, map continuous color-by values to the palette using quantiles
+       * instead of a linear min-to-max mapping.
+       */
+      quantileColoring: false,
+      /**
+       * #property
        * User-defined categorical palettes: name -> array of hex colors
        */
       customCategoricalPalettes: {} as Record<string, string[]>,
@@ -621,6 +627,12 @@ function stateModelFactory(_pluginManager: PluginManager) {
        */
       setContinuousPalette(palette: string) {
         self.continuousPalette = palette
+      },
+      /**
+       * #action
+       */
+      setQuantileColoring(value: boolean) {
+        self.quantileColoring = value
       },
       /**
        * #action

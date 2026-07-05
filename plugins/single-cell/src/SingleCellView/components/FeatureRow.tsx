@@ -147,6 +147,7 @@ export default observer(function FeatureRow({
     transformKind === 'geneSet'
       ? (model.geneSetTransforms.get(name) ?? DEFAULT_TRANSFORM)
       : (model.featureTransforms.get(name) ?? DEFAULT_TRANSFORM)
+  const quantileColoring = model.quantileColoring
 
   const transformedValues = applyXTransform(values, transform.x)
   const allIndices = useMemo(
@@ -216,6 +217,7 @@ export default observer(function FeatureRow({
                 height={14}
                 bins={20}
                 yTransform={transform.y}
+                quantileMode={quantileColoring}
               />
             ) : null}
           </div>
@@ -321,6 +323,7 @@ export default observer(function FeatureRow({
             label={histogramLabel ?? name}
             palette={palette}
             yTransform={transform.y}
+            quantileMode={quantileColoring}
             onChange={handleRangeChange}
           />
         </div>

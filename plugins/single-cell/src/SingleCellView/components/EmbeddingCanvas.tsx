@@ -11,7 +11,7 @@ import {
   createModelTF,
   createProjectionTF,
 } from './embeddingUtils.ts'
-import { getCategoricalColorRGB, getContinuousRGB } from './colorUtils.ts'
+import { getCategoricalColorRGB, getContinuousRGB, getQuantileTs } from './colorUtils.ts'
 
 import type { SingleCellViewModel, Transform } from '../model.ts'
 import type {
@@ -69,6 +69,7 @@ function computeColors(
   categoricalPalette: string,
   continuousPalette: string,
   xTransform: Transform = 'linear',
+  quantileColoring = false,
 ): Float32Array {
   const col = metadata[colorBy]
   const colors = new Float32Array(nPoints * 3)
@@ -106,10 +107,11 @@ function computeColors(
     }
   } else {
     const values = applyXTransform(col.values, xTransform)
+    const ts = quantileColoring ? getQuantileTs(values) : null
     const { min, max } = getMinMax(values)
     const range = max - min || 1
     for (let i = 0; i < nPoints; i++) {
-      const v = (values[i]! - min) / range
+      const v = ts ? ts[i]! : (values[i]! - min) / range
       const [r, g, b] = getContinuousRGB(v, continuousPalette)
       colors[i * 3] = r
       colors[i * 3 + 1] = g
@@ -172,6 +174,7 @@ export default observer(function EmbeddingCanvas({
     showLabels,
     categoricalPalette,
     continuousPalette,
+    quantileColoring,
   } = model
   const colorByKind = model.colorBy?.kind
   const colorByName = model.colorBy?.name
@@ -223,11 +226,12 @@ export default observer(function EmbeddingCanvas({
           : undefined
     if (rawValues) {
       const values = applyXTransform(rawValues, xTransform)
+      const ts = quantileColoring ? getQuantileTs(values) : null
       const { min, max } = getMinMax(values)
       const range = max - min || 1
       const colors = new Float32Array(nPoints * 3)
       for (let i = 0; i < nPoints; i++) {
-        const v = (values[i]! - min) / range
+        const v = ts ? ts[i]! : (values[i]! - min) / range
         const [r, g, b] = getContinuousRGB(v, continuousPalette)
         colors[i * 3] = r
         colors[i * 3 + 1] = g
@@ -243,6 +247,7 @@ export default observer(function EmbeddingCanvas({
       categoricalPalette,
       continuousPalette,
       xTransform,
+      quantileColoring,
     )
   }, [
     data,
@@ -251,6 +256,7 @@ export default observer(function EmbeddingCanvas({
     colorByName,
     categoricalPalette,
     continuousPalette,
+    quantileColoring,
     xTransform,
     colorByFeatureValues,
     colorByGeneSetValues,
