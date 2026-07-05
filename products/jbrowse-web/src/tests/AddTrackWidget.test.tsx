@@ -1,4 +1,4 @@
-import { fireEvent, within } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { createView, doBeforeEach, expectCanvasMatch, setup } from './util.tsx'
 
@@ -39,10 +39,10 @@ test('adds a PAF via the add track workflow', async () => {
   const inputs = await findAllByTestId('assembly-selector')
 
   // change query assembly
-  fireEvent.mouseDown(inputs[0]!)
-  const listboxes = await findAllByRole('listbox')
-  const listbox = within(listboxes[listboxes.length - 1]!)
-  fireEvent.click(listbox.getByText('volvox_del'))
+  const input = inputs[0]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
   fireEvent.keyDown(document, { key: 'Escape' })
   fireEvent.click(getAllByTestId('addTrackNextButton')[0]!)
 

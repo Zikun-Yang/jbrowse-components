@@ -1,4 +1,4 @@
-import { fireEvent, waitFor, within } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 
 import { createView, doBeforeEach, expectCanvasMatch, setup } from './util.tsx'
 setup()
@@ -28,8 +28,11 @@ test('open tracklist file', async () => {
   const assemblyInputs = await findAllByTestId('assembly-selector')
   expect(assemblyInputs.length).toBe(2)
 
-  fireEvent.mouseDown(assemblyInputs[1]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input = assemblyInputs[1]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
+
   fireEvent.click(await findByText('Launch'))
 
   expectCanvasMatch(await findByTestId('synteny_canvas', {}, delay))
@@ -55,11 +58,15 @@ test('three level', async () => {
 
   expect(assemblyInputs.length).toBe(3)
 
-  fireEvent.mouseDown(assemblyInputs[0]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_ins'))
+  const input0 = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input0)
+  fireEvent.keyDown(input0, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_ins' }))
 
-  fireEvent.mouseDown(assemblyInputs[2]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input2 = assemblyInputs[2]! as HTMLInputElement
+  fireEvent.focus(input2)
+  fireEvent.keyDown(input2, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   const synbuttons = await findAllByTestId('synbutton')
   expect(synbuttons.length).toBe(2)
@@ -85,8 +92,10 @@ test('open local paf', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  fireEvent.mouseDown(assemblyInputs[0]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   const synbuttons = await findAllByTestId('synbutton')
   fireEvent.click(synbuttons[0]!)
@@ -112,8 +121,10 @@ test('open local pif', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  fireEvent.mouseDown(assemblyInputs[0]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   const synbuttons = await findAllByTestId('synbutton')
   fireEvent.click(synbuttons[0]!)

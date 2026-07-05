@@ -1,6 +1,6 @@
 // @ts-expect-error
 import { createTestSession } from '@jbrowse/web/src/rootModel/index.js'
-import { fireEvent, render, within } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 
 import AddTrackWidget from './AddTrackWidget.tsx'
 jest.mock('@jbrowse/web/src/makeWorkerInstance', () => () => {})
@@ -114,9 +114,10 @@ test('adds a track', async () => {
   })
   fireEvent.mouseDown(getByTestId('trackTypeSelect'))
   fireEvent.click(await findByText('Feature track'))
-  fireEvent.mouseDown(getByTestId('assemblyNameSelect'))
-  const listbox = await findByRole('listbox')
-  fireEvent.click(within(listbox).getByText('volMyt1'))
+  const input = getByTestId('assemblyNameSelect') as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volMyt1' }))
   fireEvent.click(getAllByTestId('addTrackNextButton')[0]!)
   expect(session.sessionTracks.length).toBe(2)
 })

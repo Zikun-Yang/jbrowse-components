@@ -1,4 +1,4 @@
-import { fireEvent, within } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { createView, doBeforeEach, expectCanvasMatch, setup } from './util.tsx'
 setup()
@@ -25,10 +25,11 @@ test('open tracklist file', async () => {
 
   expect(assemblyInputs.length).toBe(2)
 
-  fireEvent.mouseDown(assemblyInputs[1]!)
+  const input = assemblyInputs[1]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
-  const listbox = within(await findByRole('listbox'))
-  fireEvent.click(listbox.getByText('volvox_del'))
   fireEvent.click(await findByText('Launch'))
 
   expectCanvasMatch(await findByTestId('prerendered_canvas_done', {}, delay))
@@ -44,8 +45,10 @@ test('open local paf', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  fireEvent.mouseDown(assemblyInputs[0]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   fireEvent.click(await findByText('New track'))
   fireEvent.click(await findByText('.paf'))
@@ -70,8 +73,10 @@ test('open local pif', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  fireEvent.mouseDown(assemblyInputs[0]!)
-  fireEvent.click(within(await findByRole('listbox')).getByText('volvox_del'))
+  const input = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   fireEvent.click(await findByText('New track'))
   fireEvent.click(await findByText('.pif.gz'))
