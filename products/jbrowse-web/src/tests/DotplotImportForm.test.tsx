@@ -25,9 +25,14 @@ test('open tracklist file', async () => {
 
   expect(assemblyInputs.length).toBe(2)
 
-  const input = assemblyInputs[1]! as HTMLInputElement
-  fireEvent.focus(input)
-  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  const input0 = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input0)
+  fireEvent.keyDown(input0, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox' }))
+
+  const input1 = assemblyInputs[1]! as HTMLInputElement
+  fireEvent.focus(input1)
+  fireEvent.keyDown(input1, { key: 'ArrowDown' })
   fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
 
   fireEvent.click(await findByText('Launch'))
@@ -45,10 +50,16 @@ test('open local paf', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  const input = assemblyInputs[0]! as HTMLInputElement
-  fireEvent.focus(input)
-  fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+  const input0 = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input0)
+  fireEvent.keyDown(input0, { key: 'ArrowDown' })
   fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
+
+  const input1 = assemblyInputs[1]! as HTMLInputElement
+  fireEvent.focus(input1)
+  fireEvent.keyDown(input1, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox' }))
 
   fireEvent.click(await findByText('New track'))
   fireEvent.click(await findByText('.paf'))
@@ -73,10 +84,16 @@ test('open local pif', async () => {
   expect(session.views.length).toBe(2)
 
   const assemblyInputs = await findAllByTestId('assembly-selector')
-  const input = assemblyInputs[0]! as HTMLInputElement
-  fireEvent.focus(input)
-  fireEvent.keyDown(input, { key: 'ArrowDown' })
+
+  const input0 = assemblyInputs[0]! as HTMLInputElement
+  fireEvent.focus(input0)
+  fireEvent.keyDown(input0, { key: 'ArrowDown' })
   fireEvent.click(await findByRole('option', { name: 'volvox_del' }))
+
+  const input1 = assemblyInputs[1]! as HTMLInputElement
+  fireEvent.focus(input1)
+  fireEvent.keyDown(input1, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox' }))
 
   fireEvent.click(await findByText('New track'))
   fireEvent.click(await findByText('.pif.gz'))

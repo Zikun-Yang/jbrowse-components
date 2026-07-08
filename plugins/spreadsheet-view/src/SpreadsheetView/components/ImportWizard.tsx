@@ -45,7 +45,7 @@ const ImportWizard = observer(function ImportWizard({
   const { assemblyNames, assemblyManager } = session
   const { loading, fileType, fileSource, isReadyToOpen, fileTypes, error } =
     model
-  const [selectedAssembly, setSelectedAssembly] = useState(assemblyNames[0])
+  const [selectedAssembly, setSelectedAssembly] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState('')
   const [selectorType, setSelectorType] = useState('custom')
 
@@ -62,7 +62,10 @@ const ImportWizard = observer(function ImportWizard({
     }
   }, [selectedSpecies, selectedAssembly, assemblyNames, assemblyManager])
 
-  const err = assemblyManager.get(selectedAssembly!)?.error || error
+  const err =
+    (selectedAssembly
+      ? assemblyManager.get(selectedAssembly)?.error
+      : undefined) || error
   const rootModel = getRoot(model)
 
   return (
@@ -150,6 +153,7 @@ const ImportWizard = observer(function ImportWizard({
             }}
           />
           <AssemblySelector
+            label="Genome"
             session={session}
             selected={selectedAssembly}
             species={selectedSpecies}
@@ -160,7 +164,7 @@ const ImportWizard = observer(function ImportWizard({
         </div>
         <div>
           <Button
-            disabled={!isReadyToOpen || !!err}
+            disabled={!selectedAssembly || !isReadyToOpen || !!err}
             variant="contained"
             data-testid="open_spreadsheet"
             color="primary"

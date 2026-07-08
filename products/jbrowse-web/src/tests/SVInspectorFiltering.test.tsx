@@ -28,7 +28,7 @@ const delay = { timeout: 40000 }
 
 test('opens SVInspector and tests data grid filtering functionality', async () => {
   await mockConsoleWarn(async () => {
-    const { session, findByTestId, getByTestId, findByText } =
+    const { session, findByTestId, getByTestId, findByText, findByRole } =
       await createView()
 
     // Open the SV Inspector view
@@ -40,6 +40,14 @@ test('opens SVInspector and tests data grid filtering functionality', async () =
     fireEvent.change(await findByTestId('urlInput', {}, delay), {
       target: { value: 'volvox.dup.renamed.vcf.gz' },
     })
+
+    const assemblyInput = (await findByTestId(
+      'assembly-selector',
+    )) as HTMLInputElement
+    fireEvent.focus(assemblyInput)
+    fireEvent.keyDown(assemblyInput, { key: 'ArrowDown' })
+    fireEvent.click(await findByRole('option', { name: 'volvox' }))
+
     await waitFor(() => {
       expect(
         getByTestId('open_spreadsheet').closest('button'),
@@ -130,7 +138,7 @@ test('opens SVInspector and tests data grid filtering functionality', async () =
 
 test('SVInspector filtering updates circular view accordingly', async () => {
   await mockConsoleWarn(async () => {
-    const { session, findByTestId, getByTestId, findByText } =
+    const { session, findByTestId, getByTestId, findByText, findByRole } =
       await createView()
 
     // Open the SV Inspector view
@@ -142,6 +150,14 @@ test('SVInspector filtering updates circular view accordingly', async () => {
     fireEvent.change(await findByTestId('urlInput', {}, delay), {
       target: { value: 'volvox.dup.renamed.vcf.gz' },
     })
+
+    const assemblyInput = (await findByTestId(
+      'assembly-selector',
+    )) as HTMLInputElement
+    fireEvent.focus(assemblyInput)
+    fireEvent.keyDown(assemblyInput, { key: 'ArrowDown' })
+    fireEvent.click(await findByRole('option', { name: 'volvox' }))
+
     await waitFor(() => {
       expect(
         getByTestId('open_spreadsheet').closest('button'),

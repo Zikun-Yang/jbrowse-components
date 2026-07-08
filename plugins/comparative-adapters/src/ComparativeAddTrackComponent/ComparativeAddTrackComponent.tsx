@@ -8,8 +8,8 @@ const ComparativeAddTrackComponent = observer(
   function ComparativeAddTrackComponent({ model }: any) {
     const session = getSession(model)
     const { assemblyNames, assemblyManager } = session
-    const [r0, setR0] = useState(session.assemblies[0]?.name)
-    const [r1, setR1] = useState(session.assemblies[0]?.name)
+    const [r0, setR0] = useState(session.assemblies[0]?.name || '')
+    const [r1, setR1] = useState(session.assemblies[0]?.name || '')
     const [species0, setSpecies0] = useState('')
     const [species1, setSpecies1] = useState('')
 

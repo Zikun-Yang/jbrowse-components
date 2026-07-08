@@ -43,7 +43,7 @@ const LinearGenomeViewImportForm = observer(
     const session = getSession(model)
     const { assemblyNames, assemblyManager } = session
     const { initialized, error } = model
-    const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+    const [selectedAsm, setSelectedAsm] = useState('')
     const [selectedSpecies, setSelectedSpecies] = useState('')
     const [option, setOption] = useState<BaseResult>()
     const assembly = assemblyManager.get(selectedAsm)
@@ -147,11 +147,11 @@ const LinearGenomeViewImportForm = observer(
                     </FormControl>
                     <FormControl>
                       <AssemblySelector
+                        label="Genome"
                         onChange={val => {
                           setSelectedAsm(val)
                         }}
                         species={selectedSpecies}
-                        localStorageKey="lgv"
                         session={session}
                         selected={selectedAsm}
                       />

@@ -110,6 +110,7 @@ const ConfirmTrack = observer(function ConfirmTrack({
             />
             <AssemblySelector
               session={session}
+              label="Genome"
               helperText="Select assembly to add track to"
               selected={model.assembly}
               species={selectedSpecies}

@@ -1,10 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { Autocomplete, TextField } from '@mui/material'
 import { observer } from 'mobx-react'
 
 import { readConfObject } from '../configuration/index.ts'
-import { useLocalStorage } from '../util/index.ts'
 import { makeStyles } from '../util/tss-react/index.ts'
 
 import type { AbstractSessionModel } from '../util/index.ts'
@@ -24,7 +23,6 @@ const AssemblySelector = observer(function AssemblySelector({
   species,
   InputProps,
   TextFieldProps,
-  localStorageKey,
   helperText = 'Select assembly to view',
 }: {
   session: AbstractSessionModel
@@ -33,25 +31,11 @@ const AssemblySelector = observer(function AssemblySelector({
   onChange: (arg: string) => void
   selected?: string
   species?: string
-  localStorageKey?: string
   InputProps?: IIP
   TextFieldProps?: TFP
 }) {
   const { classes } = useStyles()
   const { assemblies, assemblyNames } = session
-
-  // constructs a localstorage key based on host/path/config to help
-  // remember. non-config assists usage with e.g. embedded apps
-  const config = new URLSearchParams(window.location.search).get('config')
-  const [lastSelected, setLastSelected] = useLocalStorage(
-    `lastAssembly-${[
-      window.location.host + window.location.pathname,
-      config,
-      localStorageKey,
-    ].join('-')}`,
-    selected,
-    typeof jest === 'undefined' && Boolean(localStorageKey),
-  )
 
   const assemblyMap = useMemo(() => {
     const map = new Map<
@@ -85,18 +69,8 @@ const AssemblySelector = observer(function AssemblySelector({
     [assemblyNames, assemblyMap, species],
   )
 
-  const selection =
-    options.find(o => o.name === (lastSelected || selected || ''))?.name ||
-    options[0]?.name
-
-  useEffect(() => {
-    if (selection && selection !== selected) {
-      onChange(selection)
-    }
-  }, [selection, selected, onChange])
-
   const error = assemblyNames.length ? '' : 'No configured assemblies'
-  const value = options.find(o => o.name === selection) || null
+  const value = options.find(o => o.name === selected) || null
   const { slotProps: consumerSlotProps, ...consumerTextFieldProps } =
     TextFieldProps || {}
 
@@ -109,10 +83,7 @@ const AssemblySelector = observer(function AssemblySelector({
       isOptionEqualToValue={(option, val) => option.name === val.name}
       value={value}
       onChange={(_event, newValue) => {
-        if (newValue) {
-          setLastSelected(newValue.name)
-          onChange(newValue.name)
-        }
+        onChange(newValue?.name || '')
       }}
       className={classes.importFormEntry}
       renderInput={params => (

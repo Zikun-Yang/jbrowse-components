@@ -130,6 +130,7 @@ const AssemblyRows = observer(function AssemblyRows({
         }}
       />
       <AssemblySelector
+        label="Genome"
         helperText=""
         species={selectedSpecies[idx]}
         selected={assemblyName}
@@ -171,7 +172,6 @@ const LeftPanel = observer(function LeftPanel({
   setSelectedAssemblyNames,
   selectedRow,
   setSelectedRow,
-  defaultAssemblyName,
   onLaunch,
 }: {
   model: LinearSyntenyViewModel
@@ -179,14 +179,15 @@ const LeftPanel = observer(function LeftPanel({
   setSelectedAssemblyNames: (names: string[]) => void
   selectedRow: number
   setSelectedRow: (row: number) => void
-  defaultAssemblyName: string
   onLaunch: () => void
 }) {
   const { classes } = useStyles()
   const numRowPairs = selectedAssemblyNames.length - 1
-  const canLaunch = !Array.from({ length: numRowPairs }, (_, i) => i).some(i =>
-    rowNeedsConfiguration(model, i),
-  )
+  const canLaunch =
+    !selectedAssemblyNames.some(name => !name) &&
+    !Array.from({ length: numRowPairs }, (_, i) => i).some(i =>
+      rowNeedsConfiguration(model, i),
+    )
 
   return (
     <>
@@ -207,10 +208,7 @@ const LeftPanel = observer(function LeftPanel({
           variant="contained"
           color="secondary"
           onClick={() => {
-            setSelectedAssemblyNames([
-              ...selectedAssemblyNames,
-              defaultAssemblyName,
-            ])
+            setSelectedAssemblyNames([...selectedAssemblyNames, ''])
           }}
         >
           Add row

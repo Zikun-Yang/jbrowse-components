@@ -68,11 +68,12 @@ test(
 test(
   'lower case refname, searching: contigb',
   async () => {
-    const { getInputValue, autocomplete, input, findByText } = await getInput()
+    const { getInputValue, autocomplete, input, findByText, findByRole } =
+      await getInput()
 
     fireEvent.change(input, { target: { value: 'contigb' } })
     fireEvent.keyDown(autocomplete, { key: 'ArrowDown' })
-    fireEvent.keyDown(autocomplete, { key: 'Enter' })
+    fireEvent.click(await findByRole('option', { name: /ctgB/ }))
 
     fireEvent.click(await findByText('Open'))
 

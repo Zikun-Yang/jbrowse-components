@@ -40,12 +40,19 @@ test('opens a vcf.gz file in the sv inspector view', () => {
 }, 90000)
 
 test('opens a track with minimal adapter config via "Open from track"', async () => {
-  const { session, findByText, findByTestId, findByLabelText } =
+  const { session, findByText, findByTestId, findByRole, findByLabelText } =
     await createView()
 
   fireEvent.click(await findByText('File'))
   fireEvent.click(await findByText('Add'))
   fireEvent.click(await findByText('SV inspector'))
+
+  const assemblyInput = (await findByTestId(
+    'assembly-selector',
+  )) as HTMLInputElement
+  fireEvent.focus(assemblyInput)
+  fireEvent.keyDown(assemblyInput, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name: 'volvox' }))
 
   fireEvent.click(await findByLabelText('Open from track', {}, delay))
 

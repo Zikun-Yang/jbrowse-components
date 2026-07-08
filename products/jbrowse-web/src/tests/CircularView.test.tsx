@@ -1,7 +1,13 @@
 import '@testing-library/jest-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 
-import { createView, doBeforeEach, hts, setup } from './util.tsx'
+import {
+  createView,
+  doBeforeEach,
+  hts,
+  selectAssembly,
+  setup,
+} from './util.tsx'
 import configSnapshot from '../../test_data/volvox/config.json' with { type: 'json' }
 
 setup()
@@ -14,12 +20,21 @@ const delay = { timeout: 10000 }
 const opts = [{}, delay]
 
 test('open a circular view', async () => {
-  const { findByTestId, findByText, queryByTestId } = await createView({
-    ...configSnapshot,
-    defaultSession: {
-      name: 'Integration Test Circular',
-      views: [{ id: 'integration_test_circular', type: 'CircularView' }],
-    },
+  const { findByTestId, findByRole, findByText, queryByTestId } =
+    await createView({
+      ...configSnapshot,
+      defaultSession: {
+        name: 'Integration Test Circular',
+        views: [{ id: 'integration_test_circular', type: 'CircularView' }],
+      },
+    })
+  const assemblyInput = (await findByTestId(
+    'assembly-selector',
+  )) as HTMLInputElement
+  await selectAssembly(findByRole, assemblyInput, 'volvox')
+  const openButton = await findByText('Open')
+  await waitFor(() => {
+    expect(openButton.closest('button')).not.toBeDisabled()
   })
   fireEvent.click(await findByText('File', ...opts))
   fireEvent.click(await findByText(/Open track/, ...opts))

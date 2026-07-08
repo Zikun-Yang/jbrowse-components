@@ -2,7 +2,7 @@ import { createJBrowseTheme } from '@jbrowse/core/ui'
 // @ts-expect-error
 import { createTestSession } from '@jbrowse/web/src/rootModel/index.js'
 import { ThemeProvider } from '@mui/material'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 
 import AssemblySelector from './AssemblySelector.tsx'
 
@@ -58,20 +58,22 @@ function Wrapper({ children }: { children: React.ReactNode }) {
   return <ThemeProvider theme={createJBrowseTheme()}>{children}</ThemeProvider>
 }
 
-test('renders all assemblies when no species filter', async () => {
+test('renders empty by default', async () => {
   const session = createTestSession({
     jbrowseConfig: { assemblies: assemblyConfs },
   })
   const onChange = jest.fn()
-  const { getByRole } = render(
+  const { getByRole, container } = render(
     <Wrapper>
       <AssemblySelector session={session} onChange={onChange} />
     </Wrapper>,
   )
   const combobox = getByRole('combobox') as HTMLInputElement
   await waitFor(() => {
-    expect(combobox.value).toBe('Human (GRCh38/hg38)')
+    expect(combobox.value).toBe('')
   })
+  const label = container.querySelector('label')
+  expect(label?.getAttribute('data-shrink')).toBe('false')
 })
 
 test('filters assemblies by species', async () => {
@@ -95,12 +97,12 @@ test('filters assemblies by species', async () => {
   })
 })
 
-test('falls back to first matching assembly when selection is filtered out', async () => {
+test('does not fall back when selection is filtered out', async () => {
   const session = createTestSession({
     jbrowseConfig: { assemblies: assemblyConfs },
   })
   const onChange = jest.fn()
-  render(
+  const { getByRole } = render(
     <Wrapper>
       <AssemblySelector
         session={session}
@@ -110,8 +112,29 @@ test('falls back to first matching assembly when selection is filtered out', asy
       />
     </Wrapper>,
   )
+  const combobox = getByRole('combobox') as HTMLInputElement
   await waitFor(() => {
-    expect(onChange).toHaveBeenCalledWith('mm39')
+    expect(combobox.value).toBe('')
+  })
+  expect(onChange).not.toHaveBeenCalled()
+})
+
+test('selecting a value shrinks the label', async () => {
+  const session = createTestSession({
+    jbrowseConfig: { assemblies: assemblyConfs },
+  })
+  const onChange = jest.fn()
+  const { getByRole } = render(
+    <Wrapper>
+      <AssemblySelector session={session} onChange={onChange} />
+    </Wrapper>,
+  )
+  const combobox = getByRole('combobox') as HTMLInputElement
+  fireEvent.focus(combobox)
+  fireEvent.keyDown(combobox, { key: 'ArrowDown' })
+  fireEvent.click(getByRole('option', { name: 'Human (GRCh38/hg38)' }))
+  await waitFor(() => {
+    expect(onChange).toHaveBeenCalledWith('hg38')
   })
 })
 

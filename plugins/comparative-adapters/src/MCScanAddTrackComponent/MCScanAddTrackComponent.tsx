@@ -16,8 +16,8 @@ const MCScanAddTrackComponent = observer(function MCScanAddTrackComponent({
 }: any) {
   const session = getSession(model)
   const { assemblyNames, assemblyManager } = session
-  const [r0, setR0] = useState(session.assemblies[0]?.name)
-  const [r1, setR1] = useState(session.assemblies[0]?.name)
+  const [r0, setR0] = useState(session.assemblies[0]?.name || '')
+  const [r1, setR1] = useState(session.assemblies[0]?.name || '')
   const [species0, setSpecies0] = useState('')
   const [species1, setSpecies1] = useState('')
   const [bed1Location, setBed1Location] = useState<FileLocation>()

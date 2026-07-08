@@ -66,8 +66,8 @@ const DotplotImportForm = observer(function DotplotImportForm({
   const { classes } = useStyles()
   const session = getSession(model)
   const { assemblyNames, assemblyManager } = session
-  const [assembly2, setAssembly2] = useState(assemblyNames[0] || '')
-  const [assembly1, setAssembly1] = useState(assemblyNames[0] || '')
+  const [assembly2, setAssembly2] = useState('')
+  const [assembly1, setAssembly1] = useState('')
   const [species2, setSpecies2] = useState('')
   const [species1, setSpecies1] = useState('')
   const [error, setError] = useState<unknown>()
@@ -117,6 +117,7 @@ const DotplotImportForm = observer(function DotplotImportForm({
             }}
           />
           <AssemblySelector
+            label="Genome"
             helperText="x-axis assembly"
             selected={assembly2}
             species={species2}
@@ -133,6 +134,7 @@ const DotplotImportForm = observer(function DotplotImportForm({
             }}
           />
           <AssemblySelector
+            label="Genome"
             helperText="y-axis assembly"
             selected={assembly1}
             species={species1}
@@ -143,6 +145,7 @@ const DotplotImportForm = observer(function DotplotImportForm({
           />
           <FormControl>
             <Button
+              disabled={!assembly1 || !assembly2}
               onClick={() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 ;(async () => {
@@ -166,11 +169,13 @@ const DotplotImportForm = observer(function DotplotImportForm({
             </Button>
           </FormControl>
         </Grid>
-        <TrackSelector
-          assembly2={assembly2}
-          assembly1={assembly1}
-          model={model}
-        />
+        {assembly1 && assembly2 ? (
+          <TrackSelector
+            assembly2={assembly2}
+            assembly1={assembly1}
+            model={model}
+          />
+        ) : null}
       </Paper>
     </Container>
   )

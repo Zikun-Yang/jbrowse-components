@@ -41,12 +41,8 @@ const LinearSyntenyViewImportForm = observer(
     const { classes } = useStyles()
     const session = getSession(model)
     const { assemblyNames } = session
-    const defaultAssemblyName = assemblyNames[0] || ''
     const [selectedRow, setSelectedRow] = useState(0)
-    const [selectedAssemblyNames, setSelectedAssemblyNames] = useState([
-      defaultAssemblyName,
-      defaultAssemblyName,
-    ])
+    const [selectedAssemblyNames, setSelectedAssemblyNames] = useState(['', ''])
     const [error, setError] = useState<unknown>()
 
     const handleLaunch = async () => {
@@ -73,7 +69,6 @@ const LinearSyntenyViewImportForm = observer(
               setSelectedAssemblyNames={setSelectedAssemblyNames}
               selectedRow={selectedRow}
               setSelectedRow={setSelectedRow}
-              defaultAssemblyName={defaultAssemblyName}
               onLaunch={() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 handleLaunch()

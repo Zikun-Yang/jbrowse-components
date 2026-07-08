@@ -128,13 +128,36 @@ interface Results2 extends Results {
   input: HTMLElement
   getInputValue: () => string
 }
+export async function selectAssembly(
+  findByRole: (
+    role: string,
+    options?: { name?: string },
+  ) => Promise<HTMLElement>,
+  input: HTMLInputElement,
+  name: string,
+) {
+  fireEvent.focus(input)
+  fireEvent.keyDown(input, { key: 'ArrowDown' })
+  fireEvent.click(await findByRole('option', { name }))
+}
+
 export async function doSetupForImportForm(val?: unknown): Promise<Results2> {
   const args = await createView(val)
-  const { view, findByTestId, getByPlaceholderText, findByPlaceholderText } =
-    args
+  const {
+    view,
+    findByTestId,
+    findByRole,
+    getByPlaceholderText,
+    findByPlaceholderText,
+  } = args
 
   // clear view takes us to the import form
   view.clearView()
+
+  const assemblyInput = (await findByTestId(
+    'assembly-selector',
+  )) as HTMLInputElement
+  await selectAssembly(findByRole, assemblyInput, 'volvox')
 
   const autocomplete = await findByTestId(
     'autocomplete',
@@ -146,6 +169,13 @@ export async function doSetupForImportForm(val?: unknown): Promise<Results2> {
     {},
     { timeout: 10000 },
   )) as HTMLInputElement
+
+  await waitFor(
+    () => {
+      expect(input.value).toBeTruthy()
+    },
+    { timeout: 10000 },
+  )
 
   // this will be the input that is obtained after opening the LGV from the
   // import form
@@ -280,6 +310,11 @@ export async function openSpreadsheetView({
     target: { value: fileUrl },
   })
 
+  const assemblyInput = (await screen.findByTestId(
+    'assembly-selector',
+  )) as HTMLInputElement
+  await selectAssembly(screen.findByRole, assemblyInput, 'volvox')
+
   await waitFor(() => {
     expect(screen.getByTestId('open_spreadsheet')).not.toBeDisabled()
   }, delay)
@@ -299,7 +334,7 @@ export async function openViewWithFileInput({
 }) {
   const delay = { timeout: timeout || 40000 }
   const result = await createView()
-  const { findByTestId, getByTestId, findByText } = result
+  const { findByTestId, getByTestId, findByText, findByRole } = result
 
   for (const item of menuPath) {
     fireEvent.click(await findByText(item))
@@ -308,6 +343,11 @@ export async function openViewWithFileInput({
   fireEvent.change(await findByTestId('urlInput', {}, delay), {
     target: { value: fileUrl },
   })
+
+  const assemblyInput = (await findByTestId(
+    'assembly-selector',
+  )) as HTMLInputElement
+  await selectAssembly(findByRole, assemblyInput, 'volvox')
 
   await waitFor(() => {
     expect(getByTestId('open_spreadsheet').closest('button')).not.toBeDisabled()

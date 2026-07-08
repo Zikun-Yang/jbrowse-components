@@ -108,7 +108,7 @@ const ImportBookmarksDialog = observer(function ImportBookmarksDialog({
   const [shareLink, setShareLink] = useState('')
   const session = getSession(model)
   const { assemblyNames, assemblyManager } = session
-  const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+  const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0] || '')
   const [selectedSpecies, setSelectedSpecies] = useState('')
   const [expanded, setExpanded] = useState<
     'shareLinkAccordion' | 'fileAccordion'
@@ -187,6 +187,7 @@ const ImportBookmarksDialog = observer(function ImportBookmarksDialog({
               }}
             />
             <AssemblySelector
+              label="Genome"
               onChange={val => {
                 setSelectedAsm(val)
               }}
@@ -207,7 +208,10 @@ const ImportBookmarksDialog = observer(function ImportBookmarksDialog({
           data-testid="dialogImport"
           variant="contained"
           color="primary"
-          disabled={!location && !shareLink}
+          disabled={
+            (!location && !shareLink) ||
+            (expanded === 'fileAccordion' && !selectedAsm)
+          }
           startIcon={<ImportIcon />}
           onClick={async () => {
             try {

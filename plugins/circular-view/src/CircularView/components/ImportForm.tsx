@@ -27,7 +27,7 @@ const ImportForm = observer(function ImportForm({
   const session = getSession(model)
   const { error } = model
   const { assemblyNames, assemblyManager } = session
-  const [selectedAsm, setSelectedAsm] = useState(assemblyNames[0]!)
+  const [selectedAsm, setSelectedAsm] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState('')
   const assembly = assemblyManager.get(selectedAsm)
 
@@ -66,6 +66,7 @@ const ImportForm = observer(function ImportForm({
           }}
         />
         <AssemblySelector
+          label="Genome"
           onChange={val => {
             model.setError(undefined)
             setSelectedAsm(val)
