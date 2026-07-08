@@ -2,6 +2,7 @@ import Plugin from '@jbrowse/core/Plugin'
 
 import FeatureChartAdapterF from './FeatureChartAdapter/index.ts'
 import FeatureChartRendererF from './FeatureChartRenderer/index.ts'
+import FeatureChartPlotlyRendererF from './FeatureChartPlotlyRenderer/index.ts'
 import LinearFeatureChartDisplayF from './LinearFeatureChartDisplay/index.ts'
 import FeatureChartTrackF from './FeatureChartTrack/index.ts'
 import { initBuiltInDrawers } from './FeatureChartDrawer/drawerRegistry.ts'
@@ -14,6 +15,7 @@ export default class FeatureChartPlugin extends Plugin {
   install(pluginManager: PluginManager) {
     FeatureChartAdapterF(pluginManager)
     FeatureChartRendererF(pluginManager)
+    FeatureChartPlotlyRendererF(pluginManager)
     LinearFeatureChartDisplayF(pluginManager)
     FeatureChartTrackF(pluginManager)
     initBuiltInDrawers()

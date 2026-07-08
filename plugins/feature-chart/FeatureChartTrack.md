@@ -201,12 +201,13 @@ tabix -p bed expression.tsv.gz
 
 ## 3. 架构设计
 
-采用 JBrowse 标准四层架构：
+采用 JBrowse 标准四层架构，display 现在支持多种 renderer：
 
 ```
 FeatureChartTrack (TrackType)
   → LinearFeatureChartDisplay (DisplayType)
-    → FeatureChartRenderer (RendererType)
+    → FeatureChartRenderer (RendererType, canvas/D3)
+    → FeatureChartPlotlyRenderer (RendererType, DOM/Plotly)
       → FeatureChartTabixAdapter (AdapterType)
 ```
 
@@ -230,16 +231,26 @@ FeatureChartTrack (TrackType)
 - 通过 drawer 名称从注册表获取 drawer 函数并调用
 - 当视图内 chart 数量超过阈值或空间过挤时，渲染"数据太多，请放大查看"的提示（黄色），不绘制单个 chart
 
-### 3.3 LinearFeatureChartDisplay
+### 3.3 FeatureChartPlotlyRenderer
+
+- 继承 `FeatureRendererType`，client-side React 渲染
+- 使用 [Plotly.js](https://plotly.com/javascript/) 绘制交互式图表
+- `plotly.js-dist-min` 按需 lazy load，未使用 Plotly renderer 的 track 不会加载
+- 支持 `box`、`violin`、`bar`、`scatter`、`line` 等常见图表类型
+- 每个 feature 对应一个独立 Plotly 图表，位置计算与 canvas renderer 一致
+- 图表支持 Plotly 内置悬停、缩放等交互
+
+### 3.4 LinearFeatureChartDisplay
 
 - 继承 `BaseLinearDisplay`
-- 指定 `rendererTypeName` 为 `FeatureChartRenderer`
+- `rendererTypeName` 从 display 配置读取，可切换 `FeatureChartRenderer` 或
+  `FeatureChartPlotlyRenderer`
 - 提供自定义 `TooltipComponent`
 - `chartHeight`、`chartWidth`、`align` 作为显示配置
 - hover chart 时显示 maximize 图标
 - 点击 maximize 图标打开详情 Dialog
 
-### 3.4 Drawer 注册表
+### 3.5 Drawer 注册表
 
 模块级单例，主线程和 worker 共享：
 
@@ -265,6 +276,8 @@ export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
 ---
 
 ## 4. 配置示例
+
+### 4.1 Canvas renderer 配置示例
 
 ```json
 {
@@ -300,6 +313,48 @@ export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
   ]
 }
 ```
+
+### 4.2 Plotly renderer 配置示例
+
+使用 Plotly 绘制交互式 box plot，数据格式与 `rawBoxPlot`
+一致（`{ tissues: { Brain: [...], Liver: [...] } }`）：
+
+```json
+{
+  "type": "FeatureChartTrack",
+  "trackId": "tissue_expression_plotly",
+  "name": "Tissue expression (Plotly)",
+  "assemblyNames": ["hg38"],
+  "adapter": {
+    "type": "FeatureChartTabixAdapter",
+    "dataLocation": {
+      "uri": "expression.tsv.gz",
+      "locationType": "UriLocation"
+    },
+    "index": {
+      "location": {
+        "uri": "expression.tsv.gz.tbi",
+        "locationType": "UriLocation"
+      }
+    },
+    "format": "tsv-json-payload"
+  },
+  "displays": [
+    {
+      "type": "LinearFeatureChartDisplay",
+      "renderer": {
+        "type": "FeatureChartPlotlyRenderer",
+        "plotType": "box",
+        "chartHeight": 180,
+        "chartWidth": 140,
+        "align": "center"
+      }
+    }
+  ]
+}
+```
+
+`plotType` 可选值：`box`、`violin`、`bar`、`scatter`、`line`。
 
 ---
 
@@ -400,6 +455,7 @@ Dialog 中的放大图复用当前 renderer 已加载的 `data` 和
 | chart 对齐         | `align: left/right/center` 相对 start/end  | 灵活锚定                                                       |
 | 绘图包             | D3 + Canvas 2D                             | 适配 JBrowse `renderToAbstractCanvas`，支持 worker 和 SVG 导出 |
 | 自定义绘图         | Drawer 注册表（模块级单例）                | 主线程和 worker 共享，避免函数序列化问题                       |
+| Plotly 支持        | 可选 `FeatureChartPlotlyRenderer`          | 需要交互/美观图表时启用，按需加载                              |
 | 数据与 drawer 关系 | 一个文件一种图表，不同 track 用不同 drawer | 清晰分离，避免一个文件里混多种数据结构                         |
 | description 格式   | Markdown + `{{variable}}` 模板             | 丰富且可复用，减少重复文本                                     |
 | 数据过载展示       | 黄色提示带，提示用户放大查看               | 避免 overcrowded 时强行渲染导致混乱                            |

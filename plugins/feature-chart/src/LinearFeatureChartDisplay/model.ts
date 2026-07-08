@@ -44,7 +44,7 @@ function stateModelFactory(
        * #getter
        */
       get rendererTypeName() {
-        return 'FeatureChartRenderer'
+        return getConf(self, ['renderer', 'type']) as string
       },
 
       /**

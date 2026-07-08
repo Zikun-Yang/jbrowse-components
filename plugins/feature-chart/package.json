@@ -39,12 +39,16 @@
     "d3-scale": "^4.0.2",
     "mobx": "^6.15.0",
     "mobx-react": "^9.2.1",
+    "plotly.js-dist-min": "^2.35.3",
     "react-markdown": "^10.1.0",
     "rxjs": "^7.8.2"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/plotly.js": "^2.35.2"
   },
   "publishConfig": {
     "access": "public",

@@ -1,8 +1,6 @@
 import { ConfigurationSchema } from '@jbrowse/core/configuration'
 import { baseLinearDisplayConfigSchema } from '@jbrowse/plugin-linear-genome-view'
 
-import rendererConfigSchema from '../FeatureChartRenderer/configSchema.ts'
-
 import type PluginManager from '@jbrowse/core/PluginManager'
 
 /**
@@ -10,14 +8,14 @@ import type PluginManager from '@jbrowse/core/PluginManager'
  */
 function x() {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
-function configSchemaFactory(_pluginManager: PluginManager) {
+function configSchemaFactory(pluginManager: PluginManager) {
   return ConfigurationSchema(
     'LinearFeatureChartDisplay',
     {
       /**
        * #slot
        */
-      renderer: rendererConfigSchema,
+      renderer: pluginManager.pluggableConfigSchemaType('renderer'),
     },
     {
       /**
