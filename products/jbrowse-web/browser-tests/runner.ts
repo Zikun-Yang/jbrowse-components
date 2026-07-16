@@ -277,12 +277,6 @@ async function clickViewMenuOption(
   await option?.click()
 }
 
-async function setupWorkspacesViaMoveToTab(page: Page) {
-  await copyView(page)
-  await clickViewMenuOption(page, 'Move to new tab', 0)
-  await waitForWorkspacesReady(page)
-}
-
 // Test suites
 interface TestSuite {
   name: string
@@ -363,18 +357,6 @@ const testSuites: TestSuite[] = [
         fn: async page => {
           await navigateToApp(page)
 
-          // Enable workspaces via Tools menu
-          const toolsMenu = await findByText(page, 'Tools', 10000)
-          await toolsMenu?.click()
-          await delay(300)
-          const useWorkspacesCheckbox = await findByText(
-            page,
-            'Use workspaces',
-            10000,
-          )
-          await useWorkspacesCheckbox?.click()
-          await delay(500)
-
           // Count views before adding
           const searchInputsBefore = await page.$$(
             'input[placeholder="Search for location"]',
@@ -415,14 +397,6 @@ const testSuites: TestSuite[] = [
 
           await waitForLoadingToComplete(page)
           await snapshot(page, 'workspaces-add-view')
-        },
-      },
-      {
-        name: 'move to new tab enables workspaces',
-        fn: async page => {
-          await navigateToApp(page)
-          await setupWorkspacesViaMoveToTab(page)
-          await snapshot(page, 'workspaces-new-tab')
         },
       },
       {
@@ -468,7 +442,7 @@ const testSuites: TestSuite[] = [
                 loc: 'ctgB:1-5000',
               },
             ],
-            // Horizontal split: left panel has views 0 and 1 stacked, right panel has view 2
+            // Each view gets its own panel; with 3 views we expect 3 groups
             layout: {
               direction: 'horizontal',
               children: [{ views: [0, 1] }, { views: [2] }],
@@ -486,15 +460,15 @@ const testSuites: TestSuite[] = [
           )
           await delay(2000)
 
-          // With a horizontal split, we should have 2 dockview groups
+          // With one view per panel, we should have 3 dockview groups
           const groups = await page.$$('.dv-groupview')
-          if (groups.length < 2) {
+          if (groups.length < 3) {
             throw new Error(
-              `Expected at least 2 dockview groups for horizontal split, got ${groups.length}`,
+              `Expected at least 3 dockview groups for 3 views, got ${groups.length}`,
             )
           }
 
-          // Should have 3 total view containers (2 in left panel, 1 in right)
+          // Should have 3 total view containers
           let viewContainers: Awaited<ReturnType<typeof page.$$>> = []
           for (let i = 0; i < 20; i++) {
             viewContainers = await page.$$('[data-testid^="view-container-"]')
@@ -530,7 +504,7 @@ const testSuites: TestSuite[] = [
                 loc: 'ctgB:1-5000',
               },
             ],
-            // 70/30 horizontal split
+            // Each view gets its own panel; with 2 views we expect 2 groups
             layout: {
               direction: 'horizontal',
               children: [
@@ -569,47 +543,6 @@ const testSuites: TestSuite[] = [
 
           await waitForLoadingToComplete(page)
           await snapshot(page, 'workspaces-layout-custom-sizes')
-        },
-      },
-      {
-        name: 'multiple views in workspace - move up and down',
-        fn: async page => {
-          await navigateToApp(page)
-          await setupWorkspacesViaMoveToTab(page)
-
-          // Copy view again to have multiple views in one panel
-          await copyView(page)
-
-          // Get the order of view containers before moving
-          const getViewOrder = () =>
-            page.evaluate(() => {
-              const containers = document.querySelectorAll(
-                '[data-testid^="view-container-"]',
-              )
-              return [...containers].map(c => (c as HTMLElement).dataset.testid)
-            })
-
-          const orderBefore = await getViewOrder()
-          if (orderBefore.length < 2) {
-            throw new Error(
-              `Expected at least 2 view containers, got ${orderBefore.length}`,
-            )
-          }
-
-          // Now try to move first view down
-          await clickViewMenuOption(page, 'Move view down', 0)
-          await delay(500)
-
-          // Verify the order actually changed
-          const orderAfter = await getViewOrder()
-          if (
-            orderBefore[0] === orderAfter[0] &&
-            orderBefore[1] === orderAfter[1]
-          ) {
-            throw new Error(
-              `View order did not change after move down. Before: ${orderBefore.join(', ')}. After: ${orderAfter.join(', ')}`,
-            )
-          }
         },
       },
     ],

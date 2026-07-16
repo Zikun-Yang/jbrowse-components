@@ -1,2 +1,5 @@
 export * from './App.tsx'
 export { default as DialogQueue } from './DialogQueue.tsx'
+export { default as LandingPage } from './LandingPage.tsx'
+export { default as SettingsView } from './SettingsView.tsx'
+export { default as WorkspaceToolbar } from './WorkspaceToolbar.tsx'

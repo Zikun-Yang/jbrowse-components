@@ -48,6 +48,8 @@ import type { MenuItem } from '@jbrowse/core/ui'
 import type { AssemblyManager } from '@jbrowse/core/util/types'
 import type { Instance, SnapshotIn } from '@jbrowse/mobx-state-tree'
 
+type ActiveView = 'landing' | 'workspace' | 'recents' | 'settings'
+
 // lazies
 const AboutDialog = lazy(() => import('./AboutDialog.tsx'))
 
@@ -110,6 +112,15 @@ export function BaseWebSession({
       sessionPlugins: types.array(
         types.frozen<PluginDefinition & { name: string }>(),
       ),
+      /**
+       * #property
+       * the currently active UI view/page. intentionally not persisted in
+       * session snapshots so reloading starts in workspace mode.
+       */
+      activeView: types.optional(
+        types.enumeration(['landing', 'workspace', 'recents', 'settings'] as const),
+        'workspace',
+      ),
     })
     .volatile((/* self */) => ({
       /**
@@ -131,6 +142,12 @@ export function BaseWebSession({
        */
       get tracks(): AnyConfigurationModel[] {
         return [...self.sessionTracks, ...self.jbrowse.tracks]
+      },
+      /**
+       * #getter
+       */
+      get showRecentsDashboard() {
+        return self.activeView === 'recents'
       },
       /**
        * #getter
@@ -163,6 +180,18 @@ export function BaseWebSession({
        */
       setName(str: string) {
         self.name = str
+      },
+      /**
+       * #action
+       */
+      setActiveView(view: ActiveView) {
+        self.activeView = view
+      },
+      /**
+       * #action
+       */
+      setShowRecentsDashboard(show: boolean) {
+        self.activeView = show ? 'recents' : 'workspace'
       },
     }))
 
@@ -517,10 +546,19 @@ export function BaseWebSession({
     preProcessor(
       snapshot: SnapshotIn<typeof extendedSessionModel> & {
         connectionInstances?: unknown
+        showRecentsDashboard?: unknown
+        activeView?: unknown
       },
     ) {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      const { connectionInstances, ...rest } = snapshot || {}
+      const { connectionInstances, showRecentsDashboard, activeView, ...rest } =
+        snapshot || {}
+      // showRecentsDashboard was migrated to the activeView property, so remove
+      // it from any old snapshots that may still contain it
+      void showRecentsDashboard
+      // activeView is intentionally not restored from snapshots; the URL or
+      // default state determines the initial view
+      void activeView
 
       // connectionInstances schema changed from object to an array, so any old
       // connectionInstances as object is in snapshot, filter it out

@@ -97,7 +97,7 @@ export function useWidthSetter(
   const [ref, { width }] = useMeasure()
   useEffect(() => {
     let token: ReturnType<typeof requestAnimationFrame>
-    if (width && isAlive(view)) {
+    if (width && isStateTreeNode(view) && isAlive(view)) {
       // sets after a requestAnimationFrame
       // https://stackoverflow.com/a/58701523/2129219
       // avoids ResizeObserver loop error being shown during development

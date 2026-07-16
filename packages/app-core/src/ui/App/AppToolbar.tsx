@@ -1,110 +1,82 @@
-import AppLogo from '@jbrowse/core/ui/AppLogo'
-import DropDownMenu from '@jbrowse/core/ui/DropDownMenu'
-import EditableTypography from '@jbrowse/core/ui/EditableTypography'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import { Toolbar, Tooltip } from '@mui/material'
+import { Toolbar } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import type { MenuItem as JBMenuItem } from '@jbrowse/core/ui/Menu'
+import WorkspaceToolbar from './WorkspaceToolbar.tsx'
+
 import type { SnackbarMessage } from '@jbrowse/core/ui/SnackbarModel'
 import type { SessionWithDrawerWidgets } from '@jbrowse/core/util'
 
 const useStyles = makeStyles()(theme => ({
-  grow: {
-    flexGrow: 1,
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
   },
-  inputBase: {
-    color: theme.palette.primary.contrastText,
+  side: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
   },
-  inputRoot: {
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-    },
+  rightSide: {
+    justifyContent: 'flex-end',
   },
-  inputFocused: {
-    borderColor: theme.palette.secondary.main,
-    backgroundColor: theme.palette.primary.light,
+  center: {
+    flex: '0 0 auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: theme.palette.text.primary,
   },
 }))
 
-interface Menu {
-  label: string
-  menuItems: JBMenuItem[] | (() => JBMenuItem[])
+interface History {
+  canUndo: boolean
+  canRedo: boolean
+  undo: () => void
+  redo: () => void
 }
 
-type AppSession = SessionWithDrawerWidgets & {
-  menus: () => Menu[]
-  snackbarMessages: SnackbarMessage[]
-  renameCurrentSession: (arg: string) => void
-  popSnackbarMessage: () => unknown
-}
-
-function wrapMenuItems(items: JBMenuItem[], session: AppSession): JBMenuItem[] {
-  return items.map(item => ({
-    ...item,
-    ...('onClick' in item
-      ? {
-          onClick: () => {
-            item.onClick(session)
-          },
-        }
-      : {}),
-    ...('subMenu' in item
-      ? { subMenu: wrapMenuItems(item.subMenu, session) }
-      : {}),
-  }))
+interface Props {
+  HeaderButtons?: React.ReactElement
+  session: SessionWithDrawerWidgets & {
+    snackbarMessages: SnackbarMessage[]
+    popSnackbarMessage: () => unknown
+    activeView?: 'landing' | 'workspace' | 'recents' | 'settings'
+    showRecentsDashboard?: boolean
+    addView: (typeName: string, initialState?: Record<string, unknown>) => unknown
+    root: {
+      history: History
+    }
+  }
 }
 
 const AppToolbar = observer(function AppToolbar({
-  session,
   HeaderButtons = <div />,
-}: {
-  HeaderButtons?: React.ReactElement
-  session: AppSession
-}) {
-  const { classes } = useStyles()
-  const { name, menus } = session
+  session,
+}: Props) {
+  const { classes, cx } = useStyles()
+  const view = session.activeView || 'workspace'
+  const titles: Record<string, string> = {
+    landing: 'Home',
+    recents: 'Recents',
+    settings: 'Settings',
+  }
 
   return (
-    <Toolbar>
-      {menus().map(menu => (
-        <DropDownMenu
-          key={menu.label}
-          menuTitle={menu.label}
-          menuItems={() => {
-            const items =
-              typeof menu.menuItems === 'function'
-                ? menu.menuItems()
-                : menu.menuItems
-            return wrapMenuItems(items, session)
-          }}
-        />
-      ))}
-      <div className={classes.grow} />
-      <Tooltip title="Rename session" arrow>
-        <EditableTypography
-          value={name}
-          variant="body1"
-          classes={{
-            inputBase: classes.inputBase,
-            inputRoot: classes.inputRoot,
-            inputFocused: classes.inputFocused,
-          }}
-          setValue={newName => {
-            session.renameCurrentSession(newName)
-          }}
-        />
-      </Tooltip>
-      {HeaderButtons}
-      <div className={classes.grow} />
-      <div
-        style={{
-          width: 150,
-          maxHeight: 48,
-        }}
-      >
-        <AppLogo session={session} />
+    <Toolbar className={classes.toolbar}>
+      <div className={classes.side} />
+      <div className={classes.center}>
+        {view === 'workspace' ? (
+          <WorkspaceToolbar session={session} />
+        ) : titles[view] ? (
+          <div className={classes.title}>{titles[view]}</div>
+        ) : null}
       </div>
+      <div className={cx(classes.side, classes.rightSide)}>{HeaderButtons}</div>
     </Toolbar>
   )
 })

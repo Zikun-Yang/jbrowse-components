@@ -21,6 +21,21 @@ const useStyles = makeStyles()(theme => ({
     // xref https://stackoverflow.com/questions/43909940/why-does-overflowhidden-prevent-positionsticky-from-working
     // note that contain:paint also seems to work
   },
+  viewContainerPanel: {
+    margin: 0,
+    padding: 0,
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  viewWrapper: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    overflow: 'hidden',
+  },
   focusedView: {
     background: theme.palette.secondary.main,
   },
@@ -32,9 +47,11 @@ const useStyles = makeStyles()(theme => ({
 const ViewContainer = observer(function ViewContainer({
   view,
   session,
+  panelId,
 }: {
   view: AbstractViewModel
   session: SessionWithFocusedViewAndDrawerWidgets
+  panelId?: string
 }) {
   const theme = useTheme()
   const ref = useWidthSetter(view, theme.spacing(1))
@@ -61,18 +78,20 @@ const ViewContainer = observer(function ViewContainer({
       : classes.unfocusedView
   const viewContainerClassName = cx(
     classes.viewContainer,
-    backgroundColorClassName,
+    !panelId && backgroundColorClassName,
+    panelId && classes.viewContainerPanel,
   )
 
   return (
     <Paper
       ref={ref}
-      elevation={12}
+      elevation={panelId ? 0 : 12}
       className={viewContainerClassName}
       data-testid={`view-container-${view.id}`}
     >
       <ViewHeader
         view={view}
+        panelId={panelId}
         onClose={() => {
           session.removeView(view)
         }}
@@ -81,8 +100,8 @@ const ViewContainer = observer(function ViewContainer({
         }}
         className={backgroundColorClassName}
       />
-      <Paper elevation={0}>
-        <ViewWrapper view={view} session={session} />
+      <Paper elevation={0} className={panelId ? classes.viewWrapper : undefined}>
+        <ViewWrapper view={view} session={session} panelId={panelId} />
       </Paper>
     </Paper>
   )

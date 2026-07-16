@@ -57,6 +57,18 @@ export function DockviewLayoutMixin() {
       getViewIdsForPanel(panelId: string) {
         return self.panelViewAssignments.get(panelId) ?? []
       },
+      /**
+       * #getter
+       * Get the panel ID that contains a specific view
+       */
+      getPanelIdForView(viewId: string) {
+        for (const [panelId, viewIds] of self.panelViewAssignments.entries()) {
+          if (viewIds.includes(viewId)) {
+            return panelId
+          }
+        }
+        return undefined
+      },
     }))
     .actions(self => ({
       /**
@@ -121,6 +133,14 @@ export function DockviewLayoutMixin() {
        */
       removePanel(panelId: string) {
         self.panelViewAssignments.delete(panelId)
+      },
+
+      /**
+       * #action
+       * Clear all panel-view assignments
+       */
+      clearPanelViewAssignments() {
+        self.panelViewAssignments.clear()
       },
 
       /**

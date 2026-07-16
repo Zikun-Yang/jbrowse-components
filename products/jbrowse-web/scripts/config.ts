@@ -18,6 +18,13 @@ export default function webpackConfig(config: Configuration) {
   // Allow serving dotfiles (e.g. .zgroup, .zarray for Zarr datasets)
   config.devServer = {
     ...(config.devServer || {}),
+    historyApiFallback: true,
+    proxy: [
+      {
+        context: '/api',
+        target: 'http://localhost:8080',
+      },
+    ],
     static: [
       {
         directory: path.join(__dirname, '../public'),

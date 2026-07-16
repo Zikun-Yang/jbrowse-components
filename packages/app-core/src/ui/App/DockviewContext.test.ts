@@ -2,7 +2,6 @@ import {
   clearPendingMoveAction,
   getPendingMoveAction,
   peekPendingMoveAction,
-  setPendingMoveToNewTab,
   setPendingMoveToSplitRight,
 } from './DockviewContext.tsx'
 
@@ -27,34 +26,34 @@ describe('DockviewContext pending move actions', () => {
     })
   })
 
-  describe('setPendingMoveToNewTab', () => {
+  describe('setPendingMoveToSplitRight', () => {
     it('stores the pending action', () => {
-      setPendingMoveToNewTab('view-123')
+      setPendingMoveToSplitRight('view-123')
 
       const action = peekPendingMoveAction()
-      expect(action).toEqual({ type: 'newTab', viewId: 'view-123' })
+      expect(action).toEqual({ type: 'splitRight', viewId: 'view-123' })
     })
 
     it('peekPendingMoveAction does not consume the action', () => {
-      setPendingMoveToNewTab('view-123')
+      setPendingMoveToSplitRight('view-123')
 
       // Peek multiple times - should always return the same action
       expect(peekPendingMoveAction()).toEqual({
-        type: 'newTab',
+        type: 'splitRight',
         viewId: 'view-123',
       })
       expect(peekPendingMoveAction()).toEqual({
-        type: 'newTab',
+        type: 'splitRight',
         viewId: 'view-123',
       })
     })
 
     it('getPendingMoveAction consumes the action', () => {
-      setPendingMoveToNewTab('view-123')
+      setPendingMoveToSplitRight('view-123')
 
       // First call returns the action
       expect(getPendingMoveAction()).toEqual({
-        type: 'newTab',
+        type: 'splitRight',
         viewId: 'view-123',
       })
       // Second call returns null (action was consumed)
@@ -62,7 +61,7 @@ describe('DockviewContext pending move actions', () => {
     })
 
     it('clearPendingMoveAction clears the action', () => {
-      setPendingMoveToNewTab('view-123')
+      setPendingMoveToSplitRight('view-123')
 
       clearPendingMoveAction()
 
@@ -70,18 +69,9 @@ describe('DockviewContext pending move actions', () => {
     })
   })
 
-  describe('setPendingMoveToSplitRight', () => {
-    it('stores the pending action with splitRight type', () => {
-      setPendingMoveToSplitRight('view-456')
-
-      const action = peekPendingMoveAction()
-      expect(action).toEqual({ type: 'splitRight', viewId: 'view-456' })
-    })
-  })
-
   describe('action overwriting', () => {
     it('later action overwrites earlier action', () => {
-      setPendingMoveToNewTab('view-1')
+      setPendingMoveToSplitRight('view-1')
       setPendingMoveToSplitRight('view-2')
 
       const action = peekPendingMoveAction()

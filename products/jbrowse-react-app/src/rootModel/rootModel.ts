@@ -17,7 +17,6 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import GetAppIcon from '@mui/icons-material/GetApp'
 import PublishIcon from '@mui/icons-material/Publish'
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import StorageIcon from '@mui/icons-material/Storage'
 import { autorun } from 'mobx'
 
@@ -283,19 +282,7 @@ export default function RootModel({
             },
             {
               label: 'Tools',
-              menuItems: [
-                {
-                  label: 'Use workspaces',
-                  icon: SpaceDashboardIcon,
-                  type: 'checkbox',
-                  checked: self.session?.useWorkspaces ?? false,
-                  helpText:
-                    'Workspaces allow you to organize views into tabs and tiles. You can drag views between tabs or split them side-by-side.',
-                  onClick: () => {
-                    self.session?.setUseWorkspaces(!self.session.useWorkspaces)
-                  },
-                },
-              ],
+              menuItems: [],
             },
           ],
           self.mutableMenuActions,

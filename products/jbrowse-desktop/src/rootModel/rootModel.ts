@@ -21,7 +21,6 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import RedoIcon from '@mui/icons-material/Redo'
 import SaveAsIcon from '@mui/icons-material/SaveAs'
 import SettingsIcon from '@mui/icons-material/Settings'
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import StorageIcon from '@mui/icons-material/Storage'
 import UndoIcon from '@mui/icons-material/Undo'
 
@@ -331,17 +330,6 @@ export default function rootModelFactory({
                         },
                       ],
                     )
-                  },
-                },
-                {
-                  label: 'Use workspaces',
-                  icon: SpaceDashboardIcon,
-                  type: 'checkbox',
-                  checked: self.session?.useWorkspaces ?? false,
-                  helpText:
-                    'Workspaces allow you to organize views into tabs and tiles. You can drag views between tabs or split them side-by-side.',
-                  onClick: () => {
-                    self.session?.setUseWorkspaces(!self.session.useWorkspaces)
                   },
                 },
               ],

@@ -1,73 +1,56 @@
-import { Suspense, lazy } from 'react'
-
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { observer } from 'mobx-react'
 
 import ViewContainer from './ViewContainer.tsx'
-import { getViewsForPanel } from './dockviewUtils.ts'
 
 import type { DockviewSessionType } from './types.ts'
+import type { AbstractViewModel } from '@jbrowse/core/util'
 import type { IDockviewPanelProps } from 'dockview-react'
 
-const ViewLauncher = lazy(() => import('./ViewLauncher.tsx'))
-
-const useStyles = makeStyles()(theme => ({
+const useStyles = makeStyles()({
   container: {
     height: '100%',
-    overflowY: 'auto',
-    background: theme.palette.background.default,
-  },
-  viewStack: {
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
+    background: 'transparent',
   },
-  spacer: {
-    height: 300,
-  },
-  emptyPanel: {
+  viewWrapper: {
+    flex: 1,
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
+    flexDirection: 'column',
+    minHeight: 0,
   },
-}))
+})
 
 export interface JBrowseViewPanelParams {
   panelId: string
+  viewId: string
   session?: DockviewSessionType
 }
 
 const JBrowseViewPanel = observer(function JBrowseViewPanel({
   params,
 }: IDockviewPanelProps<JBrowseViewPanelParams>) {
-  const { panelId, session } = params
+  const { viewId, session, panelId } = params
   const { classes } = useStyles()
 
   if (!session) {
     return <div className={classes.container}>Loading...</div>
   }
 
-  const views = getViewsForPanel(panelId, session)
+  const view = session.views.find(
+    (v: AbstractViewModel) => v.id === viewId,
+  )
 
-  if (views.length === 0) {
-    return (
-      <div className={classes.container}>
-        <div className={classes.emptyPanel}>
-          <Suspense fallback={null}>
-            <ViewLauncher session={session} />
-          </Suspense>
-        </div>
-      </div>
-    )
+  if (!view) {
+    return <div className={classes.container} />
   }
 
   return (
     <div className={classes.container}>
-      <div className={classes.viewStack}>
-        {views.map(view => (
-          <ViewContainer key={view.id} view={view} session={session} />
-        ))}
-        <div className={classes.spacer} />
+      <div className={classes.viewWrapper} data-panel-id={panelId}>
+        <ViewContainer view={view} session={session} panelId={panelId} />
       </div>
     </div>
   )

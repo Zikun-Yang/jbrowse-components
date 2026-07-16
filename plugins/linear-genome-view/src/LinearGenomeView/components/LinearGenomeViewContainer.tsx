@@ -15,17 +15,30 @@ import type { LinearGenomeViewModel } from '../index.ts'
 const NoTracksActiveButton = lazy(() => import('./NoTracksActiveButton.tsx'))
 
 const useStyles = makeStyles()(theme => ({
+  root: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'hidden',
+  },
   header: {
     background: theme.palette.background.paper,
     top: VIEW_HEADER_HEIGHT,
     zIndex: 850,
   },
+  tracksContainer: {
+    flex: 1,
+    minHeight: 0,
+    // Internal track scrolling only when the view is inside a dockview panel.
+    '[data-panel-id] &': {
+      overflowX: 'hidden',
+      overflowY: 'auto',
+    },
+  },
   pinnedTracks: {
     position: 'sticky',
     zIndex: 3,
-  },
-  rel: {
-    position: 'relative',
   },
 }))
 
@@ -65,7 +78,7 @@ const LinearGenomeViewContainer = observer(function LinearGenomeViewContainer({
 
   return (
     <div
-      className={classes.rel}
+      className={classes.root}
       ref={ref}
       onMouseLeave={() => {
         session.setHovered(undefined)
@@ -89,7 +102,7 @@ const LinearGenomeViewContainer = observer(function LinearGenomeViewContainer({
         <HeaderComponent model={model} />
         <MiniControlsComponent model={model} />
       </div>
-      <TracksContainer model={model}>
+      <TracksContainer model={model} className={classes.tracksContainer}>
         {!tracks.length ? (
           <Suspense fallback={null}>
             <NoTracksActiveButton model={model} />

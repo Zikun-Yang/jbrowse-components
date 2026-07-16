@@ -4,8 +4,11 @@ import type {
   SessionWithFocusedViewAndDrawerWidgets,
 } from '@jbrowse/core/util'
 
+import type { SessionWithDockviewLayout } from '../../DockviewLayout/index.ts'
+
 export type DockviewSessionType = SessionWithFocusedViewAndDrawerWidgets &
-  AbstractViewContainer & {
+  AbstractViewContainer &
+  SessionWithDockviewLayout & {
     renameCurrentSession: (arg: string) => void
     snackbarMessages: SnackbarMessage[]
     popSnackbarMessage: () => unknown

@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 // ui elements
 import LoadingEllipses from '@jbrowse/core/ui/LoadingEllipses'
 import { getEnv } from '@jbrowse/core/util'
+import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
 import { observer } from 'mobx-react'
 
 import type {
@@ -10,13 +11,29 @@ import type {
   SessionWithFocusedViewAndDrawerWidgets,
 } from '@jbrowse/core/util'
 
+const useStyles = makeStyles()({
+  root: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    overflow: 'hidden',
+    '& > *': {
+      flex: 1,
+    },
+  },
+})
+
 const ViewWrapper = observer(function ViewWrapper({
   view,
   session,
+  panelId,
 }: {
   view: AbstractViewModel
   session: SessionWithFocusedViewAndDrawerWidgets
+  panelId?: string
 }) {
+  const { classes } = useStyles()
   const { pluginManager } = getEnv(session)
   const viewType = pluginManager.getViewType(view.type)
   if (!viewType) {
@@ -29,7 +46,9 @@ const ViewWrapper = observer(function ViewWrapper({
 
   return (
     <Suspense fallback={<LoadingEllipses variant="h6" />}>
-      <ReactComponent model={view} session={session} />
+      <div className={cx(panelId && classes.root)}>
+        <ReactComponent model={view} session={session} />
+      </div>
     </Suspense>
   )
 })

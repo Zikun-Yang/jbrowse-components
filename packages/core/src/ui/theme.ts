@@ -28,6 +28,7 @@ declare module '@mui/material/styles' {
     tertiary: PaletteColor
     quaternary: PaletteColor
     highlight: PaletteColor
+    softTeal: PaletteColor
     stopCodon: string
     startCodon: string
     insertion: string
@@ -48,6 +49,7 @@ declare module '@mui/material/styles' {
     tertiary?: PaletteColorOptions
     quaternary?: PaletteColorOptions
     highlight?: PaletteColorOptions
+    softTeal?: PaletteColorOptions
     stopCodon?: string
     startCodon?: string
     hardclip?: string
@@ -67,10 +69,11 @@ declare module '@mui/material/styles' {
 }
 
 const refTheme = createTheme()
-const midnight = refTheme.palette.augmentColor({ color: { main: '#0D233F' } })
-const grape = refTheme.palette.augmentColor({ color: { main: '#721E63' } })
-const forest = refTheme.palette.augmentColor({ color: { main: '#135560' } })
-const mandarin = refTheme.palette.augmentColor({ color: { main: '#FFB11D' } })
+const teal = refTheme.palette.augmentColor({ color: { main: '#0A7A62' } })
+const softTeal = refTheme.palette.augmentColor({ color: { main: '#49796B' } })
+const charcoal = refTheme.palette.augmentColor({ color: { main: '#1A1A1A' } })
+const warmGray = refTheme.palette.augmentColor({ color: { main: '#6B6B6B' } })
+const amber = refTheme.palette.augmentColor({ color: { main: '#D4A017' } })
 const lightgrey = refTheme.palette.augmentColor({ color: { main: '#aaa' } })
 const bases = {
   A: refTheme.palette.augmentColor({ color: green }),
@@ -105,11 +108,12 @@ const softclip = '#00f'
 const skip = '#97b8c9'
 
 const defaults = {
-  primary: midnight,
-  secondary: grape,
-  tertiary: forest,
-  quaternary: mandarin,
-  highlight: mandarin,
+  primary: teal,
+  secondary: charcoal,
+  tertiary: warmGray,
+  quaternary: amber,
+  highlight: amber,
+  softTeal,
   stopCodon,
   startCodon,
   insertion,
@@ -127,14 +131,22 @@ function stockTheme() {
     palette: {
       ...defaults,
       mode: undefined,
+      background: {
+        default: '#F7F7F6',
+        paper: '#FFFFFF',
+      },
+      text: {
+        primary: '#1A1A1A',
+        secondary: '#6B6B6B',
+      },
+      divider: '#E5E5E5',
     },
     components: {
       MuiLink: {
         styleOverrides: {
-          // the default link color uses theme.palette.primary.main which is
-          // very bad with dark mode+midnight primary
+          // use primary (teal) for links instead of the old midnight/forest
           root: ({ theme }) => ({
-            color: theme.palette.tertiary.main,
+            color: theme.palette.primary.main,
           }),
         },
       },
@@ -423,12 +435,11 @@ export function createJBrowseBaseTheme(theme?: ThemeOptions): ThemeOptions {
       MuiAccordionSummary: {
         styleOverrides: {
           root: {
-            // @ts-expect-error
-            backgroundColor: theme?.palette?.tertiary?.main,
+            backgroundColor: theme?.palette?.background?.paper,
+            borderBottom: `1px solid ${theme?.palette?.divider}`,
           },
           content: {
-            // @ts-expect-error
-            color: theme?.palette?.tertiary?.contrastText,
+            color: theme?.palette?.text?.primary,
           },
         },
       },
@@ -527,7 +538,8 @@ function addMissingColors(theme: ThemeOptions = {}) {
       palette: {
         quaternary: palette?.quaternary || lightgrey,
         tertiary: palette?.tertiary || lightgrey,
-        highlight: palette?.highlight || mandarin,
+        highlight: palette?.highlight || amber,
+        softTeal: palette?.softTeal || softTeal,
         insertion: palette?.insertion || insertion,
         softclip: palette?.softclip || softclip,
         skip: palette?.skip || skip,

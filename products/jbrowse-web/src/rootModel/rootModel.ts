@@ -31,7 +31,6 @@ import GetAppIcon from '@mui/icons-material/GetApp'
 import PublishIcon from '@mui/icons-material/Publish'
 import RedoIcon from '@mui/icons-material/Redo'
 import SettingsIcon from '@mui/icons-material/Settings'
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import StarIcon from '@mui/icons-material/Star'
 import StorageIcon from '@mui/icons-material/Storage'
 import UndoIcon from '@mui/icons-material/Undo'
@@ -733,17 +732,6 @@ export default function RootModel({
                       ],
                     )
                   }
-                },
-              },
-              {
-                label: 'Use workspaces',
-                icon: SpaceDashboardIcon,
-                type: 'checkbox',
-                checked: self.session?.useWorkspaces ?? false,
-                helpText:
-                  'Workspaces allow you to organize views into tabs and tiles. There are a variety of unique features, for instance, you can drag views between tabs or split them side-by-side. Try clicking and dragging the tab header to create a new split',
-                onClick: () => {
-                  self.session?.setUseWorkspaces(!self.session.useWorkspaces)
                 },
               },
             ],

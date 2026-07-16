@@ -1,8 +1,8 @@
-import { Suspense, lazy, useRef } from 'react'
+import { Suspense, lazy, useEffect, useRef } from 'react'
 
 import { Menu } from '@jbrowse/core/ui'
 import { getEnv } from '@jbrowse/core/util'
-import { makeStyles } from '@jbrowse/core/util/tss-react'
+import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
 import { observer } from 'mobx-react'
 
 import Gridlines from './Gridlines.tsx'
@@ -32,11 +32,13 @@ type LGV = LinearGenomeViewModel
 const TracksContainer = observer(function TracksContainer({
   children,
   model,
+  className,
 }: {
   children: React.ReactNode
   model: LGV
+  className?: string
 }) {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const { pluginManager } = getEnv(model)
   const { mouseDown: mouseDown1, mouseUp } = useSideScroll(model)
   const {
@@ -76,7 +78,7 @@ const TracksContainer = observer(function TracksContainer({
     <div
       ref={ref}
       data-testid="tracksContainer"
-      className={classes.tracksContainer}
+      className={cx(classes.tracksContainer, className)}
       onMouseDown={event => {
         mouseDown1(event)
         mouseDown2(event)
