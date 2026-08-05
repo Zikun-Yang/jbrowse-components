@@ -9,7 +9,6 @@ import TextSearchManager from '@jbrowse/core/TextSearch/TextSearchManager'
 import assemblyConfigSchemaFactory from '@jbrowse/core/assemblyManager/assemblyConfigSchema'
 import { readConfObject } from '@jbrowse/core/configuration'
 import RpcManager from '@jbrowse/core/rpc/RpcManager'
-import { Cable, DNA } from '@jbrowse/core/ui/Icons'
 import {
   addDisposer,
   cast,
@@ -23,20 +22,25 @@ import {
   BaseRootModelFactory,
   InternetAccountsRootModelMixin,
 } from '@jbrowse/product-core'
-import AddIcon from '@mui/icons-material/Add'
-import ExtensionIcon from '@mui/icons-material/Extension'
-import FileCopyIcon from '@mui/icons-material/FileCopy'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
-import GetAppIcon from '@mui/icons-material/GetApp'
-import PublishIcon from '@mui/icons-material/Publish'
-import RedoIcon from '@mui/icons-material/Redo'
-import SettingsIcon from '@mui/icons-material/Settings'
-import StarIcon from '@mui/icons-material/Star'
-import StorageIcon from '@mui/icons-material/Storage'
-import UndoIcon from '@mui/icons-material/Undo'
 import { formatDistanceToNow } from 'date-fns'
 import { openDB } from 'idb'
 import { autorun } from 'mobx'
+
+import {
+  AddIcon,
+  Cable,
+  DNA,
+  ExtensionIcon,
+  FileCopyIcon,
+  FolderOpenIcon,
+  GetAppIcon,
+  PublishIcon,
+  RedoIcon,
+  SettingsIcon,
+  StarIcon,
+  StorageIcon,
+  UndoIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import packageJSON from '../../package.json' with { type: 'json' }
 import jbrowseWebFactory from '../jbrowseModel.ts'

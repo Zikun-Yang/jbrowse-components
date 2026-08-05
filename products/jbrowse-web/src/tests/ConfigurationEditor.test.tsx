@@ -23,7 +23,7 @@ test('change color on track', async () => {
   const {
     view,
     findByTestId,
-    findByText,
+    findAllByText,
     findByDisplayValue,
     findAllByTestId,
   } = await createView(undefined, true)
@@ -38,7 +38,11 @@ test('change color on track', async () => {
       delay,
     ),
   )
-  await user.click(await findByText('Settings'))
+  await user.click(
+    (await findAllByText('Settings')).find(elt =>
+      elt.closest('[role="menu"]'),
+    )!,
+  )
   const elt = await findByDisplayValue('goldenrod', {}, delay)
   await user.clear(elt)
   await user.type(elt, 'green')

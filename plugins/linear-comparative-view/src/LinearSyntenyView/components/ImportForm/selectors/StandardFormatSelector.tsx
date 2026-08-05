@@ -1,7 +1,8 @@
 import { FileSelector } from '@jbrowse/core/ui'
-import HelpIcon from '@mui/icons-material/Help'
 import { Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { HelpIcon } from '@jbrowse/core/ui/Icons'
 
 import { helpStrings } from './SelectorTypes.ts'
 import SwapAssemblies from './SwapAssemblies.tsx'

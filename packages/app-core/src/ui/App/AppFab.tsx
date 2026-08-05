@@ -1,7 +1,8 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import LaunchIcon from '@mui/icons-material/Launch'
 import { Fab, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { LaunchIcon } from '@jbrowse/core/ui/Icons'
 
 import type { SessionWithDrawerWidgets } from '@jbrowse/core/util'
 

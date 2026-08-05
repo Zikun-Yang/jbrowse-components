@@ -1,6 +1,5 @@
 import { Suspense, lazy, useEffect, useRef } from 'react'
 
-import { VIEW_HEADER_HEIGHT } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import Paper from '@mui/material/Paper'
@@ -24,21 +23,11 @@ const useStyles = makeStyles()(theme => ({
   },
   header: {
     background: theme.palette.background.paper,
-    top: VIEW_HEADER_HEIGHT,
     zIndex: 850,
   },
   tracksContainer: {
     flex: 1,
     minHeight: 0,
-    // Internal track scrolling only when the view is inside a dockview panel.
-    '[data-panel-id] &': {
-      overflowX: 'hidden',
-      overflowY: 'auto',
-    },
-  },
-  pinnedTracks: {
-    position: 'sticky',
-    zIndex: 3,
   },
 }))
 
@@ -47,13 +36,7 @@ const LinearGenomeViewContainer = observer(function LinearGenomeViewContainer({
 }: {
   model: LinearGenomeViewModel
 }) {
-  const {
-    pinnedTracks,
-    stickyViewHeaders,
-    pinnedTracksTop,
-    tracks,
-    unpinnedTracks,
-  } = model
+  const { pinnedTracks, tracks, unpinnedTracks } = model
   const { classes } = useStyles()
   const session = getSession(model)
   const ref = useRef<HTMLDivElement>(null)
@@ -95,35 +78,31 @@ const LinearGenomeViewContainer = observer(function LinearGenomeViewContainer({
         session.setHovered({ hoverPosition, hoverFeature })
       }}
     >
-      <div
-        className={classes.header}
-        style={{ position: stickyViewHeaders ? 'sticky' : undefined }}
-      >
+      <div className={classes.header}>
         <HeaderComponent model={model} />
         <MiniControlsComponent model={model} />
       </div>
-      <TracksContainer model={model} className={classes.tracksContainer}>
+      <TracksContainer
+        model={model}
+        className={classes.tracksContainer}
+        pinnedTracks={
+          pinnedTracks.length ? (
+            <Paper elevation={6}>
+              {pinnedTracks.map(track => (
+                <TrackContainer key={track.id} model={model} track={track} />
+              ))}
+            </Paper>
+          ) : null
+        }
+      >
         {!tracks.length ? (
           <Suspense fallback={null}>
             <NoTracksActiveButton model={model} />
           </Suspense>
         ) : (
-          <>
-            {pinnedTracks.length ? (
-              <Paper
-                elevation={6}
-                className={classes.pinnedTracks}
-                style={{ top: pinnedTracksTop }}
-              >
-                {pinnedTracks.map(track => (
-                  <TrackContainer key={track.id} model={model} track={track} />
-                ))}
-              </Paper>
-            ) : null}
-            {unpinnedTracks.map(track => (
-              <TrackContainer key={track.id} model={model} track={track} />
-            ))}
-          </>
+          unpinnedTracks.map(track => (
+            <TrackContainer key={track.id} model={model} track={track} />
+          ))
         )}
       </TracksContainer>
     </div>

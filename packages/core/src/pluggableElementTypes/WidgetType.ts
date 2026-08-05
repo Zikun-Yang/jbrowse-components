@@ -23,6 +23,9 @@ export default class WidgetType extends PluggableElementBase {
 
   helpText?: React.ReactNode
 
+  // widgets with this flag are shown in a modal dialog instead of the drawer
+  modalByDefault?: boolean
+
   constructor(stuff: {
     name: string
     heading?: string
@@ -31,6 +34,7 @@ export default class WidgetType extends PluggableElementBase {
     stateModel: IAnyModelType
     ReactComponent: WidgetComponentType
     helpText?: React.ReactNode
+    modalByDefault?: boolean
   }) {
     super(stuff)
     this.heading = stuff.heading
@@ -39,5 +43,6 @@ export default class WidgetType extends PluggableElementBase {
     this.stateModel = stuff.stateModel
     this.ReactComponent = stuff.ReactComponent
     this.helpText = stuff.helpText
+    this.modalByDefault = stuff.modalByDefault
   }
 }

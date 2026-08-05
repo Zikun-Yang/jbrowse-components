@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { observer } from 'mobx-react'
+
+import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
   Box,
   Button,
@@ -9,10 +10,13 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import PaletteIcon from '@mui/icons-material/Palette'
-import { makeStyles } from '@jbrowse/core/util/tss-react'
+import { observer } from 'mobx-react'
+
+import {
+  ExpandLessIcon,
+  ExpandMoreIcon,
+  PaletteIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import HistogramBrush from './HistogramBrush.tsx'
 import HistogramTransformToggle from './HistogramTransformToggle.tsx'
@@ -20,14 +24,14 @@ import MiniHistogram from './MiniHistogram.tsx'
 import MiniStackedBar from './MiniStackedBar.tsx'
 
 import type {
-  SingleCellViewModel,
-  Transform,
-  AxisTransforms,
-} from '../model.ts'
-import type {
   CategoricalColumn,
   ContinuousColumn,
 } from '../../SingleCellAdapter/SingleCellZarrAdapter.ts'
+import type {
+  AxisTransforms,
+  SingleCellViewModel,
+  Transform,
+} from '../model.ts'
 
 const DEFAULT_TRANSFORM: AxisTransforms = { x: 'linear', y: 'linear' }
 const EMPTY_ARRAY: string[] = []

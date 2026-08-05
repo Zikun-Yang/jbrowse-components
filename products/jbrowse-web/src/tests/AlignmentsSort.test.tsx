@@ -6,6 +6,7 @@ import {
   doBeforeEach,
   expectCanvasMatch,
   hts,
+  openTrackMenu,
   pv,
   setup,
 } from './util.tsx'
@@ -28,7 +29,7 @@ test('selects a sort, sort by base pair', async () => {
   await user.click(
     await screen.findByTestId(hts('volvox_cram_alignments_ctga'), ...opts),
   )
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
 
   await user.click(await screen.findByText('Pileup settings'))
   await user.click(await screen.findByText('Sort by...'))

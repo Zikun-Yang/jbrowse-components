@@ -10,8 +10,9 @@ import {
   getPath,
   types,
 } from '@jbrowse/mobx-state-tree'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { autorun } from 'mobx'
+
+import { FolderOpenIcon } from '@jbrowse/core/ui/Icons'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { MenuItem } from '@jbrowse/core/ui'

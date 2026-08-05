@@ -1,0 +1,332 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-mPanTro3v2.0_pri",
+      "species": "Chimpanzee (Pan troglodytes)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "mPanTro3-v2.0-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mPanTro3-v2.0_pri.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mPanTro3-v2.0_pri.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-mPanTro3v2.0_pri_RefSeq",
+      "name": "T2T-mPanTro3v2.0_pri_RefSeq",
+      "category": ["Gene Annotations"],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mPanTro3-v2.0_pri.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mPanTro3-v2.0_pri.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "mPanTro3.hap1hap2.v1.cenSatv1.0",
+      "name": "mPanTro3.hap1hap2.v1.cenSatv1.0",
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/censat/mPanTro3.hap1hap2.v1.cenSatv1.0.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.winnowmap.dip.ONT.pri",
+      "name": "winnowmap.dip.ONT.pri",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.dip.ONT.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.dip.ONT.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.winnowmap.analysis-dip.HiFi",
+      "name": "winnowmap.analysis-dip.HiFi",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.analysis-dip.HiFi.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.analysis-dip.HiFi.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.winnowmap.analysis-dip.HiFi.pri",
+      "name": "winnowmap.analysis-dip.HiFi.pri",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.analysis-dip.HiFi.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/mapping/winnowmap.analysis-dip.HiFi.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.IsoSeq_1",
+      "name": "mPanTro3_v2.0.IsoSeq_1",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_1.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_1.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.IsoSeq_2",
+      "name": "mPanTro3_v2.0.IsoSeq_2",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_2.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_2.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.IsoSeq_testis",
+      "name": "mPanTro3_v2.0.IsoSeq_testis",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_testis.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_testis.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_v2.0.IsoSeq_merged",
+      "name": "mPanTro3_v2.0.IsoSeq_merged",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_merged.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/iso-seq/mPanTro3_v2.0.IsoSeq_merged.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_h3k9me3_exper",
+      "name": "mPanTro3_h3k9me3_exper",
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results/02_alignment/bowtie2/target/aligned/h3k9me3_R1.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results/02_alignment/bowtie2/target/aligned/h3k9me3_R1.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_h3k9me3_ctrl",
+      "name": "mPanTro3_h3k9me3_ctrl",
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results/02_alignment/bowtie2/target/aligned/noab_ctrl_R1.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results/02_alignment/bowtie2/target/aligned/noab_ctrl_R1.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_h3k9me3_exper_2",
+      "name": "mPanTro3_h3k9me3_exper_2",
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/002-chimpanzee-results/02_alignment/bowtie2/target/chimp_h3k9me3_R1.target.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/002-chimpanzee-results/02_alignment/bowtie2/target/chimp_h3k9me3_R1.target.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanTro3_h3k9me3_ctrl_2",
+      "name": "mPanTro3_h3k9me3_ctrl_2",
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/002-chimpanzee-results/02_alignment/bowtie2/target/chimp_noab_ctrl_R1.target.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/002-chimpanzee-results/02_alignment/bowtie2/target/chimp_noab_ctrl_R1.target.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "mPanTro3_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0",
+      "name": "mPanTro3_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0",
+      "category": ["Regulation"],
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/regulation/mPanTro3_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0.bw"
+        }
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": [
+    {
+      "type": "TrixTextSearchAdapter",
+      "textSearchAdapterId": "T2T-mPanTro3v2.0_pri-index",
+      "ixFilePath": {
+        "uri": "../trix/T2T-mPanTro3v2.0_pri.ix",
+        "locationType": "UriLocation"
+      },
+      "ixxFilePath": {
+        "uri": "../trix/T2T-mPanTro3v2.0_pri.ixx",
+        "locationType": "UriLocation"
+      },
+      "metaFilePath": {
+        "uri": "../trix/T2T-mPanTro3v2.0_pri_meta.json",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri"]
+    }
+  ]
+}

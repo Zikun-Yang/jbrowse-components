@@ -1,0 +1,30 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "NCBI36 (hg18)",
+      "species": "Human (Homo sapiens)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "NCBI36-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_hg18/hg18.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_hg18/hg18.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+
+  ],
+  "aggregateTextSearchAdapters": [
+  ]
+}

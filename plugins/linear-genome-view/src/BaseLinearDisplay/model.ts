@@ -17,10 +17,6 @@ import {
   getRpcSessionId,
 } from '@jbrowse/core/util/tracks'
 import { addDisposer, flow, isAlive, types } from '@jbrowse/mobx-state-tree'
-import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong'
-import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import MenuOpenIcon from '@mui/icons-material/MenuOpen'
 import { autorun } from 'mobx'
 
 import { calculateSvgLegendWidth } from './calculateSvgLegendWidth.ts'
@@ -30,10 +26,12 @@ import TrackHeightMixin from './models/TrackHeightMixin.tsx'
 import configSchema from './models/configSchema.ts'
 import BlockState from './models/serverSideRenderedBlock.ts'
 import {
+  getAutoHeightSettings,
+  getBlocksContentHeight,
+} from './models/util.ts'
+import {
   fetchFeatureByIdRpc,
   findSubfeatureById,
-  getTranscripts,
-  hasIntrons,
 } from './util.ts'
 
 import type { LinearGenomeViewModel } from '../LinearGenomeView/index.ts'
@@ -47,9 +45,6 @@ import type { Theme } from '@mui/material'
 
 // lazies
 const Tooltip = lazy(() => import('./components/Tooltip.tsx'))
-const CollapseIntronsDialog = lazy(
-  () => import('./components/CollapseIntronsDialog/CollapseIntronsDialog.tsx'),
-)
 
 type LGV = LinearGenomeViewModel
 
@@ -102,10 +97,6 @@ function stateModelFactory() {
        * #volatile
        */
       subfeatureIdUnderMouse: undefined as undefined | string,
-      /**
-       * #volatile
-       */
-      contextMenuFeature: undefined as undefined | Feature,
     }))
     .views(self => ({
       /**
@@ -141,6 +132,16 @@ function stateModelFactory() {
        */
       get renderDelay() {
         return 50
+      },
+
+      /**
+       * #getter
+       * whether the display participates in the global auto-size-track-height
+       * behavior. subclasses whose height is managed elsewhere (e.g. the
+       * pileup sub-display of an alignments display) override to false
+       */
+      get autoHeightEnabled() {
+        return true
       },
 
       /**
@@ -374,17 +375,6 @@ function stateModelFactory() {
       /**
        * #action
        */
-      navToFeature(feature: Feature) {
-        const view = getContainingView(self) as LGV
-        view.navTo({
-          refName: feature.get('refName'),
-          start: feature.get('start'),
-          end: feature.get('end'),
-        })
-      },
-      /**
-       * #action
-       */
       clearFeatureSelection() {
         getSession(self).clearSelection()
       },
@@ -402,12 +392,6 @@ function stateModelFactory() {
         self.subfeatureIdUnderMouse = subfeatureId
       },
 
-      /**
-       * #action
-       */
-      setContextMenuFeature(feature?: Feature) {
-        self.contextMenuFeature = feature
-      },
       /**
        * #action
        */
@@ -488,46 +472,6 @@ function stateModelFactory() {
           getSession(self).notifyError(`${e}`, e)
         }
       }),
-      /**
-       * #action
-       * Set context menu feature by ID, looking up in features map and subfeatures.
-       * Falls back to RPC if not found locally (e.g., for canvas renderer).
-       * @param featureId - The ID of the feature to set
-       * @param parentFeatureId - The immediate parent's ID for subfeature lookup
-       * @param topLevelFeatureId - The top-level feature ID for RPC lookup
-       */
-      setContextMenuFeatureById: flow(function* (
-        featureId: string,
-        parentFeatureId?: string,
-        topLevelFeatureId?: string,
-      ) {
-        const feature = self.getFeatureById(featureId, parentFeatureId)
-        if (feature) {
-          self.setContextMenuFeature(feature)
-          return
-        }
-        const rpcParentId =
-          topLevelFeatureId && topLevelFeatureId !== featureId
-            ? topLevelFeatureId
-            : parentFeatureId
-        try {
-          const session = getSession(self)
-          const f = yield fetchFeatureByIdRpc({
-            rpcManager: session.rpcManager,
-            sessionId: getRpcSessionId(self),
-            trackId: getContainingTrack(self).id,
-            rendererType: self.rendererTypeName,
-            featureId,
-            parentFeatureId: rpcParentId,
-          })
-          if (f && isAlive(self)) {
-            self.setContextMenuFeature(f)
-          }
-        } catch (e) {
-          console.error(e)
-          getSession(self).notifyError(`${e}`, e)
-        }
-      }),
     }))
 
     .views(self => ({
@@ -538,69 +482,6 @@ function stateModelFactory() {
         return []
       },
 
-      /**
-       * #method
-       */
-      contextMenuItems(): MenuItem[] {
-        const feat = self.contextMenuFeature
-        const transcripts = getTranscripts(feat)
-
-        return feat
-          ? [
-              {
-                label: 'Open feature details',
-                icon: MenuOpenIcon,
-                onClick: () => {
-                  self.selectFeature(feat)
-                },
-              },
-              {
-                label: 'Zoom to feature',
-                icon: CenterFocusStrongIcon,
-                onClick: () => {
-                  self.navToFeature(feat)
-                },
-              },
-              {
-                label: 'Copy info to clipboard',
-                icon: ContentCopyIcon,
-                onClick: async () => {
-                  const { uniqueId, ...rest } = feat.toJSON()
-                  const session = getSession(self)
-                  const { default: copy } = await import('copy-to-clipboard')
-                  copy(JSON.stringify(rest, null, 4))
-                  session.notify('Copied to clipboard', 'success')
-                },
-              },
-              ...(hasIntrons(transcripts)
-                ? [
-                    {
-                      label: 'Collapse introns',
-                      icon: CloseFullscreenIcon,
-                      onClick: () => {
-                        const view = getContainingView(self) as LGV
-                        const { assemblyManager } = getSession(self)
-                        const assembly = assemblyManager.get(
-                          view.assemblyNames[0]!,
-                        )
-                        if (assembly) {
-                          getSession(self).queueDialog(handleClose => [
-                            CollapseIntronsDialog,
-                            {
-                              view,
-                              transcripts,
-                              handleClose,
-                              assembly,
-                            },
-                          ])
-                        }
-                      },
-                    },
-                  ]
-                : []),
-            ]
-          : []
-      },
       /**
        * #method
        * props for the renderer's React "Rendering" component - client-side
@@ -618,11 +499,6 @@ function stateModelFactory() {
           // e.g. displayModel.setFeatureIdUnderMouse(undefined)
           onMouseLeave(_: unknown) {
             self.setFeatureIdUnderMouse(undefined)
-          },
-          // @deprecated - renderers should call displayModel methods directly
-          onContextMenu(_: unknown) {
-            self.setContextMenuFeature(undefined)
-            self.clearFeatureSelection()
           },
           onFeatureClick(_: unknown, featureId?: string) {
             if (featureId) {
@@ -694,6 +570,51 @@ function stateModelFactory() {
             {
               name: 'BaseLinearDisplayBlockDefinitions',
               delay: 60,
+            },
+          ),
+        )
+
+        // auto-sizing: fit the display height to the totalHeight reported by
+        // block layouts, clamped to the session min/max. updates in real
+        // time in both directions as block renders complete; while no block
+        // has reported a layout yet (rendering in flight) the height is left
+        // untouched. manual drag-resizes are overridden by the next render
+        // while the setting is on
+        addDisposer(
+          self,
+          autorun(
+            function autoHeightAutorun() {
+              try {
+                if (!isAlive(self) || self.isMinimized) {
+                  return
+                }
+                if (!self.autoHeightEnabled) {
+                  return
+                }
+                const { enabled, min, max } = getAutoHeightSettings(
+                  getSession(self),
+                )
+                if (!enabled) {
+                  return
+                }
+                const content = getBlocksContentHeight(
+                  self.blockState.values(),
+                )
+                if (content === undefined) {
+                  return
+                }
+                const target = Math.min(Math.max(content, min), max)
+                if (target !== self.height) {
+                  self.setHeight(target)
+                }
+              } catch (e) {
+                // catch errors that may occur during test cleanup or when
+                // the display is not properly attached to a view
+              }
+            },
+            {
+              name: 'BaseLinearDisplayAutoHeight',
+              delay: 100,
             },
           ),
         )

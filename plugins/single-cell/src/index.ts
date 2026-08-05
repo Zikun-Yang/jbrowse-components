@@ -2,20 +2,20 @@ import Plugin from '@jbrowse/core/Plugin'
 import { ConfigurationSchema } from '@jbrowse/core/configuration'
 import { isAbstractMenuManager } from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
-import ScatterPlotIcon from '@mui/icons-material/ScatterPlot'
 
+import { ScatterPlotIcon } from '@jbrowse/core/ui/Icons'
+
+import LinearGenomeViewExtensionF from './LinearGenomeViewExtension.ts'
+import { SingleCellSelection } from './SessionExtension.ts'
 import SingleCellAdapterF from './SingleCellAdapter/index.ts'
-import SingleCellViewF from './SingleCellView/index.ts'
 import SingleCellAlignmentsTrackF from './SingleCellView/SingleCellAlignmentsTrack/index.ts'
 import SingleCellPileupDisplayF from './SingleCellView/SingleCellPileupDisplay/index.ts'
 import SingleCellSNPCoverageDisplayF from './SingleCellView/SingleCellSNPCoverageDisplay/index.ts'
-import { SingleCellSelection } from './SessionExtension.ts'
-import LinearGenomeViewExtensionF from './LinearGenomeViewExtension.ts'
-
-import type { IAnyModelType } from '@jbrowse/mobx-state-tree'
+import SingleCellViewF from './SingleCellView/index.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AbstractSessionModel } from '@jbrowse/core/util'
+import type { IAnyModelType } from '@jbrowse/mobx-state-tree'
 
 export default class SingleCellPlugin extends Plugin {
   name = 'SingleCellPlugin'

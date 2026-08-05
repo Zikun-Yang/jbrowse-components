@@ -33,6 +33,7 @@ export default function BreakpointAlignmentsFeatureDetailF(
       heading: 'Breakpoint feature details',
       configSchema,
       stateModel,
+      modalByDefault: true,
       ReactComponent: lazy(
         () => import('./BreakpointAlignmentsFeatureDetail.tsx'),
       ),

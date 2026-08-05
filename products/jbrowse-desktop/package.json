@@ -75,7 +75,6 @@
     "@jbrowse/plugin-wiggle": "workspace:^",
     "@jbrowse/product-core": "workspace:^",
     "@jbrowse/text-indexing": "workspace:^",
-    "@mui/icons-material": "^7.3.10",
     "@mui/material": "^7.3.10",
     "@mui/x-data-grid": "^8.28.2",
     "date-fns": "^4.1.0",

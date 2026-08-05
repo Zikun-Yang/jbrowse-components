@@ -1,12 +1,12 @@
 import Plugin from '@jbrowse/core/Plugin'
 import { isAbstractMenuManager } from '@jbrowse/core/util'
-import CalendarIcon from '@mui/icons-material/CalendarViewDay'
+
+import { CalendarViewDayIcon as CalendarIcon } from '@jbrowse/core/ui/Icons'
 
 import LGVSyntenyDisplayF from './LGVSyntenyDisplay/index.ts'
 import LaunchLinearSyntenyViewF from './LaunchLinearSyntenyView.ts'
 import LinearComparativeDisplayF from './LinearComparativeDisplay/index.ts'
 import LinearComparativeViewF from './LinearComparativeView/index.ts'
-import LinearReadVsRefMenuItemF from './LinearReadVsRef/index.ts'
 import LinearSyntenyDisplayF from './LinearSyntenyDisplay/index.ts'
 import LinearSyntenyViewF from './LinearSyntenyView/index.ts'
 import LinearSyntenyViewHelperF from './LinearSyntenyViewHelper/index.tsx'
@@ -32,7 +32,6 @@ export default class LinearComparativeViewPlugin extends Plugin {
     LGVSyntenyDisplayF(pluginManager)
     LaunchLinearSyntenyViewF(pluginManager)
     SyntenyTrackF(pluginManager)
-    LinearReadVsRefMenuItemF(pluginManager)
   }
 
   configure(pluginManager: PluginManager) {

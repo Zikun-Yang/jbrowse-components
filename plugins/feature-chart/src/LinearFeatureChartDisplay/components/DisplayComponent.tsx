@@ -1,8 +1,9 @@
 import { useState } from 'react'
 
-import FullscreenIcon from '@mui/icons-material/Fullscreen'
 import { BaseLinearDisplayComponent } from '@jbrowse/plugin-linear-genome-view'
 import { observer } from 'mobx-react'
+
+import { FullscreenIcon } from '@jbrowse/core/ui/Icons'
 
 import MaximizeDialog from './MaximizeDialog.tsx'
 

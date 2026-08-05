@@ -66,6 +66,18 @@ function initialize() {
     .volatile(() => ({
       regions: volvoxDisplayedRegions,
       initialized: true,
+      cytobands: [
+        {
+          get: (attr: string) =>
+            ({
+              refName: 'ctgA',
+              start: 0,
+              end: 5000,
+              gieStain: 'gneg',
+              name: 'p36.1',
+            })[attr as 'refName'],
+        },
+      ],
     }))
     .views(() => ({
       getCanonicalRefName(refName: string) {
@@ -156,8 +168,8 @@ test('can instantiate a model that lets you navigate', () => {
   model.setNewView(0.02, 0)
 
   expect(model.scalebarHeight).toEqual(20)
-  // header height 20 + area where polygons get drawn has height of 48
-  expect(model.headerHeight).toEqual(68)
+  // header height 37 + area where polygons get drawn has height of 48
+  expect(model.headerHeight).toEqual(85)
   // TODO: figure out how to better test height
   // expect(model.height).toBe(191)
   // test some sanity values from zooming around
@@ -209,6 +221,37 @@ test('can instantiate a model that has multiple displayed regions', () => {
   expect(model.offsetPx).toEqual(800)
   model.moveTo({ index: 0, offset: 9950 }, { index: 1, offset: 50 })
   expect(model.offsetPx).toEqual(79401)
+})
+
+test('canShowCytobands is independent of displayed region count', () => {
+  const { Session, LinearGenomeModel } = initialize()
+  const session = Session.create({
+    configuration: {},
+  })
+  const model = session.setView(
+    LinearGenomeModel.create({
+      id: 'testCytobands',
+      type: 'LinearGenomeView',
+    }),
+  )
+  model.setWidth(800)
+  // stub volvox assembly has cytobands, so ideograms are allowed for both a
+  // single region and multiple regions
+  model.setDisplayedRegions([
+    { assemblyName: 'volvox', start: 0, end: 10000, refName: 'ctgA' },
+  ])
+  expect(model.canShowCytobands).toBe(true)
+  expect(model.showCytobands).toBe(true)
+  model.setDisplayedRegions([
+    { assemblyName: 'volvox', start: 0, end: 10000, refName: 'ctgA' },
+    { assemblyName: 'volvox', start: 0, end: 10000, refName: 'ctgB' },
+  ])
+  expect(model.canShowCytobands).toBe(true)
+  expect(model.showCytobands).toBe(true)
+  // user setting still gates display
+  model.setShowCytobands(false)
+  expect(model.canShowCytobands).toBe(true)
+  expect(model.showCytobands).toBe(false)
 })
 
 test('can instantiate a model that tests navTo/moveTo', async () => {

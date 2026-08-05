@@ -40,15 +40,6 @@ export default function stateModelFactory(
 
       /**
        * #getter
-       * positions multi-row below the tracklabel even if using overlap
-       * tracklabels
-       */
-      get prefersOffset() {
-        return true
-      },
-
-      /**
-       * #getter
        */
       get featureWidgetType() {
         return {

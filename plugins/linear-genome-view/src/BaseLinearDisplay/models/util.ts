@@ -16,6 +16,69 @@ export function getDisplayStr(totalBytes: number) {
   }
 }
 
+// reads the global auto-size-track-height session settings via loose typing,
+// since plugins cannot depend on @jbrowse/product-core where the session
+// mixin lives. sessions without the mixin (e.g. embedded products) get
+// enabled=false, preserving the legacy fixed-height behavior
+export function getAutoHeightSettings(session: unknown) {
+  const s = session as {
+    autoSizeTrackHeight?: boolean
+    minAutoTrackHeight?: number
+    maxAutoTrackHeight?: number
+  }
+  return {
+    enabled: s.autoSizeTrackHeight === true,
+    min: s.minAutoTrackHeight ?? 20,
+    max: s.maxAutoTrackHeight ?? 1000,
+  }
+}
+
+// max content height across rendered block layouts, or undefined if no block
+// has reported a layout yet (still rendering, or a renderer without layout
+// support like wiggle/arc/hic).
+//
+// computed from the max rectangle bottom rather than layout.getTotalHeight():
+// the layout is shared per-refName across the whole track for row stability
+// while panning, so getTotalHeight() is the chromosome-wide max including
+// previously visited dense regions. the serialized rectangles are filtered
+// to the block's region, so their max bottom reflects what is actually drawn
+export function getBlocksContentHeight(
+  blocks: Iterable<{
+    layout?: {
+      getTotalHeight?: () => number
+      getRectangles?: () => Map<string, number[]>
+    } | undefined
+  }>,
+) {
+  let sawLayout = false
+  let content = 0
+  for (const b of blocks) {
+    const { layout } = b
+    if (!layout) {
+      continue
+    }
+    const rectangles = layout.getRectangles?.()
+    if (rectangles) {
+      sawLayout = true
+      for (const rect of rectangles.values()) {
+        const bottom = rect[3] ?? 0
+        if (bottom > content) {
+          content = bottom
+        }
+      }
+    } else {
+      const h = layout.getTotalHeight?.()
+      if (h !== undefined) {
+        sawLayout = true
+        if (h > content) {
+          content = h
+        }
+      }
+    }
+  }
+  return sawLayout ? content : undefined
+}
+
 // stabilize clipid under test for snapshot
 export function getId(id: string, index: string | number) {
   const notJest = typeof jest === 'undefined'

@@ -1,0 +1,164 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-mPanPan1v2.0_pri",
+      "species": "Bonobo (Pan paniscus)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "mPanPan1-v2.0-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/mPanPan1-v2.0_pri.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/mPanPan1-v2.0_pri.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-mPanPan1v2.0_pri_RefSeq",
+      "name": "T2T-mPanPan1v2.0_pri_RefSeq",
+      "category": ["Gene Annotations"],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/mPanPan1-v2.0_pri.sorted.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/mPanPan1-v2.0_pri.sorted.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanPan1_v2.0.IsoSeq_1",
+      "name": "mPanPan1_v2.0.IsoSeq_1",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_1.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_1.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanPan1_v2.0.IsoSeq_2",
+      "name": "mPanPan1_v2.0.IsoSeq_2",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_2.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_2.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanPan1_v2.0.IsoSeq_testis",
+      "name": "mPanPan1_v2.0.IsoSeq_testis",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_testis.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_testis.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "mPanPan1_v2.0.IsoSeq_merged",
+      "name": "mPanPan1_v2.0.IsoSeq_merged",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_merged.pbmm2.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/iso-seq/mPanPan1_v2.0.IsoSeq_merged.pbmm2.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "mPanPan1_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0",
+      "name": "mPanPan1_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0",
+      "category": ["Regulation"],
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/regulation/mPanPan1_v2.0.ONT_Guppy6.3.8_5mC.winnowmap_modkit_5mC_CpG_v1.0.bw"
+        }
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": [
+    {
+      "type": "TrixTextSearchAdapter",
+      "textSearchAdapterId": "T2T-mPanPan1v2.0_pri-index",
+      "ixFilePath": {
+        "uri": "../trix/T2T-mPanPan1v2.0_pri.ix",
+        "locationType": "UriLocation"
+      },
+      "ixxFilePath": {
+        "uri": "../trix/T2T-mPanPan1v2.0_pri.ixx",
+        "locationType": "UriLocation"
+      },
+      "metaFilePath": {
+        "uri": "../trix/T2T-mPanPan1v2.0_pri_meta.json",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri"]
+    }
+  ]
+}

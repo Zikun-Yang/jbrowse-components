@@ -30,7 +30,7 @@ const Rubberband = observer(function Rubberband({
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const { classes } = useStyles()
-  const { stickyViewHeaders, rubberbandTop, isScalebarRefNameMenuOpen } = model
+  const { isScalebarRefNameMenuOpen } = model
 
   const {
     guideX,
@@ -62,8 +62,6 @@ const Rubberband = observer(function Rubberband({
           numOfBpSelected={numOfBpSelected}
           width={width}
           left={left}
-          top={rubberbandTop}
-          sticky={stickyViewHeaders}
         />
       ) : null}
       {anchorPosition ? (
@@ -86,10 +84,6 @@ const Rubberband = observer(function Rubberband({
       <div
         data-testid="rubberband_controls"
         className={classes.rubberbandControl}
-        style={{
-          top: rubberbandTop,
-          position: stickyViewHeaders ? 'sticky' : undefined,
-        }}
         ref={ref}
         onMouseDown={mouseDown}
         onMouseMove={mouseMove}

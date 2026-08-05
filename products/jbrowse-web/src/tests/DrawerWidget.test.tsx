@@ -22,23 +22,8 @@ xtest('opens feature detail from left click', async () => {
   ).toBeInTheDocument()
 }, 40000)
 
-xtest('open feature detail from right click', async () => {
-  const { view, findByTestId, findAllByTestId, findByText } = await createView()
-  view.setNewView(0.05, 5000)
-  fireEvent.click(await findByTestId(hts('volvox_filtered_vcf'), {}, delay))
-  view.tracks[0].displays[0].setFeatureIdUnderMouse('test-vcf-604453')
-
-  fireEvent.contextMenu(
-    (await findAllByTestId('test-vcf-604453', {}, delay))[0]!,
-  )
-  fireEvent.click(await findByText('Open feature details'))
-  expect(
-    await findByTestId('variant-side-drawer', {}, delay),
-  ).toBeInTheDocument()
-}, 40000)
-
 test('widget drawer navigation', async () => {
-  const { view, session, findByTestId, findByText } = await createView()
+  const { view, session, findByTestId, findAllByText } = await createView()
   view.setNewView(0.05, 5000)
   // opens a config editor widget
   fireEvent.click(await findByTestId(hts('volvox_filtered_vcf'), {}, delay))
@@ -49,18 +34,12 @@ test('widget drawer navigation', async () => {
       delay,
     ),
   )
-  fireEvent.click(await findByText('Settings'))
-  await findByTestId('configEditor', {}, delay)
-  // shows up when there active widgets
-  fireEvent.mouseDown(
-    getByRole(await findByTestId('widget-drawer-selects'), 'combobox'),
-  )
   fireEvent.click(
-    await findByTestId(
-      'widget-drawer-selects-item-HierarchicalTrackSelectorWidget',
-    ),
+    (await findAllByText('Settings')).find(elt =>
+      elt.closest('[role="menu"]'),
+    )!,
   )
-  await findByTestId('hierarchical_track_selector')
+  await findByTestId('configEditor', {}, delay)
 
   // test minimize and maximize widget drawer
   // @ts-expect-error
@@ -75,13 +54,28 @@ test('widget drawer navigation', async () => {
   // @ts-expect-error
   expect(session.minimized).toBeFalsy()
 
+  // track selector shows up in a modal dialog instead of the drawer
+  fireEvent.mouseDown(
+    getByRole(await findByTestId('widget-drawer-selects'), 'combobox'),
+  )
+  fireEvent.click(
+    await findByTestId(
+      'widget-drawer-selects-item-HierarchicalTrackSelectorWidget',
+    ),
+  )
+  await findByTestId('hierarchical_track_selector')
+
+  // closing the modal returns to the config editor in the drawer
+  fireEvent.click(await findByTestId('modal-widget-close'))
+  await findByTestId('configEditor', {}, delay)
+
   // test deleting widget from select dropdown using trash icon
   // @ts-expect-error
-  expect(session.activeWidgets.size).toEqual(2)
+  expect(session.activeWidgets.size).toEqual(1)
   fireEvent.mouseDown(
     getByRole(await findByTestId('widget-drawer-selects'), 'combobox'),
   )
   fireEvent.click(await findByTestId('ConfigurationEditorWidget-drawer-delete'))
   // @ts-expect-error
-  expect(session.activeWidgets.size).toEqual(1)
+  expect(session.activeWidgets.size).toEqual(0)
 }, 40000)

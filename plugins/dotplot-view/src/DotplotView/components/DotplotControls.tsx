@@ -1,14 +1,17 @@
 import { lazy, useState } from 'react'
 
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import { getSession } from '@jbrowse/core/util'
-import MoreVert from '@mui/icons-material/MoreVert'
-import ShuffleIcon from '@mui/icons-material/Shuffle'
-import ZoomIn from '@mui/icons-material/ZoomIn'
-import ZoomOut from '@mui/icons-material/ZoomOut'
 import { IconButton } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  MoreVertIcon as MoreVert,
+  ShuffleIcon,
+  TrackSelector as TrackSelectorIcon,
+  ZoomInIcon as ZoomIn,
+  ZoomOutIcon as ZoomOut,
+} from '@jbrowse/core/ui/Icons'
 
 import ColorBySelector from './ColorBySelector.tsx'
 import { CursorMouse, CursorMove } from './CursorIcon.tsx'

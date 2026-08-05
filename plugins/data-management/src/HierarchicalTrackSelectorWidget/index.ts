@@ -16,9 +16,8 @@ export default function HierarchicalTrackSelectorWidgetF(
       heading: 'Available tracks',
       configSchema,
       stateModel: stateModelFactory(pluginManager),
-      ReactComponent: lazy(
-        () => import('./components/HierarchicalTrackSelector.tsx'),
-      ),
+      modalByDefault: true,
+      ReactComponent: lazy(() => import('./components/CardTrackSelector.tsx')),
     })
   })
 }

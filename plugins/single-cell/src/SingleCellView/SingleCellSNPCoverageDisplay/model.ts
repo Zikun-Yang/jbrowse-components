@@ -109,10 +109,14 @@ function stateModelFactory(pluginManager: PluginManager) {
   )
 
   // Run as LinearSNPCoverageDisplay internally so we can reuse its React
-  // component and behavior.
+  // component and behavior. Only rewrite our own type: this model sits in the
+  // display union, and an unconditional rewrite would match (and hijack)
+  // every display snapshot registered after us.
   return types.snapshotProcessor(withSelectionProps, {
     preProcessor(snap: { type?: string }) {
-      return { ...snap, type: 'LinearSNPCoverageDisplay' as const }
+      return snap.type === 'SingleCellSNPCoverageDisplay'
+        ? { ...snap, type: 'LinearSNPCoverageDisplay' as const }
+        : snap
     },
   })
 }

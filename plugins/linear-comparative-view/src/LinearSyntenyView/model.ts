@@ -2,12 +2,15 @@ import { lazy } from 'react'
 
 import { getSession } from '@jbrowse/core/util'
 import { addDisposer, types } from '@jbrowse/mobx-state-tree'
-import CropFreeIcon from '@mui/icons-material/CropFree'
-import LinkIcon from '@mui/icons-material/Link'
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
-import ShuffleIcon from '@mui/icons-material/Shuffle'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import { autorun, observable, when } from 'mobx'
+
+import {
+  CropFreeIcon,
+  LinkIcon,
+  PhotoCameraIcon,
+  ShuffleIcon,
+  VisibilityIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { Curves } from './components/Icons.tsx'
 import baseModel from '../LinearComparativeView/model.ts'

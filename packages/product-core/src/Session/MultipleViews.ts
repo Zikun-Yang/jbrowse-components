@@ -1,9 +1,4 @@
-import {
-  localStorageGetBoolean,
-  localStorageSetBoolean,
-} from '@jbrowse/core/util'
-import { addDisposer, cast, types } from '@jbrowse/mobx-state-tree'
-import { autorun } from 'mobx'
+import { cast, types } from '@jbrowse/mobx-state-tree'
 
 import { BaseSessionModel, isBaseSession } from './BaseSession.ts'
 import { DrawerWidgetSessionMixin } from './DrawerWidgets.ts'
@@ -29,12 +24,6 @@ export function MultipleViewsSessionMixin(pluginManager: PluginManager) {
          */
         views: types.array(
           pluginManager.pluggableMstType('view', 'stateModel'),
-        ),
-        /**
-         * #property
-         */
-        stickyViewHeaders: types.optional(types.boolean, () =>
-          localStorageGetBoolean('stickyViewHeaders', true),
         ),
       }),
     )
@@ -106,40 +95,7 @@ export function MultipleViewsSessionMixin(pluginManager: PluginManager) {
         }
         self.views.remove(view)
       },
-
-      /**
-       * #action
-       */
-      setStickyViewHeaders(sticky: boolean) {
-        self.stickyViewHeaders = sticky
-      },
-
-      afterAttach() {
-        addDisposer(
-          self,
-          autorun(
-            function stickyViewHeadersAutorun() {
-              localStorageSetBoolean(
-                'stickyViewHeaders',
-                self.stickyViewHeaders,
-              )
-            },
-            { name: 'StickyViewHeaders' },
-          ),
-        )
-      },
     }))
-    .postProcessSnapshot(snap => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!snap) {
-        return snap
-      }
-      const { stickyViewHeaders, ...rest } = snap as Omit<typeof snap, symbol>
-      return {
-        ...rest,
-        ...(!stickyViewHeaders ? { stickyViewHeaders } : {}),
-      } as typeof snap
-    })
 }
 
 /** Session mixin MST type for a session that manages multiple views */

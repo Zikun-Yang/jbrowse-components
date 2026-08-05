@@ -26,7 +26,6 @@ const OverviewHighlight = observer(function OverviewHighlight({
   model: LGV
   overview: Base1DViewModel
 }) {
-  const { cytobandOffset } = model
   const session = getSession(model) as SessionWithWidgets
   const { classes } = useStyles()
   const { assemblyManager } = session
@@ -54,7 +53,7 @@ const OverviewHighlight = observer(function OverviewHighlight({
           return s !== undefined && e !== undefined
             ? {
                 width: Math.abs(e - s),
-                left: s + cytobandOffset,
+                left: s,
                 highlight: r.highlight,
                 label: r.label,
               }

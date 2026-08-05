@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import CloseIcon from '@mui/icons-material/Close'
 import {
   Button,
   Dialog,
@@ -10,6 +9,8 @@ import {
   IconButton,
 } from '@mui/material'
 import { SourceMapConsumer } from 'source-map-js'
+
+import { CloseIcon } from '@jbrowse/core/ui/Icons'
 
 import ErrorMessageStackTraceContents from './ErrorMessageStackTraceContents.tsx'
 import LoadingEllipses from './LoadingEllipses.tsx'

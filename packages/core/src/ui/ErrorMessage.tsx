@@ -1,8 +1,8 @@
 import { Suspense, lazy, useState } from 'react'
 
-import RefreshIcon from '@mui/icons-material/Refresh'
-import ReportIcon from '@mui/icons-material/Report'
 import { IconButton, Tooltip } from '@mui/material'
+
+import { RefreshIcon, ReportIcon } from '@jbrowse/core/ui/Icons'
 
 import RedErrorMessageBox from './RedErrorMessageBox.tsx'
 import { makeStyles } from '../util/tss-react/index.ts'

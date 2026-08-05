@@ -1,10 +1,13 @@
 import { CascadingMenuButton } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { getSnapshot } from '@jbrowse/mobx-state-tree'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import VerticalSplitIcon from '@mui/icons-material/VerticalSplit'
-import MenuIcon from '@mui/icons-material/Menu'
 import { observer } from 'mobx-react'
+
+import {
+  ContentCopyIcon,
+  MenuIcon,
+  VerticalSplitIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { useDockview } from './DockviewContext.tsx'
 import { renameIds } from './copyView.ts'

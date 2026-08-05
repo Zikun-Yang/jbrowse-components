@@ -1,9 +1,9 @@
 import ErrorMessageStackTraceDialog from '@jbrowse/core/ui/ErrorMessageStackTraceDialog'
 import { getSession } from '@jbrowse/core/util'
-import RefreshIcon from '@mui/icons-material/Refresh'
-import ReportIcon from '@mui/icons-material/Report'
 import { IconButton, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { RefreshIcon, ReportIcon } from '@jbrowse/core/ui/Icons'
 
 import BlockMsg from './BlockMsg.tsx'
 

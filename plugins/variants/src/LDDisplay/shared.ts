@@ -354,12 +354,6 @@ export default function sharedModelFactory(
       /**
        * #getter
        */
-      get prefersOffset() {
-        return true
-      },
-      /**
-       * #getter
-       */
       get rendererTypeName() {
         return 'LDRenderer'
       },

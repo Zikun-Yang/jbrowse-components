@@ -1,7 +1,7 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AddIcon from '@mui/icons-material/Add'
-import DashboardIcon from '@mui/icons-material/Dashboard'
 import { observer } from 'mobx-react'
+
+import { AddIcon, DashboardIcon } from '@jbrowse/core/ui/Icons'
 
 const useStyles = makeStyles()(theme => ({
   root: {
@@ -195,7 +195,9 @@ const RecentsDashboard = observer(function RecentsDashboard({
             </div>
             <div className={classes.info}>
               <div className={classes.name}>{meta.name}</div>
-              <div className={classes.desc}>Opened {formatDate(meta.createdAt)}</div>
+              <div className={classes.desc}>
+                Opened {formatDate(meta.createdAt)}
+              </div>
             </div>
           </button>
         ))}

@@ -14,6 +14,8 @@ export interface FloatingLabelData {
   relativeY: number
   color: string
   textWidth: number
+  /** 'left' renders the label inline to the left of the feature; default is below the feature */
+  placement?: 'left'
   isOverlay?: boolean
   parentFeatureId?: string
   subfeatureId?: string
@@ -30,6 +32,8 @@ export interface LayoutFeatureMetadata {
   totalFeatureHeight?: number
   featureWidth?: number
   actualTopPx?: number
+  /** Vertical offset of the feature within its layout row (left-label centering) */
+  featureYOffset?: number
   /** Actual feature start in bp (not layout start which includes padding) */
   featureStartBp?: number
   /** Actual feature end in bp (not layout end which includes padding) */

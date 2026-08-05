@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react'
+
 import {
   Box,
   Button,
@@ -10,9 +10,11 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { observer } from 'mobx-react'
 
+import { AddIcon, DeleteIcon } from '@jbrowse/core/ui/Icons'
+
+import CustomPaletteDialog from './CustomPaletteDialog.tsx'
 import {
   CATEGORICAL_PALETTES,
   CONTINUOUS_PALETTES,
@@ -24,7 +26,6 @@ import {
   removeCustomCategoricalPalette,
   removeCustomContinuousPalette,
 } from './colorUtils.ts'
-import CustomPaletteDialog from './CustomPaletteDialog.tsx'
 
 import type { SingleCellViewModel } from '../model.ts'
 
@@ -158,9 +159,7 @@ export default observer(function PalettePicker({
                 size="small"
               />
             }
-            label={
-              <Typography variant="body2">Color by quantile</Typography>
-            }
+            label={<Typography variant="body2">Color by quantile</Typography>}
             sx={{ mb: 0.5 }}
           />
 

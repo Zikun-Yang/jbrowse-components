@@ -2,7 +2,13 @@ import '@testing-library/jest-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 
-import { createView, doBeforeEach, hts, setup } from './util.tsx'
+import {
+  createView,
+  doBeforeEach,
+  hts,
+  openTrackMenu,
+  setup,
+} from './util.tsx'
 
 setup()
 
@@ -27,7 +33,7 @@ test('click on subfeature label (EDEN.1) opens feature details', async () => {
   await findAllByTestId(/prerendered_canvas.*done/, ...opts)
 
   // Open track menu and enable subfeature labels
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
   await user.click(await screen.findByText('Show...', ...opts))
   await user.click(await screen.findByText('Subfeature labels', ...opts))
   await user.click(await screen.findByText('below', ...opts))

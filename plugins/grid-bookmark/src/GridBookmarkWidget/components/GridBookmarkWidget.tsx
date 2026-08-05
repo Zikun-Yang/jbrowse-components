@@ -1,18 +1,21 @@
 import { lazy, useState } from 'react'
 
-import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import { SpeciesSelector } from '@jbrowse/core/ui'
+import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import Delete from '@mui/icons-material/Delete'
-import GetApp from '@mui/icons-material/GetApp'
-import Menu from '@mui/icons-material/Menu'
-import Palette from '@mui/icons-material/Palette'
-import Publish from '@mui/icons-material/Publish'
-import Settings from '@mui/icons-material/Settings'
-import Share from '@mui/icons-material/Share'
 import { Alert } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  DeleteIcon as Delete,
+  GetAppIcon as GetApp,
+  MenuIcon as Menu,
+  PaletteIcon as Palette,
+  PublishIcon as Publish,
+  SettingsIcon as Settings,
+  ShareIcon as Share,
+} from '@jbrowse/core/ui/Icons'
 
 import AssemblySelector from './AssemblySelector.tsx'
 import BookmarkGrid from './BookmarkGrid.tsx'

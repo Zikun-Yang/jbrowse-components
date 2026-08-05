@@ -8,6 +8,7 @@ import { getConf, readConfObject } from '@jbrowse/core/configuration'
 import SnackbarModel from '@jbrowse/core/ui/SnackbarModel'
 import { getParent, types } from '@jbrowse/mobx-state-tree'
 import {
+  AutoTrackHeightSessionMixin,
   ConnectionManagementSessionMixin,
   DialogQueueSessionMixin,
   DrawerWidgetSessionMixin,
@@ -62,6 +63,7 @@ export default function sessionModelFactory({
         DrawerWidgetSessionMixin(pluginManager),
         DialogQueueSessionMixin(pluginManager),
         ThemeManagerSessionMixin(pluginManager),
+        AutoTrackHeightSessionMixin(pluginManager),
         TracksManagerSessionMixin(pluginManager),
         MultipleViewsSessionMixin(pluginManager),
         DesktopSessionFactory(pluginManager),

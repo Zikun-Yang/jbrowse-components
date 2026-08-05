@@ -7,9 +7,7 @@ import { observer } from 'mobx-react'
 
 import FloatingLegend from './FloatingLegend.tsx'
 import LinearBlocks from './LinearBlocks.tsx'
-import MenuPage from './MenuPage.tsx'
 
-import type { Coord } from './types.ts'
 import type { BaseLinearDisplayModel } from '../model.ts'
 
 const useStyles = makeStyles()({
@@ -31,7 +29,6 @@ const BaseLinearDisplay = observer(function BaseLinearDisplay(props: {
   const [clientRect, setClientRect] = useState<DOMRect>()
   const [offsetMouseCoord, setOffsetMouseCoord] = useState([0, 0])
   const [clientMouseCoord, setClientMouseCoord] = useState([0, 0])
-  const [contextCoord, setContextCoord] = useState<Coord>()
   const { model, children } = props
   const {
     TooltipComponent,
@@ -47,15 +44,6 @@ const BaseLinearDisplay = observer(function BaseLinearDisplay(props: {
       ref={ref}
       data-testid={`display-${getConf(model, 'displayId')}`}
       className={classes.display}
-      onContextMenu={event => {
-        event.preventDefault()
-        if (contextCoord) {
-          // There's already a context menu open, so close it
-          setContextCoord(undefined)
-        } else if (ref.current) {
-          setContextCoord([event.clientX, event.clientY])
-        }
-      }}
       onMouseMove={event => {
         if (!ref.current) {
           return
@@ -89,15 +77,6 @@ const BaseLinearDisplay = observer(function BaseLinearDisplay(props: {
             mouseCoord={offsetMouseCoord}
           />
         </Suspense>
-      ) : null}
-      {contextCoord ? (
-        <MenuPage
-          contextCoord={contextCoord}
-          model={model}
-          onClose={() => {
-            setContextCoord(undefined)
-          }}
-        />
       ) : null}
     </div>
   )

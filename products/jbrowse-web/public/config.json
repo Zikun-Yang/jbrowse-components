@@ -1,0 +1,166 @@
+{
+  "includes": [
+    "subconfig/human_chm13.json",
+    "subconfig/human_hg38.json",
+    "subconfig/bonobo_mPanPan1v2.0_pri.json",
+    "subconfig/chimpanzee_mPanTro3v2.0_pri.json",
+    "subconfig/gorilla_mGorGor1v2.1_pri.json",
+    "subconfig/orangutan_mPonAbe1v2.0_pri.json",
+    "subconfig/macaque_MFA8v1.1.json",
+    "subconfig/mouse_mm39.json",
+    "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--pcht_spacer_example.json",
+    "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--telo_subtelo_eu_example.json"
+  ],
+  "plugins": [
+    {
+      "name": "bedfeaturecoloring",
+      "esmLoc": {
+        "uri": "plugins/bedfeaturecoloring.js"
+      }
+    }
+  ],
+  "assemblies": [],
+  "configuration": {
+    "SingleCellPlugin": {
+      "datasets": [
+        {
+          "name": "human_paired_scRNA_matrix-0421",
+          "uri": "./human_paired_scRNA_matrix-0421.zarr"
+        }
+      ]
+    }
+  },
+  "connections": [],
+  "defaultSession": {
+    "name": "New Session"
+  },
+  "tracks": [
+    {
+      "type": "SyntenyTrack",
+      "trackId": "GRCh38__T2T-CHM13v2.0",
+      "assemblyNames": ["GRCh38 (hg38)", "T2T-CHM13v2.0"],
+      "name": "GRCh38__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCh38.p14__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["GRCh38 (hg38)", "T2T-CHM13v2.0"]
+      }
+    },
+        {
+      "type": "SyntenyTrack",
+      "trackId": "hg18__T2T-CHM13v2.0",
+      "assemblyNames": ["NCBI36 (hg18)", "T2T-CHM13v2.0"],
+      "name": "hg18__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/hg18__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["NCBI36 (hg18)", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPanPan1v2.0-pri__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-mPanPan1v2.0_pri", "T2T-CHM13v2.0"],
+      "name": "mPanPan1v2.0-pri__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanPan1v2.0-pri__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-mPanPan1v2.0_pri", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPanTro3v2.0-pri__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri", "T2T-CHM13v2.0"],
+      "category": ["Comparative Genomics"],
+      "name": "mPanTro3v2.0-pri__T2T-CHM13v2.0",
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanTro3v2.0-pri__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-mPanTro3v2.0_pri", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mGorGor1v2.1-pri__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-mGorGor1v2.1_pri", "T2T-CHM13v2.0"],
+      "name": "mGorGor1v2.1-pri__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mGorGor1v2.1-pri__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-mGorGor1v2.1_pri", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonAbe1v2.0-pri__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-mPonAbe1v2.0_pri", "T2T-CHM13v2.0"],
+      "name": "mPonAbe1v2.0-pri__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonAbe1v2.0-pri__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-mPonAbe1v2.0_pri", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonPyg2v2.0-pri__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-mPonPyg2v2.0_pri", "T2T-CHM13v2.0"],
+      "name": "mPonPyg2v2.0-pri__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonPyg2v2.0-pri__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-mPonPyg2v2.0_pri", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "MFA8v1.1__T2T-CHM13v2.0",
+      "assemblyNames": ["T2T-MFA8v1.1", "T2T-CHM13v2.0"],
+      "name": "MFA8v1.1__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/MFA8v1.1__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["T2T-MFA8v1.1", "T2T-CHM13v2.0"]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "GRCm39__T2T-CHM13v2.0",
+      "assemblyNames": ["GRCm39 (mm39)", "T2T-CHM13v2.0"],
+      "name": "GRCm39__T2T-CHM13v2.0",
+      "category": ["Comparative Genomics"],
+      "adapter": {
+        "type": "ChainAdapter",
+        "chainLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCm39__T2T-CHM13v2.0.chain"
+        },
+        "assemblyNames": ["GRCm39 (mm39)", "T2T-CHM13v2.0"]
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": []
+}

@@ -1,6 +1,7 @@
 import { CascadingMenuButton } from '@jbrowse/core/ui'
-import MenuIcon from '@mui/icons-material/Menu'
 import { observer } from 'mobx-react'
+
+import { MenuIcon } from '@jbrowse/core/ui/Icons'
 
 import type { IBaseViewModel } from '@jbrowse/core/pluggableElementTypes/models/BaseViewModel'
 import type { IconButtonProps, SvgIconProps } from '@mui/material'

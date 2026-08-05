@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { Menu } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { observer } from 'mobx-react'
@@ -33,10 +34,10 @@ const OverviewRubberband = observer(function OverviewRubberband({
   overview: Base1DViewModel
   ControlComponent?: React.ReactElement
 }) {
-  const { cytobandOffset } = model
   const [startX, setStartX] = useState<number>()
   const [currentX, setCurrentX] = useState<number>()
   const [guideX, setGuideX] = useState<number>()
+  const [contextCoord, setContextCoord] = useState<[number, number]>()
   const controlsRef = useRef<HTMLDivElement>(null)
   const { classes } = useStyles()
   const mouseDragging = startX !== undefined
@@ -55,16 +56,13 @@ const OverviewRubberband = observer(function OverviewRubberband({
         if (Math.abs(currentX - startX) > 3) {
           const left = Math.min(startX, currentX)
           const right = Math.max(startX, currentX)
-          model.moveTo(
-            overview.pxToBp(left - cytobandOffset),
-            overview.pxToBp(right - cytobandOffset),
-          )
+          model.moveTo(overview.pxToBp(left), overview.pxToBp(right))
         }
       }
 
       // just a click
       if (startX !== undefined && currentX === undefined) {
-        const click = overview.pxToBp(startX - cytobandOffset)
+        const click = overview.pxToBp(startX)
         if (!click.refName) {
           getSession(model).notify('unknown position clicked')
           console.error('unknown position clicked', click)
@@ -98,13 +96,49 @@ const OverviewRubberband = observer(function OverviewRubberband({
       }
     }
     return () => {}
-  }, [mouseDragging, currentX, startX, model, overview, cytobandOffset])
+  }, [mouseDragging, currentX, startX, model, overview])
 
   function mouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    if (event.button !== 0) {
+      return
+    }
     event.preventDefault()
     event.stopPropagation()
     setStartX(getRelativeX(event, controlsRef.current))
   }
+
+  function contextMenu(event: React.MouseEvent<HTMLDivElement>) {
+    event.preventDefault()
+    setContextCoord([event.clientX, event.clientY])
+  }
+
+  // while the menu is open, right-clicks land on the MUI modal backdrop rather
+  // than the control div, so reposition from a global listener instead
+  useEffect(() => {
+    function globalContextMenu(event: MouseEvent) {
+      const ref = controlsRef.current
+      if (ref) {
+        const rect = ref.getBoundingClientRect()
+        if (
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom
+        ) {
+          event.preventDefault()
+          event.stopPropagation()
+          setContextCoord([event.clientX, event.clientY])
+        }
+      }
+    }
+    if (contextCoord) {
+      window.addEventListener('contextmenu', globalContextMenu, true)
+      return () => {
+        window.removeEventListener('contextmenu', globalContextMenu, true)
+      }
+    }
+    return () => {}
+  }, [contextCoord])
 
   function mouseMove(event: React.MouseEvent<HTMLDivElement>) {
     setGuideX(getRelativeX(event, controlsRef.current))
@@ -113,6 +147,35 @@ const OverviewRubberband = observer(function OverviewRubberband({
   function mouseOut() {
     setGuideX(undefined)
   }
+
+  const contextMenuComponent = contextCoord ? (
+    <Menu
+      open
+      onMenuItemClick={(_: unknown, callback: () => void) => {
+        callback()
+        setContextCoord(undefined)
+      }}
+      onClose={() => {
+        setContextCoord(undefined)
+      }}
+      anchorReference="anchorPosition"
+      anchorPosition={{
+        top: contextCoord[1],
+        left: contextCoord[0],
+      }}
+      menuItems={[
+        {
+          label: 'Show ideogram',
+          type: 'checkbox' as const,
+          checked: model.showCytobands,
+          disabled: !model.anyCytobandsExist,
+          onClick: () => {
+            model.setShowCytobands(!model.showCytobands)
+          },
+        },
+      ]}
+    />
+  ) : null
 
   if (startX === undefined) {
     return (
@@ -131,9 +194,11 @@ const OverviewRubberband = observer(function OverviewRubberband({
           onMouseDown={mouseDown}
           onMouseOut={mouseOut}
           onMouseMove={mouseMove}
+          onContextMenu={contextMenu}
         >
           {ControlComponent}
         </div>
+        {contextMenuComponent}
       </div>
     )
   }
@@ -148,8 +213,8 @@ const OverviewRubberband = observer(function OverviewRubberband({
   let leftBpOffset: ReturnType<typeof overview.pxToBp> | undefined
   let rightBpOffset: ReturnType<typeof overview.pxToBp> | undefined
   if (startX) {
-    leftBpOffset = overview.pxToBp(startX - cytobandOffset)
-    rightBpOffset = overview.pxToBp(startX + width - cytobandOffset)
+    leftBpOffset = overview.pxToBp(startX)
+    rightBpOffset = overview.pxToBp(startX + width)
     if (currentX !== undefined && currentX < startX) {
       ;[leftBpOffset, rightBpOffset] = [rightBpOffset, leftBpOffset]
     }
@@ -172,9 +237,11 @@ const OverviewRubberband = observer(function OverviewRubberband({
         onMouseDown={mouseDown}
         onMouseOut={mouseOut}
         onMouseMove={mouseMove}
+        onContextMenu={contextMenu}
       >
         {ControlComponent}
       </div>
+      {contextMenuComponent}
     </div>
   )
 })

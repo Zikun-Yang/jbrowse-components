@@ -1,6 +1,11 @@
 import { getConf } from '@jbrowse/core/configuration'
 import { BaseDisplay } from '@jbrowse/core/pluggableElementTypes/models'
-import { addDisposer, getSnapshot, types } from '@jbrowse/mobx-state-tree'
+import { getSession } from '@jbrowse/core/util'
+import { addDisposer, getSnapshot, isAlive, types } from '@jbrowse/mobx-state-tree'
+import {
+  getAutoHeightSettings,
+  getBlocksContentHeight,
+} from '@jbrowse/plugin-linear-genome-view'
 import deepEqual from 'fast-deep-equal'
 import { autorun } from 'mobx'
 
@@ -278,6 +283,46 @@ function stateModelFactory(
               )
             },
             { name: 'PileupHeight' },
+          ),
+        )
+
+        // auto-sizing at the parent level: fit height to the pileup content
+        // height plus the SNP coverage panel height, clamped to the session
+        // min/max, in real time in both directions. the PileupHeight autorun
+        // above then re-distributes the new total
+        addDisposer(
+          self,
+          autorun(
+            function alignmentsAutoHeightAutorun() {
+              try {
+                if (!isAlive(self) || self.isMinimized) {
+                  return
+                }
+                const { enabled, min, max } = getAutoHeightSettings(
+                  getSession(self),
+                )
+                if (!enabled) {
+                  return
+                }
+                const pileup = getBlocksContentHeight(
+                  self.PileupDisplay?.blockState.values() ?? [],
+                )
+                if (pileup === undefined) {
+                  return
+                }
+                const target = Math.min(
+                  Math.max(pileup + (self.SNPCoverageDisplay?.height ?? 0), min),
+                  max,
+                )
+                if (target !== self.height) {
+                  self.setHeight(target)
+                }
+              } catch (e) {
+                // catch errors that may occur during test cleanup or when
+                // the display is not properly attached to a view
+              }
+            },
+            { name: 'AlignmentsAutoHeight', delay: 100 },
           ),
         )
 

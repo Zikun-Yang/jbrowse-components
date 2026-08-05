@@ -2,11 +2,16 @@ import { CascadingMenuButton } from '@jbrowse/core/ui'
 import EditableTypography from '@jbrowse/core/ui/EditableTypography'
 import { isSessionModelWithWidgets } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import GridViewIcon from '@mui/icons-material/GridView'
-import SettingsIcon from '@mui/icons-material/Settings'
 import { Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  AccessTimeIcon,
+  GridViewIcon,
+  HomeIcon,
+  MoreVertIcon,
+  SettingsIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import type { MenuItem as JBMenuItem } from '@jbrowse/core/ui'
 import type { SnackbarMessage } from '@jbrowse/core/ui/SnackbarModel'
@@ -157,8 +162,8 @@ const useStyles = makeStyles()(theme => ({
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.06)',
   },
   navIcon: {
-    width: 18,
-    height: 18,
+    width: 20,
+    height: 20,
     display: 'grid',
     placeItems: 'center',
     flexShrink: 0,
@@ -166,6 +171,10 @@ const useStyles = makeStyles()(theme => ({
   navLabel: {
     fontSize: 14,
     fontWeight: 600,
+    lineHeight: 1,
+    // Latin glyphs sit on the baseline, so their optical center is ~1px above
+    // the geometric center; nudge down to align with the icon
+    transform: 'translateY(1px)',
     whiteSpace: 'nowrap',
     opacity: 0,
     maxWidth: 0,
@@ -318,19 +327,7 @@ const LeftSidebar = observer(function LeftSidebar({
           type="button"
         >
           <span className={classes.navIcon}>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
+            <HomeIcon fontSize="small" />
           </span>
           <span className={`${classes.navLabel} sidebar-label`}>Home</span>
         </button>
@@ -392,20 +389,7 @@ const LeftSidebar = observer(function LeftSidebar({
           >
             <button className={classes.navButton}>
               <span className={classes.navIcon}>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="5" r="1" />
-                  <circle cx="12" cy="12" r="1" />
-                  <circle cx="12" cy="19" r="1" />
-                </svg>
+                <MoreVertIcon fontSize="small" />
               </span>
               <span className={`${classes.navLabel} sidebar-label`}>
                 {menu.label}

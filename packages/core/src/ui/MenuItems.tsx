@@ -1,14 +1,17 @@
-import ArrowRightIcon from '@mui/icons-material/ArrowRight'
-import CheckBoxIcon from '@mui/icons-material/CheckBox'
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import {
   CircularProgress,
   ListItemIcon,
   ListItemText,
   MenuItem,
 } from '@mui/material'
+
+import {
+  ArrowRightIcon,
+  CheckBoxIcon,
+  CheckBoxOutlineBlankIcon,
+  RadioButtonCheckedIcon,
+  RadioButtonUncheckedIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { makeStyles } from '../util/tss-react/index.ts'
 

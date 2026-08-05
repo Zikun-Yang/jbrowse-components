@@ -1,14 +1,14 @@
-import CloseIcon from '@mui/icons-material/Close'
 // Report icon is rendered here instead of in SnackbarModel to avoid storing
 // JSX in MobX observables, which causes Chrome-specific issues
 // See https://github.com/GMOD/jbrowse-components/issues/5325
-import Report from '@mui/icons-material/Report'
 import {
   Alert,
   Button,
   IconButton,
   Snackbar as MUISnackbar,
 } from '@mui/material'
+
+import { CloseIcon, ReportIcon as Report } from '@jbrowse/core/ui/Icons'
 
 import type { SnackbarMessage } from './SnackbarModel.tsx'
 

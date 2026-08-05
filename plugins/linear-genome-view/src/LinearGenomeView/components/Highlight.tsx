@@ -4,11 +4,10 @@ import { Menu } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { colord } from '@jbrowse/core/util/colord'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import BookmarkIcon from '@mui/icons-material/Bookmark'
-import CloseIcon from '@mui/icons-material/Close'
-import LinkIcon from '@mui/icons-material/Link'
 import { IconButton, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { BookmarkIcon, CloseIcon, LinkIcon } from '@jbrowse/core/ui/Icons'
 
 import type { LinearGenomeViewModel } from '../model.ts'
 import type { Region, SessionWithWidgets } from '@jbrowse/core/util'

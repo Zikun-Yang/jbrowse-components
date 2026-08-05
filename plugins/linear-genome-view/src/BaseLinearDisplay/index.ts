@@ -19,6 +19,10 @@ export {
   default as BaseLinearDisplayComponent,
 } from './components/BaseLinearDisplay.tsx'
 export { default as TrackHeightMixin } from './models/TrackHeightMixin.tsx'
+export {
+  getAutoHeightSettings,
+  getBlocksContentHeight,
+} from './models/util.ts'
 export { default as FeatureDensityMixin } from './models/FeatureDensityMixin.tsx'
 export {
   type NonBlockCanvasDisplayMixinType,

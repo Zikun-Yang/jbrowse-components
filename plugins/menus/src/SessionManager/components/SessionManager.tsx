@@ -1,9 +1,6 @@
 import DataGridFlexContainer from '@jbrowse/core/ui/DataGridFlexContainer'
 import { measureGridWidth, useLocalStorage } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import DeleteIcon from '@mui/icons-material/Delete'
-import StarIcon from '@mui/icons-material/Star'
-import StarBorderIcon from '@mui/icons-material/StarBorder'
 import {
   Button,
   Checkbox,
@@ -15,6 +12,8 @@ import {
 import { DataGrid } from '@mui/x-data-grid'
 import { differenceInDays, formatDistanceToNow } from 'date-fns'
 import { observer } from 'mobx-react'
+
+import { DeleteIcon, StarBorderIcon, StarIcon } from '@jbrowse/core/ui/Icons'
 
 import type { SessionModel } from './util.ts'
 

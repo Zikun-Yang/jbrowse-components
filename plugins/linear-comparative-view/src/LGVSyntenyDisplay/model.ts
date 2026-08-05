@@ -1,6 +1,4 @@
-import { lazy } from 'react'
-
-import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
+import { ConfigurationReference } from '@jbrowse/core/configuration'
 import {
   getContainingTrack,
   getContainingView,
@@ -12,13 +10,6 @@ import { SharedLinearPileupDisplayMixin } from '@jbrowse/plugin-alignments'
 
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
-import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
-
-type LGV = LinearGenomeViewModel
-
-const LaunchSyntenyViewDialog = lazy(
-  () => import('./components/LaunchSyntenyViewDialog.tsx'),
-)
 
 /**
  * #stateModel LGVSyntenyDisplay
@@ -44,39 +35,6 @@ function stateModelFactory(schema: AnyConfigurationSchemaType) {
         configuration: ConfigurationReference(schema),
       }),
     )
-    .views(self => {
-      const superContextMenuItems = self.contextMenuItems
-      return {
-        /**
-         * #method
-         */
-        contextMenuItems() {
-          const feature = self.contextMenuFeature
-          return [
-            ...superContextMenuItems(),
-            ...(feature
-              ? [
-                  {
-                    label: 'Launch synteny view for this position',
-                    onClick: () => {
-                      getSession(self).queueDialog(handleClose => [
-                        LaunchSyntenyViewDialog,
-                        {
-                          view: getContainingView(self) as LGV,
-                          trackId: getConf(getContainingTrack(self), 'trackId'),
-                          handleClose,
-                          session: getSession(self),
-                          feature,
-                        },
-                      ])
-                    },
-                  },
-                ]
-              : []),
-          ]
-        },
-      }
-    })
     .views(self => {
       const {
         trackMenuItems: superTrackMenuItems,

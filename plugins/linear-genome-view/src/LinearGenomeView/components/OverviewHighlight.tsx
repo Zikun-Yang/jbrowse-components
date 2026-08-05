@@ -28,7 +28,7 @@ const OverviewHighlight = observer(function OverviewHighlight({
   overview: Base1DViewModel
 }) {
   const { classes } = useStyles()
-  const { highlight, cytobandOffset } = model
+  const { highlight } = model
 
   const session = getSession(model) as SessionWithWidgets
   const { assemblyManager } = session
@@ -49,7 +49,7 @@ const OverviewHighlight = observer(function OverviewHighlight({
       return s !== undefined && e !== undefined
         ? {
             width: Math.abs(e - s),
-            left: s + cytobandOffset,
+            left: s,
           }
         : undefined
     })

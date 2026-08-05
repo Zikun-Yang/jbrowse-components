@@ -3,7 +3,6 @@ import { lazy } from 'react'
 
 import { readConfObject } from '@jbrowse/core/configuration'
 import { BaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import {
   clamp,
   getSession,
@@ -15,9 +14,13 @@ import {
   toggleTrackGeneric,
 } from '@jbrowse/core/util/tracks'
 import { addDisposer, cast, types } from '@jbrowse/mobx-state-tree'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import { autorun } from 'mobx'
+
+import {
+  FolderOpenIcon,
+  PhotoCameraIcon,
+  TrackSelector as TrackSelectorIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { calculateStaticSlices, sliceIsVisible } from './slices.ts'
 import { viewportVisibleSection } from './viewportVisibleRegion.ts'

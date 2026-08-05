@@ -1,8 +1,9 @@
 import { useEffect, useEffectEvent, useState } from 'react'
 
 import { useDebounce } from '@jbrowse/core/util'
-import ClearIcon from '@mui/icons-material/Clear'
 import { IconButton, InputAdornment, TextField } from '@mui/material'
+
+import { ClearIcon } from '@jbrowse/core/ui/Icons'
 
 export default function ClearableSearchField({
   value,

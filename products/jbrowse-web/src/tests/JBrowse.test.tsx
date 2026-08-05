@@ -12,6 +12,7 @@ import {
   doBeforeEach,
   expectCanvasMatch,
   hts,
+  openTrackMenu,
   setup,
 } from './util.tsx'
 import JBrowseRootModelFactory from '../rootModel/rootModel.ts'
@@ -99,11 +100,12 @@ test('test sharing', async () => {
 }, 30000)
 
 test('looks at about this track dialog', async () => {
-  const { findByTestId, findAllByText, findByText } = await createView()
+  const { findByTestId, findAllByTestId, findAllByText, findByText } =
+    await createView()
 
   // load track
   fireEvent.click(await findByTestId(hts('volvox-long-reads-cram'), {}, delay))
-  fireEvent.click(await findByTestId('track_menu_icon', {}, delay))
+  await openTrackMenu({ findAllByTestId }, 'volvox-long-reads-cram', delay)
   fireEvent.click(await findByText('About track'))
   await findAllByText(/SQ/, {}, delay)
 }, 30000)

@@ -1,8 +1,11 @@
 import { forwardRef, lazy, useState } from 'react'
 
-import MoreVert from '@mui/icons-material/MoreVert'
-import Settings from '@mui/icons-material/Settings'
 import { observer } from 'mobx-react'
+
+import {
+  MoreVertIcon as MoreVert,
+  SettingsIcon as Settings,
+} from '@jbrowse/core/ui/Icons'
 
 import CascadingMenuButton from '../../../ui/CascadingMenuButton.tsx'
 

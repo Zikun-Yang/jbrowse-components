@@ -13,13 +13,16 @@ import { stopStopToken } from '@jbrowse/core/util/stopToken'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { cast, isAlive, types } from '@jbrowse/mobx-state-tree'
 import { linearBareDisplayStateModelFactory } from '@jbrowse/plugin-linear-genome-view'
-import CategoryIcon from '@mui/icons-material/Category'
-import ClearAllIcon from '@mui/icons-material/ClearAll'
-import HeightIcon from '@mui/icons-material/Height'
-import SplitscreenIcon from '@mui/icons-material/Splitscreen'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import { ascending } from '@mui/x-charts-vendor/d3-array'
 import deepEqual from 'fast-deep-equal'
+
+import {
+  CategoryIcon,
+  ClearAllIcon,
+  HeightIcon,
+  SplitscreenIcon,
+  VisibilityIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import {
   NO_CALL_COLOR,

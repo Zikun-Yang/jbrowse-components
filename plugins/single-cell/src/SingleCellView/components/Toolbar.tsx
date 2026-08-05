@@ -1,23 +1,27 @@
 import { useState } from 'react'
-import { observer } from 'mobx-react'
+
 import {
-  ToggleButton,
-  ToggleButtonGroup,
+  Box,
+  Button,
+  Chip,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
-  Box,
-  Chip,
-  Button,
+  Select,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
 } from '@mui/material'
-import PanToolIcon from '@mui/icons-material/PanTool'
-import GestureIcon from '@mui/icons-material/Gesture'
-import CropFreeIcon from '@mui/icons-material/CropFree'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import SegmentIcon from '@mui/icons-material/Segment'
-import PaletteIcon from '@mui/icons-material/Palette'
+import { observer } from 'mobx-react'
+
+import {
+  CropFreeIcon,
+  GestureIcon,
+  PaletteIcon,
+  PanToolIcon,
+  PlayArrowIcon,
+  SegmentIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import PalettePicker from './PalettePicker.tsx'
 

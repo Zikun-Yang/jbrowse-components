@@ -10,18 +10,14 @@ import type { Base1DViewModel } from '@jbrowse/core/util/Base1DViewModel'
 const OverviewScalebarPolygon = observer(function OverviewScalebarPolygon({
   model,
   overview,
-  useOffset = true,
 }: {
   model: LinearGenomeViewModel
   overview: Base1DViewModel
-  useOffset?: boolean
 }) {
   const theme = useTheme()
   const polygonColor = theme.palette.tertiary.light
-  const multiplier = Number(useOffset)
 
-  const { interRegionPaddingWidth, offsetPx, dynamicBlocks, cytobandOffset } =
-    model
+  const { interRegionPaddingWidth, offsetPx, dynamicBlocks } = model
   const { contentBlocks, totalWidthPxWithoutBorders } = dynamicBlocks
 
   if (!contentBlocks.length) {
@@ -31,17 +27,15 @@ const OverviewScalebarPolygon = observer(function OverviewScalebarPolygon({
   const first = contentBlocks.at(0)!
   const last = contentBlocks.at(-1)!
   const topLeft =
-    (overview.bpToPx({
+    overview.bpToPx({
       refName: first.refName,
       coord: first.reversed ? first.end : first.start,
-    }) || 0) +
-    cytobandOffset * multiplier
+    }) || 0
   const topRight =
-    (overview.bpToPx({
+    overview.bpToPx({
       refName: last.refName,
       coord: last.reversed ? last.start : last.end,
-    }) || 0) +
-    cytobandOffset * multiplier
+    }) || 0
 
   const startPx = Math.max(0, -offsetPx)
   const endPx =

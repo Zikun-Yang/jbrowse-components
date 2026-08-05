@@ -171,9 +171,10 @@ function addChildrenRecursive({
         }
       }
 
-      // Use child's actual layout position
-      const leftPx = child.x
-      const rightPx = child.x + child.totalLayoutWidth
+      // Use child's actual layout position, including left padding
+      // (strand arrows / left-side labels extend left of the glyph)
+      const leftPx = child.x - child.leftPadding
+      const rightPx = leftPx + child.totalLayoutWidth
       const topPx = child.y
       const bottomPx = child.y + child.totalLayoutHeight
 

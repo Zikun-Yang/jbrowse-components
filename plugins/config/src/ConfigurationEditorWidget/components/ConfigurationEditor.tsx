@@ -7,7 +7,6 @@ import {
 import SanitizedHTML from '@jbrowse/core/ui/SanitizedHTML'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { getMembers } from '@jbrowse/mobx-state-tree'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
   AccordionDetails,
@@ -17,6 +16,8 @@ import {
 } from '@mui/material'
 import { observer } from 'mobx-react'
 import { singular } from 'pluralize'
+
+import { ExpandMoreIcon } from '@jbrowse/core/ui/Icons'
 
 import SlotEditor from './SlotEditor.tsx'
 import TypeSelector from './TypeSelector.tsx'

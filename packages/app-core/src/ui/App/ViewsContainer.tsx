@@ -55,8 +55,6 @@ interface Props {
       allThemes?: () => Record<string, ThemeOptions & { name?: string }>
       themeName?: string
       setThemeName?: (arg: string) => void
-      stickyViewHeaders?: boolean
-      setStickyViewHeaders?(sticky: boolean): void
     }
 }
 
@@ -83,7 +81,8 @@ const ViewsContainer = observer(function ViewsContainer(props: Props) {
       break
     case 'workspace':
     default:
-      content = views.length > 0 ? <TiledViewsContainer session={session} /> : null
+      content =
+        views.length > 0 ? <TiledViewsContainer session={session} /> : null
   }
 
   return (

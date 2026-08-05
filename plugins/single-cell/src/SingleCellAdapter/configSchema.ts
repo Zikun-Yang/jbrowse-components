@@ -53,6 +53,7 @@ const singleCellZarrAdapterConfigSchema = ConfigurationSchema(
       defaultValue: 'index',
     },
   },
+  { explicitlyTyped: true },
 )
 
 export default singleCellZarrAdapterConfigSchema

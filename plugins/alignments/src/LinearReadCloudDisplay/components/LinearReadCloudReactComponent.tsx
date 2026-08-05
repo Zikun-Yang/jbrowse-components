@@ -133,15 +133,8 @@ function MismatchTooltip({
 }
 
 const FeatureHighlights = observer(function FeatureHighlights({
-  selectedFeatureBounds,
   hoveredFeature,
 }: {
-  selectedFeatureBounds: {
-    x: number
-    y: number
-    width: number
-    height: number
-  } | null
   hoveredFeature:
     | {
         x: number
@@ -151,37 +144,19 @@ const FeatureHighlights = observer(function FeatureHighlights({
       }
     | undefined
 }) {
-  return (
-    <>
-      {selectedFeatureBounds ? (
-        <div
-          style={{
-            position: 'absolute',
-            left: selectedFeatureBounds.x,
-            top: selectedFeatureBounds.y,
-            width: selectedFeatureBounds.width,
-            height: selectedFeatureBounds.height,
-            border: '2px solid #00b8ff',
-            boxSizing: 'border-box',
-            pointerEvents: 'none',
-          }}
-        />
-      ) : null}
-      {hoveredFeature ? (
-        <div
-          style={{
-            position: 'absolute',
-            left: hoveredFeature.x,
-            top: hoveredFeature.y,
-            width: hoveredFeature.width,
-            height: hoveredFeature.height,
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-            pointerEvents: 'none',
-          }}
-        />
-      ) : null}
-    </>
-  )
+  return hoveredFeature ? (
+    <div
+      style={{
+        position: 'absolute',
+        left: hoveredFeature.x,
+        top: hoveredFeature.y,
+        width: hoveredFeature.width,
+        height: hoveredFeature.height,
+        backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        pointerEvents: 'none',
+      }}
+    />
+  ) : null
 })
 
 const CloudCanvases = observer(function CloudCanvases({
@@ -277,29 +252,6 @@ const Cloud = observer(function Cloud({
       ? Flatbush.from(model.mismatchLayout.data)
       : null
   }, [model.mismatchLayout])
-
-  // Look up the bounds of the selected feature by ID
-  const selectedFeatureBounds = useMemo(() => {
-    if (!model.selectedFeatureId) {
-      return null
-    }
-
-    // Find the feature with the matching chain ID
-    const feature = model.featuresForFlatbush.find(
-      f => f.chainId === model.selectedFeatureId,
-    )
-
-    if (feature) {
-      return {
-        x: feature.chainMinX,
-        y: feature.y1,
-        width: feature.chainMaxX - feature.chainMinX,
-        height: feature.y2 - feature.y1,
-      }
-    }
-
-    return null
-  }, [model.selectedFeatureId, model.featuresForFlatbush])
 
   const getFeatureUnderMouse = useCallback(
     (event: React.MouseEvent) => {
@@ -457,10 +409,7 @@ const Cloud = observer(function Cloud({
       onClick={onClick}
     >
       <CloudCanvases model={model} width={width} height={height} />
-      <FeatureHighlights
-        selectedFeatureBounds={selectedFeatureBounds}
-        hoveredFeature={hoveredFeature}
-      />
+      <FeatureHighlights hoveredFeature={hoveredFeature} />
       {hoveredMismatchData && mousePosition ? (
         <MismatchTooltip
           mismatchData={hoveredMismatchData}

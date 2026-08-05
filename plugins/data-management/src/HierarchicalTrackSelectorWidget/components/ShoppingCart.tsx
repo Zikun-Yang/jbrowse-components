@@ -1,8 +1,9 @@
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import { getEnv, getSession } from '@jbrowse/core/util'
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { Badge } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ShoppingCartIcon } from '@jbrowse/core/ui/Icons'
 
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { MenuItem } from '@jbrowse/core/ui/Menu'

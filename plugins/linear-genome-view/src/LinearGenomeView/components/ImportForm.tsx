@@ -7,7 +7,6 @@ import {
 } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import CloseIcon from '@mui/icons-material/Close'
 import {
   Button,
   CircularProgress,
@@ -16,6 +15,8 @@ import {
   Grid as Grid,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { CloseIcon } from '@jbrowse/core/ui/Icons'
 
 import ImportFormRefNameAutocomplete from './ImportFormRefNameAutocomplete.tsx'
 import { handleSelectedRegion, navToOption } from '../../searchUtils.ts'

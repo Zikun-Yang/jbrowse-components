@@ -1,9 +1,10 @@
 import { useState } from 'react'
 
 import { Menu } from '@jbrowse/core/ui'
-import MoreVert from '@mui/icons-material/MoreVert'
 import { Grid, IconButton } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { MoreVertIcon as MoreVert } from '@jbrowse/core/ui/Icons'
 
 import ClearableSearchField from '../../HierarchicalTrackSelectorWidget/components/ClearableSearchField.tsx'
 import ShoppingCart from '../../HierarchicalTrackSelectorWidget/components/ShoppingCart.tsx'

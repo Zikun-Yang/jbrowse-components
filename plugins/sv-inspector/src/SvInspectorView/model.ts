@@ -3,8 +3,9 @@ import { BaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
 import { getSession } from '@jbrowse/core/util'
 import { ElementId } from '@jbrowse/core/util/types/mst'
 import { addDisposer, types } from '@jbrowse/mobx-state-tree'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { autorun, reaction } from 'mobx'
+
+import { FolderOpenIcon } from '@jbrowse/core/ui/Icons'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { Region } from '@jbrowse/core/util'

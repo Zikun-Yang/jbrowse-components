@@ -1,41 +1,322 @@
-import SvgIcon from '@mui/material/SvgIcon'
+import { forwardRef } from 'react'
+
+import { useTheme } from '@mui/material/styles'
+import {
+  ArrowDownWideNarrow,
+  ArrowLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  ArrowUpDown,
+  BookMarked,
+  Bookmark,
+  BookmarkPlus,
+  Cable as LucideCable,
+  CalendarRange,
+  Camera,
+  ChartPie,
+  ChartScatter,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  ChevronsDown,
+  ChevronsUp,
+  Circle,
+  CircleAlert,
+  CircleDot,
+  CircleHelp,
+  Clock,
+  CloudUpload,
+  Columns2,
+  Columns3,
+  Copy,
+  Crop,
+  Database,
+  Dna,
+  DoorOpen,
+  Download,
+  Ellipsis,
+  EllipsisVertical,
+  ExternalLink,
+  Eye,
+  Files,
+  Focus,
+  FolderOpen,
+  Fullscreen,
+  Grid2x2,
+  Grid3x3,
+  Grip,
+  Group,
+  Hand,
+  Highlighter,
+  House,
+  Info,
+  LayoutDashboard,
+  LayoutGrid,
+  Link,
+  List,
+  ListChecks,
+  ListPlus,
+  ListX,
+  Lock,
+  LockOpen,
+  Menu,
+  Minus,
+  OctagonAlert,
+  Palette,
+  PanelLeftOpen,
+  Pencil,
+  Pin,
+  Play,
+  Plus,
+  Puzzle,
+  Redo2,
+  RefreshCw,
+  RotateCcw,
+  RotateCw,
+  Ruler,
+  Save,
+  SaveAll,
+  Search,
+  Settings,
+  Shapes,
+  Share2,
+  ShoppingCart,
+  Shuffle,
+  Signature,
+  SlidersVertical,
+  Square,
+  SquareArrowOutUpRight,
+  SquareCheck,
+  SquareSplitVertical,
+  Star,
+  Table,
+  Tag,
+  Tags,
+  TextSearch,
+  Trash2,
+  Type,
+  Undo2,
+  UnfoldVertical,
+  Upload,
+  User,
+  Waypoints,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react'
 
 import type { SvgIconProps } from '@mui/material/SvgIcon'
+import type { LucideProps } from 'lucide-react'
 
-// https://materialdesignicons.com/ text-search icon
-export function Indexing(props: SvgIconProps) {
-  return (
-    <SvgIcon {...props}>
-      <path d="M19.31 18.9L22.39 22L21 23.39L17.88 20.32C17.19 20.75 16.37 21 15.5 21C13 21 11 19 11 16.5C11 14 13 12 15.5 12C18 12 20 14 20 16.5C20 17.38 19.75 18.21 19.31 18.9M15.5 19C16.88 19 18 17.88 18 16.5C18 15.12 16.88 14 15.5 14C14.12 14 13 15.12 13 16.5C13 17.88 14.12 19 15.5 19M21 4V6H3V4H21M3 16V14H9V16H3M3 11V9H21V11H18.97C17.96 10.37 16.77 10 15.5 10C14.23 10 13.04 10.37 12.03 11H3Z" />
-    </SvgIcon>
-  )
-}
+// MUI SvgIcon fontSize -> lucide size, matching MUI's rem values
+const fontSizeMap = {
+  small: 20,
+  medium: 24,
+  large: 35,
+  inherit: '1em',
+} as const
 
-//  format-list-checkbox from https://materialdesignicons.com/
-export function TrackSelector(props: SvgIconProps) {
-  return (
-    <SvgIcon {...props}>
-      <path d="M21 19v-2H8v2h13m0-6v-2H8v2h13M8 7h13V5H8v2M4 5v2h2V5H4M3 5a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V5m1 6v2h2v-2H4m-1 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2m1 6v2h2v-2H4m-1 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" />
-    </SvgIcon>
-  )
-}
+type LucideIconComponent = React.ForwardRefExoticComponent<
+  Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
+>
 
-//  dna from https://materialdesignicons.com/
-export function DNA(props: SvgIconProps) {
-  return (
-    <SvgIcon {...props}>
-      <path
-        fill="currentColor"
-        d="M4,2H6V4C6,5.44 6.68,6.61 7.88,7.78C8.74,8.61 9.89,9.41 11.09,10.2L9.26,11.39C8.27,10.72 7.31,10 6.5,9.21C5.07,7.82 4,6.1 4,4V2M18,2H20V4C20,6.1 18.93,7.82 17.5,9.21C16.09,10.59 14.29,11.73 12.54,12.84C10.79,13.96 9.09,15.05 7.88,16.22C6.68,17.39 6,18.56 6,20V22H4V20C4,17.9 5.07,16.18 6.5,14.79C7.91,13.41 9.71,12.27 11.46,11.16C13.21,10.04 14.91,8.95 16.12,7.78C17.32,6.61 18,5.44 18,4V2M14.74,12.61C15.73,13.28 16.69,14 17.5,14.79C18.93,16.18 20,17.9 20,20V22H18V20C18,18.56 17.32,17.39 16.12,16.22C15.26,15.39 14.11,14.59 12.91,13.8L14.74,12.61M7,3H17V4L16.94,4.5H7.06L7,4V3M7.68,6H16.32C16.08,6.34 15.8,6.69 15.42,7.06L14.91,7.5H9.07L8.58,7.06C8.2,6.69 7.92,6.34 7.68,6M9.09,16.5H14.93L15.42,16.94C15.8,17.31 16.08,17.66 16.32,18H7.68C7.92,17.66 8.2,17.31 8.58,16.94L9.09,16.5M7.06,19.5H16.94L17,20V21H7V20L7.06,19.5Z"
+function createIcon(LucideIcon: LucideIconComponent, name: string) {
+  const Icon = forwardRef<SVGSVGElement, SvgIconProps>(function Icon(
+    {
+      fontSize,
+      color,
+      // MUI-only props, dropped so they don't leak onto the DOM svg element
+      htmlColor,
+      titleAccess,
+      sx,
+      component,
+      inheritViewBox,
+      viewBox,
+      ...props
+    },
+    ref,
+  ) {
+    const theme = useTheme()
+    const paletteColor =
+      color === 'action'
+        ? theme.palette.action.active
+        : color === 'disabled'
+          ? theme.palette.action.disabled
+          : color === 'primary'
+            ? theme.palette.primary.main
+            : color === 'secondary'
+              ? theme.palette.secondary.main
+              : color === 'error'
+                ? theme.palette.error.main
+                : color === 'info'
+                  ? theme.palette.info.main
+                  : color === 'success'
+                    ? theme.palette.success.main
+                    : color === 'warning'
+                      ? theme.palette.warning.main
+                      : undefined
+    return (
+      <LucideIcon
+        ref={ref}
+        size={fontSizeMap[fontSize ?? 'medium'] ?? 24}
+        color={htmlColor ?? paletteColor}
+        aria-label={titleAccess}
+        {...props}
       />
-    </SvgIcon>
-  )
+    )
+  })
+  Icon.displayName = name
+  return Icon
 }
 
-export function Cable(props: SvgIconProps) {
-  return (
-    <SvgIcon {...props}>
-      <path d="M20 5V4c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v1h-1v4c0 .55.45 1 1 1h1v7c0 1.1-.9 2-2 2s-2-.9-2-2V7c0-2.21-1.79-4-4-4S5 4.79 5 7v7H4c-.55 0-1 .45-1 1v4h1v1c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-1h1v-4c0-.55-.45-1-1-1H7V7c0-1.1.9-2 2-2s2 .9 2 2v10c0 2.21 1.79 4 4 4s4-1.79 4-4v-7h1c.55 0 1-.45 1-1V5h-1z" />
-    </SvgIcon>
-  )
-}
+export const AccessTimeIcon = createIcon(Clock, 'AccessTimeIcon')
+export const AddIcon = createIcon(Plus, 'AddIcon')
+export const AppsIcon = createIcon(Grip, 'AppsIcon')
+export const ArrowBackIcon = createIcon(ArrowLeft, 'ArrowBackIcon')
+export const ArrowDropDownIcon = createIcon(ChevronDown, 'ArrowDropDownIcon')
+export const ArrowDropUpIcon = createIcon(ChevronUp, 'ArrowDropUpIcon')
+export const ArrowForwardIcon = createIcon(ArrowRight, 'ArrowForwardIcon')
+export const ArrowForwardIosIcon = createIcon(
+  ChevronRight,
+  'ArrowForwardIosIcon',
+)
+export const ArrowLeftIcon = createIcon(ArrowLeft, 'ArrowLeftIcon')
+export const ArrowRightIcon = createIcon(ArrowRight, 'ArrowRightIcon')
+export const BookmarkAddIcon = createIcon(BookmarkPlus, 'BookmarkAddIcon')
+export const BookmarkIcon = createIcon(Bookmark, 'BookmarkIcon')
+export const BookmarksIcon = createIcon(BookMarked, 'BookmarksIcon')
+export const Cable = createIcon(LucideCable, 'Cable')
+export const CalendarViewDayIcon = createIcon(
+  CalendarRange,
+  'CalendarViewDayIcon',
+)
+export const CategoryIcon = createIcon(Shapes, 'CategoryIcon')
+export const CenterFocusStrongIcon = createIcon(Focus, 'CenterFocusStrongIcon')
+export const CheckBoxIcon = createIcon(SquareCheck, 'CheckBoxIcon')
+export const CheckBoxOutlineBlankIcon = createIcon(
+  Square,
+  'CheckBoxOutlineBlankIcon',
+)
+export const CheckIcon = createIcon(Check, 'CheckIcon')
+export const ChevronRightIcon = createIcon(ChevronRight, 'ChevronRightIcon')
+export const ClearAllIcon = createIcon(ListX, 'ClearAllIcon')
+export const ClearIcon = createIcon(X, 'ClearIcon')
+export const CloseIcon = createIcon(X, 'CloseIcon')
+export const CloudUploadIcon = createIcon(CloudUpload, 'CloudUploadIcon')
+export const ColorLensIcon = createIcon(Palette, 'ColorLensIcon')
+export const ContentCopyIcon = createIcon(Copy, 'ContentCopyIcon')
+export const CreateIcon = createIcon(Pencil, 'CreateIcon')
+export const CropFreeIcon = createIcon(Crop, 'CropFreeIcon')
+export const DNA = createIcon(Dna, 'DNA')
+export const DashboardIcon = createIcon(LayoutDashboard, 'DashboardIcon')
+export const DataUsageIcon = createIcon(ChartPie, 'DataUsageIcon')
+export const DeleteIcon = createIcon(Trash2, 'DeleteIcon')
+export const EqualizerIcon = createIcon(SlidersVertical, 'EqualizerIcon')
+export const ErrorIcon = createIcon(CircleAlert, 'ErrorIcon')
+export const ExpandLessIcon = createIcon(ChevronUp, 'ExpandLessIcon')
+export const ExpandMoreIcon = createIcon(ChevronDown, 'ExpandMoreIcon')
+export const ExtensionIcon = createIcon(Puzzle, 'ExtensionIcon')
+export const FileCopyIcon = createIcon(Files, 'FileCopyIcon')
+export const FolderOpenIcon = createIcon(FolderOpen, 'FolderOpenIcon')
+export const FullscreenIcon = createIcon(Fullscreen, 'FullscreenIcon')
+export const GestureIcon = createIcon(Signature, 'GestureIcon')
+export const GetAppIcon = createIcon(Download, 'GetAppIcon')
+export const GridViewIcon = createIcon(Grid3x3, 'GridViewIcon')
+export const HeightIcon = createIcon(UnfoldVertical, 'HeightIcon')
+export const HelpIcon = createIcon(CircleHelp, 'HelpIcon')
+export const HelpOutlineIcon = createIcon(CircleHelp, 'HelpOutlineIcon')
+export const HighlightIcon = createIcon(Highlighter, 'HighlightIcon')
+export const HomeIcon = createIcon(House, 'HomeIcon')
+export const Indexing = createIcon(TextSearch, 'Indexing')
+export const InfoIcon = createIcon(Info, 'InfoIcon')
+export const InfoOutlinedIcon = createIcon(Info, 'InfoOutlinedIcon')
+export const KeyboardArrowDownIcon = createIcon(
+  ChevronDown,
+  'KeyboardArrowDownIcon',
+)
+export const KeyboardArrowRightIcon = createIcon(
+  ChevronRight,
+  'KeyboardArrowRightIcon',
+)
+export const KeyboardArrowUpIcon = createIcon(ChevronUp, 'KeyboardArrowUpIcon')
+export const KeyboardDoubleArrowDownIcon = createIcon(
+  ChevronsDown,
+  'KeyboardDoubleArrowDownIcon',
+)
+export const KeyboardDoubleArrowUpIcon = createIcon(
+  ChevronsUp,
+  'KeyboardDoubleArrowUpIcon',
+)
+export const LabelIcon = createIcon(Tag, 'LabelIcon')
+export const LaunchIcon = createIcon(ExternalLink, 'LaunchIcon')
+export const LineStyleIcon = createIcon(Ruler, 'LineStyleIcon')
+export const LinkIcon = createIcon(Link, 'LinkIcon')
+export const ListIcon = createIcon(List, 'ListIcon')
+export const LockIcon = createIcon(Lock, 'LockIcon')
+export const LockOpenIcon = createIcon(LockOpen, 'LockOpenIcon')
+export const LowPriorityIcon = createIcon(
+  ArrowDownWideNarrow,
+  'LowPriorityIcon',
+)
+export const MeetingRoomIcon = createIcon(DoorOpen, 'MeetingRoomIcon')
+export const MenuIcon = createIcon(Menu, 'MenuIcon')
+export const MenuOpenIcon = createIcon(PanelLeftOpen, 'MenuOpenIcon')
+export const MinimizeIcon = createIcon(Minus, 'MinimizeIcon')
+export const MoreHorizIcon = createIcon(Ellipsis, 'MoreHorizIcon')
+export const MoreVertIcon = createIcon(EllipsisVertical, 'MoreVertIcon')
+export const OpenInNewIcon = createIcon(SquareArrowOutUpRight, 'OpenInNewIcon')
+export const PaletteIcon = createIcon(Palette, 'PaletteIcon')
+export const PaletteOutlinedIcon = createIcon(Palette, 'PaletteOutlinedIcon')
+export const PanToolIcon = createIcon(Hand, 'PanToolIcon')
+export const PersonIcon = createIcon(User, 'PersonIcon')
+export const PhotoCameraIcon = createIcon(Camera, 'PhotoCameraIcon')
+export const PlayArrowIcon = createIcon(Play, 'PlayArrowIcon')
+export const PlaylistAddIcon = createIcon(ListPlus, 'PlaylistAddIcon')
+export const PublishIcon = createIcon(Upload, 'PublishIcon')
+export const PushPinIcon = createIcon(Pin, 'PushPinIcon')
+export const RadioButtonCheckedIcon = createIcon(
+  CircleDot,
+  'RadioButtonCheckedIcon',
+)
+export const RadioButtonUncheckedIcon = createIcon(
+  Circle,
+  'RadioButtonUncheckedIcon',
+)
+export const RedoIcon = createIcon(Redo2, 'RedoIcon')
+export const RefreshIcon = createIcon(RefreshCw, 'RefreshIcon')
+export const ReportIcon = createIcon(OctagonAlert, 'ReportIcon')
+export const RotateLeftIcon = createIcon(RotateCcw, 'RotateLeftIcon')
+export const RotateRightIcon = createIcon(RotateCw, 'RotateRightIcon')
+export const SaveAsIcon = createIcon(SaveAll, 'SaveAsIcon')
+export const SaveIcon = createIcon(Save, 'SaveIcon')
+export const ScatterPlotIcon = createIcon(ChartScatter, 'ScatterPlotIcon')
+export const SearchIcon = createIcon(Search, 'SearchIcon')
+export const SegmentIcon = createIcon(Tags, 'SegmentIcon')
+export const SettingsIcon = createIcon(Settings, 'SettingsIcon')
+export const ShareIcon = createIcon(Share2, 'ShareIcon')
+export const ShoppingCartIcon = createIcon(ShoppingCart, 'ShoppingCartIcon')
+export const ShuffleIcon = createIcon(Shuffle, 'ShuffleIcon')
+export const SplitscreenIcon = createIcon(Columns2, 'SplitscreenIcon')
+export const StarBorderIcon = createIcon(Star, 'StarBorderIcon')
+export const StarBorderOutlinedIcon = createIcon(Star, 'StarBorderOutlinedIcon')
+export const StarIcon = createIcon(Star, 'StarIcon')
+export const StorageIcon = createIcon(Database, 'StorageIcon')
+export const SwapVertIcon = createIcon(ArrowUpDown, 'SwapVertIcon')
+export const SyncAltIcon = createIcon(ArrowLeftRight, 'SyncAltIcon')
+export const TableChartIcon = createIcon(Table, 'TableChartIcon')
+export const TextFieldsIcon = createIcon(Type, 'TextFieldsIcon')
+export const TimelineIcon = createIcon(Waypoints, 'TimelineIcon')
+export const TrackSelector = createIcon(ListChecks, 'TrackSelector')
+export const UndoIcon = createIcon(Undo2, 'UndoIcon')
+export const VerticalSplitIcon = createIcon(
+  SquareSplitVertical,
+  'VerticalSplitIcon',
+)
+export const ViewColumnIcon = createIcon(Columns3, 'ViewColumnIcon')
+export const ViewComfyIcon = createIcon(Grid2x2, 'ViewComfyIcon')
+export const ViewModuleIcon = createIcon(LayoutGrid, 'ViewModuleIcon')
+export const VisibilityIcon = createIcon(Eye, 'VisibilityIcon')
+export const WorkspacesIcon = createIcon(Group, 'WorkspacesIcon')
+export const ZoomInIcon = createIcon(ZoomIn, 'ZoomInIcon')
+export const ZoomOutIcon = createIcon(ZoomOut, 'ZoomOutIcon')

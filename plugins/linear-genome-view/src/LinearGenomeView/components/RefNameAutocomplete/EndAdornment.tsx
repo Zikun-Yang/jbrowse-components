@@ -1,8 +1,8 @@
 import { Suspense, lazy, useState } from 'react'
 
-import HelpIcon from '@mui/icons-material/Help'
-import SearchIcon from '@mui/icons-material/Search'
 import { IconButton, InputAdornment } from '@mui/material'
+
+import { HelpIcon, SearchIcon } from '@jbrowse/core/ui/Icons'
 
 // lazy
 const HelpDialog = lazy(() => import('./HelpDialog.tsx'))

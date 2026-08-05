@@ -1,12 +1,15 @@
 import { useState } from 'react'
 
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import SearchIcon from '@mui/icons-material/Search'
 import { FormGroup } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  MoreVertIcon,
+  SearchIcon,
+  TrackSelector as TrackSelectorIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import ColorBySelector from './ColorBySelector.tsx'
 import HeaderSearchBoxes from './HeaderSearchBoxes.tsx'

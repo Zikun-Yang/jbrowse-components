@@ -69,7 +69,6 @@ const Lollipop = observer(function Lollipop({
   feature,
   config,
   layoutRecord,
-  selectedFeatureId,
   onFeatureMouseDown,
   onFeatureMouseEnter,
   onFeatureMouseOut,
@@ -82,7 +81,6 @@ const Lollipop = observer(function Lollipop({
   feature: Feature
   config: AnyConfigurationModel
   layoutRecord: LayoutEntry
-  selectedFeatureId?: string
   onFeatureMouseDown?: (event: React.MouseEvent, id: string) => void
   onFeatureMouseEnter?: (event: React.MouseEvent, id: string) => void
   onFeatureMouseOut?: (
@@ -129,10 +127,7 @@ const Lollipop = observer(function Lollipop({
         cy={cy}
         r={radiusPx}
         style={{
-          fill:
-            String(selectedFeatureId) === String(featureId)
-              ? 'red'
-              : readConfObject(config, 'strokeColor', { feature }),
+          fill: readConfObject(config, 'strokeColor', { feature }),
         }}
         {...handlers}
       />

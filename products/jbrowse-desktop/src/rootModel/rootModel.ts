@@ -7,22 +7,26 @@ import {
 } from '@jbrowse/app-core'
 import assemblyConfigSchemaF from '@jbrowse/core/assemblyManager/assemblyConfigSchema'
 import RpcManager from '@jbrowse/core/rpc/RpcManager'
-import { Cable, DNA } from '@jbrowse/core/ui/Icons'
 import { types } from '@jbrowse/mobx-state-tree'
 import { AssemblyManager } from '@jbrowse/plugin-data-management'
 import {
   BaseRootModelFactory,
   InternetAccountsRootModelMixin,
 } from '@jbrowse/product-core'
-import AppsIcon from '@mui/icons-material/Apps'
-import ExtensionIcon from '@mui/icons-material/Extension'
-import OpenIcon from '@mui/icons-material/FolderOpen'
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
-import RedoIcon from '@mui/icons-material/Redo'
-import SaveAsIcon from '@mui/icons-material/SaveAs'
-import SettingsIcon from '@mui/icons-material/Settings'
-import StorageIcon from '@mui/icons-material/Storage'
-import UndoIcon from '@mui/icons-material/Undo'
+
+import {
+  AppsIcon,
+  Cable,
+  DNA,
+  ExtensionIcon,
+  FolderOpenIcon as OpenIcon,
+  MeetingRoomIcon,
+  RedoIcon,
+  SaveAsIcon,
+  SettingsIcon,
+  StorageIcon,
+  UndoIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { DesktopSessionManagementMixin, getSaveSession } from './Sessions.ts'
 import packageJSON from '../../package.json' with { type: 'json' }

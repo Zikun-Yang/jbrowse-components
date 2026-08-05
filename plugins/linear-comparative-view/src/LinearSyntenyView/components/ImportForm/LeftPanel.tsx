@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 import { AssemblySelector, SpeciesSelector } from '@jbrowse/core/ui'
 import { getSession, notEmpty } from '@jbrowse/core/util'
 import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-import CloseIcon from '@mui/icons-material/Close'
 import { Button, IconButton, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ArrowForwardIosIcon, CloseIcon } from '@jbrowse/core/ui/Icons'
 
 import type { LinearSyntenyViewModel } from '../../model.ts'
 

@@ -3,15 +3,17 @@ import { Suspense } from 'react'
 import { Dialog } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { getEnv } from '@jbrowse/mobx-state-tree'
-import CloseIcon from '@mui/icons-material/Close'
 import { AppBar, IconButton, Paper, Toolbar, Typography } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { CloseIcon } from '@jbrowse/core/ui/Icons'
 
 import type { SessionWithWidgets } from '@jbrowse/core/util'
 
 const useStyles = makeStyles()(theme => ({
   paper: {
     overflow: 'auto',
+    width: '50vw',
     minWidth: 800,
   },
   closeButton: {
@@ -49,7 +51,11 @@ const DrawerAppBar = observer(function DrawerAppBar({
           <Typography variant="h6">{heading}</Typography>
         )}
       </Toolbar>
-      <IconButton className={classes.closeButton} onClick={onClose}>
+      <IconButton
+        className={classes.closeButton}
+        data-testid="modal-widget-close"
+        onClick={onClose}
+      >
         <CloseIcon />
       </IconButton>
     </AppBar>
@@ -95,7 +101,7 @@ const ModalWidget = observer(function ModalWidget({
               modal={true}
               overrideDimensions={{
                 height: (window.innerHeight * 5) / 8,
-                width: 800,
+                width: Math.max(window.innerWidth / 2, 800),
               }}
             />
           </Paper>

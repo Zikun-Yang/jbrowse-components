@@ -34,7 +34,6 @@ test('no features', () => {
     <Rendering
       exportSVG={false}
       height={400}
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       config={ConfigurationSchema('Test', {}).create()}
       regions={[
@@ -54,7 +53,6 @@ test('one feature', () => {
       exportSVG={false}
       height={400}
       config={ConfigurationSchema('Test', {}).create()}
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       regions={[
         { refName: 'zonk', start: 0, end: 1000, assemblyName: 'volvox' },
@@ -88,7 +86,6 @@ test('one semicircle', () => {
       config={ConfigurationSchema('Test', {
         displayMode: { type: 'string', defaultValue: 'semicircles' },
       }).create()}
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       regions={[
         { refName: 'zonk', start: 0, end: 1000, assemblyName: 'volvox' },
@@ -121,7 +118,6 @@ test('semicircle via displayMode prop', () => {
       height={400}
       config={ConfigurationSchema('Test', {}).create()}
       displayMode="semicircles"
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       regions={[
         { refName: 'zonk', start: 0, end: 1000, assemblyName: 'volvox' },
@@ -157,7 +153,6 @@ test('user-supplied jexl height expression produces valid arc paths (issue #5500
       exportSVG={false}
       height={400}
       config={config}
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       regions={[
         { refName: 'zonk', start: 0, end: 1000, assemblyName: 'volvox' },
@@ -193,7 +188,6 @@ test('default jexl height expression produces valid arc paths', () => {
       exportSVG={false}
       height={400}
       config={config}
-      displayModel={{ selectedFeatureId: 'none' }}
       onFeatureClick={() => {}}
       regions={[
         { refName: 'zonk', start: 0, end: 1000, assemblyName: 'volvox' },

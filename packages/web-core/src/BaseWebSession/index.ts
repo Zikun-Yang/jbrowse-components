@@ -18,6 +18,7 @@ import {
   types,
 } from '@jbrowse/mobx-state-tree'
 import {
+  AutoTrackHeightSessionMixin,
   DialogQueueSessionMixin,
   DrawerWidgetSessionMixin,
   MultipleViewsSessionMixin,
@@ -25,11 +26,14 @@ import {
   SessionTracksManagerSessionMixin,
   ThemeManagerSessionMixin,
 } from '@jbrowse/product-core'
-import DeleteIcon from '@mui/icons-material/Delete'
-import CopyIcon from '@mui/icons-material/FileCopy'
-import InfoIcon from '@mui/icons-material/Info'
-import SettingsIcon from '@mui/icons-material/Settings'
 import { autorun } from 'mobx'
+
+import {
+  DeleteIcon,
+  FileCopyIcon as CopyIcon,
+  InfoIcon,
+  SettingsIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { WebSessionConnectionsMixin } from '../SessionConnections.ts'
 
@@ -88,6 +92,7 @@ export function BaseWebSession({
         DrawerWidgetSessionMixin(pluginManager),
         DialogQueueSessionMixin(pluginManager),
         ThemeManagerSessionMixin(pluginManager),
+        AutoTrackHeightSessionMixin(pluginManager),
         MultipleViewsSessionMixin(pluginManager),
       ),
       types.compose(
@@ -118,7 +123,12 @@ export function BaseWebSession({
        * session snapshots so reloading starts in workspace mode.
        */
       activeView: types.optional(
-        types.enumeration(['landing', 'workspace', 'recents', 'settings'] as const),
+        types.enumeration([
+          'landing',
+          'workspace',
+          'recents',
+          'settings',
+        ] as const),
         'workspace',
       ),
     })

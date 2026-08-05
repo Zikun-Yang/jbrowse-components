@@ -1,0 +1,2940 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-CHM13v2.0",
+      "species": "Human (Homo sapiens)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "T2T-CHM13-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      },
+      "cytobands": {
+        "adapter": {
+          "type": "CytobandAdapter",
+          "cytobandLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/cytoBandMapped/cytoBandMapped.bed"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-CHM13v2.0_RefSeq_geneOnly",
+      "name": "T2T-CHM13v2.0_RefSeq_geneOnly",
+      "category": [
+        "Gene Annotations"
+      ],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CHM13cell_SRR12519036",
+      "name": "CHM13cell_SRR12519036",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CHM13cell_SRR12519035",
+      "name": "CHM13cell_SRR12519035",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CHM13cell_SRR12519035/6_merged",
+      "name": "CHM13cell_SRR12519035/6_merged",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CN1_NPC",
+      "name": "CN1_NPC",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/project/241109-npepps/009-global_pattern_of_sd_readthrough/000-data/CN1_NPC.mapped.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/project/241109-npepps/009-global_pattern_of_sd_readthrough/000-data/CN1_NPC.mapped.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "C20_NPC_flnc",
+      "name": "C20_NPC_flnc",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-C20_SY2D2_5821_NPC_isoseq/C20/flnc/flnc_mapped_chm13_primary.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-C20_SY2D2_5821_NPC_isoseq/C20/flnc/flnc_mapped_chm13_primary.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "C20_NPC_hq",
+      "name": "C20_NPC_hq",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-C20_SY2D2_5821_NPC_isoseq/C20/4-hq_reads/C20.hq.aln.T2T-CHM13.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-C20_SY2D2_5821_NPC_isoseq/C20/4-hq_reads/C20.hq.aln.T2T-CHM13.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CJJ-1_adultBrain_flnc",
+      "name": "CJJ-1_adultBrain_flnc",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251029-1adult2fetalBrain_iso-seq/CJJ-1/flnc/flnc_mapped_primary.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251029-1adult2fetalBrain_iso-seq/CJJ-1/flnc/flnc_mapped_primary.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "CJJ-1_adultBrain_hq",
+      "name": "CJJ-1_adultBrain_hq",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251029-1adult2fetalBrain_iso-seq/CJJ-1/4-hq_reads/CJJ-1.hq.aln.T2T-CHM13.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251029-1adult2fetalBrain_iso-seq/CJJ-1/4-hq_reads/CJJ-1.hq.aln.T2T-CHM13.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "E55A_fetalBrain_M12W5_flnc",
+      "name": "E55A_fetalBrain_M12W5_flnc",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55A/flnc/flnc_mapped_chm13_primary.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55A/flnc/flnc_mapped_chm13_primary.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "E55A_fetalBrain_M12W5_hq",
+      "name": "E55A_fetalBrain_M12W5_hq",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55A/map_to_T2T-CHM13/4-hq_reads/E55A.hq.aln.T2T-CHM13.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55A/map_to_T2T-CHM13/4-hq_reads/E55A.hq.aln.T2T-CHM13.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "E55B_fetalBrain_M12W5_flnc",
+      "name": "E55B_fetalBrain_M12W5_flnc",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55B/flnc/flnc_mapped_chm13_primary.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55B/flnc/flnc_mapped_chm13_primary.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "E55B_fetalBrain_M12W5_hq",
+      "name": "E55B_fetalBrain_M12W5_hq",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55B/map_to_T2T-CHM13/4-hq_reads/E55B.hq.aln.T2T-CHM13.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/251124-55A_55B_M12W5_Brain_iso-seq/E55B/map_to_T2T-CHM13/4-hq_reads/E55B.hq.aln.T2T-CHM13.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "brainUHRR_PacBio",
+      "name": "brainUHRR_PacBio",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG002_PacBio",
+      "name": "HG002_PacBio",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG002_PacBio",
+      "name": "HG002_PacBio",
+      "category": [
+        "Iso-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "iPSC_fromCN1",
+      "name": "iPSC_fromCN1",
+      "category": [
+        "RNA-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/iPSC.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/iPSC.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "NPC_fromCN1",
+      "name": "NPC_fromCN1",
+      "category": [
+        "RNA-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/NPC.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/NPC.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "FBN_fromCN1",
+      "name": "FBN_fromCN1",
+      "category": [
+        "RNA-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/FBN.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/project/241109-npepps/003-RNA_splicing/005-iPSC_NPC_FBN/002-pipeline_results/star_salmon/FBN.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "PCW3-01_whole_body",
+      "name": "PCW3-01_whole_body",
+      "category": [
+        "scRNA-seq"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_censat",
+      "name": "chm13v2.0_censat",
+      "category": [
+        "Repeats"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/censat/censat.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_encode_cCRE_lifted_from_hg38",
+      "name": "chm13v2.0_encode_cCRE_lifted_from_hg38",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_cCRE/encodeCcreCombined.lifted.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_encode_T2T",
+      "name": "chm13v2.0_encode_T2T",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_T2T/integrated_chm13v2.0_encode_T2T.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_CpG_island",
+      "name": "chm13v2.0_CpG_island",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/cpgIslandExt.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "black"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chm13v2.0_CHM13_CpG_ont_guppy3.6.0_nanopolish0.13.2",
+      "name": "chm13v2.0_CHM13_CpG_ont_guppy3.6.0_nanopolish0.13.2",
+      "category": [
+        "Regulation"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/chm13v2.0_CHM13_CpG_ont_guppy3.6.0_nanopolish0.13.2.bw"
+        }
+      }
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "subcategory": [
+        "Methylation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "subcategory": [
+        "Methylation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "name": "HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri",
+      "category": [
+        "Regulation"
+      ],
+      "subcategory": [
+        "Methylation"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "(((HSA,PTR),GGO),PAB)-merged",
+      "name": "(((HSA,PTR),GGO),PAB)-merged",
+      "category": [
+        "ILS"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "V0-(((HSA,PTR),GGO),PAB)",
+            "group": "topology",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "V1-(((HSA,PTR),GGO),PAB)",
+            "group": "topology",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "V2-(((HSA,GGO),PTR),PAB)",
+            "group": "topology",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "V3-(((PTR,GGO),HSA),PAB)",
+            "group": "topology",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "(((HSA,PTR),GGO),PAB)-V0",
+      "name": "(((HSA,PTR),GGO),PAB)-V0",
+      "category": [
+        "ILS"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "trackGroupId": "(((HSA,PTR),GGO),PAB)-merged",
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "(((HSA,PTR),GGO),PAB)-V1",
+      "name": "(((HSA,PTR),GGO),PAB)-V1",
+      "category": [
+        "ILS"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "trackGroupId": "(((HSA,PTR),GGO),PAB)-merged",
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "(((HSA,PTR),GGO),PAB)-V2",
+      "name": "(((HSA,PTR),GGO),PAB)-V2",
+      "category": [
+        "ILS"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "trackGroupId": "(((HSA,PTR),GGO),PAB)-merged",
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "(((HSA,PTR),GGO),PAB)-V3",
+      "name": "(((HSA,PTR),GGO),PAB)-V3",
+      "category": [
+        "ILS"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "trackGroupId": "(((HSA,PTR),GGO),PAB)-merged",
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
+        }
+      },
+      "displays": [
+        {
+          "type": "LinearWiggleDisplay",
+          "min": 0,
+          "max": 1,
+          "autoscale": "local"
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_VAMPIRE_tandem_repeat",
+      "name": "chm13v2.0_VAMPIRE_tandem_repeat",
+      "category": [
+        "Repeats"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/vampire.chm13v2.0.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_TRF_tandem_repeat",
+      "name": "chm13v2.0_TRF_tandem_repeat",
+      "category": [
+        "Repeats"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/trf.chm13v2.0.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_vamos_tandem_repeat",
+      "name": "chm13v2.0_vamos_tandem_repeat",
+      "category": [
+        "Repeats"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/vamos.chm13v2.0.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_segdup",
+      "name": "chm13v2.0_segdup",
+      "category": [
+        "Repeats"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/segdup/T2TCHM13v2.0.asm.SDs.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Bono_wssd",
+      "name": "Bonobo_Bono_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Bono_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Catherine_wssd",
+      "name": "Bonobo_Catherine_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Catherine_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Desmond_wssd",
+      "name": "Bonobo_Desmond_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Desmond_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Dzeeta_wssd",
+      "name": "Bonobo_Dzeeta_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Dzeeta_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Hermien_wssd",
+      "name": "Bonobo_Hermien_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hermien_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Hortense_wssd",
+      "name": "Bonobo_Hortense_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hortense_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Kombote_wssd",
+      "name": "Bonobo_Kombote_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kombote_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Kosana_wssd",
+      "name": "Bonobo_Kosana_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kosana_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Kumbuka_wssd",
+      "name": "Bonobo_Kumbuka_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kumbuka_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Bonobo_Natalie_wssd",
+      "name": "Bonobo_Natalie_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Natalie_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286216_wssd",
+      "name": "Chimp_ERS1286216_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286216_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286218_wssd",
+      "name": "Chimp_ERS1286218_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286218_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286220_wssd",
+      "name": "Chimp_ERS1286220_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286220_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286221_wssd",
+      "name": "Chimp_ERS1286221_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286221_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286222_wssd",
+      "name": "Chimp_ERS1286222_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286222_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286238_wssd",
+      "name": "Chimp_ERS1286238_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286238_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286240_wssd",
+      "name": "Chimp_ERS1286240_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286240_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286241_wssd",
+      "name": "Chimp_ERS1286241_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286241_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286243_wssd",
+      "name": "Chimp_ERS1286243_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286243_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Chimp_ERS1286245_wssd",
+      "name": "Chimp_ERS1286245_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286245_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Amani_wssd",
+      "name": "Gorilla_Amani_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Amani_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Banjo_wssd",
+      "name": "Gorilla_Banjo_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Banjo_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Delphi_wssd",
+      "name": "Gorilla_Delphi_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Delphi_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Dian_wssd",
+      "name": "Gorilla_Dian_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Dian_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Kaisi_wssd",
+      "name": "Gorilla_Kaisi_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kaisi_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Kolo_wssd",
+      "name": "Gorilla_Kolo_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kolo_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Gorilla_Mimi_wssd",
+      "name": "Gorilla_Mimi_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Mimi_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Babu_wssd",
+      "name": "Orangutan_Babu_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Babu_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Buschi_wssd",
+      "name": "Orangutan_Buschi_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Buschi_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Dunja_wssd",
+      "name": "Orangutan_Dunja_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Dunja_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Elsi_wssd",
+      "name": "Orangutan_Elsi_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Elsi_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Kiki_wssd",
+      "name": "Orangutan_Kiki_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Kiki_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Napoleon_wssd",
+      "name": "Orangutan_Napoleon_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Napoleon_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Nonja_wssd",
+      "name": "Orangutan_Nonja_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Nonja_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Sari_wssd",
+      "name": "Orangutan_Sari_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Sari_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Orangutan_Tilda_wssd",
+      "name": "Orangutan_Tilda_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Tilda_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_11433-07b_wssd",
+      "name": "Macaque_11433-07b_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_11433-07b_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_23138_wssd",
+      "name": "Macaque_23138_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_23138_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_35045_wssd",
+      "name": "Macaque_35045_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35045_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_35091_wssd",
+      "name": "Macaque_35091_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35091_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38550_wssd",
+      "name": "Macaque_38550_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38550_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38572_wssd",
+      "name": "Macaque_38572_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38572_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38615_wssd",
+      "name": "Macaque_38615_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38615_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38629_wssd",
+      "name": "Macaque_38629_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38629_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38655_wssd",
+      "name": "Macaque_38655_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38655_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_Macaque_38660_wssd",
+      "name": "Macaque_38660_wssd",
+      "category": [
+        "NHP Copy Number - FastCN"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38660_wssd.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "VariantTrack",
+      "trackId": "HPRC_T2T-CHM13v2.0.88haps",
+      "name": "HPRC_T2T-CHM13v2.0.88haps",
+      "category": [
+        "Variants"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "VcfTabixAdapter",
+        "vcfGzLocation": {
+          "uri": "data/HPRC_T2T-CHM13v2.0.88haps.vcf.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "data/HPRC_T2T-CHM13v2.0.88haps.vcf.gz.tbi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "HGSVC3_pi_win5000_step5000",
+      "name": "HGSVC3_pi_win5000_step5000",
+      "category": [
+        "Population Genetics"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "AFR",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/AFR_win5000_step5000.bw"
+            },
+            "group": "AFR"
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "nonAFR",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/nonAFR_win5000_step5000.bw"
+            },
+            "group": "nonAFR"
+          }
+        ]
+      }
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "HGSVC3_tajimaD_win5000_step5000",
+      "name": "HGSVC3_tajimaD_win5000_step5000",
+      "category": [
+        "Population Genetics"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "AFR",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/AFR_win5000_step5000.bw"
+            },
+            "group": "AFR"
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "nonAFR",
+            "bigWigLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/nonAFR_win5000_step5000.bw"
+            },
+            "group": "nonAFR"
+          }
+        ]
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "TR_index_log_smoothness",
+      "name": "TR_index_log_smoothness",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "TR_index_log_smoothness_mad",
+      "name": "TR_index_log_smoothness_mad",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index_mad.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "TR_index_smoothness_mad",
+      "name": "TR_index_smoothness_mad",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index_not_log.bw"
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "TR_index_exp",
+      "name": "TR_index_exp",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "bigWigLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_exp.bw"
+        }
+      }
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "OPDM_patient_genome_ONT",
+      "name": "OPDM_patient_genome_ONT",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/job/250326-STR_overexpansion/002-alignment/alignment.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/job/250326-STR_overexpansion/002-alignment/alignment.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      }
+    },
+    {
+      "type": "VariantTrack",
+      "trackId": "OPDM_patient_SVs",
+      "name": "OPDM_patient_SVs",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "VcfTabixAdapter",
+        "vcfGzLocation": {
+          "uri": "/home/zkyang/job/250326-STR_overexpansion/004-variants/SVs.vcf.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/job/250326-STR_overexpansion/004-variants/SVs.vcf.gz.tbi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr1_k17",
+      "name": "chr1_k17",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k17.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr1_k13",
+      "name": "chr1_k13",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k13.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr1_k9",
+      "name": "chr1_k9",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k9.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr1_k5",
+      "name": "chr1_k5",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k5.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr1_k3",
+      "name": "chr1_k3",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k3.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr22_k17",
+      "name": "chr22_k17",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k17.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr22_k9",
+      "name": "chr22_k9",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k9.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr22_k5",
+      "name": "chr22_k5",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k5.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "chr22_k3",
+      "name": "chr22_k3",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BigWigAdapter",
+        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k3.bw",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13_chr1_1-150M-anno",
+      "name": "chm13_chr1_1-150M-anno",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-anno.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13_chr1_1-150M--loose08",
+      "name": "chm13_chr1_1-150M--loose08",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M--loose08.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13_chr1_1-150M-0311",
+      "name": "chm13_chr1_1-150M-0311",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-0311.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13_chr1_1-150M-0312",
+      "name": "chm13_chr1_1-150M-0312",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-0312.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-CHM13v2.0-0312",
+      "name": "T2T-CHM13v2.0-0312",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/T2T-CHM13v2.0-0312.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-CHM13v2.0-0324",
+      "name": "T2T-CHM13v2.0-0324",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/T2T-CHM13v2.0-0324.bed4"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-CHM13v2.0-0421",
+      "name": "T2T-CHM13v2.0-0421",
+      "category": [
+        "Test"
+      ],
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ],
+      "adapter": {
+        "type": "BedAdapter",
+        "bedLocation": {
+          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-0421.bed4"
+        }
+      }
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-KO-1",
+      "name": "TB-KO-1",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-1.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-1.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-KO-2",
+      "name": "TB-KO-2",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-2.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-2.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-KO-3",
+      "name": "TB-KO-3",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-3.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-KO-3.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-WT-1",
+      "name": "TB-WT-1",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-1.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-1.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-WT-2",
+      "name": "TB-WT-2",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-2.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-2.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "TB-WT-3",
+      "name": "TB-WT-3",
+      "category": [
+        "Test"
+      ],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-3.markdup.sorted.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/home/zkyang/primates_private_dataset/260402-TBC1D3_KO_H9_ESC/002-bulkRNA_results/star_salmon/TB-WT-3.markdup.sorted.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    }
+  ],
+  "aggregateTextSearchAdapters": [
+    {
+      "type": "TrixTextSearchAdapter",
+      "textSearchAdapterId": "T2T-CHM13v2.0-index",
+      "ixFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0.ix",
+        "locationType": "UriLocation"
+      },
+      "ixxFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0.ixx",
+        "locationType": "UriLocation"
+      },
+      "metaFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0_meta.json",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": [
+        "T2T-CHM13v2.0"
+      ]
+    }
+  ],
+  "defaultSession": {
+    "name": "cytoband-test",
+    "views": [
+      {
+        "id": "lgv1",
+        "type": "LinearGenomeView",
+        "bpPerPx": 200000,
+        "offsetPx": 0,
+        "displayedRegions": [
+          {
+            "refName": "chr1",
+            "start": 0,
+            "end": 248387328,
+            "assemblyName": "T2T-CHM13v2.0"
+          }
+        ],
+        "tracks": []
+      }
+    ]
+  }
+}

@@ -6,9 +6,6 @@ import {
   localStorageGetItem,
 } from '@jbrowse/core/util'
 import { getSnapshot } from '@jbrowse/mobx-state-tree'
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import SettingsIcon from '@mui/icons-material/Settings'
 import {
   Button,
   DialogActions,
@@ -18,6 +15,12 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  BookmarkAddIcon,
+  ContentCopyIcon,
+  SettingsIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { shareSessionToDynamo } from '../sessionSharing.ts'
 import { setQueryParams } from '../useQueryParam.ts'

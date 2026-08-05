@@ -1,0 +1,382 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-MFA8v1.1",
+      "species": "Crab-eating macaque (Macaca fascicularis)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "MFA8v1.1-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/T2T-MFA8v1.1.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/T2T-MFA8v1.1.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-MFA8v1.1_RefSeq",
+      "name": "T2T-MFA8v1.1_RefSeq",
+      "category": ["Gene Annotations"],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/T2T-MFA8v1.1.sorted.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/T2T-MFA8v1.1.sorted.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA186ZAI.lung",
+      "name": "MFA186ZAI.lung",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.lung.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.lung.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA186ZAI.prefrontal_cortex",
+      "name": "MFA186ZAI.prefrontal_cortex",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.prefrontal_cortex.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.prefrontal_cortex.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA186ZAI.testis",
+      "name": "MFA186ZAI.testis",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.testis.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA186ZAI.testis.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.cerebellum",
+      "name": "MFA676.cerebellum",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.cerebellum.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.cerebellum.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.heart",
+      "name": "MFA676.heart",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.heart.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.heart.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.hippocampus",
+      "name": "MFA676.hippocampus",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.hippocampus.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.hippocampus.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.kidney",
+      "name": "MFA676.kidney",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.kidney.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.kidney.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.liver",
+      "name": "MFA676.liver",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.liver.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.liver.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.muscle",
+      "name": "MFA676.muscle",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.muscle.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.muscle.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.ovary",
+      "name": "MFA676.ovary",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.ovary.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.ovary.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.spleen",
+      "name": "MFA676.spleen",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.spleen.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.spleen.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.striatum",
+      "name": "MFA676.striatum",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.striatum.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.striatum.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.thalamus",
+      "name": "MFA676.thalamus",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.thalamus.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.thalamus.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA676.visual_cortex",
+      "name": "MFA676.visual_cortex",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.visual_cortex.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA676.visual_cortex.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    },
+    {
+      "type": "AlignmentsTrack",
+      "trackId": "MFA712.blood",
+      "name": "MFA712.blood",
+      "category": ["Iso-seq"],
+      "adapter": {
+        "type": "BamAdapter",
+        "bamLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA712.blood.bam",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/iso-seq/MFA712.blood.bam.bai",
+            "locationType": "UriLocation"
+          },
+          "indexType": "BAI"
+        }
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    }
+  ],
+  "aggregateTextSearchAdapters": [
+    {
+      "type": "TrixTextSearchAdapter",
+      "textSearchAdapterId": "T2T-MFA8v1.1-index",
+      "ixFilePath": {
+        "uri": "../trix/T2T-MFA8v1.1.ix",
+        "locationType": "UriLocation"
+      },
+      "ixxFilePath": {
+        "uri": "../trix/T2T-MFA8v1.1.ixx",
+        "locationType": "UriLocation"
+      },
+      "metaFilePath": {
+        "uri": "../trix/T2T-MFA8v1.1_meta.json",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-MFA8v1.1"]
+    }
+  ]
+}

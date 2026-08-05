@@ -4,9 +4,6 @@ import { ExternalLink } from '@jbrowse/core/ui'
 import { getEnv, getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { isSessionWithSessionPlugins } from '@jbrowse/core/util/types'
-import AddIcon from '@mui/icons-material/Add'
-import CheckIcon from '@mui/icons-material/Check'
-import PersonIcon from '@mui/icons-material/Person'
 import {
   Button,
   Card,
@@ -15,6 +12,8 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { AddIcon, CheckIcon, PersonIcon } from '@jbrowse/core/ui/Icons'
 
 import type { PluginStoreModel } from '../model.ts'
 import type { JBrowsePlugin } from '@jbrowse/core/util/types'

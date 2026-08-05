@@ -11,7 +11,8 @@ import {
   ReferenceManagementSessionMixin,
   TracksManagerSessionMixin,
 } from '@jbrowse/product-core'
-import InfoIcon from '@mui/icons-material/Info'
+
+import { InfoIcon } from '@jbrowse/core/ui/Icons'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { MenuItem } from '@jbrowse/core/ui'

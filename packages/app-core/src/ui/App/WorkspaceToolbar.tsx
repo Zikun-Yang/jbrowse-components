@@ -2,14 +2,17 @@ import { useState } from 'react'
 
 import { getEnv } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AddIcon from '@mui/icons-material/Add'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import RedoIcon from '@mui/icons-material/Redo'
-import UndoIcon from '@mui/icons-material/Undo'
-import ViewColumnIcon from '@mui/icons-material/ViewColumn'
-import ViewModuleIcon from '@mui/icons-material/ViewModule'
 import { Button, Menu, MenuItem } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  AddIcon,
+  DashboardIcon,
+  RedoIcon,
+  UndoIcon,
+  ViewColumnIcon,
+  ViewModuleIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { useDockview } from './DockviewContext.tsx'
 import {
@@ -181,14 +184,10 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <MenuItem
-          onClick={() => handleLayoutAction(tilePanelsHorizontally)}
-        >
+        <MenuItem onClick={() => handleLayoutAction(tilePanelsHorizontally)}>
           <ViewColumnIcon className={classes.menuIcon} /> Tile horizontal
         </MenuItem>
-        <MenuItem
-          onClick={() => handleLayoutAction(tilePanelsVertically)}
-        >
+        <MenuItem onClick={() => handleLayoutAction(tilePanelsVertically)}>
           <ViewColumnIcon
             className={classes.menuIcon}
             style={{ transform: 'rotate(90deg)' }}

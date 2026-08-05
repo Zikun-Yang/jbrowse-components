@@ -50,6 +50,13 @@ export function getPluginManager(
   )
 
   rootModel.setDefaultSession()
+  // keep auto-size-track-height off in tests so existing snapshots retain
+  // their fixed track heights; dedicated tests re-enable it explicitly
+  ;(
+    rootModel.session as unknown as {
+      setAutoSizeTrackHeight?: (arg: boolean) => void
+    }
+  ).setAutoSizeTrackHeight?.(false)
   pluginManager.setRootModel(rootModel)
   pluginManager.configure()
   return { pluginManager, rootModel }
@@ -80,6 +87,19 @@ export function expectCanvasMatch(
 export const hts = (str: string) => `htsTrackEntry-Tracks,${str}`
 export const pc = (str: string) => `prerendered_canvas_${str}_done`
 export const pv = (str: string) => pc(`{volvox}ctgA:${str}`)
+
+// opens the track menu by right-clicking the track (previously a button with
+// testid track_menu_icon). finds the first matching track container
+export async function openTrackMenu(
+  ctx: { findAllByTestId: (...args: any[]) => Promise<HTMLElement[]> },
+  trackId?: string,
+  delay = { timeout: 30000 },
+) {
+  const matcher = trackId
+    ? new RegExp(`trackRenderingContainer-.+-${trackId}`)
+    : /trackRenderingContainer/
+  fireEvent.contextMenu((await ctx.findAllByTestId(matcher, {}, delay))[0]!)
+}
 
 export async function createView(args?: any, adminMode?: boolean) {
   const ret = createViewNoWait(args, adminMode)

@@ -1,6 +1,6 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { ErrorMessage, ResizeHandle } from '@jbrowse/core/ui'
+import { ErrorMessage, Menu, ResizeHandle } from '@jbrowse/core/ui'
 import { ErrorBoundary } from '@jbrowse/core/ui/ErrorBoundary'
 import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
 import { isAlive } from '@jbrowse/mobx-state-tree'
@@ -10,6 +10,7 @@ import { observer } from 'mobx-react'
 import Gridlines from './Gridlines.tsx'
 import TrackLabelContainer from './TrackLabelContainer.tsx'
 import TrackRenderingContainer from './TrackRenderingContainer.tsx'
+import { getTrackMenuItems } from './trackMenuItems.ts'
 import { shouldSwapTracks } from './util.ts'
 
 import type { LinearGenomeViewModel } from '../index.ts'
@@ -49,6 +50,35 @@ const TrackContainer = observer(function TrackContainer({
   const display = track.displays[0]
   const { draggingTrackId, showTrackOutlines } = model
   const ref = useRef<HTMLDivElement>(null)
+  const [contextCoord, setContextCoord] = useState<[number, number]>()
+
+  // while the menu is open, right-clicks land on the MUI modal backdrop rather
+  // than the track, so reposition from a global listener instead
+  useEffect(() => {
+    function globalContextMenu(event: MouseEvent) {
+      const el = ref.current
+      if (el) {
+        const rect = el.getBoundingClientRect()
+        if (
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom
+        ) {
+          event.preventDefault()
+          event.stopPropagation()
+          setContextCoord([event.clientX, event.clientY])
+        }
+      }
+    }
+    if (contextCoord) {
+      window.addEventListener('contextmenu', globalContextMenu, true)
+      return () => {
+        window.removeEventListener('contextmenu', globalContextMenu, true)
+      }
+    }
+    return () => {}
+  }, [contextCoord])
 
   return (
     <Paper
@@ -56,6 +86,10 @@ const TrackContainer = observer(function TrackContainer({
       className={cx(classes.root, track.pinned ? null : classes.unpinnedTrack)}
       variant={showTrackOutlines ? 'outlined' : undefined}
       elevation={showTrackOutlines ? undefined : 0}
+      onContextMenu={event => {
+        event.preventDefault()
+        setContextCoord([event.clientX, event.clientY])
+      }}
       onClick={event => {
         if (event.detail === 2 && !display.featureIdUnderMouse) {
           const left = ref.current?.getBoundingClientRect().left || 0
@@ -92,6 +126,24 @@ const TrackContainer = observer(function TrackContainer({
         onDrag={display.resizeHeight}
         className={classes.resizeHandle}
       />
+      {contextCoord ? (
+        <Menu
+          open
+          onMenuItemClick={(_: unknown, callback: () => void) => {
+            callback()
+            setContextCoord(undefined)
+          }}
+          onClose={() => {
+            setContextCoord(undefined)
+          }}
+          anchorReference="anchorPosition"
+          anchorPosition={{
+            top: contextCoord[1],
+            left: contextCoord[0],
+          }}
+          menuItems={getTrackMenuItems(track)}
+        />
+      ) : null}
     </Paper>
   )
 })

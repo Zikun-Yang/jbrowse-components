@@ -77,14 +77,7 @@ const LollipopRendering = observer(function LollipopRendering(
     const { onClick: handler } = props
     return handler?.(event)
   }
-  const {
-    regions,
-    bpPerPx,
-    config,
-    features = new Map(),
-    displayModel = {},
-  } = props
-  const { selectedFeatureId } = displayModel
+  const { regions, bpPerPx, config, features = new Map() } = props
   const region = regions[0]!
   const width = (region.end - region.start) / bpPerPx
 
@@ -127,7 +120,6 @@ const LollipopRendering = observer(function LollipopRendering(
               config={config}
               layoutRecord={layoutRecord}
               feature={feature}
-              selectedFeatureId={selectedFeatureId}
               onFeatureMouseDown={props.onFeatureMouseDown}
               onFeatureMouseEnter={props.onFeatureMouseEnter}
               onFeatureMouseOut={props.onFeatureMouseOut}

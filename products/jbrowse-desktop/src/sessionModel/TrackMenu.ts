@@ -1,6 +1,5 @@
 import { lazy } from 'react'
 
-import { Indexing } from '@jbrowse/core/ui/Icons'
 import { isSupportedIndexingAdapter } from '@jbrowse/core/util'
 import {
   getParent,
@@ -8,10 +7,14 @@ import {
   isStateTreeNode,
   types,
 } from '@jbrowse/mobx-state-tree'
-import DeleteIcon from '@mui/icons-material/Delete'
-import CopyIcon from '@mui/icons-material/FileCopy'
-import InfoIcon from '@mui/icons-material/Info'
-import SettingsIcon from '@mui/icons-material/Settings'
+
+import {
+  DeleteIcon,
+  FileCopyIcon as CopyIcon,
+  Indexing,
+  InfoIcon,
+  SettingsIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import type { DesktopRootModel } from '../rootModel/rootModel.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'

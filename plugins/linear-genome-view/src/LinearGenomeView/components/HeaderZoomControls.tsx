@@ -3,11 +3,14 @@ import { lazy, useEffect, useState } from 'react'
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import { getBpDisplayStr, getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import MoreVert from '@mui/icons-material/MoreVert'
-import ZoomIn from '@mui/icons-material/ZoomIn'
-import ZoomOut from '@mui/icons-material/ZoomOut'
 import { IconButton, Slider, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  MoreVertIcon as MoreVert,
+  ZoomInIcon as ZoomIn,
+  ZoomOutIcon as ZoomOut,
+} from '@jbrowse/core/ui/Icons'
 
 import type { LinearGenomeViewModel } from '../index.ts'
 import type { SliderValueLabelProps } from '@mui/material'

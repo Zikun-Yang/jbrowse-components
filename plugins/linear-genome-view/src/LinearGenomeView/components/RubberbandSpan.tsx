@@ -38,16 +38,12 @@ export default function RubberbandSpan({
   numOfBpSelected,
   left,
   width,
-  top = 0,
-  sticky = false,
 }: {
   leftBpOffset: Offset
   rightBpOffset: Offset
   numOfBpSelected?: number
   left: number
   width: number
-  top?: number
-  sticky?: boolean
 }) {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = useState<HTMLSpanElement | null>(null)
@@ -77,10 +73,6 @@ export default function RubberbandSpan({
             ref={setAnchorEl}
             variant="h6"
             className={classes.rubberbandText}
-            style={{
-              top,
-              position: sticky ? 'sticky' : undefined,
-            }}
           >
             {getBpDisplayStr(numOfBpSelected)}
           </Typography>

@@ -20,7 +20,6 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
   flatbush: ArrayBufferLike
   subfeatureInfos?: SubfeatureInfo[]
   subfeatureFlatbush?: ArrayBufferLike
-  onContextMenu?: (e: React.MouseEvent) => void
 }) {
   const {
     displayModel,
@@ -30,7 +29,6 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
     items,
     subfeatureFlatbush,
     subfeatureInfos = [],
-    onContextMenu,
   } = props
   const flatbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
   const subfeatureFlatbush2 = useMemo(
@@ -47,12 +45,7 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
     return map
   }, [items])
 
-  const {
-    selectedFeatureId,
-    featureIdUnderMouse,
-    subfeatureIdUnderMouse,
-    contextMenuFeature,
-  } = displayModel
+  const { featureIdUnderMouse, subfeatureIdUnderMouse } = displayModel
 
   const ref = useRef<HTMLDivElement>(null)
   const [mouseIsDown, setMouseIsDown] = useState(false)
@@ -110,17 +103,8 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
     [flatbush2, items, subfeatureFlatbush2, subfeatureInfos],
   )
 
-  // For selected features, check subfeatures first, then items
-  const selectedSubfeature = selectedFeatureId
-    ? subfeatureInfosById.get(selectedFeatureId)
-    : undefined
-  const selectedItem =
-    selectedFeatureId && !selectedSubfeature
-      ? itemsById.get(selectedFeatureId)
-      : undefined
-
   // For highlighted features, use subfeature bounds if available
-  const highlightedFeature = featureIdUnderMouse || contextMenuFeature?.id()
+  const highlightedFeature = featureIdUnderMouse
   const highlightedSubfeature = subfeatureIdUnderMouse
     ? subfeatureInfosById.get(subfeatureIdUnderMouse)
     : undefined
@@ -149,11 +133,6 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
     }
   }
 
-  const selected = selectedSubfeature
-    ? boundsToRect(selectedSubfeature)
-    : selectedItem
-      ? boundsToRect(selectedItem)
-      : undefined
   const highlight = highlightedSubfeature
     ? boundsToRect(highlightedSubfeature, 0)
     : highlightedItem
@@ -255,35 +234,6 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
           }
         }
       }}
-      onContextMenu={event => {
-        if (ref.current) {
-          const rect = ref.current.getBoundingClientRect()
-          const scrollT = ref.current.scrollTop
-          const offsetX = event.clientX - rect.left
-          const offsetY = event.clientY - rect.top + scrollT
-
-          const { item, featureId, parentFeatureId } = getFeatureAtPosition(
-            offsetX,
-            offsetY,
-          )
-          if (item) {
-            displayModel
-              .setContextMenuFeatureById(
-                featureId,
-                parentFeatureId,
-                item.featureId,
-              )
-              .catch((e: unknown) => {
-                console.error(e)
-                getSession(displayModel).notifyError(`${e}`, e)
-              })
-          } else {
-            onContextMenu?.(event)
-          }
-        } else {
-          onContextMenu?.(event)
-        }
-      }}
     >
       <PrerenderedCanvas
         {...props}
@@ -297,17 +247,6 @@ const CanvasFeatureRendering = observer(function CanvasFeatureRendering(props: {
             pointerEvents: 'none',
             zIndex: 10,
             ...highlight,
-          }}
-        />
-      ) : null}
-      {selected ? (
-        <div
-          style={{
-            position: 'absolute',
-            border: '2px solid #00b8ff',
-            boxSizing: 'content-box',
-            pointerEvents: 'none',
-            ...selected,
           }}
         />
       ) : null}

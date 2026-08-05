@@ -3,7 +3,6 @@ import { lazy } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
 import { BaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
-import { VIEW_HEADER_HEIGHT } from '@jbrowse/core/ui'
 import {
   assembleLocString,
   clamp,
@@ -13,7 +12,6 @@ import {
   isSessionModelWithWidgets,
   localStorageGetBoolean,
   localStorageGetItem,
-  measureText,
   springAnimate,
   sum,
 } from '@jbrowse/core/util'
@@ -29,7 +27,6 @@ import {
 } from '@jbrowse/core/util/tracks'
 import { ElementId } from '@jbrowse/core/util/types/mst'
 import { cast, getParent, getSnapshot, types } from '@jbrowse/mobx-state-tree'
-import { isSessionWithMultipleViews } from '@jbrowse/product-core'
 import { when } from 'mobx'
 
 import { handleSelectedRegion } from '../searchUtils.ts'
@@ -365,42 +362,10 @@ export function stateModelFactory(pluginManager: PluginManager) {
       /**
        * #getter
        * checking if lgv is a 'top-level' view is used for toggling pin track
-       * capability, sticky positioning
+       * capability
        */
       get isTopLevelView() {
         return getSession(self).views.some(r => r.id === self.id)
-      },
-      /**
-       * #getter
-       * only uses sticky view headers when it is a 'top-level' view and
-       * session allows it
-       */
-      get stickyViewHeaders() {
-        const session = getSession(self)
-        return isSessionWithMultipleViews(session)
-          ? this.isTopLevelView && session.stickyViewHeaders
-          : false
-      },
-
-      /**
-       * #getter
-       */
-      get rubberbandTop() {
-        let pinnedTracksTop = 0
-        if (this.stickyViewHeaders) {
-          pinnedTracksTop = VIEW_HEADER_HEIGHT
-          if (!self.hideHeader) {
-            pinnedTracksTop += HEADER_BAR_HEIGHT
-            if (!self.hideHeaderOverview) {
-              pinnedTracksTop += HEADER_OVERVIEW_HEIGHT
-            }
-          }
-        }
-        return pinnedTracksTop
-      },
-
-      get pinnedTracksTop() {
-        return this.rubberbandTop + SCALE_BAR_HEIGHT
       },
     }))
     .views(self => ({
@@ -1315,7 +1280,7 @@ export function stateModelFactory(pluginManager: PluginManager) {
        * #getter
        */
       get canShowCytobands() {
-        return self.displayedRegions.length === 1 && this.anyCytobandsExist
+        return this.anyCytobandsExist
       },
       /**
        * #getter
@@ -1331,16 +1296,6 @@ export function stateModelFactory(pluginManager: PluginManager) {
         return self.assemblyNames.some(
           a => assemblyManager.get(a)?.cytobands?.length,
         )
-      },
-      /**
-       * #getter
-       * the cytoband is displayed to the right of the chromosome name, and
-       * that offset is calculated manually with this method
-       */
-      get cytobandOffset() {
-        return this.showCytobands
-          ? measureText(self.displayedRegions[0]?.refName || '', 12) + 15
-          : 0
       },
     }))
     .views(self => ({

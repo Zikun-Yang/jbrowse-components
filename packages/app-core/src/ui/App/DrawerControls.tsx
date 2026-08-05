@@ -1,10 +1,9 @@
 import { useState } from 'react'
 
-import CloseIcon from '@mui/icons-material/Close'
-import MinimizeIcon from '@mui/icons-material/Minimize'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { CloseIcon, MinimizeIcon, MoreVertIcon } from '@jbrowse/core/ui/Icons'
 
 import type { SessionWithFocusedViewAndDrawerWidgets } from '@jbrowse/core/util/types'
 

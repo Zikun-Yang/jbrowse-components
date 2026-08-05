@@ -1,6 +1,11 @@
 import { fireEvent } from '@testing-library/react'
 
-import { createView, expectCanvasMatch, hts } from './util.tsx'
+import {
+  createView,
+  expectCanvasMatch,
+  hts,
+  openTrackMenu,
+} from './util.tsx'
 
 export async function testMultiVariantDisplay({
   displayType,
@@ -23,12 +28,12 @@ export async function testMultiVariantDisplay({
   await view.navToLocString('ctgA')
   fireEvent.click(await findByTestId(hts('volvox_test_vcf'), ...opts))
 
-  fireEvent.click(await findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu({ findAllByTestId }, 'volvox_test_vcf')
   fireEvent.click(await findByText('Display types', ...opts))
   fireEvent.click(await findByText(displayText, ...opts))
 
   if (phasedMode) {
-    fireEvent.click(await findByTestId('track_menu_icon', ...opts))
+    await openTrackMenu({ findAllByTestId }, 'volvox_test_vcf')
     fireEvent.click(await findByText('Rendering mode', ...opts))
     fireEvent.click(await findByText(/^Phased/, ...opts))
   }

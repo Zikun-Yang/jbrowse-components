@@ -3,9 +3,12 @@ import { lazy } from 'react'
 import { getConf } from '@jbrowse/core/configuration'
 import { getContainingView, getSession } from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
-import EqualizerIcon from '@mui/icons-material/Equalizer'
-import PaletteIcon from '@mui/icons-material/Palette'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+
+import {
+  EqualizerIcon,
+  PaletteIcon,
+  VisibilityIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import SharedWiggleMixin from '../shared/SharedWiggleMixin.ts'
 import axisPropsFromTickScale from '../shared/axisPropsFromTickScale.ts'

@@ -6,6 +6,7 @@ import {
   doBeforeEach,
   expectCanvasMatch,
   hts,
+  openTrackMenu,
   pc,
   setup,
 } from './util.tsx'
@@ -27,7 +28,7 @@ test('opens the track menu and enables soft clipping', async () => {
   await user.click(
     await screen.findByTestId(hts('volvox-long-reads-sv-bam'), ...opts),
   )
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
   await user.click(await screen.findByText('Pileup settings'))
   await user.click(await screen.findByText('Show...'))
   await user.click(await screen.findByText('Show soft clipping'))

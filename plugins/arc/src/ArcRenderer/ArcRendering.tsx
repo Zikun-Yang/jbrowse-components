@@ -52,7 +52,6 @@ function getBezierPath(
 }
 
 function ArcFeature({
-  selectedFeatureId,
   region,
   bpPerPx,
   config,
@@ -61,7 +60,6 @@ function ArcFeature({
   semicircle,
   onFeatureClick,
 }: {
-  selectedFeatureId?: string
   region: Region
   config: AnyConfigurationModel
   bpPerPx: number
@@ -79,9 +77,7 @@ function ArcFeature({
   )
 
   const featureId = feature.id()
-  const selected = selectedFeatureId === featureId
-  const stroke = selected ? 'red' : readConfObject(config, 'color', { feature })
-  const textStroke = selected ? 'red' : 'black'
+  const stroke = readConfObject(config, 'color', { feature })
   const label = readConfObject(config, 'label', { feature })
   const caption = readConfObject(config, 'caption', { feature })
   const strokeWidth = readConfObject(config, 'thickness', { feature }) || 2
@@ -119,7 +115,7 @@ function ArcFeature({
       <text x={centerX} y={textYCoord + 3} stroke="white" strokeWidth="0.6em">
         {label}
       </text>
-      <text x={centerX} y={textYCoord + 3} stroke={textStroke}>
+      <text x={centerX} y={textYCoord + 3} stroke="black">
         {label}
       </text>
     </g>
@@ -134,7 +130,6 @@ const ArcRendering = observer(function ArcRendering({
   height,
   displayMode,
   exportSVG,
-  displayModel,
   onFeatureClick,
 }: {
   features: Map<string, Feature>
@@ -143,7 +138,6 @@ const ArcRendering = observer(function ArcRendering({
   bpPerPx: number
   height: number
   displayMode?: string
-  displayModel?: { selectedFeatureId: string }
   onFeatureClick: (event: React.MouseEvent, featureId: string) => void
   exportSVG: boolean
 }) {
@@ -151,7 +145,6 @@ const ArcRendering = observer(function ArcRendering({
   const width = (region.end - region.start) / bpPerPx
   const semicircle =
     (displayMode ?? readConfObject(config, 'displayMode')) === 'semicircles'
-  const { selectedFeatureId } = displayModel || {}
 
   const children = [...features.values()].map(f => (
     <ArcFeature
@@ -160,7 +153,6 @@ const ArcRendering = observer(function ArcRendering({
       config={config}
       region={region}
       bpPerPx={bpPerPx}
-      selectedFeatureId={selectedFeatureId}
       onFeatureClick={onFeatureClick}
       feature={f}
       semicircle={semicircle}

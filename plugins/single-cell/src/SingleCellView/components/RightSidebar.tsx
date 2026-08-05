@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { observer } from 'mobx-react'
+
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
   Box,
@@ -13,14 +13,14 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import ClearIcon from '@mui/icons-material/Clear'
-import SearchIcon from '@mui/icons-material/Search'
+import { observer } from 'mobx-react'
 
-import FeatureRow from './FeatureRow.tsx'
-import CreateGeneSetDialog from './CreateGeneSetDialog.tsx'
-import AddGeneSetDialog from './AddGeneSetDialog.tsx'
+import { AddIcon, ClearIcon, SearchIcon } from '@jbrowse/core/ui/Icons'
+
 import AddExistingIcon from './AddExistingIcon.tsx'
+import AddGeneSetDialog from './AddGeneSetDialog.tsx'
+import CreateGeneSetDialog from './CreateGeneSetDialog.tsx'
+import FeatureRow from './FeatureRow.tsx'
 
 import type { SingleCellViewModel } from '../model.ts'
 

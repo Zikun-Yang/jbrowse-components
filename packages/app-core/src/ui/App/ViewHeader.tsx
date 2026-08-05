@@ -3,9 +3,9 @@ import { useEffect, useRef } from 'react'
 import { VIEW_HEADER_HEIGHT } from '@jbrowse/core/ui'
 import { getSession } from '@jbrowse/core/util'
 import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
-import { isSessionWithMultipleViews } from '@jbrowse/product-core'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import { observer } from 'mobx-react'
+
+import { KeyboardArrowRightIcon } from '@jbrowse/core/ui/Icons'
 
 import { useDockview } from './DockviewContext.tsx'
 import ViewButtons from './ViewButtons.tsx'
@@ -44,7 +44,10 @@ function directionToPosition(
   return 'right'
 }
 
-function findPanelIdAtPoint(clientX: number, clientY: number): string | undefined {
+function findPanelIdAtPoint(
+  clientX: number,
+  clientY: number,
+): string | undefined {
   const elements = document.elementsFromPoint(clientX, clientY)
   for (const element of elements) {
     const wrapper = element.closest('[data-panel-id]')
@@ -98,10 +101,6 @@ const ViewHeader = observer(function ViewHeader({
   const scrollRef = useRef<HTMLDivElement>(null)
   const session = getSession(view)
   const { api } = useDockview()
-  let stickyViewHeaders = false
-  if (isSessionWithMultipleViews(session)) {
-    ;({ stickyViewHeaders } = session)
-  }
 
   // scroll the view into view when first mounted. note: this effect will run
   // only once, because of the empty array second param
@@ -168,7 +167,9 @@ const ViewHeader = observer(function ViewHeader({
         return
       }
 
-      const wrapper = document.querySelector(`[data-panel-id="${targetPanelId}"]`)
+      const wrapper = document.querySelector(
+        `[data-panel-id="${targetPanelId}"]`,
+      )
       if (!(wrapper instanceof HTMLElement)) {
         return
       }
@@ -190,7 +191,6 @@ const ViewHeader = observer(function ViewHeader({
         panelId && classes.viewHeaderDraggable,
         className,
       )}
-      style={{ position: stickyViewHeaders ? 'sticky' : undefined }}
       onPointerDown={handlePointerDown}
     >
       <ViewMenu model={view} IconProps={{ className: classes.icon }} />

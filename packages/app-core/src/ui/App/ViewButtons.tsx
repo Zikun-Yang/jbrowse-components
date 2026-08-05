@@ -1,9 +1,8 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AddIcon from '@mui/icons-material/Add'
-import CloseIcon from '@mui/icons-material/Close'
-import MinimizeIcon from '@mui/icons-material/Minimize'
 import { IconButton } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { AddIcon, CloseIcon, MinimizeIcon } from '@jbrowse/core/ui/Icons'
 
 import type { IBaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
 

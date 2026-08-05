@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JBrowse 2 — UI Redesign Prototype</title>
+  <style>
+    /* =========================================================
+       DESIGN TOKENS
+       ========================================================= */
+    :root {
+      --canvas: #f7f7f6;
+      --canvas-warm: #f7f7f6;
+      --sidebar-bg: #f1f1f0;
+      --surface: #ffffff;
+      --surface-hover: #eaeae9;
+      --border: #e5e5e5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-tertiary: #9a9a99;
+      --accent-primary: #0a7a62;
+      --accent-primary-hover: #085e4b;
+
+      --accent-blue-bg: #e1f3fe;
+      --accent-blue-text: #1f6c9f;
+      --accent-red-bg: #fdebec;
+      --accent-red-text: #9f2f2d;
+      --accent-green-bg: #edf3ec;
+      --accent-green-text: #346538;
+      --accent-yellow-bg: #fbf3db;
+      --accent-yellow-text: #956400;
+      --accent-purple-bg: #f3eefc;
+      --accent-purple-text: #5e3a8c;
+
+      --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Helvetica Neue", sans-serif;
+      --font-editorial: "Lyon Text", "Newsreader", "Playfair Display", Georgia, serif;
+      --font-mono: "Geist Mono", "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --transition-fast: 150ms ease;
+      --transition-medium: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--canvas-warm);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* =========================================================
+       APP SHELL
+       ========================================================= */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ---------------- App Bar ---------------- */
+    .app-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      padding: 0 16px;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .app-bar-left {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .logo-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--text-primary);
+      display: grid;
+      place-items: center;
+    }
+
+    .logo-mark svg { width: 14px; height: 14px; }
+
+    .omnibox {
+      position: relative;
+      width: 420px;
+      max-width: 50vw;
+    }
+
+    .omnibox--top {
+      flex-shrink: 0;
+    }
+
+    .omnibox input {
+      width: 100%;
+      height: 34px;
+      padding: 0 36px 0 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--text-primary);
+      outline: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .omnibox input::placeholder { color: var(--text-tertiary); }
+    .omnibox input:hover { background: var(--canvas); }
+    .omnibox input:focus {
+      background: var(--canvas);
+      border-color: var(--text-tertiary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .omnibox-kbd {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-tertiary);
+      padding: 2px 5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--canvas);
+      pointer-events: none;
+    }
+
+    .app-bar-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .icon-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn svg { width: 18px; height: 18px; }
+
+    .primary-btn {
+      height: 30px;
+      padding: 0 14px;
+      background: var(--accent-primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      transition: background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .primary-btn:hover { background: var(--accent-primary-hover); }
+    .primary-btn:active { transform: scale(0.98); }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+
+    /* =========================================================
+       WORKSPACE
+       ========================================================= */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ---------------- Sidebar ---------------- */
+    .sidebar {
+      width: 44px;
+      flex-shrink: 0;
+      position: relative;
+      background: transparent;
+    }
+
+    .sidebar-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 44px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      gap: 4px;
+      overflow: hidden;
+      z-index: 50;
+      transition: width var(--transition-medium), box-shadow var(--transition-medium);
+    }
+
+    .sidebar:hover .sidebar-inner,
+    .sidebar-inner:hover {
+      width: 180px;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 32px;
+      padding: 0 11px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .sidebar-logo-text {
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar:hover .sidebar-logo-text,
+    .sidebar-inner:hover .sidebar-logo-text {
+      opacity: 1;
+    }
+
+    .sidebar-logo-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: var(--text-primary);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-mark svg { width: 14px; height: 14px; }
+
+    .sidebar-btn {
+      width: 32px;
+      height: 32px;
+      margin: 4px 6px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      position: relative;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .sidebar:hover .sidebar-btn,
+    .sidebar-inner:hover .sidebar-btn {
+      width: calc(100% - 12px);
+      justify-content: flex-start;
+      padding-left: 9px;
+    }
+
+    .sidebar-btn:hover {
+      background: #ffffff;
+      color: var(--text-primary);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar-btn.active {
+      background: #ffffff;
+      color: var(--accent-primary);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar:hover .sidebar-btn.active,
+    .sidebar-inner:hover .sidebar-btn.active {
+      padding-left: 15px;
+    }
+
+    .sidebar:hover .sidebar-btn.active::before,
+    .sidebar-inner:hover .sidebar-btn.active::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+    }
+
+    .sidebar-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .sidebar-label {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar:hover .sidebar-label,
+    .sidebar-inner:hover .sidebar-label {
+      opacity: 1;
+    }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-footer {
+      padding: 0 6px;
+      margin-top: 8px;
+      white-space: nowrap;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-user-text {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .sidebar:hover .sidebar-user-text,
+    .sidebar-inner:hover .sidebar-user-text {
+      opacity: 1;
+    }
+
+    .sidebar-user-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .sidebar-user-role {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    /* ---------------- View Area ---------------- */
+    .view-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--canvas-warm);
+      position: relative;
+    }
+
+    .view-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 16px 0;
+      background: var(--canvas-warm);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .view-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .view-tab:hover { background: var(--surface-hover); color: var(--text-primary); }
+    .view-tab.active {
+      color: var(--text-primary);
+      background: var(--canvas);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .view-tab svg { width: 14px; height: 14px; }
+
+    .view-tab-add {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      margin-left: 4px;
+    }
+
+    .view-tab-add:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+    /* ---------------- Recents Dashboard ---------------- */
+    .recents-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+      background: var(--canvas-warm);
+    }
+
+    .recents-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+
+    .recents-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .workspace-card {
+      width: 240px;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .workspace-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .workspace-card.new {
+      border-style: dashed;
+      background: transparent;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-secondary);
+    }
+
+    .workspace-card.new:hover {
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+
+    .workspace-card-thumb {
+      flex: 1;
+      background: var(--canvas-warm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workspace-card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .workspace-card-thumb-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .workspace-card-info {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .workspace-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .workspace-card-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .workspace-card-add-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px dashed var(--border);
+      display: grid;
+      place-items: center;
+    }
+
+    .workspace-card-add-icon svg { width: 16px; height: 16px; }
+
+    .workspace-card-add-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .workspace-card-add-desc {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .hidden { display: none !important; }
+
+    /* ---------------- LGV ---------------- */
+    .lgv {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--canvas);
+      margin: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .lgv-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--canvas);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .lgv-header .omnibox { width: 320px; }
+
+    .region-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .region-meta span { cursor: default; }
+    .region-meta .value { color: var(--text-primary); }
+
+    .scalebar {
+      height: 34px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, var(--canvas) 0%, var(--surface) 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    .scalebar-ticks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .tick {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .tick-label {
+      position: absolute;
+      top: 4px;
+      transform: translateX(-50%);
+    }
+
+    .tick.major { background: var(--text-tertiary); }
+
+    .tracks {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .track {
+      display: flex;
+      min-height: 64px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      transition: background var(--transition-fast);
+    }
+
+    .track:hover { background: rgba(0,0,0,0.01); }
+
+    .track-label-strip {
+      width: 44px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 6px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    .track-grip {
+      width: 16px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--text-tertiary);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .track:hover .track-grip { opacity: 1; }
+    .track-grip svg { width: 12px; height: 12px; }
+
+    .track-menu {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      opacity: 0;
+      transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .track:hover .track-menu { opacity: 1; }
+    .track-menu:hover { background: var(--surface-hover); color: var(--text-primary); }
+    .track-menu svg { width: 14px; height: 14px; }
+
+    .track-body {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .track-name {
+      position: absolute;
+      left: 10px;
+      top: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      z-index: 2;
+      pointer-events: none;
+      letter-spacing: 0.01em;
+    }
+
+    /* ---------------- Track: Genes ---------------- */
+    .genes-track { min-height: 90px; }
+
+    .gene {
+      position: absolute;
+      height: 18px;
+      background: var(--accent-blue-bg);
+      border: 1px solid rgba(31, 108, 159, 0.18);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--accent-blue-text);
+      font-family: var(--font-mono);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .gene::after {
+      content: "";
+      position: absolute;
+      right: 2px;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 5px solid var(--accent-blue-text);
+    }
+
+    .gene.rev::after {
+      right: auto;
+      left: 2px;
+      border-left: none;
+      border-right: 5px solid var(--accent-blue-text);
+    }
+
+    /* ---------------- Track: Variants ---------------- */
+    .variant {
+      position: absolute;
+      width: 2px;
+      top: 24px;
+      bottom: 24px;
+      background: var(--accent-red-text);
+      border-radius: 1px;
+    }
+
+    .variant::before {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-red-bg);
+      border: 1.5px solid var(--accent-red-text);
+    }
+
+    /* ---------------- Track: Signal/Wiggle ---------------- */
+    .signal-canvas {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, var(--accent-green-bg) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0,60 Q60,20 120,45 T240,35 T360,55 T480,25 T600,40 T720,30 T840,50 T960,20 T1080,35 T1200,45 V80 H0 Z' fill='%23EDF3EC'/%3E%3C/svg%3E");
+      background-size: 100% 100%, cover;
+      opacity: 0.9;
+    }
+
+    /* ---------------- Track: Alignments ---------------- */
+    .read {
+      position: absolute;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--accent-purple-bg);
+      border: 1px solid rgba(94, 58, 140, 0.18);
+    }
+
+    .read.mate {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--accent-purple-bg),
+        var(--accent-purple-bg) 3px,
+        rgba(94, 58, 140, 0.12) 3px,
+        rgba(94, 58, 140, 0.12) 6px
+      );
+    }
+
+    /* ---------------- Drawer ---------------- */
+    .drawer {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--canvas);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .drawer-search {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-search input {
+      width: 100%;
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .drawer-search input::placeholder { color: var(--text-tertiary); }
+
+    .drawer-section {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .track-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: var(--radius-md);
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .track-chip:hover { background: var(--surface-hover); }
+
+    .track-chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .track-chip-name {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    .track-chip-type {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    /* =========================================================
+       COMMAND PALETTE
+       ========================================================= */
+    .command-palette-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-medium);
+    }
+
+    .command-palette-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .command-palette {
+      position: fixed;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-12px);
+      width: 560px;
+      max-width: 90vw;
+      background: var(--canvas);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+      z-index: 101;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-medium), transform var(--transition-medium);
+      overflow: hidden;
+    }
+
+    .command-palette.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .command-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .command-input-wrap svg { color: var(--text-tertiary); }
+
+    .command-input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: var(--font-ui);
+      font-size: 15px;
+      color: var(--text-primary);
+      background: transparent;
+    }
+
+    .command-input-wrap input::placeholder { color: var(--text-tertiary); }
+
+    .command-section {
+      padding: 8px 0;
+    }
+
+    .command-section-title {
+      padding: 6px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .command-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .command-item:hover,
+    .command-item.selected {
+      background: var(--surface-hover);
+    }
+
+    .command-item svg { color: var(--text-secondary); }
+    .command-item-title { flex: 1; font-size: 13px; }
+    .command-item-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    /* =========================================================
+       BADGES & HELPERS
+       ========================================================= */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-blue { background: var(--accent-blue-bg); color: var(--accent-blue-text); }
+    .badge-red { background: var(--accent-red-bg); color: var(--accent-red-text); }
+    .badge-green { background: var(--accent-green-bg); color: var(--accent-green-text); }
+    .badge-yellow { background: var(--accent-yellow-bg); color: var(--accent-yellow-text); }
+
+    .hint {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 12px;
+      background: var(--text-primary);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-size: 11px;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .hint kbd {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.2);
+      color: #fff;
+      margin: 0 2px;
+    }
+
+    kbd {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 4px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <!-- APP BAR -->
+    <header class="app-bar">
+      <div class="app-bar-left"></div>
+
+      <div class="omnibox omnibox--top">
+        <input type="text" placeholder="Go to chr1:1-1000 or search tracks..." id="omnibox"/>
+        <span class="omnibox-kbd">⌘K</span>
+      </div>
+
+      <div class="app-bar-right">
+        <button class="icon-btn" title="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="icon-btn" title="Help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+        <button class="primary-btn">Export</button>
+        <div class="avatar">ZY</div>
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+      <!-- SIDEBAR -->
+      <nav class="sidebar">
+        <div class="sidebar-inner">
+          <div class="sidebar-logo">
+            <div class="sidebar-logo-mark">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h10M4 18h16"/>
+              </svg>
+            </div>
+            <span class="sidebar-logo-text">JBrowse</span>
+          </div>
+
+          <button class="sidebar-btn" id="recentsBtn" title="Recents">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="sidebar-label">Recents</span>
+          </button>
+
+          <button class="sidebar-btn active" id="workspaceBtn" title="Workspace">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span class="sidebar-label">Workspace</span>
+          </button>
+
+          <div class="sidebar-spacer"></div>
+
+          <button class="sidebar-btn" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span class="sidebar-label">Settings</span>
+          </button>
+
+          <button class="sidebar-btn" title="Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span class="sidebar-label">Help</span>
+          </button>
+
+          <div class="sidebar-footer">
+            <div class="sidebar-user">
+              <div class="avatar">ZY</div>
+              <div class="sidebar-user-text">
+                <div class="sidebar-user-name">Zikun Yang</div>
+                <div class="sidebar-user-role">Researcher</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- VIEW AREA -->
+      <main class="view-area">
+        <div class="view-tabs" id="workspaceTabs">
+          <button class="view-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+              <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+            </svg>
+            Linear Genome View
+          </button>
+          <button class="view-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+            </svg>
+            Circular View
+          </button>
+          <button class="view-tab-add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="lgv" id="workspaceView">
+          <div class="lgv-header">
+            <div class="omnibox">
+              <input type="text" value="chr1:50,000,000-50,010,000"/>
+              <span class="omnibox-kbd">⌘L</span>
+            </div>
+            <div class="region-meta">
+              <span>Width <span class="value">10 kb</span></span>
+              <span>Assembly <span class="value">GRCh38</span></span>
+              <span>Region <span class="value">chr1</span></span>
+            </div>
+          </div>
+
+          <div class="scalebar">
+            <div class="scalebar-ticks">
+              <div class="tick major" style="left: 0%"><span class="tick-label">50,000,000</span></div>
+              <div class="tick" style="left: 20%"><span class="tick-label">50,002,000</span></div>
+              <div class="tick" style="left: 40%"><span class="tick-label">50,004,000</span></div>
+              <div class="tick" style="left: 60%"><span class="tick-label">50,006,000</span></div>
+              <div class="tick" style="left: 80%"><span class="tick-label">50,008,000</span></div>
+              <div class="tick major" style="left: 100%"><span class="tick-label">50,010,000</span></div>
+            </div>
+          </div>
+
+          <div class="tracks">
+            <!-- Genes -->
+            <div class="track genes-track">
+              <div class="track-label-strip">
+                <div class="track-grip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                </div>
+                <div class="track-menu">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+              <div class="track-body">
+                <div class="track-name">Gencode v42 genes</div>
+                <div class="gene" style="left: 8%; width: 18%; top: 42px;">BRCA2</div>
+                <div class="gene rev" style="left: 32%; width: 12%; top: 62px;">NBR2</div>
+                <div class="gene" style="left: 55%; width: 22%; top: 42px;">RAD51</div>
+                <div class="gene rev" style="left: 76%; width: 10%; top: 62px;">BRCC3</div>
+              </div>
+            </div>
+
+            <!-- Variants -->
+            <div class="track" style="min-height: 72px;">
+              <div class="track-label-strip">
+                <div class="track-grip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                </div>
+                <div class="track-menu">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+              <div class="track-body">
+                <div class="track-name">ClinVar variants</div>
+                <div class="variant" style="left: 14%"></div>
+                <div class="variant" style="left: 28%"></div>
+                <div class="variant" style="left: 47%"></div>
+                <div class="variant" style="left: 63%"></div>
+                <div class="variant" style="left: 81%"></div>
+              </div>
+            </div>
+
+            <!-- Signal -->
+            <div class="track" style="min-height: 110px;">
+              <div class="track-label-strip">
+                <div class="track-grip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                </div>
+                <div class="track-menu">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+              <div class="track-body">
+                <div class="track-name">ATAC-seq signal</div>
+                <div class="signal-canvas"></div>
+              </div>
+            </div>
+
+            <!-- Alignments -->
+            <div class="track" style="min-height: 140px;">
+              <div class="track-label-strip">
+                <div class="track-grip">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                </div>
+                <div class="track-menu">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                </div>
+              </div>
+              <div class="track-body">
+                <div class="track-name">PacBio alignments</div>
+                <div class="read" style="left: 5%; width: 18%; top: 34px;"></div>
+                <div class="read mate" style="left: 22%; width: 14%; top: 48px;"></div>
+                <div class="read" style="left: 36%; width: 22%; top: 62px;"></div>
+                <div class="read" style="left: 58%; width: 12%; top: 76px;"></div>
+                <div class="read mate" style="left: 70%; width: 20%; top: 90px;"></div>
+                <div class="read" style="left: 12%; width: 16%; top: 104px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">
+            Press <kbd>⌘K</kbd> for commands · <kbd>⌘L</kbd> to jump · scroll to zoom
+          </div>
+        </div>
+
+        <!-- RECENTS DASHBOARD -->
+        <div class="recents-view hidden" id="recentsView">
+          <div class="recents-title">Recents</div>
+          <div class="recents-grid">
+            <div class="workspace-card new">
+              <div class="workspace-card-add-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              </div>
+              <div class="workspace-card-add-label">New Workspace</div>
+              <div class="workspace-card-add-desc">Start from scratch</div>
+            </div>
+
+            <div class="workspace-card new">
+              <div class="workspace-card-add-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+                </svg>
+              </div>
+              <div class="workspace-card-add-label">From Template</div>
+              <div class="workspace-card-add-desc">Use a preset layout</div>
+            </div>
+
+            <div class="workspace-card">
+              <div class="workspace-card-thumb">
+                <div class="workspace-card-thumb-placeholder">workspace screenshot</div>
+              </div>
+              <div class="workspace-card-info">
+                <div class="workspace-card-name">BRCA2 Variant Analysis</div>
+                <div class="workspace-card-desc">ClinVar + gnomAD + PacBio alignments around chr13:32,300,000-32,400,000.</div>
+              </div>
+            </div>
+
+            <div class="workspace-card">
+              <div class="workspace-card-thumb">
+                <div class="workspace-card-thumb-placeholder">workspace screenshot</div>
+              </div>
+              <div class="workspace-card-info">
+                <div class="workspace-card-name">ATAC-seq Comparison</div>
+                <div class="workspace-card-desc">Signal tracks for HeLa, K562, and GM12878 cell lines.</div>
+              </div>
+            </div>
+
+            <div class="workspace-card">
+              <div class="workspace-card-thumb">
+                <div class="workspace-card-thumb-placeholder">workspace screenshot</div>
+              </div>
+              <div class="workspace-card-info">
+                <div class="workspace-card-name">SARS-CoV-2 Genomes</div>
+                <div class="workspace-card-desc">Multiple alignment view of spike protein region across variants.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- DRAWER -->
+      <aside class="drawer">
+        <div class="drawer-header">
+          <span class="drawer-title">Tracks</span>
+          <button class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="drawer-search">
+          <input type="text" placeholder="Filter tracks..."/>
+        </div>
+
+        <div class="drawer-section">
+          <div class="section-header">
+            Active
+            <span class="badge badge-blue">4</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--accent-blue-text)"></div>
+            <span class="track-chip-name">Gencode v42 genes</span>
+            <span class="track-chip-type badge badge-blue">Gene</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--accent-red-text)"></div>
+            <span class="track-chip-name">ClinVar variants</span>
+            <span class="track-chip-type badge badge-red">VCF</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--accent-green-text)"></div>
+            <span class="track-chip-name">ATAC-seq signal</span>
+            <span class="track-chip-type badge badge-green">Wig</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--accent-purple-text)"></div>
+            <span class="track-chip-name">PacBio alignments</span>
+            <span class="track-chip-type badge badge-purple" style="background: var(--accent-purple-bg); color: var(--accent-purple-text)">BAM</span>
+          </div>
+        </div>
+
+        <div class="drawer-section">
+          <div class="section-header">
+            Available
+            <span class="badge badge-yellow">12</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--text-tertiary)"></div>
+            <span class="track-chip-name">RepeatMasker</span>
+            <span class="track-chip-type badge badge-yellow">BED</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--text-tertiary)"></div>
+            <span class="track-chip-name">CpG islands</span>
+            <span class="track-chip-type badge badge-yellow">BED</span>
+          </div>
+          <div class="track-chip">
+            <div class="track-chip-dot" style="background: var(--text-tertiary)"></div>
+            <span class="track-chip-name">gnomAD SV</span>
+            <span class="track-chip-type badge badge-red">VCF</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- COMMAND PALETTE -->
+  <div class="command-palette-overlay" id="paletteOverlay"></div>
+  <div class="command-palette" id="commandPalette">
+    <div class="command-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search commands, tracks, or locations..." id="commandInput"/>
+    </div>
+    <div class="command-section">
+      <div class="command-section-title">Navigation</div>
+      <div class="command-item selected">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        <span class="command-item-title">Go to location...</span>
+        <span class="command-item-meta">⌘L</span>
+      </div>
+      <div class="command-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+        <span class="command-item-title">Zoom to region</span>
+        <span class="command-item-meta">Z</span>
+      </div>
+    </div>
+    <div class="command-section">
+      <div class="command-section-title">Tracks</div>
+      <div class="command-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="command-item-title">Add track...</span>
+        <span class="command-item-meta">⌘T</span>
+      </div>
+      <div class="command-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="command-item-title">Open track selector</span>
+        <span class="command-item-meta">⌘⇧T</span>
+      </div>
+    </div>
+    <div class="command-section">
+      <div class="command-section-title">Session</div>
+      <div class="command-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="command-item-title">Save session</span>
+        <span class="command-item-meta">⌘S</span>
+      </div>
+      <div class="command-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span class="command-item-title">Share view</span>
+        <span class="command-item-meta">⌘⇧S</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('paletteOverlay');
+    const palette = document.getElementById('commandPalette');
+    const omnibox = document.getElementById('omnibox');
+
+    function openPalette() {
+      overlay.classList.add('open');
+      palette.classList.add('open');
+      document.getElementById('commandInput').focus();
+    }
+
+    function closePalette() {
+      overlay.classList.remove('open');
+      palette.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openPalette();
+      }
+      if (e.key === 'Escape') {
+        closePalette();
+      }
+    });
+
+    overlay.addEventListener('click', closePalette);
+    omnibox.addEventListener('focus', () => {
+      // In a real app this would focus the location input
+    });
+
+    // Simple command item hover selection
+    const items = document.querySelectorAll('.command-item');
+    items.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        items.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+      });
+    });
+
+    // Sidebar navigation: Recents dashboard <-> Workspace genome view
+    const recentsBtn = document.getElementById('recentsBtn');
+    const workspaceBtn = document.getElementById('workspaceBtn');
+    const workspaceTabs = document.getElementById('workspaceTabs');
+    const workspaceView = document.getElementById('workspaceView');
+    const recentsView = document.getElementById('recentsView');
+
+    function showRecents() {
+      workspaceTabs.classList.add('hidden');
+      workspaceView.classList.add('hidden');
+      recentsView.classList.remove('hidden');
+      recentsBtn.classList.add('active');
+      workspaceBtn.classList.remove('active');
+    }
+
+    function showWorkspace() {
+      workspaceTabs.classList.remove('hidden');
+      workspaceView.classList.remove('hidden');
+      recentsView.classList.add('hidden');
+      workspaceBtn.classList.add('active');
+      recentsBtn.classList.remove('active');
+    }
+
+    recentsBtn.addEventListener('click', showRecents);
+    workspaceBtn.addEventListener('click', showWorkspace);
+  </script>
+</body>
+</html>

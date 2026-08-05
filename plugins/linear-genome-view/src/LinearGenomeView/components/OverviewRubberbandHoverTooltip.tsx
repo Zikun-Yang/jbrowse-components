@@ -31,10 +31,9 @@ const OverviewRubberbandHoverTooltip = observer(
     overview: Base1DViewModel
   }) {
     const { classes } = useStyles()
-    const { cytobandOffset } = model
     const { assemblyManager } = getSession(model)
 
-    const px = overview.pxToBp(guideX - cytobandOffset)
+    const px = overview.pxToBp(guideX)
     const assembly = assemblyManager.get(px.assemblyName)
     const cytoband = assembly?.cytobands?.find(
       f =>

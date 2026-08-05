@@ -12,11 +12,9 @@ import {
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import { cast, isAlive, types } from '@jbrowse/mobx-state-tree'
 import { BaseLinearDisplay } from '@jbrowse/plugin-linear-genome-view'
-import ClearAllIcon from '@mui/icons-material/ClearAll'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import MenuOpenIcon from '@mui/icons-material/MenuOpen'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import { observable } from 'mobx'
+
+import { ClearAllIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import LinearPileupDisplayBlurb from './components/LinearPileupDisplayBlurb.tsx'
 import { getPileupLegendItems } from '../shared/legendUtils.ts'
@@ -318,17 +316,6 @@ export function SharedLinearPileupDisplayMixin(
 
     .views(self => ({
       /**
-       * #method
-       * uses copy-to-clipboard and generates notification
-       */
-      async copyFeatureToClipboard(feature: Feature) {
-        const { uniqueId, ...rest } = feature.toJSON()
-        const session = getSession(self)
-        const { default: copy } = await import('copy-to-clipboard')
-        copy(JSON.stringify(rest, null, 4))
-        session.notify('Copied to clipboard', 'success')
-      },
-      /**
        * #getter
        */
       get rendererConfig() {
@@ -446,33 +433,6 @@ export function SharedLinearPileupDisplayMixin(
         },
 
         /**
-         * #method
-         */
-        contextMenuItems() {
-          const feat = self.contextMenuFeature
-          return feat
-            ? [
-                {
-                  label: 'Open feature details',
-                  icon: MenuOpenIcon,
-                  onClick: () => {
-                    self.clearFeatureSelection()
-                    self.selectFeature(feat)
-                  },
-                },
-                {
-                  label: 'Copy info to clipboard',
-                  icon: ContentCopyIcon,
-                  onClick: () => {
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                    self.copyFeatureToClipboard(feat)
-                  },
-                },
-              ]
-            : []
-        },
-
-        /**
          * #getter
          */
         get DisplayBlurb() {
@@ -533,37 +493,6 @@ export function SharedLinearPileupDisplayMixin(
 
             onClick() {
               self.clearFeatureSelection()
-            },
-            // similar to click but opens a menu with further options
-            async onFeatureContextMenu(_: unknown, featureId?: string) {
-              const session = getSession(self)
-              const { rpcManager } = session
-              try {
-                const f = featureId || self.featureIdUnderMouse
-                if (!f) {
-                  self.clearFeatureSelection()
-                } else {
-                  const sessionId = getRpcSessionId(self)
-                  const { feature } = (await rpcManager.call(
-                    sessionId,
-                    'CoreGetFeatureDetails',
-                    {
-                      featureId: f,
-                      sessionId,
-                      trackInstanceId: getContainingTrack(self).id,
-                      rendererType: 'PileupRenderer',
-                      rpcDriverName: self.effectiveRpcDriverName,
-                    },
-                  )) as { feature: SimpleFeatureSerialized | undefined }
-
-                  if (feature) {
-                    self.setContextMenuFeature(new SimpleFeature(feature))
-                  }
-                }
-              } catch (e) {
-                console.error(e)
-                session.notifyError(`${e}`, e)
-              }
             },
           }
         },

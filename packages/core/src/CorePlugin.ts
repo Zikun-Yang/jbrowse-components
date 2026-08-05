@@ -27,6 +27,7 @@ export default class CorePlugin extends Plugin {
         heading: 'Feature details',
         configSchema,
         stateModel: stateModelFactory(pluginManager),
+        modalByDefault: true,
         ReactComponent: lazy(
           () => import('./BaseFeatureWidget/BaseFeatureDetail/index.tsx'),
         ),

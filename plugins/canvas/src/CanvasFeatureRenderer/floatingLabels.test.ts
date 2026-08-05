@@ -23,6 +23,7 @@ function createMockConfigContext(
     displayMode: 'normal',
     showLabels: true,
     showDescriptions: true,
+    labelPlacement: 'below',
     subfeatureLabels: 'below',
     transcriptTypes: [],
     containerTypes: [],
@@ -134,6 +135,36 @@ describe('floatingLabels', () => {
       })
       expect(result[0]!.textWidth).toBeGreaterThan(0)
       expect(result[1]!.textWidth).toBeGreaterThan(0)
+    })
+
+    it('marks labels with placement "left" when labelPlacement is left', () => {
+      const result = createFeatureFloatingLabels({
+        feature: mockFeature,
+        config: mockConfig,
+        configContext: createMockConfigContext({ labelPlacement: 'left' }),
+        nameColor: 'black',
+        descriptionColor: 'blue',
+        name: 'Gene1',
+        description: 'A gene',
+      })
+      expect(result).toHaveLength(2)
+      expect(result[0]!.placement).toBe('left')
+      expect(result[1]!.placement).toBe('left')
+    })
+
+    it('leaves placement undefined when labelPlacement is below', () => {
+      const result = createFeatureFloatingLabels({
+        feature: mockFeature,
+        config: mockConfig,
+        configContext: createMockConfigContext({ labelPlacement: 'below' }),
+        nameColor: 'black',
+        descriptionColor: 'blue',
+        name: 'Gene1',
+        description: 'A gene',
+      })
+      expect(result).toHaveLength(2)
+      expect(result[0]!.placement).toBeUndefined()
+      expect(result[1]!.placement).toBeUndefined()
     })
   })
 

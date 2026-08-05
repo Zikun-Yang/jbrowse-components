@@ -15,9 +15,9 @@ import {
   isAlive,
   types,
 } from '@jbrowse/mobx-state-tree'
-import ClearAllIcon from '@mui/icons-material/ClearAll'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import { reaction, toJS } from 'mobx'
+
+import { ClearAllIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import { BaseLinearDisplay } from '../BaseLinearDisplay/index.ts'
 
@@ -277,37 +277,6 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
 
                   if (isAlive(self) && feature) {
                     self.selectFeature(new SimpleFeature(feature))
-                  }
-                }
-              } catch (e) {
-                console.error(e)
-                session.notifyError(`${e}`, e)
-              }
-            },
-            async onFeatureContextMenu(_: unknown, featureId?: string) {
-              const { rpcManager } = session
-              const { parentTrack } = self
-              try {
-                const f = featureId || self.featureIdUnderMouse
-                if (!f) {
-                  self.clearFeatureSelection()
-                } else {
-                  const sessionId = getRpcSessionId(self)
-                  const { feature } = (await rpcManager.call(
-                    sessionId,
-                    'CoreGetFeatureDetails',
-                    {
-                      featureId: f,
-                      sessionId,
-                      trackInstanceId: parentTrack.id,
-                      rendererType: self.rendererTypeName,
-                    },
-                  )) as {
-                    feature: SimpleFeatureSerialized | undefined
-                  }
-
-                  if (isAlive(self) && feature) {
-                    self.setContextMenuFeature(new SimpleFeature(feature))
                   }
                 }
               } catch (e) {

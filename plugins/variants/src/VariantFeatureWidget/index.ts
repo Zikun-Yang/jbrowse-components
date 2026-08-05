@@ -15,6 +15,7 @@ export default function VariantFeatureWidgetF(pluginManager: PluginManager) {
         heading: 'Feature details',
         configSchema: configSchema,
         stateModel: stateModelFactory(pluginManager),
+        modalByDefault: true,
         ReactComponent: lazy(() => import('./VariantFeatureWidget.tsx')),
       }),
   )

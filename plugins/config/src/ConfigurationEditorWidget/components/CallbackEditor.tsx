@@ -3,9 +3,10 @@ import { useState, useTransition } from 'react'
 import { stringToJexlExpression } from '@jbrowse/core/util/jexlStrings'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { getEnv } from '@jbrowse/mobx-state-tree'
-import HelpIcon from '@mui/icons-material/Help'
 import { IconButton, TextField, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { HelpIcon } from '@jbrowse/core/ui/Icons'
 
 const fontFamily =
   'Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace'

@@ -1,11 +1,10 @@
 import { readConfObject } from '@jbrowse/core/configuration'
 import DataGridFlexContainer from '@jbrowse/core/ui/DataGridFlexContainer'
-import AddIcon from '@mui/icons-material/Add'
-import CreateIcon from '@mui/icons-material/Create'
-import DeleteIcon from '@mui/icons-material/Delete'
 import { Button, DialogActions, DialogContent, IconButton } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import { observer } from 'mobx-react'
+
+import { AddIcon, CreateIcon, DeleteIcon } from '@jbrowse/core/ui/Icons'
 
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { AbstractSessionModel } from '@jbrowse/core/util'

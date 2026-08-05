@@ -5,7 +5,7 @@ import { screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { saveAs } from 'file-saver-es'
 
-import { createView, doBeforeEach, hts, setup } from './util.tsx'
+import { createView, doBeforeEach, hts, openTrackMenu, setup } from './util.tsx'
 
 jest.mock('file-saver-es', () => {
   return {
@@ -30,8 +30,10 @@ async function openSaveTrackDataDialog(
   user: ReturnType<typeof userEvent.setup>,
   trackId: string,
 ) {
-  await user.click(await screen.findByTestId(hts(trackId), ...opts))
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  // findAllByTestId: tracks with a multi-level category appear once per
+  // category section in the track selector
+  await user.click((await screen.findAllByTestId(hts(trackId), ...opts))[0]!)
+  await openTrackMenu(screen, trackId)
   await user.click(await screen.findByText('Track actions', ...opts))
   await user.click(await screen.findByText('Save track data', ...opts))
 }

@@ -1,7 +1,7 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Button, alpha } from '@mui/material'
+
+import { ArrowBackIcon, ArrowForwardIcon } from '@jbrowse/core/ui/Icons'
 
 import { SPACING } from '../consts.ts'
 
@@ -13,6 +13,13 @@ const useStyles = makeStyles()(theme => ({
     background: alpha(theme.palette.background.paper, 0.8),
     color: theme.palette.text.primary,
     margin: SPACING,
+    borderColor:
+      theme.palette.mode === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)',
+    '&:hover': {
+      borderColor: theme.palette.text.primary,
+    },
   },
 }))
 
@@ -22,6 +29,7 @@ export default function HeaderPanControls({ model }: { model: LGV }) {
     <>
       <Button
         variant="outlined"
+        color="inherit"
         className={classes.panButton}
         onClick={() => {
           model.slide(-0.9)
@@ -31,6 +39,7 @@ export default function HeaderPanControls({ model }: { model: LGV }) {
       </Button>
       <Button
         variant="outlined"
+        color="inherit"
         className={classes.panButton}
         onClick={() => {
           model.slide(0.9)

@@ -18,7 +18,6 @@ const useStyles = makeStyles()({
     zIndex: 1001,
   },
   tooltipTarget: {
-    position: 'sticky',
     left: 0,
     width: 1,
   },
@@ -32,7 +31,6 @@ const VerticalGuide = observer(function VerticalGuide({
   coordX: number
 }) {
   const { classes } = useStyles()
-  const { stickyViewHeaders, rubberbandTop } = model
 
   return (
     <>
@@ -46,8 +44,6 @@ const VerticalGuide = observer(function VerticalGuide({
           className={classes.tooltipTarget}
           style={{
             transform: `translateX(${coordX + 6}px)`,
-            top: rubberbandTop,
-            position: stickyViewHeaders ? 'sticky' : undefined,
           }}
         />
       </Tooltip>

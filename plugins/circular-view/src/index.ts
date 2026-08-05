@@ -1,6 +1,7 @@
 import Plugin from '@jbrowse/core/Plugin'
 import { isAbstractMenuManager } from '@jbrowse/core/util'
-import DataUsageIcon from '@mui/icons-material/DataUsage'
+
+import { DataUsageIcon } from '@jbrowse/core/ui/Icons'
 
 import CircularViewF from './CircularView/index.ts'
 import LaunchCircularViewF from './LaunchCircularView/index.ts'

@@ -1,5 +1,4 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
   Accordion,
   AccordionSummary,
@@ -8,6 +7,8 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ExpandMoreIcon } from '@jbrowse/core/ui/Icons'
 
 import CurrentJobCard from './CurrentJobCard.tsx'
 import JobCard from './JobCard.tsx'

@@ -6,7 +6,7 @@ import { observer } from 'mobx-react'
 import FacetFilters from './FacetFilters.tsx'
 import FacetedDataGrid from './FacetedDataGrid.tsx'
 import FacetedHeader from './FacetedHeader.tsx'
-import TrackSelectorTrackMenu from '../../HierarchicalTrackSelectorWidget/components/tree/TrackSelectorTrackMenu.tsx'
+import TrackSelectorTrackMenu from '../../HierarchicalTrackSelectorWidget/components/TrackSelectorTrackMenu.tsx'
 
 import type { FacetedColumn } from './FacetedDataGrid.tsx'
 import type { HierarchicalTrackSelectorModel } from '../../HierarchicalTrackSelectorWidget/model.ts'

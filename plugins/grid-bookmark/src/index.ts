@@ -4,10 +4,13 @@ import {
   isAbstractMenuManager,
   isSessionModelWithWidgets,
 } from '@jbrowse/core/util'
-import BookmarkIcon from '@mui/icons-material/Bookmark'
-import BookmarksIcon from '@mui/icons-material/Bookmarks'
-import HighlightIcon from '@mui/icons-material/Highlight'
-import LabelIcon from '@mui/icons-material/Label'
+
+import {
+  BookmarkIcon,
+  BookmarksIcon,
+  HighlightIcon,
+  LabelIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import GridBookmarkWidgetF from './GridBookmarkWidget/index.ts'
 

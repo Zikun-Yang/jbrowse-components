@@ -1,5 +1,6 @@
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { Link } from '@mui/material'
+
+import { OpenInNewIcon } from '@jbrowse/core/ui/Icons'
 
 import type { LinkProps } from '@mui/material'
 

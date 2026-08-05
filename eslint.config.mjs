@@ -222,7 +222,7 @@ export default defineConfig(
             },
             {
               group: 'external',
-              pattern: '@mui/icons-material',
+              pattern: '@jbrowse/core/ui/Icons',
               position: 'after',
             },
           ],

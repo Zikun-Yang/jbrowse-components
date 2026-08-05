@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import GetAppIcon from '@mui/icons-material/GetApp'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import {
   Button,
   DialogActions,
@@ -20,6 +17,12 @@ import {
 import copy from 'copy-to-clipboard'
 import { saveAs } from 'file-saver-es'
 import { observer } from 'mobx-react'
+
+import {
+  ContentCopyIcon,
+  GetAppIcon,
+  HelpOutlineIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { getConf } from '../../../configuration/index.ts'
 import { Dialog, ErrorMessage } from '../../../ui/index.ts'

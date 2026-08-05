@@ -9,9 +9,12 @@ import {
   getPath,
   types,
 } from '@jbrowse/mobx-state-tree'
-import LinkIcon from '@mui/icons-material/Link'
-import PhotoCamera from '@mui/icons-material/PhotoCamera'
 import { autorun } from 'mobx'
+
+import {
+  LinkIcon,
+  PhotoCameraIcon as PhotoCamera,
+} from '@jbrowse/core/ui/Icons'
 
 import { calc, getBlockFeatures, intersect } from './util.ts'
 

@@ -1,7 +1,8 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown'
 import { Button, alpha } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ArrowDropDownIcon as ArrowDropDown } from '@jbrowse/core/ui/Icons'
 
 import CascadingMenuButton from './CascadingMenuButton.tsx'
 

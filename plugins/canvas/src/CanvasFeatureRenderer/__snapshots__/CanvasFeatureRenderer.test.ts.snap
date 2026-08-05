@@ -3,10 +3,10 @@
 exports[`CanvasFeatureRenderer makeImageData snapshot of flatbush items structure 1`] = `
 [
   {
-    "bottomPx": 34,
+    "bottomPx": 22,
     "endBp": 200,
     "featureId": "test1",
-    "leftPx": 100,
+    "leftPx": 12.4375,
     "rightPx": 200,
     "startBp": 100,
     "tooltip": "TestFeature<br/>Test description",

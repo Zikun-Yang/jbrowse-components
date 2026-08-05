@@ -2,11 +2,8 @@ import { Dialog } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
   Button,
-  Checkbox,
   DialogActions,
   DialogContent,
-  FormControlLabel,
-  FormGroup,
   MenuItem,
   TextField,
 } from '@mui/material'
@@ -28,8 +25,6 @@ const PreferencesDialog = observer(function PreferencesDialog({
   session: {
     allThemes: () => Record<string, ThemeOptions & { name?: string }>
     themeName?: string
-    stickyViewHeaders: boolean
-    setStickyViewHeaders(sticky: boolean): void
     setThemeName: (arg: string) => void
   }
 }) {
@@ -51,15 +46,6 @@ const PreferencesDialog = observer(function PreferencesDialog({
             </MenuItem>
           ))}
         </TextField>
-        <FormGroup>
-          <FormControlLabel
-            control={<Checkbox checked={session.stickyViewHeaders} />}
-            onChange={(_, checked) => {
-              session.setStickyViewHeaders(checked)
-            }}
-            label="Keep view header visible"
-          />
-        </FormGroup>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Close</Button>

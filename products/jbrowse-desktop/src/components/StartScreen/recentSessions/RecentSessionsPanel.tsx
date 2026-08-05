@@ -2,10 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useLocalStorage } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import DeleteIcon from '@mui/icons-material/Delete'
-import ListIcon from '@mui/icons-material/List'
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import ViewComfyIcon from '@mui/icons-material/ViewComfy'
 import {
   Button,
   FormControl,
@@ -14,6 +10,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
+
+import {
+  DeleteIcon,
+  ListIcon,
+  PlaylistAddIcon,
+  ViewComfyIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import Checkbox2 from '../Checkbox2.tsx'
 import RecentSessionsCards from './RecentSessionsCards.tsx'

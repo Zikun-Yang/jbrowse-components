@@ -21,8 +21,6 @@ const PreferencesDialog = observer(function PreferencesDialog({
     allThemes: () => Record<string, ThemeOptions & { name?: string }>
     themeName?: string
     setThemeName: (arg: string) => void
-    stickyViewHeaders: boolean
-    setStickyViewHeaders(sticky: boolean): void
   }
 }) {
   const { classes } = useStyles()

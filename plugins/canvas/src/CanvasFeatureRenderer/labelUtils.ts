@@ -1,6 +1,7 @@
 import { readConfObject } from '@jbrowse/core/configuration'
 import { measureText } from '@jbrowse/core/util'
 
+import { FLOATING_LABEL_FONT_SIZE } from './floatingLabels.ts'
 import { readCachedConfig } from './renderConfig.ts'
 import { truncateLabel } from './util.ts'
 
@@ -26,6 +27,7 @@ export function applyLabelDimensions(
     showLabels,
     showDescriptions,
     subfeatureLabels,
+    labelPlacement,
     fontHeight,
     labelAllowed,
   } = configContext
@@ -80,9 +82,31 @@ export function applyLabelDimensions(
   }
 
   const isOverlayMode = isTranscriptChild && subfeatureLabels === 'overlay'
-  if (!isOverlayMode) {
-    layout.totalLayoutHeight = layout.height + extraHeightPx
+  const isLeftMode = labelPlacement === 'left' && !isNested
+  if (isLeftMode) {
+    // Reserve label space to the left of the feature instead of below it.
+    // leftPadding/totalLayoutWidth grow equally so the right-side reservation
+    // (used by below-mode labels) is unchanged.
+    if (maxLabelWidthPx > 0) {
+      const gapPx = 3
+      layout.leftPadding += maxLabelWidthPx + gapPx
+      layout.totalLayoutWidth += maxLabelWidthPx + gapPx
+      // Height of the inline text block (name + description lines). Grow the
+      // row to fit it and center the feature vertically, so the text never
+      // extends outside the row (clips at track top / overlaps other rows)
+      const labelLines =
+        (shouldShowName ? 1 : 0) + (shouldShowDescription ? 1 : 0)
+      layout.leftLabelBlockHeight = labelLines * FLOATING_LABEL_FONT_SIZE
+      layout.totalLayoutHeight = Math.max(
+        layout.height,
+        layout.leftLabelBlockHeight,
+      )
+      layout.y += (layout.totalLayoutHeight - layout.height) / 2
+    }
+  } else {
+    if (!isOverlayMode) {
+      layout.totalLayoutHeight = layout.height + extraHeightPx
+    }
+    layout.totalLayoutWidth = Math.max(layout.totalLayoutWidth, maxLabelWidthPx)
   }
-
-  layout.totalLayoutWidth = Math.max(layout.totalLayoutWidth, maxLabelWidthPx)
 }

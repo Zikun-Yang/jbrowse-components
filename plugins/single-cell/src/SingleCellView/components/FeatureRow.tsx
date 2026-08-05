@@ -1,17 +1,21 @@
+import { useMemo } from 'react'
+
+import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
   CircularProgress,
   IconButton,
   Tooltip,
   Typography,
 } from '@mui/material'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import PaletteIcon from '@mui/icons-material/Palette'
-import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
-import AddIcon from '@mui/icons-material/Add'
-import { useMemo } from 'react'
 import { observer } from 'mobx-react'
-import { makeStyles } from '@jbrowse/core/util/tss-react'
+
+import {
+  AddIcon,
+  InfoOutlinedIcon,
+  MoreVertIcon,
+  PaletteIcon,
+  PaletteOutlinedIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import ExpandArrowsIcon from './ExpandArrowsIcon.tsx'
 import HistogramBrush from './HistogramBrush.tsx'
@@ -19,8 +23,8 @@ import HistogramTransformToggle from './HistogramTransformToggle.tsx'
 import MiniHistogram from './MiniHistogram.tsx'
 
 import type {
-  SingleCellViewModel,
   AxisTransforms,
+  SingleCellViewModel,
   Transform,
 } from '../model.ts'
 

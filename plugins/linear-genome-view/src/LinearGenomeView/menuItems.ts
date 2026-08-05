@@ -1,20 +1,23 @@
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import {
   getSession,
   isSessionWithAddTracks,
   toLocale,
 } from '@jbrowse/core/util'
-import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
-import LabelIcon from '@mui/icons-material/Label'
-import MenuOpenIcon from '@mui/icons-material/MenuOpen'
-import PaletteIcon from '@mui/icons-material/Palette'
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
-import SearchIcon from '@mui/icons-material/Search'
-import SyncAltIcon from '@mui/icons-material/SyncAlt'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import ZoomInIcon from '@mui/icons-material/ZoomIn'
+
+import {
+  CenterFocusStrongIcon,
+  ContentCopyIcon,
+  FolderOpenIcon,
+  LabelIcon,
+  MenuOpenIcon,
+  PaletteIcon,
+  PhotoCameraIcon,
+  SearchIcon,
+  SyncAltIcon,
+  TrackSelector as TrackSelectorIcon,
+  VisibilityIcon,
+  ZoomInIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import {
   ExportSvgDialog,
@@ -201,37 +204,15 @@ export function buildMenuItems(self: LinearGenomeViewModel): MenuItem[] {
       ],
     },
     {
-      label: 'Track labels',
+      label: 'Show track labels',
       icon: LabelIcon,
-      subMenu: [
-        {
-          label: 'Overlapping',
-          icon: VisibilityIcon,
-          type: 'radio',
-          checked: self.trackLabelsSetting === 'overlapping',
-          onClick: () => {
-            self.setTrackLabels('overlapping')
-          },
-        },
-        {
-          label: 'Offset',
-          icon: VisibilityIcon,
-          type: 'radio',
-          checked: self.trackLabelsSetting === 'offset',
-          onClick: () => {
-            self.setTrackLabels('offset')
-          },
-        },
-        {
-          label: 'Hidden',
-          icon: VisibilityIcon,
-          type: 'radio',
-          checked: self.trackLabelsSetting === 'hidden',
-          onClick: () => {
-            self.setTrackLabels('hidden')
-          },
-        },
-      ],
+      type: 'checkbox',
+      checked: self.trackLabelsSetting !== 'hidden',
+      onClick: () => {
+        self.setTrackLabels(
+          self.trackLabelsSetting === 'hidden' ? '' : 'hidden',
+        )
+      },
     },
   ]
 

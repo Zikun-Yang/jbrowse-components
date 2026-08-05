@@ -1,0 +1,83 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-mPanTro3v2.0_pri--pcht_spacer_example",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "T2T-mPanTro3v2.0_pri--pcht_spacer_example-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/pcht_spacer_example.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/pcht_spacer_example.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "connections": [],
+  "tracks": [
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "mPanTro3_h3k9me3--example",
+      "name": "mPanTro3_h3k9me3--example",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri--pcht_spacer_example"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "AFR",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--example/02_alignment/bowtie2/target/aligned/h3k9me3_R1.target.bw"
+            },
+            "group": "exper"
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "nonAFR",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--example/02_alignment/bowtie2/target/aligned/noab_ctrl_R1.target.bw"
+            },
+            "group": "ctrl"
+          }
+        ]
+      }
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "mPanTro3_h3k9me3--example_markdup",
+      "name": "mPanTro3_h3k9me3--example_markdup",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri--pcht_spacer_example"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "AFR",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--example/02_alignment/bowtie2/target/markdup/h3k9me3_R1.target.markdup.bw"
+            },
+            "group": "exper"
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "nonAFR",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--example/02_alignment/bowtie2/target/markdup/noab_ctrl_R1.target.markdup.bw"
+            },
+            "group": "ctrl"
+          }
+        ]
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": []
+}

@@ -3,7 +3,6 @@ import { lazy } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
 import BaseViewModel from '@jbrowse/core/pluggableElementTypes/models/BaseViewModel'
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import {
   getSession,
   getTickDisplayStr,
@@ -28,9 +27,13 @@ import {
   getSnapshot,
   types,
 } from '@jbrowse/mobx-state-tree'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import { autorun, observable } from 'mobx'
+
+import {
+  FolderOpenIcon,
+  PhotoCameraIcon,
+  TrackSelector as TrackSelectorIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { Dotplot1DView, DotplotHView, DotplotVView } from './1dview.ts'
 import { getBlockLabelKeysToHide, makeTicks } from './components/util.ts'

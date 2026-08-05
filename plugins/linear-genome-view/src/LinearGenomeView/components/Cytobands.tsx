@@ -1,34 +1,14 @@
-import { getFillProps } from '@jbrowse/core/util'
+import { getFillProps, measureText } from '@jbrowse/core/util'
+import { useTheme } from '@mui/material'
 import { observer } from 'mobx-react'
 
 // core
 import { getCytobands } from './util.ts'
-import { HEADER_OVERVIEW_HEIGHT } from '../consts.ts'
+import { HEADER_OVERVIEW_BAR_HEIGHT } from '../consts.ts'
 
 import type { Assembly } from '@jbrowse/core/assemblyManager/assembly'
 import type { Base1DViewModel } from '@jbrowse/core/util/Base1DViewModel'
 import type { ContentBlock } from '@jbrowse/core/util/blockTypes'
-
-// rounded rect from https://stackoverflow.com/a/45889603/2129219
-function rightRoundedRect(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-) {
-  return `M${x},${y}h${width - radius}a${radius},${radius} 0 0 1 ${radius},${radius}v${height - 2 * radius}a${radius},${radius} 0 0 1 ${-radius},${radius}h${radius - width}z`
-}
-
-function leftRoundedRect(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-) {
-  return `M${x + radius},${y}h${width - radius}v${height}h${radius - width}a${radius},${radius} 0 0 1 ${-radius},${-radius}v${2 * radius - height}a${radius},${radius} 0 0 1 ${radius},${-radius}z`
-}
 
 function leftTriangle(x: number, _y: number, width: number, height: number) {
   return [
@@ -59,6 +39,9 @@ const colorMap: Record<string, string> = {
   acen: '#800',
 }
 
+const LABEL_FONT_SIZE = 10
+const LABEL_PADDING = 4
+
 const Cytobands = observer(function Cytobands({
   overview,
   block,
@@ -69,23 +52,54 @@ const Cytobands = observer(function Cytobands({
   block: ContentBlock
 }) {
   const { offsetPx, reversed } = block
+  const theme = useTheme()
   const cytobands = getCytobands(assembly, block.refName)
-  const lcap = reversed ? cytobands.length - 1 : 0
-  const rcap = reversed ? 0 : cytobands.length - 1
 
-  const h = HEADER_OVERVIEW_HEIGHT
+  const h = HEADER_OVERVIEW_BAR_HEIGHT
+  const bands = cytobands.map(args => {
+    const { refName, start, end } = args
+    const s = overview.bpToPx({ refName, coord: start }) || 0
+    const e = overview.bpToPx({ refName, coord: end }) || 0
+    return {
+      ...args,
+      l: Math.min(s, e),
+      r: Math.max(s, e),
+      s,
+    }
+  })
+
+  if (!bands.length) {
+    return null
+  }
+
+  // black border rects around each arm, bounded by (but excluding) the acen
+  // triangles
+  const chromL = Math.min(...bands.map(b => b.l))
+  const chromR = Math.max(...bands.map(b => b.r))
+  const acenBands = bands.filter(b => b.type === 'acen')
+  const borderRects: { x: number; w: number }[] = []
+  if (acenBands.length) {
+    const acenL = Math.min(...acenBands.map(b => b.l))
+    const acenR = Math.max(...acenBands.map(b => b.r))
+    if (acenL - chromL > 0) {
+      borderRects.push({ x: chromL, w: acenL - chromL })
+    }
+    if (chromR - acenR > 0) {
+      borderRects.push({ x: acenR, w: chromR - acenR })
+    }
+  } else {
+    borderRects.push({ x: chromL, w: chromR - chromL })
+  }
+
   let centromereSeen = false
   let curr = ''
   let idx = 0
   return (
     <g transform={`translate(-${offsetPx})`}>
-      {cytobands.map((args, index) => {
-        const k = JSON.stringify(args)
-        const { refName, name, type, start, end } = args
-        const s = overview.bpToPx({ refName, coord: start }) || 0
-        const e = overview.bpToPx({ refName, coord: end }) || 0
-        const l = Math.min(s, e)
-        const w = Math.abs(e - s)
+      {bands.map(args => {
+        const { name, type, l, r, s } = args
+        const w = r - l
+        const k = `${name}-${l}-${w}`
         if (type === 'n/a') {
           const match = name?.match(/^(\d+)([A-Za-z])/)
           const ret = match[1] + match[2]
@@ -115,7 +129,7 @@ const Cytobands = observer(function Cytobands({
             />
           )
         }
-        if (type === 'acen' && centromereSeen) {
+        if (type === 'acen') {
           return (
             <polygon
               key={k}
@@ -128,28 +142,41 @@ const Cytobands = observer(function Cytobands({
             />
           )
         }
-        if (lcap === index) {
-          return (
-            <path
-              key={k}
-              d={leftRoundedRect(l, 0, w, h, 8)}
-              {...getFillProps(c)}
-            />
-          )
-        }
-        if (rcap === index) {
-          return (
-            <path
-              key={k}
-              d={rightRoundedRect(l, 0, w, h, 8)}
-              {...getFillProps(c)}
-            />
-          )
-        }
+
+        const showLabel =
+          name && w >= measureText(name, LABEL_FONT_SIZE) + LABEL_PADDING
         return (
-          <rect key={k} x={l} y={0} width={w} height={h} {...getFillProps(c)} />
+          <g key={k}>
+            <rect x={l} y={0} width={w} height={h} {...getFillProps(c)} />
+            {showLabel ? (
+              <text
+                x={l + w / 2}
+                y={h / 2}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={LABEL_FONT_SIZE}
+                fill={theme.palette.getContrastText(c)}
+                pointerEvents="none"
+              >
+                {name}
+              </text>
+            ) : null}
+          </g>
         )
       })}
+      {borderRects.map(({ x, w }) => (
+        <rect
+          key={`border-${x}-${w}`}
+          x={x + 0.5}
+          y={0.5}
+          width={Math.max(w - 1, 0)}
+          height={h - 1}
+          fill="none"
+          stroke={theme.palette.text.primary}
+          strokeWidth={1}
+          pointerEvents="none"
+        />
+      ))}
     </g>
   )
 })

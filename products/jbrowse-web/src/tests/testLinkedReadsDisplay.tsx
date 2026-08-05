@@ -1,7 +1,12 @@
 import { waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 
-import { createView, expectCanvasMatch, hts } from './util.tsx'
+import {
+  createView,
+  expectCanvasMatch,
+  hts,
+  openTrackMenu,
+} from './util.tsx'
 
 async function waitForPileupDraw(view: any, timeout = 60000) {
   await waitFor(
@@ -26,13 +31,19 @@ export async function testLinkedReadsDisplay({
   timeout?: number
 }) {
   const user = userEvent.setup()
-  const { view, getByTestId, findByTestId, findAllByText, findByText } =
-    await createView()
+  const {
+    view,
+    getByTestId,
+    findByTestId,
+    findAllByTestId,
+    findAllByText,
+    findByText,
+  } = await createView()
   const opts = [{}, { timeout }] as const
 
   await view.navToLocString(loc)
   await user.click(await findByTestId(hts(track), ...opts))
-  await user.click(await findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu({ findAllByTestId }, track, { timeout })
   await user.click(await findByText('Replace lower panel with...'))
 
   if (displayMode === 'arc') {
@@ -40,7 +51,7 @@ export async function testLinkedReadsDisplay({
   } else {
     await user.click((await findAllByText('Linked reads display'))[0]!)
     if (displayMode === 'cloud') {
-      await user.click(await findByTestId('track_menu_icon', ...opts))
+      await openTrackMenu({ findAllByTestId }, track, { timeout })
       await user.click(await findByText('Pileup settings'))
       await user.click((await findAllByText(/Show.../))[0]!)
       await user.click((await findAllByText(/Show as 'read cloud'/))[0]!)

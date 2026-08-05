@@ -1,6 +1,7 @@
 import Plugin from '@jbrowse/core/Plugin'
 import { isAbstractMenuManager } from '@jbrowse/core/util/types'
-import TableChartIcon from '@mui/icons-material/TableChart'
+
+import { TableChartIcon } from '@jbrowse/core/ui/Icons'
 
 import LaunchSvInspectorViewF from './LaunchSvInspectorView/index.ts'
 import SvInspectorViewF from './SvInspectorView/index.ts'

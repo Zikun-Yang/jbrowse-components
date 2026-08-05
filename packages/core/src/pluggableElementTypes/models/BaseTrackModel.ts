@@ -1,7 +1,8 @@
 import { lazy } from 'react'
 
 import { types } from '@jbrowse/mobx-state-tree'
-import Save from '@mui/icons-material/Save'
+
+import { SaveIcon as Save } from '@jbrowse/core/ui/Icons'
 
 import { stringifyBED } from './saveTrackFileTypes/bed.ts'
 import { stringifyGBK } from './saveTrackFileTypes/genbank.ts'

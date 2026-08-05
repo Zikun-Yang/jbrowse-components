@@ -151,11 +151,12 @@ export function deduplicateFeatureLabels(
       floatingLabels,
       totalFeatureHeight,
       actualTopPx,
+      featureYOffset,
       featureWidth,
       featureStartBp,
       featureEndBp,
     } = feature
-    const effectiveTopPx = actualTopPx ?? topPx
+    const effectiveTopPx = actualTopPx ?? topPx + (featureYOffset ?? 0)
 
     if (
       !floatingLabels ||

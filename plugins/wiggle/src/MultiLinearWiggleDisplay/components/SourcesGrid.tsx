@@ -4,12 +4,15 @@ import { SanitizedHTML } from '@jbrowse/core/ui'
 import ColorPicker, { ColorPopover } from '@jbrowse/core/ui/ColorPicker'
 import { getStr, measureGridWidth } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown'
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp'
 import { Button } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+
+import {
+  KeyboardArrowDownIcon,
+  KeyboardArrowUpIcon,
+  KeyboardDoubleArrowDownIcon,
+  KeyboardDoubleArrowUpIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { moveDown, moveUp } from './util.ts'
 

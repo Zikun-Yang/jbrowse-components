@@ -1,22 +1,28 @@
-import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
+import { SanitizedHTML } from '@jbrowse/core/ui'
+import { getSession } from '@jbrowse/core/util'
+import { getTrackName } from '@jbrowse/core/util/tracks'
+import { makeStyles } from '@jbrowse/core/util/tss-react'
+import { Typography } from '@mui/material'
 import { observer } from 'mobx-react'
-
-import TrackLabel from './TrackLabel.tsx'
 
 import type { LinearGenomeViewModel } from '../index.ts'
 import type { BaseTrackModel } from '@jbrowse/core/pluggableElementTypes/models'
 
 const useStyles = makeStyles()({
-  trackLabel: {
-    zIndex: 2,
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 20,
+    cursor: 'grab',
+    userSelect: 'none',
   },
-
-  trackLabelOffset: {
-    position: 'relative',
-    display: 'inline-block',
-  },
-  trackLabelOverlap: {
-    position: 'absolute',
+  trackName: {
+    fontSize: '0.75rem',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    pointerEvents: 'none',
   },
 })
 
@@ -30,14 +36,33 @@ const TrackLabelContainer = observer(function TrackLabelContainer({
   view: LGV
 }) {
   const { classes } = useStyles()
-  const display = track.displays[0]
-  const labelStyle =
-    view.trackLabelsSetting !== 'overlapping' || display.prefersOffset
-      ? classes.trackLabelOffset
-      : classes.trackLabelOverlap
+  const session = getSession(track)
+  const trackName = getTrackName(track.configuration, session)
 
   return view.trackLabelsSetting !== 'hidden' ? (
-    <TrackLabel track={track} className={cx(classes.trackLabel, labelStyle)} />
+    <div
+      className={classes.root}
+      draggable
+      onDragStart={() => {
+        view.setDraggingTrackId(track.id)
+      }}
+      onDragEnd={() => {
+        view.setDraggingTrackId(undefined)
+      }}
+      onClick={event => {
+        // avoid clicks on track label from turning into double-click zoom
+        event.stopPropagation()
+      }}
+      data-testid={`dragHandle-${view.id}-${track.trackId}`}
+    >
+      <Typography component="span" className={classes.trackName}>
+        <SanitizedHTML
+          html={[trackName, track.minimized ? '(minimized)' : '']
+            .filter(f => !!f)
+            .join(' ')}
+        />
+      </Typography>
+    </div>
   ) : null
 })
 

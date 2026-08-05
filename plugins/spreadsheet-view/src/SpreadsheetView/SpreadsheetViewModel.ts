@@ -1,8 +1,9 @@
 import { BaseViewModel } from '@jbrowse/core/pluggableElementTypes/models'
 import { getSession } from '@jbrowse/core/util'
 import { addDisposer, cast, types } from '@jbrowse/mobx-state-tree'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { autorun } from 'mobx'
+
+import { FolderOpenIcon } from '@jbrowse/core/ui/Icons'
 
 import ImportWizard from './ImportWizard.ts'
 import Spreadsheet from './SpreadsheetModel.tsx'

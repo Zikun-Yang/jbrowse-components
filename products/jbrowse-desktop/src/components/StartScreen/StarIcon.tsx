@@ -1,7 +1,10 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import Star from '@mui/icons-material/Star'
-import StarBorder from '@mui/icons-material/StarBorder'
 import { Tooltip } from '@mui/material'
+
+import {
+  StarBorderIcon as StarBorder,
+  StarIcon as Star,
+} from '@jbrowse/core/ui/Icons'
 
 const useStyles = makeStyles()({
   starIcon: {

@@ -5,8 +5,8 @@ import SerializableFilterChain from '@jbrowse/core/pluggableElementTypes/rendere
 import { getContainingView, getSession } from '@jbrowse/core/util'
 import { cast, getSnapshot, isAlive, types } from '@jbrowse/mobx-state-tree'
 import { linearWiggleDisplayModelFactory } from '@jbrowse/plugin-wiggle'
-import ClearAllIcon from '@mui/icons-material/ClearAll'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+
+import { ClearAllIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import { SharedModificationsMixin } from '../shared/SharedModificationsMixin.ts'
 import { getUniqueModifications } from '../shared/getUniqueModifications.ts'
@@ -409,13 +409,6 @@ function stateModelFactory(
          */
         get graphType() {
           return true
-        },
-
-        /**
-         * #method
-         */
-        contextMenuItems() {
-          return []
         },
 
         /**

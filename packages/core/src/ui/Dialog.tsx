@@ -1,6 +1,5 @@
 import { isValidElement } from 'react'
 
-import CloseIcon from '@mui/icons-material/Close'
 import {
   Dialog as MUIDialog,
   DialogTitle,
@@ -12,6 +11,8 @@ import {
   useTheme,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { CloseIcon } from '@jbrowse/core/ui/Icons'
 
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 import ErrorMessage from './ErrorMessage.tsx'

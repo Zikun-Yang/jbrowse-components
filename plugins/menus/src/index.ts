@@ -1,7 +1,7 @@
 import Plugin from '@jbrowse/core/Plugin'
 import { isAbstractMenuManager } from '@jbrowse/core/util'
-import HelpIcon from '@mui/icons-material/Help'
-import InfoIcon from '@mui/icons-material/Info'
+
+import { HelpIcon, InfoIcon } from '@jbrowse/core/ui/Icons'
 
 import AboutWidgetF from './AboutWidget/index.ts'
 import HelpWidgetF from './HelpWidget/index.ts'

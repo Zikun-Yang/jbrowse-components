@@ -168,10 +168,15 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
     ) => {
       let activeGroup: DockviewGroupPanel | undefined
       for (const viewId of viewIds) {
-        const { panelId, group } = addPanelForView(dockviewApi, session, viewId, {
-          referenceGroup: activeGroup,
-          direction: 'right',
-        })
+        const { panelId, group } = addPanelForView(
+          dockviewApi,
+          session,
+          viewId,
+          {
+            referenceGroup: activeGroup,
+            direction: 'right',
+          },
+        )
         activeGroup = group
         if (isSessionWithDockviewLayout(session)) {
           session.assignViewToPanel(panelId, viewId)
@@ -192,7 +197,11 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
       }
     }
 
-    if (pendingViewExists && isSessionWithDockviewLayout(session) && pendingAction) {
+    if (
+      pendingViewExists &&
+      isSessionWithDockviewLayout(session) &&
+      pendingAction
+    ) {
       const { viewId: pendingViewId } = pendingAction
       const otherViewIds = session.views
         .map(v => v.id)
@@ -265,9 +274,23 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
       const dockviewSession = isSessionWithDockviewLayout(sessionRef.current)
         ? sessionRef.current
         : null
-      const savedLayout = !hasPendingAction && dockviewSession?.dockviewLayout
+      const candidateLayout = !hasPendingAction
+        ? dockviewSession?.dockviewLayout
+        : undefined
+      // The saved layout can outlive the views it references (the container
+      // unmounts as soon as the last view closes, before the empty layout is
+      // persisted), so only restore layouts whose panels all point at views
+      // that still exist
+      const savedLayout =
+        candidateLayout &&
+        Object.values(candidateLayout.panels).every(panel => {
+          const viewId = panel.params?.viewId as string | undefined
+          return viewId && sessionRef.current.views.some(v => v.id === viewId)
+        })
+          ? candidateLayout
+          : undefined
 
-      if (savedLayout) {
+      if (dockviewSession && savedLayout) {
         try {
           rearrangingRef.current = true
           event.api.fromJSON(savedLayout)
@@ -290,6 +313,7 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
           }
         } catch (e) {
           console.error('Failed to restore dockview layout:', e)
+          event.api.clear()
           createInitialPanels(event.api)
         } finally {
           rearrangingRef.current = false

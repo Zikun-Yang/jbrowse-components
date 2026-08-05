@@ -1,9 +1,8 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import {
-  Checkbox,
   FormControlLabel,
-  FormGroup,
   MenuItem,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material'
@@ -48,14 +47,30 @@ const useStyles = makeStyles()(theme => ({
     minWidth: 240,
     marginBottom: 16,
   },
+  switchLabel: {
+    '& .MuiFormControlLabel-label': {
+      fontSize: 14,
+      color: theme.palette.text.primary,
+    },
+  },
+  helper: {
+    fontSize: 13,
+    color: theme.palette.text.secondary,
+    margin: '4px 0 16px',
+    maxWidth: 480,
+  },
 }))
 
 interface SettingsSession {
   allThemes?: () => Record<string, ThemeOptions & { name?: string }>
   themeName?: string
   setThemeName?: (arg: string) => void
-  stickyViewHeaders?: boolean
-  setStickyViewHeaders?(sticky: boolean): void
+  autoSizeTrackHeight?: boolean
+  setAutoSizeTrackHeight?: (arg: boolean) => void
+  minAutoTrackHeight?: number
+  setMinAutoTrackHeight?: (arg: number) => void
+  maxAutoTrackHeight?: number
+  setMaxAutoTrackHeight?: (arg: number) => void
 }
 
 const SettingsView = observer(function SettingsView({
@@ -64,7 +79,6 @@ const SettingsView = observer(function SettingsView({
   session: SettingsSession
 }) {
   const { classes } = useStyles()
-  const { stickyViewHeaders = false, setStickyViewHeaders } = session
 
   return (
     <div className={classes.root}>
@@ -96,20 +110,59 @@ const SettingsView = observer(function SettingsView({
         </div>
       ) : null}
 
-      <div className={classes.section}>
-        <Typography className={classes.sectionTitle}>Workspace</Typography>
-        <FormGroup>
-          {session.setStickyViewHeaders ? (
-            <FormControlLabel
-              control={<Checkbox checked={stickyViewHeaders} />}
-              label="Keep view header visible"
-              onChange={(_, checked) => {
-                setStickyViewHeaders?.(checked)
+      {session.setAutoSizeTrackHeight &&
+      session.setMinAutoTrackHeight &&
+      session.setMaxAutoTrackHeight ? (
+        <div className={classes.section}>
+          <Typography className={classes.sectionTitle}>Tracks</Typography>
+          <FormControlLabel
+            className={classes.switchLabel}
+            control={
+              <Switch
+                checked={session.autoSizeTrackHeight ?? false}
+                onChange={event => {
+                  session.setAutoSizeTrackHeight?.(event.target.checked)
+                }}
+              />
+            }
+            label="Auto-size track height"
+          />
+          <Typography className={classes.helper}>
+            Automatically adjust track heights to fit the features in the
+            current view as you browse.
+          </Typography>
+          <div>
+            <TextField
+              type="number"
+              label="Min auto track height (px)"
+              value={session.minAutoTrackHeight ?? 20}
+              disabled={!session.autoSizeTrackHeight}
+              onChange={event => {
+                if (event.target.value !== '') {
+                  session.setMinAutoTrackHeight?.(+event.target.value)
+                }
               }}
+              className={classes.field}
+              slotProps={{ htmlInput: { min: 20, step: 10 } }}
             />
-          ) : null}
-        </FormGroup>
-      </div>
+          </div>
+          <div>
+            <TextField
+              type="number"
+              label="Max auto track height (px)"
+              value={session.maxAutoTrackHeight ?? 1000}
+              disabled={!session.autoSizeTrackHeight}
+              onChange={event => {
+                if (event.target.value !== '') {
+                  session.setMaxAutoTrackHeight?.(+event.target.value)
+                }
+              }}
+              className={classes.field}
+              slotProps={{ htmlInput: { min: 20, step: 100 } }}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 })

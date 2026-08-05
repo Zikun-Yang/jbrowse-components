@@ -8,7 +8,7 @@ import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
 import type { FloatingLabelData } from '@jbrowse/plugin-linear-genome-view'
 
-const FLOATING_LABEL_FONT_SIZE = 11
+export const FLOATING_LABEL_FONT_SIZE = 11
 
 /**
  * Create floating labels for a top-level feature (gene, etc.)
@@ -33,13 +33,16 @@ export function createFeatureFloatingLabels({
   name: string
   description: string
 }): FloatingLabelData[] {
-  const { showLabels, showDescriptions, fontHeight } = configContext
+  const { showLabels, showDescriptions, fontHeight, labelPlacement } =
+    configContext
 
   const name = truncateLabel(rawName)
   const description = truncateLabel(rawDescription)
 
   const shouldShowLabel = /\S/.test(name) && showLabels
   const shouldShowDescription = /\S/.test(description) && showDescriptions
+
+  const placement = labelPlacement === 'left' ? ('left' as const) : undefined
 
   const floatingLabels: FloatingLabelData[] = []
   let currentY = 0
@@ -50,6 +53,7 @@ export function createFeatureFloatingLabels({
       relativeY: currentY,
       color: nameColor,
       textWidth: measureText(name, FLOATING_LABEL_FONT_SIZE),
+      placement,
     })
     currentY += readCachedConfig(
       fontHeight,
@@ -65,6 +69,7 @@ export function createFeatureFloatingLabels({
       relativeY: currentY,
       color: descriptionColor,
       textWidth: measureText(description, FLOATING_LABEL_FONT_SIZE),
+      placement,
     })
   }
 

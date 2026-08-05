@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 
-import { createView, doBeforeEach, hts, setup } from './util.tsx'
+import { createView, doBeforeEach, hts, openTrackMenu, setup } from './util.tsx'
 
 setup()
 
@@ -16,7 +16,7 @@ test('check pin track', async () => {
   const user = userEvent.setup()
   await createView()
   await user.click(await screen.findByTestId(hts('volvox_cram'), ...opts))
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen, 'volvox_cram')
   await user.click(await screen.findByText('Track order', ...opts))
   await user.click(await screen.findByText('Pin track', ...opts))
 }, 50000)

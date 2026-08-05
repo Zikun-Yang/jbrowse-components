@@ -1,11 +1,14 @@
 import { useState } from 'react'
 
 import { ColorPopover } from '@jbrowse/core/ui/ColorPicker'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown'
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp'
 import { Button } from '@mui/material'
+
+import {
+  KeyboardArrowDownIcon,
+  KeyboardArrowUpIcon,
+  KeyboardDoubleArrowDownIcon,
+  KeyboardDoubleArrowUpIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { moveDown, moveUp } from '../sourcesGridUtils.ts'
 

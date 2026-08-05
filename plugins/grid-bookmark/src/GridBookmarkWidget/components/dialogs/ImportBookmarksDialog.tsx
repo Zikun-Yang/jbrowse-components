@@ -11,8 +11,6 @@ import { getSession } from '@jbrowse/core/util'
 import { openLocation } from '@jbrowse/core/util/io'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { isSessionWithShareURL } from '@jbrowse/core/util/types'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ImportIcon from '@mui/icons-material/Publish'
 import {
   Accordion,
   AccordionDetails,
@@ -24,6 +22,11 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  ExpandMoreIcon,
+  PublishIcon as ImportIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { readSessionFromDynamo } from '../../sessionSharing.ts'
 import { fromUrlSafeB64 } from '../../utils.ts'

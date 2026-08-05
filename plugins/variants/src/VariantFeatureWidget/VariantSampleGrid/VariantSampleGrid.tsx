@@ -6,9 +6,10 @@ import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import DataGridFlexContainer from '@jbrowse/core/ui/DataGridFlexContainer'
 import { ErrorBoundary } from '@jbrowse/core/ui/ErrorBoundary'
 import { measureGridWidth } from '@jbrowse/core/util'
-import SettingsIcon from '@mui/icons-material/Settings'
 import { ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+
+import { SettingsIcon } from '@jbrowse/core/ui/Icons'
 
 import VariantGenotypeFrequencyTable from './VariantGenotypeFrequencyTable.tsx'
 import SampleFilters from './VariantSampleFilters.tsx'

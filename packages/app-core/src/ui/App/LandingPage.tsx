@@ -1,8 +1,7 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AddIcon from '@mui/icons-material/Add'
-import DashboardIcon from '@mui/icons-material/Dashboard'
-import SettingsIcon from '@mui/icons-material/Settings'
 import { observer } from 'mobx-react'
+
+import { AddIcon, DashboardIcon, SettingsIcon } from '@jbrowse/core/ui/Icons'
 
 const useStyles = makeStyles()(theme => ({
   root: {

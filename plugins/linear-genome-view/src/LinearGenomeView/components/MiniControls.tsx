@@ -1,11 +1,14 @@
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ArrowDown from '@mui/icons-material/KeyboardArrowDown'
-import ZoomIn from '@mui/icons-material/ZoomIn'
-import ZoomOut from '@mui/icons-material/ZoomOut'
 import { IconButton, Paper, alpha } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  KeyboardArrowDownIcon as ArrowDown,
+  ZoomInIcon as ZoomIn,
+  ZoomOutIcon as ZoomOut,
+} from '@jbrowse/core/ui/Icons'
 
 import type { LinearGenomeViewModel } from '../index.ts'
 

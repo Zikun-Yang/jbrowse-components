@@ -7,11 +7,14 @@ import {
 } from '@jbrowse/core/ui'
 import { useLocalStorage } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import MoreIcon from '@mui/icons-material/MoreHoriz'
 import { IconButton, Link, Typography } from '@mui/material'
 import useSWR from 'swr'
+
+import {
+  ExpandLessIcon,
+  ExpandMoreIcon,
+  MoreHorizIcon as MoreIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { useInnerDims } from '../availableGenomes/util.ts'
 import DeleteQuickstartDialog from '../dialogs/DeleteQuickstartDialog.tsx'

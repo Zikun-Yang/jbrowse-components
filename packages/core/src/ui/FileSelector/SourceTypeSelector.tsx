@@ -1,5 +1,6 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
+
+import { ArrowDropDownIcon } from '@jbrowse/core/ui/Icons'
 
 import CascadingMenuButton from '../CascadingMenuButton.tsx'
 import { getAccountLabel, isAdminMode } from './util.ts'

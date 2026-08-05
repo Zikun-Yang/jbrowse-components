@@ -1,0 +1,55 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "GRCm39 (mm39)",
+      "species": "House mouse (Mus musculus)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "GRCm39-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/mouse_GRCm39_refseq/mouse_GRCm39.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/mouse_GRCm39_refseq/mouse_GRCm39.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      },
+      "cytobands": {
+          "adapter": {
+            "type": "CytobandAdapter",
+            "cytobandLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/mouse_GRCm39_refseq/cytoBand/cytoBand.bed"
+            }
+          }
+        }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+
+  ],
+  "aggregateTextSearchAdapters": [
+    {
+      "type": "TrixTextSearchAdapter",
+      "textSearchAdapterId": "T2T-CHM13v2.0-index",
+      "ixFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0.ix",
+        "locationType": "UriLocation"
+      },
+      "ixxFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0.ixx",
+        "locationType": "UriLocation"
+      },
+      "metaFilePath": {
+        "uri": "../trix/T2T-CHM13v2.0_meta.json",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-CHM13v2.0"]
+    }
+  ]
+}

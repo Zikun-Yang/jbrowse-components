@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import DeleteIcon from '@mui/icons-material/Delete'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
-import TextFieldsIcon from '@mui/icons-material/TextFields'
 import {
   Card,
   CardHeader,
@@ -16,6 +12,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
+
+import {
+  DeleteIcon,
+  MoreVertIcon,
+  PlaylistAddIcon,
+  TextFieldsIcon,
+} from '@jbrowse/core/ui/Icons'
 
 const { ipcRenderer } = window.require('electron')
 

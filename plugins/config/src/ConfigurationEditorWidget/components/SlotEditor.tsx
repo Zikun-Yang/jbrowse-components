@@ -4,9 +4,10 @@ import { FileSelector } from '@jbrowse/core/ui'
 import { getEnv } from '@jbrowse/core/util'
 import { getSubType, getUnionSubTypes } from '@jbrowse/core/util/mst-reflection'
 import { getPropertyMembers } from '@jbrowse/mobx-state-tree'
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import { IconButton, MenuItem, Paper, SvgIcon, TextField } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { RadioButtonUncheckedIcon } from '@jbrowse/core/ui/Icons'
 
 import BooleanEditor from './BooleanEditor.tsx'
 import CallbackEditor from './CallbackEditor.tsx'

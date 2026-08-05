@@ -1,10 +1,13 @@
 import React from 'react'
 
 import { CascadingMenuButton } from '@jbrowse/core/ui'
-import Check from '@mui/icons-material/Check'
-import Close from '@mui/icons-material/Close'
-import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import { Link, Tooltip } from '@mui/material'
+
+import {
+  CheckIcon as Check,
+  CloseIcon as Close,
+  MoreHorizIcon as MoreHoriz,
+} from '@jbrowse/core/ui/Icons'
 
 import HighlightedText from './HighlightedText.tsx'
 import StarIcon from '../StarIcon.tsx'

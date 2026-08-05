@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 
 import Snackbar from '@jbrowse/core/ui/Snackbar'
+import { getEnv } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { AppBar } from '@mui/material'
 import { observer } from 'mobx-react'
@@ -56,14 +57,13 @@ interface Props {
       allThemes?: () => Record<string, ThemeOptions & { name?: string }>
       themeName?: string
       setThemeName?: (arg: string) => void
-      stickyViewHeaders?: boolean
-      setStickyViewHeaders?(sticky: boolean): void
       root: { history: History }
     }
 }
 
 // lazies
 const DrawerWidget = lazy(() => import('./DrawerWidget.tsx'))
+const ModalWidget = lazy(() => import('./ModalWidget.tsx'))
 
 const useStyles = makeStyles()(theme => ({
   root: {
@@ -106,11 +106,30 @@ const LazyDrawerWidget = observer(function LazyDrawerWidget(props: Props) {
   )
 })
 
+const LazyModalWidget = observer(function LazyModalWidget(props: Props) {
+  const { session } = props
+  const { visibleWidget } = session
+  return visibleWidget ? (
+    <Suspense fallback={null}>
+      <ModalWidget
+        session={session}
+        onClose={() => {
+          session.hideWidget(visibleWidget)
+        }}
+      />
+    </Suspense>
+  ) : null
+})
+
 const App = observer(function App(props: Props) {
   const { session } = props
   const { classes } = useStyles()
   const { minimized, visibleWidget, drawerWidth, drawerPosition } = session
-  const drawerVisible = visibleWidget && !minimized
+  const modalWidget = visibleWidget
+    ? getEnv(session).pluginManager.getWidgetType(visibleWidget.type)!
+        .modalByDefault
+    : false
+  const drawerVisible = visibleWidget && !minimized && !modalWidget
   const expanded =
     session.activeView === 'recents' ||
     session.activeView === 'settings' ||
@@ -132,6 +151,7 @@ const App = observer(function App(props: Props) {
       {drawerVisible && drawerPosition === 'left' ? (
         <LazyDrawerWidget session={session} />
       ) : null}
+      {modalWidget ? <LazyModalWidget session={session} /> : null}
       <DialogQueue session={session} />
       <div className={classes.appContainer}>
         <AppBar className={classes.appBar} position="static">

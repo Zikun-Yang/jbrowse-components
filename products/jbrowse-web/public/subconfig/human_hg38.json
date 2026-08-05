@@ -1,0 +1,38 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "GRCh38 (hg38)",
+      "species": "Human (Homo sapiens)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "GRCh38-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.chr_only.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.chr_only.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      },
+      "cytobands": {
+          "adapter": {
+            "type": "CytobandAdapter",
+            "cytobandLocation": {
+              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/cytoBand/cytoBand.bed"
+            }
+          }
+        }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+
+  ],
+  "aggregateTextSearchAdapters": [
+  ]
+}

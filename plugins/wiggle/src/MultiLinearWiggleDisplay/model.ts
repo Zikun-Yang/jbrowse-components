@@ -11,10 +11,10 @@ import {
 } from '@jbrowse/core/util'
 import { stopStopToken } from '@jbrowse/core/util/stopToken'
 import { cast, isAlive, types } from '@jbrowse/mobx-state-tree'
-import EqualizerIcon from '@mui/icons-material/Equalizer'
-import VisibilityIcon from '@mui/icons-material/Visibility'
 import { ascending } from '@mui/x-charts-vendor/d3-array'
 import deepEqual from 'fast-deep-equal'
+
+import { EqualizerIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import { cluster, hierarchy } from '../d3-hierarchy2/index.ts'
 import SharedWiggleMixin from '../shared/SharedWiggleMixin.ts'
@@ -314,14 +314,6 @@ export function stateModelFactory(
           self.rendererTypeName === 'MultiRowLineRenderer' ||
           self.rendererTypeName === 'MultiRowXYPlotRenderer'
         )
-      },
-      /**
-       * #getter
-       * positions multi-row below the tracklabel even if using overlap
-       * tracklabels for everything else
-       */
-      get prefersOffset() {
-        return this.isMultiRow
       },
 
       /**

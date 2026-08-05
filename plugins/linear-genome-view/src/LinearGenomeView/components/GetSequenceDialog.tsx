@@ -4,8 +4,6 @@ import { Dialog, ErrorMessage, LoadingEllipses } from '@jbrowse/core/ui'
 import { complement, reverse, toLocale } from '@jbrowse/core/util'
 import { formatSeqFasta } from '@jbrowse/core/util/formatFastaStrings'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import GetAppIcon from '@mui/icons-material/GetApp'
 import {
   Button,
   Checkbox,
@@ -17,6 +15,8 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ContentCopyIcon, GetAppIcon } from '@jbrowse/core/ui/Icons'
 
 import { fetchSequence } from './fetchSequence.ts'
 

@@ -2,7 +2,6 @@ import { RootAppMenuMixin, processMutableMenuActions } from '@jbrowse/app-core'
 import TextSearchManager from '@jbrowse/core/TextSearch/TextSearchManager'
 import assemblyConfigSchemaFactory from '@jbrowse/core/assemblyManager/assemblyConfigSchema'
 import RpcManager from '@jbrowse/core/rpc/RpcManager'
-import { Cable } from '@jbrowse/core/ui/Icons'
 import {
   addDisposer,
   cast,
@@ -14,11 +13,15 @@ import {
   BaseRootModelFactory,
   InternetAccountsRootModelMixin,
 } from '@jbrowse/product-core'
-import AddIcon from '@mui/icons-material/Add'
-import GetAppIcon from '@mui/icons-material/GetApp'
-import PublishIcon from '@mui/icons-material/Publish'
-import StorageIcon from '@mui/icons-material/Storage'
 import { autorun } from 'mobx'
+
+import {
+  AddIcon,
+  Cable,
+  GetAppIcon,
+  PublishIcon,
+  StorageIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import jbrowseWebFactory from '../jbrowseModel.ts'
 import { filterSessionInPlace } from '../util.ts'

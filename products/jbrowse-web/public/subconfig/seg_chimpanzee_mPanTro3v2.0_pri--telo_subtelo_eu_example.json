@@ -1,0 +1,76 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-mPanTro3v2.0_pri___telo-subtelo-eu_example",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "T2T-mPanTro3v2.0_pri___telo-subtelo-eu_example",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/000-example_sequence/example_tel-subtelo-eu.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/000-example_sequence/example_tel-subtelo-eu.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "connections": [],
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-mPanTro3v2.0_pri___telo-subtelo-eu_example_repeat_annotation",
+      "name": "repeat_annotation",
+      "category": ["Test"],
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri___telo-subtelo-eu_example"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/000-example_sequence/example_tel-subtelo-eu.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "mPanTro3_h3k9me3--tel-subtelo-eu_example--aligned",
+      "name": "mPanTro3_h3k9me3--tel-subtelo-eu_example--aligned",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-mPanTro3v2.0_pri___telo-subtelo-eu_example"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "exper",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--telo_subtelo_eu_example/02_alignment/bowtie2/target/aligned/h3k9me3_R1.target.bw"
+            },
+            "group": "exper"
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "ctrl",
+            "bigWigLocation": {
+              "uri": "/home/zkyang/primates_private_dataset/260527-chimp_h3k9me3_cutandtag/002-results--telo_subtelo_eu_example/02_alignment/bowtie2/target/aligned/noab_ctrl_R1.target.bw"
+            },
+            "group": "ctrl"
+          }
+        ]
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": []
+}

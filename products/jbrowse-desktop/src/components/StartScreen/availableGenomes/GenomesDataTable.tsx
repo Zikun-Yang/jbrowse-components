@@ -3,10 +3,13 @@ import { useCallback, useMemo, useState } from 'react'
 import { CascadingMenuButton, ErrorMessage } from '@jbrowse/core/ui'
 import { notEmpty, useLocalStorage } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import Help from '@mui/icons-material/Help'
-import MoreVert from '@mui/icons-material/MoreVert'
 import { Button, Checkbox, IconButton } from '@mui/material'
 import { alpha, darken, lighten } from '@mui/material/styles'
+
+import {
+  HelpIcon as Help,
+  MoreVertIcon as MoreVert,
+} from '@jbrowse/core/ui/Icons'
 
 import CategorySelector from './CategorySelector.tsx'
 import MoreInfoDialog from './MoreInfoDialog.tsx'

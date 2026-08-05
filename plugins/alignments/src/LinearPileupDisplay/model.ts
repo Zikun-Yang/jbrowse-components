@@ -3,9 +3,12 @@ import { lazy } from 'react'
 import { ConfigurationReference } from '@jbrowse/core/configuration'
 import { getContainingView, getSession } from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
-import ColorLensIcon from '@mui/icons-material/ColorLens'
-import SwapVertIcon from '@mui/icons-material/SwapVert'
-import WorkspacesIcon from '@mui/icons-material/Workspaces'
+
+import {
+  ColorLensIcon,
+  SwapVertIcon,
+  WorkspacesIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import { SharedLinearPileupDisplayMixin } from './SharedLinearPileupDisplayMixin.ts'
 import { SharedModificationsMixin } from '../shared/SharedModificationsMixin.ts'
@@ -67,6 +70,17 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
        * #volatile
        */
       currSortBpPerPx: 0,
+    }))
+    .views(() => ({
+      /**
+       * #getter
+       * height is allocated by the parent LinearAlignmentsDisplay
+       * (PileupHeight autorun), so the generic BaseLinearDisplay
+       * auto-height autorun must not grow this display itself
+       */
+      get autoHeightEnabled() {
+        return false
+      },
     }))
     .actions(self => ({
       /**

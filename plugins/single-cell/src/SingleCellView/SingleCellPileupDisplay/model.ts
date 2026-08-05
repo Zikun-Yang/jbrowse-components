@@ -100,9 +100,14 @@ function stateModelFactory(pluginManager: PluginManager) {
   // The underlying LinearPileupDisplay model requires its own type literal for
   // internal dispatching. Accept snapshots under our display name but run as
   // LinearPileupDisplay so we can reuse its React component and behavior.
+  // Only rewrite our own type: this model sits in the display union, and an
+  // unconditional rewrite would match (and hijack) every display snapshot
+  // registered after us.
   return types.snapshotProcessor(withSelectionProps, {
     preProcessor(snap: { type?: string }) {
-      return { ...snap, type: 'LinearPileupDisplay' as const }
+      return snap.type === 'SingleCellPileupDisplay'
+        ? { ...snap, type: 'LinearPileupDisplay' as const }
+        : snap
     },
   })
 }

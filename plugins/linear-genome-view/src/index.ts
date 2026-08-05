@@ -2,7 +2,8 @@ import Plugin from '@jbrowse/core/Plugin'
 import { ConfigurationSchema } from '@jbrowse/core/configuration'
 import { isAbstractMenuManager } from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
-import LineStyleIcon from '@mui/icons-material/LineStyle'
+
+import { LineStyleIcon } from '@jbrowse/core/ui/Icons'
 
 import {
   BaseLinearDisplay,
@@ -103,6 +104,8 @@ export {
   calculateSvgLegendWidth,
   createSubfeatureLabelMetadata,
   drawCanvasImageData,
+  getAutoHeightSettings,
+  getBlocksContentHeight,
 } from './BaseLinearDisplay/index.ts'
 export type {
   NonBlockCanvasDisplayMixinType,

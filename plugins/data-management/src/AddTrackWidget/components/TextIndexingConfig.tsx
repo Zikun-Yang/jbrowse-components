@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import AddIcon from '@mui/icons-material/Add'
-import DeleteIcon from '@mui/icons-material/Delete'
 import {
   Card,
   CardContent,
@@ -15,6 +13,8 @@ import {
   TextField,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { AddIcon, DeleteIcon } from '@jbrowse/core/ui/Icons'
 
 import type { AddTrackModel } from '../model.ts'
 

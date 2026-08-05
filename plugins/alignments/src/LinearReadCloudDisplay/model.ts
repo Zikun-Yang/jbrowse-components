@@ -14,7 +14,8 @@ import {
   FeatureDensityMixin,
   TrackHeightMixin,
 } from '@jbrowse/plugin-linear-genome-view'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+
+import { VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import { chainToSimpleFeature } from '../LinearReadArcsDisplay/chainToSimpleFeature.ts'
 import { calculateCloudTicks } from '../RenderLinearReadCloudDisplayRPC/drawFeatsCloud.ts'

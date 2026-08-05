@@ -26,6 +26,8 @@ export interface FeatureLayout {
   totalLayoutHeight: number
   totalLayoutWidth: number
   leftPadding: number
+  /** Height of the inline (left-side) label text block, if labels are placed left */
+  leftLabelBlockHeight?: number
   children: FeatureLayout[]
 }
 

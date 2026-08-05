@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { Dialog } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import GetAppIcon from '@mui/icons-material/GetApp'
 import {
   Alert,
   Button,
@@ -13,6 +12,8 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { GetAppIcon } from '@jbrowse/core/ui/Icons'
 
 import { downloadBookmarkFile } from '../../utils.ts'
 

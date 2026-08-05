@@ -1,6 +1,7 @@
 import { Dialog } from '@jbrowse/core/ui'
-import SettingsIcon from '@mui/icons-material/Settings'
 import { Button, DialogActions, DialogContent, Typography } from '@mui/material'
+
+import { SettingsIcon } from '@jbrowse/core/ui/Icons'
 
 export default function HelpDialog({
   handleClose,

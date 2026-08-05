@@ -2,8 +2,9 @@ import { useCallback, useMemo } from 'react'
 
 import { CascadingMenuButton } from '@jbrowse/core/ui'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import { Link } from '@mui/material'
+
+import { MoreHorizIcon as MoreHoriz } from '@jbrowse/core/ui/Icons'
 
 import StarIcon from '../StarIcon.tsx'
 import { loadPluginManager } from '../util.tsx'

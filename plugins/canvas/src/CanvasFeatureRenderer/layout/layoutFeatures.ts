@@ -105,6 +105,7 @@ export function layoutFeatures({
         floatingLabels,
         totalFeatureHeight: featureLayout.height,
         featureWidth: featureLayout.width,
+        featureYOffset: featureLayout.y,
         featureStartBp: featureStart,
         featureEndBp: featureEnd,
       },

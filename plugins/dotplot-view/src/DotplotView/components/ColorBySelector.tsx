@@ -1,6 +1,7 @@
 import CascadingMenuButton from '@jbrowse/core/ui/CascadingMenuButton'
-import PaletteIcon from '@mui/icons-material/Palette'
 import { observer } from 'mobx-react'
+
+import { PaletteIcon } from '@jbrowse/core/ui/Icons'
 
 import type { DotplotDisplayModel } from '../../DotplotDisplay/stateModelFactory.tsx'
 import type { DotplotViewModel } from '../model.ts'

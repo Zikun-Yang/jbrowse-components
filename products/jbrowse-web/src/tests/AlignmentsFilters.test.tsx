@@ -6,6 +6,7 @@ import {
   doBeforeEach,
   expectCanvasMatch,
   hts,
+  openTrackMenu,
   pv,
   setup,
 } from './util.tsx'
@@ -27,7 +28,7 @@ async function testFilterTrack(
 ) {
   const user = userEvent.setup()
   await user.click(await screen.findByTestId(hts(trackId), ...opts))
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
   await user.click(await screen.findByText('Pileup settings'))
   await user.click(await screen.findByText('Filter by...'))
   await user.type(
@@ -67,7 +68,7 @@ xtest('set jexl filters on bam pileup display', async () => {
 
   const user = userEvent.setup()
   await user.click(await screen.findByTestId(hts('volvox_bam'), ...opts))
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
   await user.click((await screen.findAllByText('Pileup settings'))[1]!)
 
   await waitFor(() => {
@@ -85,7 +86,7 @@ xtest('set jexl filters on snp cov display', async () => {
 
   const user = userEvent.setup()
   await user.click(await screen.findByTestId(hts('volvox_bam'), ...opts))
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
   await user.click(await screen.findByText('SNPCoverage settings'))
 
   const filter = [`jexl:get(feature,'end')==40005`]

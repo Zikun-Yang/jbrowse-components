@@ -1,8 +1,9 @@
 import { Suspense, lazy, useState } from 'react'
 
-import Help from '@mui/icons-material/Help'
 import { Button, FormControl, IconButton } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { HelpIcon as Help } from '@jbrowse/core/ui/Icons'
 
 import { LoadingEllipses } from '../../ui/index.ts'
 import { getSession } from '../../util/index.ts'

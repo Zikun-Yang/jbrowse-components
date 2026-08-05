@@ -8,6 +8,7 @@ import {
   expectCanvasMatch,
   getPluginManager,
   mockConsoleWarn,
+  openTrackMenu,
   setup,
 } from './util.tsx'
 import masterConfig from '../../test_data/volvox/connection_test.json' with { type: 'json' }
@@ -47,7 +48,15 @@ test('copy and delete track in admin mode', () => {
       ),
     )
     fireEvent.click(await findByText('Copy track'))
-    fireEvent.click(await findByText('volvox filtered vcf (copy)'))
+    fireEvent.click(
+      (
+        await findAllByTestId(
+          /htsTrackEntry-Tracks,volvox_filtered_vcf-\d+/,
+          {},
+          delay,
+        )
+      )[0]!,
+    )
     expect(queryByText(/Session tracks/)).toBeNull()
     await waitFor(() => {
       expect(view.tracks.length).toBe(1)
@@ -55,7 +64,7 @@ test('copy and delete track in admin mode', () => {
     expectCanvasMatch(
       (await findAllByTestId(/prerendered_canvas/, {}, delay))[0]!,
     )
-    fireEvent.click(await findByTestId('track_menu_icon'))
+    await openTrackMenu({ findAllByTestId })
     fireEvent.click(await findByText('Track actions'))
     fireEvent.click(await findByText('Delete track'))
     await waitFor(() => {
@@ -125,7 +134,15 @@ test('copy and delete track to session tracks', () => {
       ),
     )
     fireEvent.click(await findByText('Copy track'))
-    fireEvent.click(await findByText('volvox filtered vcf (copy)'))
+    fireEvent.click(
+      (
+        await findAllByTestId(
+          /htsTrackEntry-Tracks,volvox_filtered_vcf-\d+/,
+          {},
+          delay,
+        )
+      )[0]!,
+    )
     await findByText(/Session tracks/)
     await waitFor(() => {
       expect(view.tracks.length).toBe(1)
@@ -133,7 +150,7 @@ test('copy and delete track to session tracks', () => {
     expectCanvasMatch(
       (await findAllByTestId(/prerendered_canvas/, {}, delay))[0]!,
     )
-    fireEvent.click(await findByTestId('track_menu_icon'))
+    await openTrackMenu({ findAllByTestId })
     fireEvent.click(await findByText('Track actions'))
     fireEvent.click(await findByText('Delete track'))
     await waitFor(() => {

@@ -4,7 +4,6 @@ import { Dialog, ErrorMessage } from '@jbrowse/core/ui'
 import { getSession, isSessionWithShareURL } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { getSnapshot } from '@jbrowse/mobx-state-tree'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import {
   Alert,
   Button,
@@ -15,6 +14,8 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import { ContentCopyIcon } from '@jbrowse/core/ui/Icons'
 
 import { shareSessionToDynamo } from '../../sessionSharing.ts'
 

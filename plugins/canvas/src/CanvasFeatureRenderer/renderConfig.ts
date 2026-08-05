@@ -66,6 +66,7 @@ export interface RenderConfigContext {
   displayMode: string
   showLabels: boolean
   showDescriptions: boolean
+  labelPlacement: string
   subfeatureLabels: string
 
   transcriptTypes: string[]
@@ -109,6 +110,7 @@ export function createRenderConfigContext(
     displayMode,
     showLabels: readConfObject(config, 'showLabels') as boolean,
     showDescriptions: readConfObject(config, 'showDescriptions') as boolean,
+    labelPlacement: readConfObject(config, 'labelPlacement') as string,
     subfeatureLabels: readConfObject(config, 'subfeatureLabels') as string,
     transcriptTypes: readConfObject(config, 'transcriptTypes') as string[],
     containerTypes: readConfObject(config, 'containerTypes') as string[],

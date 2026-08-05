@@ -8,8 +8,6 @@ import {
   isSessionModelWithWidgets,
 } from '@jbrowse/core/util'
 import Flatbush from '@jbrowse/core/util/flatbush'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 import { observer } from 'mobx-react'
 
 import { flatbushItemToFeatureData } from '../types.ts'
@@ -51,8 +49,7 @@ const PileupRendering = observer(function PileupRendering(props: {
   } = props
   const { refName } = regions[0]!
   const flatbush2 = useMemo(() => Flatbush.from(flatbush), [flatbush])
-  const { selectedFeatureId, featureIdUnderMouse, contextMenuFeature } =
-    displayModel
+  const { featureIdUnderMouse } = displayModel
 
   const region = regions[0]!
   const ref = useRef<HTMLDivElement>(null)
@@ -62,23 +59,11 @@ const PileupRendering = observer(function PileupRendering(props: {
   const [itemUnderMouse, setItemUnderMouse] = useState<FlatbushItem>()
   const [featureNameUnderMouse, setFeatureNameUnderMouse] = useState<string>()
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>()
-  const [contextMenuAnchor, setContextMenuAnchor] = useState<{
-    mouseX: number
-    mouseY: number
-    item: FlatbushItem
-  } | null>(null)
-  const selectedRect = selectedFeatureId
-    ? displayModel.getFeatureByID(blockKey, selectedFeatureId)
-    : undefined
-
-  const highlightedFeature = featureIdUnderMouse || contextMenuFeature?.id()
+  const highlightedFeature = featureIdUnderMouse
   const highlightedRect = highlightedFeature
     ? displayModel.getFeatureByID(blockKey, highlightedFeature)
     : undefined
 
-  const selected = selectedRect
-    ? makeRect(selectedRect, 2, region, bpPerPx)
-    : undefined
   const highlight = highlightedRect
     ? makeRect(highlightedRect, 0, region, bpPerPx)
     : undefined
@@ -188,26 +173,6 @@ const PileupRendering = observer(function PileupRendering(props: {
           }
         }
       }}
-      onContextMenu={event => {
-        if (itemUnderMouse) {
-          event.preventDefault()
-          setContextMenuAnchor({
-            mouseX: event.clientX,
-            mouseY: event.clientY,
-            item: itemUnderMouse,
-          })
-        } else if (featureIdUnderMouse) {
-          displayModel
-            .setContextMenuFeatureById(featureIdUnderMouse)
-            .catch((e: unknown) => {
-              console.error(e)
-              getSession(displayModel).notifyError(`${e}`, e)
-            })
-        } else {
-          displayModel.setContextMenuFeature(undefined)
-          displayModel.clearFeatureSelection()
-        }
-      }}
     >
       <PrerenderedCanvas
         {...props}
@@ -227,20 +192,7 @@ const PileupRendering = observer(function PileupRendering(props: {
           }}
         />
       ) : null}
-      {selected ? (
-        <div
-          style={{
-            position: 'absolute',
-            border: '2px solid #00b8ff',
-            boxSizing: 'content-box',
-            pointerEvents: 'none',
-            ...selected,
-          }}
-        />
-      ) : null}
-      {(itemUnderMouse || featureNameUnderMouse) &&
-      mousePosition &&
-      !contextMenuAnchor ? (
+      {(itemUnderMouse || featureNameUnderMouse) && mousePosition ? (
         <PileupTooltip
           item={itemUnderMouse}
           featureName={featureNameUnderMouse}
@@ -248,66 +200,6 @@ const PileupRendering = observer(function PileupRendering(props: {
           mousePosition={mousePosition}
         />
       ) : null}
-      <Menu
-        open={contextMenuAnchor !== null}
-        onClose={() => {
-          setContextMenuAnchor(null)
-        }}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenuAnchor
-            ? { top: contextMenuAnchor.mouseY, left: contextMenuAnchor.mouseX }
-            : undefined
-        }
-      >
-        <MenuItem
-          onClick={() => {
-            if (contextMenuAnchor) {
-              const session = getSession(displayModel)
-              const view = getContainingView(displayModel)
-              const sourceRead = featureIdUnderMouse
-                ? featureNames[featureIdUnderMouse]
-                : undefined
-              const featureData = flatbushItemToFeatureData(
-                contextMenuAnchor.item,
-                refName,
-                sourceRead,
-              )
-              if (isSessionModelWithWidgets(session)) {
-                const featureWidget = session.addWidget(
-                  'BaseFeatureWidget',
-                  'baseFeature',
-                  {
-                    featureData,
-                    view,
-                    track: getContainingTrack(displayModel),
-                  },
-                )
-                session.showWidget(featureWidget)
-              }
-            }
-            setContextMenuAnchor(null)
-          }}
-        >
-          Show details
-        </MenuItem>
-        {contextMenuAnchor?.item.type === 'mismatch' ? (
-          <MenuItem
-            onClick={() => {
-              const { item } = contextMenuAnchor
-              // @ts-expect-error setSortedByAtPosition is added to the pileup model
-              displayModel.setSortedByAtPosition?.(
-                'Base pair',
-                item.start,
-                refName,
-              )
-              setContextMenuAnchor(null)
-            }}
-          >
-            Sort by base pair
-          </MenuItem>
-        ) : null}
-      </Menu>
     </div>
   )
 })

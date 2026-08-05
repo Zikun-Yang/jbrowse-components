@@ -1,9 +1,10 @@
 import Plugin from '@jbrowse/core/Plugin'
-import { Indexing } from '@jbrowse/core/ui/Icons'
 import {
   isAbstractMenuManager,
   isSessionModelWithWidgets,
 } from '@jbrowse/core/util'
+
+import { Indexing } from '@jbrowse/core/ui/Icons'
 
 import JobsListWidgetF from './JobsListWidget/index.ts'
 

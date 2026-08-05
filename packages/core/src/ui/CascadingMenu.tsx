@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import { useState } from 'react'
 
-import ChevronRight from '@mui/icons-material/ChevronRight'
 import {
   Divider,
   ListItemIcon,
@@ -10,6 +9,8 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material'
+
+import { ChevronRightIcon as ChevronRight } from '@jbrowse/core/ui/Icons'
 
 import CascadingMenuHelpIconButton from './CascadingMenuHelpIconButton.tsx'
 import HoverMenu from './HoverMenu.tsx'

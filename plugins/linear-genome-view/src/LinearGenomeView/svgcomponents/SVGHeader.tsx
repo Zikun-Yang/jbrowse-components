@@ -6,7 +6,7 @@ import SVGRuler from './SVGRuler.tsx'
 import SVGScalebar from './SVGScalebar.tsx'
 import Cytobands from '../components/Cytobands.tsx'
 import OverviewScalebarPolygon from '../components/OverviewScalebarPolygon.tsx'
-import { HEADER_OVERVIEW_HEIGHT } from '../consts.ts'
+import { HEADER_OVERVIEW_BAR_HEIGHT } from '../consts.ts'
 
 import type { LinearGenomeViewModel } from '../index.ts'
 
@@ -24,7 +24,6 @@ export default function SVGHeader({
   const { width, assemblyNames, showCytobands, displayedRegions } = model
   const { assemblyManager } = getSession(model)
   const assemblyName = assemblyNames.length > 1 ? '' : assemblyNames[0]!
-  const assembly = assemblyManager.get(assemblyName)
   const theme = useTheme()
   const c = stripAlpha(theme.palette.text.primary)
   const overview = Base1DView.create({
@@ -39,7 +38,7 @@ export default function SVGHeader({
 
   overview.setVolatileWidth(width)
   overview.showAllRegions()
-  const block = overview.dynamicBlocks.contentBlocks[0]!
+  const blocks = overview.dynamicBlocks.contentBlocks
   const first = visibleRegions.at(0)!
   const last = visibleRegions.at(-1)!
   const firstOverviewPx =
@@ -64,22 +63,25 @@ export default function SVGHeader({
 
       {showCytobands ? (
         <g transform={`translate(0 ${rulerHeight})`}>
-          <Cytobands overview={overview} assembly={assembly} block={block} />
+          {blocks.map(block => (
+            <Cytobands
+              key={`${block.refName}-${block.start}-${block.end}`}
+              overview={overview}
+              assembly={assemblyManager.get(block.assemblyName)}
+              block={block}
+            />
+          ))}
           <rect
             stroke="red"
             fill="rgb(255,0,0)"
             fillOpacity={0.1}
             width={Math.max(lastOverviewPx - firstOverviewPx, 0.5)}
-            height={HEADER_OVERVIEW_HEIGHT - 1}
+            height={HEADER_OVERVIEW_BAR_HEIGHT - 1}
             x={firstOverviewPx}
             y={0.5}
           />
-          <g transform={`translate(0,${HEADER_OVERVIEW_HEIGHT})`}>
-            <OverviewScalebarPolygon
-              overview={overview}
-              model={model}
-              useOffset={false}
-            />
+          <g transform={`translate(0,${HEADER_OVERVIEW_BAR_HEIGHT})`}>
+            <OverviewScalebarPolygon overview={overview} model={model} />
           </g>
         </g>
       ) : null}

@@ -6,6 +6,7 @@ import {
   expectCanvasMatch,
   exportAndVerifySvg,
   hts,
+  openTrackMenu,
   setup,
 } from './util.tsx'
 
@@ -28,13 +29,16 @@ test('opens a vcf track and clusters genotypes', async () => {
   await view.navToLocString('ctgA:1-50000')
 
   fireEvent.click(await findByTestId(hts('volvox_test_vcf'), ...opts))
-  fireEvent.click(await findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu({ findAllByTestId }, 'volvox_test_vcf')
   fireEvent.click(await findByText('Display types', ...opts))
   fireEvent.click(
     await findByText('Multi-sample variant display (matrix)', ...opts),
   )
+  await waitFor(() => {
+    expect(view.tracks[0].displays[0].type).toBe('LinearVariantMatrixDisplay')
+  }, delay)
 
-  fireEvent.click(await findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu({ findAllByTestId }, 'volvox_test_vcf')
   fireEvent.click(await findByText('Cluster by genotype', ...opts))
 
   const elt = await findByText('Run clustering', ...opts)

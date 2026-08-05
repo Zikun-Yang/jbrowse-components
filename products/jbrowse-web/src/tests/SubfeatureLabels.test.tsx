@@ -6,6 +6,7 @@ import {
   doBeforeEach,
   expectCanvasMatch,
   hts,
+  openTrackMenu,
   setup,
 } from './util.tsx'
 
@@ -32,7 +33,7 @@ test('toggle subfeature labels to below and verify eden.1 label appears', async 
   await findAllByTestId(/prerendered_canvas.*done/, ...opts)
 
   // Open track menu
-  await user.click(await screen.findByTestId('track_menu_icon', ...opts))
+  await openTrackMenu(screen)
 
   // Navigate to Show... -> Subfeature labels -> below
   await user.click(await screen.findByText('Show...', ...opts))

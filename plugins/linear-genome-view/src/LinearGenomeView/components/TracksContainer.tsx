@@ -24,6 +24,17 @@ const useStyles = makeStyles()({
   tracksContainer: {
     position: 'relative',
     contain: 'layout style',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  tracksScrollArea: {
+    flex: 1,
+    minHeight: 0,
+    // Internal track scrolling only when the view is inside a dockview panel.
+    '[data-panel-id] &': {
+      overflowX: 'hidden',
+      overflowY: 'auto',
+    },
   },
 })
 
@@ -33,21 +44,17 @@ const TracksContainer = observer(function TracksContainer({
   children,
   model,
   className,
+  pinnedTracks,
 }: {
   children: React.ReactNode
   model: LGV
   className?: string
+  pinnedTracks?: React.ReactNode
 }) {
   const { classes, cx } = useStyles()
   const { pluginManager } = getEnv(model)
   const { mouseDown: mouseDown1, mouseUp } = useSideScroll(model)
-  const {
-    stickyViewHeaders,
-    rubberbandTop,
-    showGridlines,
-    showCenterLine,
-    isScalebarRefNameMenuOpen,
-  } = model
+  const { showGridlines, showCenterLine, isScalebarRefNameMenuOpen } = model
   const ref = useRef<HTMLDivElement>(null)
   const {
     guideX,
@@ -100,8 +107,6 @@ const TracksContainer = observer(function TracksContainer({
             numOfBpSelected={numOfBpSelected}
             width={width}
             left={left}
-            top={rubberbandTop}
-            sticky={stickyViewHeaders}
           />
         </Suspense>
       ) : null}
@@ -140,7 +145,8 @@ const TracksContainer = observer(function TracksContainer({
       />
       <HighlightGroup model={model} />
       {additional}
-      {children}
+      {pinnedTracks}
+      <div className={classes.tracksScrollArea}>{children}</div>
     </div>
   )
 })

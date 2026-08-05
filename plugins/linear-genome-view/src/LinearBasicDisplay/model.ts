@@ -43,6 +43,10 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         /**
          * #property
          */
+        trackLabelPlacement: types.maybe(types.string),
+        /**
+         * #property
+         */
         trackDisplayDirectionalChevrons: types.maybe(types.boolean),
         /**
          * #property
@@ -72,6 +76,15 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
       /**
        * #getter
        */
+      get labelPlacement() {
+        return (
+          self.trackLabelPlacement ??
+          getConf(self, ['renderer', 'labelPlacement'])
+        )
+      },
+      /**
+       * #getter
+       */
       get displayDirectionalChevrons() {
         return (
           self.trackDisplayDirectionalChevrons ??
@@ -95,6 +108,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
             self.trackShowDescriptions ?? config.showDescriptions,
           subfeatureLabels:
             self.trackSubfeatureLabels ?? config.subfeatureLabels,
+          labelPlacement: self.trackLabelPlacement ?? config.labelPlacement,
           displayMode: self.trackDisplayMode ?? config.displayMode,
           maxHeight: self.trackMaxHeight ?? config.maxHeight,
           geneGlyphMode: self.trackGeneGlyphMode ?? config.geneGlyphMode,
@@ -116,6 +130,12 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
        */
       setSubfeatureLabels(val: string) {
         self.trackSubfeatureLabels = val
+      },
+      /**
+       * #action
+       */
+      setLabelPlacement(val: string) {
+        self.trackLabelPlacement = val
       },
       /**
        * #action
@@ -180,6 +200,20 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
                 })),
               },
               {
+                label: 'Label placement',
+                subMenu: [
+                  { value: 'left', label: 'Left of feature' },
+                  { value: 'below', label: 'Below feature' },
+                ].map(({ value, label }) => ({
+                  label,
+                  type: 'radio' as const,
+                  checked: self.labelPlacement === value,
+                  onClick: () => {
+                    self.setLabelPlacement(value)
+                  },
+                })),
+              },
+              {
                 label: 'Gene glyph',
                 subMenu: [
                   {
@@ -217,6 +251,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
       const {
         trackGeneGlyphMode,
         trackSubfeatureLabels,
+        trackLabelPlacement,
         trackDisplayDirectionalChevrons,
         ...rest
       } = snap as Omit<typeof snap, symbol>
@@ -226,6 +261,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         ...(trackSubfeatureLabels !== undefined
           ? { trackSubfeatureLabels }
           : {}),
+        ...(trackLabelPlacement !== undefined ? { trackLabelPlacement } : {}),
         ...(trackDisplayDirectionalChevrons !== undefined
           ? { trackDisplayDirectionalChevrons }
           : {}),

@@ -1,5 +1,11 @@
+import { MemoryRouter } from 'react-router-dom'
+
 import JBrowse from '../components/JBrowse.tsx'
 
 export default function TestingJBrowse(props: any) {
-  return <JBrowse {...props} />
+  return (
+    <MemoryRouter initialEntries={['/workspace']}>
+      <JBrowse {...props} />
+    </MemoryRouter>
+  )
 }

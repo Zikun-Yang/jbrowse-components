@@ -1,8 +1,8 @@
 import { lazy } from 'react'
 
 import { getSession } from '@jbrowse/core/util'
-import ClearAllIcon from '@mui/icons-material/ClearAll'
-import PaletteIcon from '@mui/icons-material/Palette'
+
+import { ClearAllIcon, PaletteIcon } from '@jbrowse/core/ui/Icons'
 
 import { modificationData } from './modificationData.ts'
 

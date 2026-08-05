@@ -1,8 +1,9 @@
 import type React from 'react'
 import { Suspense, useState } from 'react'
 
-import HelpOutline from '@mui/icons-material/HelpOutline'
 import { IconButton } from '@mui/material'
+
+import { HelpOutlineIcon as HelpOutline } from '@jbrowse/core/ui/Icons'
 
 import CascadingMenuHelpDialog from './CascadingMenuHelpDialog.tsx'
 

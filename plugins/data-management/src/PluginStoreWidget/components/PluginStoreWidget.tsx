@@ -4,9 +4,6 @@ import { LoadingEllipses } from '@jbrowse/core/ui'
 import { getSession, isElectron } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { getEnv } from '@jbrowse/mobx-state-tree'
-import ClearIcon from '@mui/icons-material/Clear'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Accordion,
   AccordionSummary,
@@ -17,6 +14,12 @@ import {
   Typography,
 } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  ClearIcon,
+  ExpandMoreIcon,
+  InfoOutlinedIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import InstalledPluginsList from './InstalledPluginsList.tsx'
 import PluginCard from './PluginCard.tsx'

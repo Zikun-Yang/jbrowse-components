@@ -1,19 +1,22 @@
 import { useState } from 'react'
 
-import { TrackSelector as TrackSelectorIcon } from '@jbrowse/core/ui/Icons'
 import JBrowseMenu from '@jbrowse/core/ui/Menu'
 import { getSession } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import LockIcon from '@mui/icons-material/Lock'
-import LockOpenIcon from '@mui/icons-material/LockOpen'
-import MoreVert from '@mui/icons-material/MoreVert'
-import PhotoCamera from '@mui/icons-material/PhotoCamera'
-import RotateLeftIcon from '@mui/icons-material/RotateLeft'
-import RotateRightIcon from '@mui/icons-material/RotateRight'
-import ZoomInIcon from '@mui/icons-material/ZoomIn'
-import ZoomOutIcon from '@mui/icons-material/ZoomOut'
 import { IconButton } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import {
+  LockIcon,
+  LockOpenIcon,
+  MoreVertIcon as MoreVert,
+  PhotoCameraIcon as PhotoCamera,
+  RotateLeftIcon,
+  RotateRightIcon,
+  TrackSelector as TrackSelectorIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from '@jbrowse/core/ui/Icons'
 
 import ExportSvgDialog from './ExportSvgDialog.tsx'
 
