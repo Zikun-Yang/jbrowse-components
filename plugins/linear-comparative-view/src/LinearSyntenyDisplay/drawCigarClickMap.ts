@@ -8,7 +8,7 @@ import {
   oobLimit,
 } from './drawSyntenyUtils.ts'
 
-import type { defaultCigarColors } from './drawSyntenyUtils.ts'
+import type { cigarColors } from './drawSyntenyUtils.ts'
 import type { LinearSyntenyDisplayModel } from './model.ts'
 import type { LinearSyntenyViewModel } from '../LinearSyntenyView/model.ts'
 
@@ -67,7 +67,7 @@ export function drawCigarClickMap(
 
         for (let j = 0; j < cigar.length; j += 2) {
           const len = +cigar[j]!
-          const op = cigar[j + 1] as keyof typeof defaultCigarColors
+          const op = cigar[j + 1] as keyof typeof cigarColors
 
           if (!continuingFlag) {
             px1 = cx1

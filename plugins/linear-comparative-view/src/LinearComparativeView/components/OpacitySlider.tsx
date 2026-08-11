@@ -1,32 +1,19 @@
-import { makeStyles } from '@jbrowse/core/util/tss-react'
-import { Box, Slider, Typography } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import SliderTooltip from './SliderTooltip.tsx'
+import SnappingSlider from './SnappingSlider.tsx'
 
 import type { LinearSyntenyDisplayModel } from '../../LinearSyntenyDisplay/model.ts'
 import type { LinearComparativeViewModel } from '../model.ts'
 
-const useStyles = makeStyles()(theme => ({
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: 16,
-    marginRight: 16,
-    minWidth: 150,
-  },
-  slider: {
-    width: 100,
-    color: theme.palette.text.secondary,
-  },
-}))
+const OPACITY_VALUES = [0, 0.25, 0.5, 0.75, 1]
+
+const formatOpacity = (v: number) => `${v}`
 
 const OpacitySlider = observer(function OpacitySlider({
   model,
 }: {
   model: LinearComparativeViewModel
 }) {
-  const { classes } = useStyles()
   const { levels } = model
 
   // Get the first synteny display from the first level (if it exists)
@@ -34,49 +21,26 @@ const OpacitySlider = observer(function OpacitySlider({
     | LinearSyntenyDisplayModel
     | undefined
 
-  const alpha = firstDisplay?.alpha ?? 1
-
-  // Use a cubic function for logarithmic-like scaling
-  // More granularity near 0, coarser towards 1
-  const exponent = 3
-  const alphaToSlider = (a: number) => Math.pow(a, 1 / exponent)
-  const sliderToAlpha = (s: number) => Math.pow(s, exponent)
-
-  const sliderValue = alphaToSlider(alpha)
-
-  const handleAlphaChange = (_event: Event, value: number | number[]) => {
-    const sliderVal = typeof value === 'number' ? value : value[0]!
-    const newAlpha = sliderToAlpha(sliderVal)
+  const setAll = (alpha: number) => {
     // Set alpha for all synteny displays across all levels
     for (const level of levels) {
       for (const track of level.tracks) {
         for (const display of track.displays) {
-          ;(display as LinearSyntenyDisplayModel).setAlpha(newAlpha)
+          ;(display as LinearSyntenyDisplayModel).setAlpha(alpha)
         }
       }
     }
   }
 
   return (
-    <Box className={classes.container}>
-      <Typography variant="body2" style={{ marginRight: 8 }}>
-        Opacity:
-      </Typography>
-      <Slider
-        value={sliderValue}
-        onChange={handleAlphaChange}
-        min={0}
-        max={1}
-        step={0.01}
-        valueLabelDisplay="auto"
-        size="small"
-        className={classes.slider}
-        slots={{
-          valueLabel: SliderTooltip,
-        }}
-        valueLabelFormat={(value: number) => sliderToAlpha(value).toFixed(3)}
-      />
-    </Box>
+    <SnappingSlider
+      label="Opacity:"
+      values={OPACITY_VALUES}
+      value={firstDisplay?.alpha ?? 1}
+      onChange={setAll}
+      onChangeCommitted={setAll}
+      format={formatOpacity}
+    />
   )
 })
 

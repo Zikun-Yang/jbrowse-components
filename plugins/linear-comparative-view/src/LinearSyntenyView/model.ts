@@ -1,10 +1,11 @@
 import { lazy } from 'react'
 
 import { getSession } from '@jbrowse/core/util'
-import { addDisposer, types } from '@jbrowse/mobx-state-tree'
-import { autorun, observable, when } from 'mobx'
+import { addDisposer, getPath, types } from '@jbrowse/mobx-state-tree'
+import { autorun, observable, reaction, when } from 'mobx'
 
 import {
+  CenterFocusStrongIcon,
   CropFreeIcon,
   LinkIcon,
   PhotoCameraIcon,
@@ -13,6 +14,7 @@ import {
 } from '@jbrowse/core/ui/Icons'
 
 import { Curves } from './components/Icons.tsx'
+import { buildLevelIndex, computeFollowTargets } from './util/followSynteny.ts'
 import baseModel from '../LinearComparativeView/model.ts'
 
 import type {
@@ -20,14 +22,49 @@ import type {
   ImportFormSyntenyTrack,
   LinearSyntenyViewInit,
 } from './types.ts'
+import type { Window } from './util/followSynteny.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
+import type { Feature } from '@jbrowse/core/util'
 import type { Instance } from '@jbrowse/mobx-state-tree'
+import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 // lazies
 const ExportSvgDialog = lazy(() => import('./components/ExportSvgDialog.tsx'))
 const DiagonalizationProgressDialog = lazy(
   () => import('./components/DiagonalizationProgressDialog.tsx'),
 )
+
+// idempotence check: is the target view already showing the mapped windows?
+// single window compares center and visible span; multiple windows compare
+// the displayed regions segment-by-segment plus total visible span, all with
+// a ~2px tolerance so the resync reaction doesn't re-apply endlessly
+function matchesWindows(view: LinearGenomeViewModel, windows: Window[]) {
+  const tolerance = view.bpPerPx * 2
+  if (windows.length === 1) {
+    const target = windows[0]!
+    const current = view.centerLineInfo
+    return (
+      current?.refName === target.refName &&
+      Math.abs(current.coord - (target.start + target.end) / 2) < tolerance &&
+      Math.abs(view.bpPerPx * view.width - (target.end - target.start)) <
+        tolerance
+    )
+  }
+  const regions = view.displayedRegions
+  const totalBp = windows.reduce((acc, w) => acc + w.end - w.start, 0)
+  return (
+    regions.length === windows.length &&
+    windows.every((w, i) => {
+      const r = regions[i]!
+      return (
+        r.refName === w.refName &&
+        Math.abs(r.start - w.start) < tolerance &&
+        Math.abs(r.end - w.end) < tolerance
+      )
+    }) &&
+    Math.abs(view.bpPerPx * view.width - totalBp) < tolerance
+  )
+}
 
 /**
  * #stateModel LinearSyntenyView
@@ -55,7 +92,7 @@ export default function stateModelFactory(pluginManager: PluginManager) {
         /**
          * #property
          */
-        drawCurves: false,
+        drawCurves: true,
         /**
          * #property
          */
@@ -339,6 +376,17 @@ export default function stateModelFactory(pluginManager: PluginManager) {
                 'When linked, panning and zooming in one genome view will automatically adjust the other view to maintain the correspondence shown by synteny lines. This makes it easier to explore syntenic regions interactively. Unlink views to navigate each genome independently.',
             },
             {
+              label: 'Follow synteny',
+              type: 'checkbox',
+              checked: self.followSynteny,
+              icon: CenterFocusStrongIcon,
+              onClick: () => {
+                self.setFollowSynteny(!self.followSynteny)
+              },
+              helpText:
+                'When enabled, navigating in one genome view makes the other genome views display the corresponding lifted-over region: the currently visible region is mapped through the synteny alignments (including CIGAR-level detail and inversions) and the other views jump to exactly the mapped position and zoom level. If the corresponding region is on a chromosome not currently displayed, the view switches to it automatically. After fast scrolling or long jumps the other views may catch up with a slight delay, once the synteny track finishes rendering the newly loaded alignments.',
+            },
+            {
               label: 'Export SVG',
               icon: PhotoCameraIcon,
               onClick: (): void => {
@@ -376,8 +424,204 @@ export default function stateModelFactory(pluginManager: PluginManager) {
         },
       }
     })
+    .views(self => ({
+      /**
+       * #method
+       * synteny-aware follow: after a navigation in `source`, lift its visible
+       * window through each level's synteny alignments (exact per-base mapping
+       * of every overlapping block, merged into one envelope per target
+       * chromosome) and make the other sub-views display the mapped regions
+       */
+      async followFromView(source: unknown) {
+        let sourceIndex = self.views.findIndex(v => v === source)
+        if (sourceIndex === -1) {
+          sourceIndex = self.views.findIndex(
+            v => getPath(v) === getPath(source as (typeof self.views)[0]),
+          )
+        }
+        if (sourceIndex === -1) {
+          return
+        }
+        const sourceView = self.views[sourceIndex]!
+        const center = sourceView.centerLineInfo
+        if (!center?.refName) {
+          return
+        }
+
+        // suppress echoes of navigation we applied ourselves
+        const last = self.lastApplied.get(sourceView.id)
+        if (
+          last &&
+          last.refName === center.refName &&
+          Math.abs(last.coord - center.coord) < sourceView.bpPerPx * 2
+        ) {
+          return
+        }
+
+        const seq = self.incFollowSeq()
+        self.incFollowing()
+        try {
+          const { assemblyManager } = getSession(self)
+          const canonicalize = (asm: string, ref: string) =>
+            assemblyManager.get(asm)?.getCanonicalRefName(ref) || ref
+          const levelIndexes = self.levels.map(level => {
+            const fwdFeatures: Feature[] = []
+            const revFeatures: Feature[] = []
+            for (const track of level.tracks as {
+              displays: {
+                type: string
+                features?: Feature[]
+                mateFeatures?: Feature[]
+              }[]
+            }[]) {
+              for (const d of track.displays) {
+                if (d.type === 'LinearSyntenyDisplay') {
+                  fwdFeatures.push(...(d.features ?? []))
+                  revFeatures.push(...(d.mateFeatures ?? []))
+                }
+              }
+            }
+            return {
+              fwd: fwdFeatures.length
+                ? buildLevelIndex(fwdFeatures, canonicalize)
+                : undefined,
+              rev: revFeatures.length
+                ? buildLevelIndex(revFeatures, canonicalize)
+                : undefined,
+            }
+          })
+
+          const halfWidthBp = (sourceView.bpPerPx * sourceView.width) / 2
+          const leftEdge = sourceView.pxToBp(0)
+          const rightEdge = sourceView.pxToBp(sourceView.width)
+          const start =
+            leftEdge.refName === center.refName
+              ? leftEdge.coord
+              : center.coord - halfWidthBp
+          const end =
+            rightEdge.refName === center.refName
+              ? rightEdge.coord
+              : center.coord + halfWidthBp
+          const targets = computeFollowTargets({
+            sourceIndex,
+            source: {
+              refName: center.refName,
+              start: Math.min(start, end),
+              end: Math.max(start, end),
+            },
+            levelIndexes,
+            maxCumulativePct: self.followCumulativePct,
+          })
+
+          for (const [index, windows] of targets) {
+            const view = self.views[index]!
+            if (matchesWindows(view, windows)) {
+              continue
+            }
+            if (
+              windows.length === 1 &&
+              view.displayedRegions.some(r => r.refName === windows[0]!.refName)
+            ) {
+              const target = windows[0]!
+              view.zoomTo((target.end - target.start) / view.width)
+              view.centerAt((target.start + target.end) / 2, target.refName)
+            } else {
+              try {
+                // multiple windows land on different chromosomes (or on a
+                // chromosome not currently displayed): navToLocString sets
+                // the displayed regions to the exact mapped segments and
+                // tiles them across the view
+                // eslint-disable-next-line no-await-in-loop
+                await view.navToLocString(
+                  windows
+                    .map(
+                      w =>
+                        `${w.refName}:${Math.max(0, Math.floor(w.start))}-${Math.ceil(w.end)}`,
+                    )
+                    .join(' '),
+                  view.assemblyNames[0],
+                )
+              } catch (e) {
+                console.error(e)
+              }
+            }
+            if (seq !== self.followSeq) {
+              return
+            }
+            const applied = view.centerLineInfo
+            if (applied?.refName) {
+              self.setLastApplied(view.id, {
+                refName: applied.refName,
+                coord: applied.coord,
+              })
+            }
+          }
+        } finally {
+          self.decFollowing()
+        }
+      },
+    }))
     .actions(self => ({
       afterAttach() {
+        addDisposer(
+          self,
+          // re-apply follow when the synteny displays finish rendering new
+          // data: a navigation may fire while the alignments covering the new
+          // position are not loaded yet (e.g. a jump to a distant locus), in
+          // which case followFromView finds no coverage and does nothing. once
+          // the render catches up, this re-runs follow from the last
+          // user-navigated view. a reaction is used (not autorun) so the
+          // follow application itself runs untracked and cannot retrigger the
+          // observer
+          reaction(
+            () => {
+              if (!self.followSynteny || !self.lastNavSource) {
+                return undefined
+              }
+              // include the filter threshold so that moving the slider
+              // re-applies follow immediately, without waiting for a new
+              // navigation
+              return `${self.levels
+                .map(level =>
+                  level.tracks
+                    .flatMap(
+                      (track: {
+                        displays: {
+                          type: string
+                          features?: Feature[]
+                          mateFeatures?: Feature[]
+                        }[]
+                      }) =>
+                        track.displays.flatMap(d =>
+                          [
+                            ...(d.features ?? []),
+                            ...(d.mateFeatures ?? []),
+                          ].map(f => f.id()),
+                        ),
+                    )
+                    .join(','),
+                )
+                .join('|')}|pct=${self.followCumulativePct}`
+            },
+            sig => {
+              if (sig === undefined) {
+                return
+              }
+              const src = self.lastNavSource
+              if (!src || self.isFollowing > 0) {
+                return
+              }
+              if (!self.views.includes(src as (typeof self.views)[0])) {
+                self.setLastNavSource(undefined)
+                return
+              }
+              self.followFromView(src).catch((e: unknown) => {
+                console.error(e)
+              })
+            },
+            { name: 'LinearSyntenyViewFollowResync' },
+          ),
+        )
         addDisposer(
           self,
           autorun(
@@ -484,7 +728,7 @@ export default function stateModelFactory(pluginManager: PluginManager) {
         ...rest,
         ...(!drawCIGAR ? { drawCIGAR } : {}),
         ...(drawCIGARMatchesOnly ? { drawCIGARMatchesOnly } : {}),
-        ...(drawCurves ? { drawCurves } : {}),
+        ...(!drawCurves ? { drawCurves } : {}),
         ...(drawLocationMarkers ? { drawLocationMarkers } : {}),
       } as typeof snap
     })

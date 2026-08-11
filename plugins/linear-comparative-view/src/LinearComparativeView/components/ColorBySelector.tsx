@@ -16,7 +16,7 @@ const ColorBySelector = observer(function ColorBySelector({
     | LinearSyntenyDisplayModel
     | undefined
 
-  const colorBy = firstDisplay?.colorBy ?? 'default'
+  const colorBy = firstDisplay?.colorBy ?? 'strand'
 
   const setColorBy = (value: string) => {
     // Set colorBy for all displays across all levels
@@ -33,16 +33,6 @@ const ColorBySelector = observer(function ColorBySelector({
     <CascadingMenuButton
       menuItems={[
         {
-          label: 'Default',
-          type: 'radio',
-          checked: colorBy === 'default',
-          onClick: () => {
-            setColorBy('default')
-          },
-          helpText:
-            'Use the default color scheme with CIGAR operation coloring. Insertions, deletions, matches, and mismatches are shown in different colors with transparency.',
-        },
-        {
           label: 'Strand',
           type: 'radio',
           checked: colorBy === 'strand',
@@ -50,17 +40,31 @@ const ColorBySelector = observer(function ColorBySelector({
             setColorBy('strand')
           },
           helpText:
-            'Color alignments by strand orientation. Forward strand alignments and reverse strand alignments are shown in different colors, making it easy to identify inversions and strand-specific patterns.',
+            'Color alignments by strand orientation. Forward strand alignments are gray and reverse strand alignments use the theme primary color, making inversions easy to spot.',
         },
         {
-          label: 'Query',
+          label: 'Identity',
           type: 'radio',
-          checked: colorBy === 'query',
+          checked: colorBy === 'identity',
           onClick: () => {
-            setColorBy('query')
+            setColorBy('identity')
           },
           helpText:
-            'Color alignments by query sequence name. Each unique query sequence is assigned a consistent color based on its name, making it easy to visually distinguish between different sequences.',
+            'Color alignments by sequence identity: 85% or below is the theme primary color (green), 100% is red, with yellow in between. Alignments without identity information are shown in gray.',
+        },
+        {
+          label: 'Query position (rainbow)',
+          subMenu: model.views.map((view, i) => ({
+            label: view.assemblyNames.join(', ') || `Genome ${i + 1}`,
+            type: 'radio' as const,
+            checked: colorBy === 'rainbow' && model.rainbowAnchor === i,
+            onClick: () => {
+              model.setRainbowAnchor(i)
+              setColorBy('rainbow')
+            },
+          })),
+          helpText:
+            "Color alignments by where they map onto the anchor genome, as a rainbow along each chromosome from 5' (blue) to 3' (red). Displays not adjacent to the anchor genome are colored by chaining through the alignments in between; regions that cannot be mapped to the anchor are shown in gray.",
         },
       ]}
     >

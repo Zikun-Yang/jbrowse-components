@@ -12,6 +12,7 @@ import {
 } from '@jbrowse/core/ui/Icons'
 
 import ColorBySelector from './ColorBySelector.tsx'
+import FollowCoverageSlider from './FollowCoverageSlider.tsx'
 import HeaderSearchBoxes from './HeaderSearchBoxes.tsx'
 import MinLengthSlider from './MinLengthSlider.tsx'
 import OpacitySlider from './OpacitySlider.tsx'
@@ -115,6 +116,7 @@ const Header = observer(function Header({
           <ColorBySelector model={model} />
           <OpacitySlider model={model} />
           <MinLengthSlider model={model} />
+          {model.followSynteny ? <FollowCoverageSlider model={model} /> : null}
         </>
       ) : null}
 

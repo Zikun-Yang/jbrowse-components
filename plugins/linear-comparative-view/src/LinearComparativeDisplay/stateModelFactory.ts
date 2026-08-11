@@ -50,6 +50,14 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
       features: undefined as Feature[] | undefined,
       /**
        * #volatile
+       * features fetched over views[level + 1]'s blocks with the adapter's
+       * orientation auto-flipped, so refName is in views[level + 1] coords and
+       * mate in views[level] coords. only populated while followSynteny is on;
+       * used exclusively to build the reverse follow index, never rendered
+       */
+      mateFeatures: undefined as Feature[] | undefined,
+      /**
+       * #volatile
        */
       message: undefined as string | undefined,
       /**
@@ -123,36 +131,31 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
             return
           }
           const { features } = args
-          const existingFeatures = self.features || []
-
-          const featIds = new Set(existingFeatures.map(f => f.id()))
-          const newFeatIds = new Set(features.map(f => f.id()))
-
-          let foundNewFeatureNotInExistingMap = false
-          let foundExistingFeatureNotInNewMap = false
-          for (const feat of features) {
-            if (!featIds.has(feat.id())) {
-              foundNewFeatureNotInExistingMap = true
-              break
-            }
-          }
-          for (const existingFeat of existingFeatures) {
-            if (!newFeatIds.has(existingFeat.id())) {
-              foundExistingFeatureNotInNewMap = true
-              break
-            }
-          }
-
           self.message = undefined
           self.error = undefined
           stopToken = undefined
-
           if (
-            foundNewFeatureNotInExistingMap ||
-            foundExistingFeatureNotInNewMap ||
+            featureSetChanged(self.features || [], features) ||
             !self.features
           ) {
             self.features = features
+          }
+        },
+
+        /**
+         * #action
+         * controlled by a reaction
+         */
+        setMateRendered(args?: { features: Feature[] }) {
+          if (!args) {
+            return
+          }
+          const { features } = args
+          if (
+            featureSetChanged(self.mateFeatures || [], features) ||
+            !self.mateFeatures
+          ) {
+            self.mateFeatures = features
           }
         },
 
@@ -188,8 +191,38 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
           self.setRendered,
           self.setError,
         )
+        // reverse-coverage fetch for followSynteny: loads the same track's
+        // alignments over views[level + 1]'s blocks (adapter flips
+        // orientation), so that following navigation from the bottom view
+        // works even when the top view's own render has no coverage of the
+        // new position. gated on followSynteny to cost nothing when off.
+        makeAbortableReaction(
+          // @ts-expect-error
+          self,
+          mateRenderBlockData,
+          mateRenderBlockEffect,
+          {
+            name: `${self.type} ${self.id} mate feature fetch`,
+            delay: 1000,
+            fireImmediately: true,
+          },
+          () => {},
+          self.setMateRendered,
+          (e: unknown) => {
+            console.error(e)
+          },
+        )
       },
     }))
+}
+
+function featureSetChanged(existing: Feature[], next: Feature[]) {
+  const existingIds = new Set(existing.map(f => f.id()))
+  const nextIds = new Set(next.map(f => f.id()))
+  return (
+    next.some(f => !existingIds.has(f.id())) ||
+    existing.some(f => !nextIds.has(f.id()))
+  )
 }
 function renderBlockData(self: LinearComparativeDisplay) {
   const { rpcManager } = getSession(self)
@@ -238,6 +271,49 @@ async function renderBlockEffect(props: ReturnType<typeof renderBlockData>) {
         statusCallback: (arg: string) => {
           model.setLoadingStatus(arg)
         },
+      })) as Feature[],
+      f => f.id(),
+    ),
+  }
+}
+
+function mateRenderBlockData(self: LinearComparativeDisplay) {
+  const { rpcManager } = getSession(self)
+  readConfObject(self.configuration)
+  const { level, adapterConfig } = self
+  const parent = getContainingView(self) as LinearComparativeViewModel
+  const sessionId = getRpcSessionId(self)
+  getSnapshot(parent)
+  return parent.initialized && parent.followSynteny
+    ? {
+        rpcManager,
+        renderProps: {
+          model: self,
+          level,
+          view: parent,
+          adapterConfig,
+          sessionId,
+          timeout: 1000000,
+        },
+      }
+    : undefined
+}
+
+async function mateRenderBlockEffect(
+  props: ReturnType<typeof mateRenderBlockData>,
+) {
+  if (!props) {
+    return
+  }
+  const { rpcManager, renderProps } = props
+  const { sessionId, adapterConfig, level } = renderProps
+  const view = renderProps.view.views[level + 1]!
+  return {
+    features: dedupe(
+      (await rpcManager.call(sessionId, 'CoreGetFeatures', {
+        regions: view.staticBlocks.contentBlocks,
+        sessionId,
+        adapterConfig,
       })) as Feature[],
       f => f.id(),
     ),

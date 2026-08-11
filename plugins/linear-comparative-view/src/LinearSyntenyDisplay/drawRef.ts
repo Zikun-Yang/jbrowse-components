@@ -12,7 +12,7 @@ import {
   oobLimit,
 } from './drawSyntenyUtils.ts'
 
-import type { defaultCigarColors } from './drawSyntenyUtils.ts'
+import type { cigarColors } from './drawSyntenyUtils.ts'
 import type { LinearSyntenyDisplayModel } from './model.ts'
 import type { LinearSyntenyViewModel } from '../LinearSyntenyView/model.ts'
 
@@ -38,7 +38,6 @@ export function drawRef(
   const colorMapWithAlpha = model.colorMapWithAlpha
   const posColorWithAlpha = model.posColorWithAlpha
   const negColorWithAlpha = model.negColorWithAlpha
-  const getQueryColorWithAlpha = model.queryColorWithAlphaMap
   const queryTotalLengths = model.queryTotalLengths
 
   const offsets = view.views.map(v => v.offsetPx)
@@ -52,7 +51,6 @@ export function drawRef(
 
   // Cache colorBy checks outside loop for performance
   const useStrandColor = colorBy === 'strand'
-  const useQueryColor = colorBy === 'query'
 
   // Cache bpPerPx values and reciprocals for division in CIGAR loop
   const bpPerPx0 = bpPerPxs[level]!
@@ -73,11 +71,16 @@ export function drawRef(
   // Single loop over features - draw main canvas and click map together
   for (const [i, featPosition] of featPositions.entries()) {
     const feature = featPosition
-    const { p11, p12, p21, p22, f, cigar } = feature
+    const { p11, p12, p21, p22, f, cigar, effStrand } = feature
 
     // Cache feature properties
+    // geometry keeps the data strand (pixel positions already account for
+    // reversed regions); only coloring uses the displayed effective strand
     const strand = f.get('strand')
-    const refName = f.get('refName')
+
+    // identity/rainbow fill precomputed in afterAttach; undefined under
+    // strand coloring
+    const fill = featPosition.fill ?? colorMapWithAlpha.M
 
     // Filter by minAlignmentLength if enabled
     if (queryTotalLengths) {
@@ -107,11 +110,9 @@ export function drawRef(
       // Set color for this line
       if (useStrandColor) {
         mainCanvas.strokeStyle =
-          strand === -1 ? negColorWithAlpha : posColorWithAlpha
-      } else if (useQueryColor) {
-        mainCanvas.strokeStyle = getQueryColorWithAlpha(refName)
+          effStrand === -1 ? negColorWithAlpha : posColorWithAlpha
       } else {
-        mainCanvas.strokeStyle = colorMapWithAlpha.M
+        mainCanvas.strokeStyle = fill
       }
 
       mainCanvas.beginPath()
@@ -147,7 +148,7 @@ export function drawRef(
 
         for (let j = 0; j < cigar.length; j += 2) {
           const len = +cigar[j]!
-          const op = cigar[j + 1] as keyof typeof defaultCigarColors
+          const op = cigar[j + 1] as keyof typeof cigarColors
 
           if (!continuingFlag) {
             px1 = cx1
@@ -196,13 +197,13 @@ export function drawRef(
               // Always keep yellow/blue for insertions/deletions regardless of colorBy
               const isInsertionOrDeletion =
                 letter === 'I' || letter === 'D' || letter === 'N'
-              if (useStrandColor && !isInsertionOrDeletion) {
-                mainCanvas.fillStyle =
-                  strand === -1 ? negColorWithAlpha : posColorWithAlpha
-              } else if (useQueryColor && !isInsertionOrDeletion) {
-                mainCanvas.fillStyle = getQueryColorWithAlpha(refName)
-              } else {
+              if (isInsertionOrDeletion) {
                 mainCanvas.fillStyle = colorMapWithAlpha[letter]
+              } else if (useStrandColor) {
+                mainCanvas.fillStyle =
+                  effStrand === -1 ? negColorWithAlpha : posColorWithAlpha
+              } else {
+                mainCanvas.fillStyle = fill
               }
 
               continuingFlag = false
@@ -253,17 +254,14 @@ export function drawRef(
         // Use custom coloring based on colorBy setting
         if (useStrandColor) {
           mainCanvas.fillStyle =
-            strand === -1 ? negColorWithAlpha : posColorWithAlpha
-        } else if (useQueryColor) {
-          mainCanvas.fillStyle = getQueryColorWithAlpha(refName)
-        }
-
-        draw(mainCanvas, x11, x12, y1, x22, x21, y2, mid, drawCurves)
-        mainCanvas.fill()
-
-        // Reset to default color if needed
-        if (useStrandColor || useQueryColor) {
+            effStrand === -1 ? negColorWithAlpha : posColorWithAlpha
+          draw(mainCanvas, x11, x12, y1, x22, x21, y2, mid, drawCurves)
+          mainCanvas.fill()
           mainCanvas.fillStyle = colorMapWithAlpha.M
+        } else {
+          mainCanvas.fillStyle = fill
+          draw(mainCanvas, x11, x12, y1, x22, x21, y2, mid, drawCurves)
+          mainCanvas.fill()
         }
       }
     }

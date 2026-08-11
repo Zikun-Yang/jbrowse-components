@@ -1,15 +1,23 @@
 import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
+import { getSession } from '@jbrowse/core/util'
+import { colord } from '@jbrowse/core/util/colord'
 import { types } from '@jbrowse/mobx-state-tree'
 
-import { applyAlpha, colorSchemes, getQueryColor } from './drawSyntenyUtils.ts'
+import {
+  applyAlpha,
+  cigarColors,
+  strandPosColor,
+  strandNegColor,
+} from './drawSyntenyUtils.ts'
 import baseModelFactory from '../LinearComparativeDisplay/stateModelFactory.ts'
 
-import type { ColorScheme } from './drawSyntenyUtils.ts'
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
 import type { Instance } from '@jbrowse/mobx-state-tree'
+import type { Theme } from '@mui/material'
 
 interface Pos {
+  index: number
   offsetPx: number
 }
 
@@ -20,6 +28,14 @@ export interface FeatPos {
   p22: Pos
   f: Feature
   cigar: string[]
+  // strand as displayed: the feature's strand flipped once for each side
+  // whose displayed region is reversed (horizontallyFlip), so strand colors
+  // match the visual slope of the polygon. 0 when the feature has no strand
+  effStrand: number
+  // precomputed fill for the identity and rainbow colorBy modes (assigned in
+  // afterAttach); undefined under strand coloring, which derives its color
+  // from effStrand at draw time
+  fill?: string
 }
 
 /**
@@ -45,7 +61,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
          * #property
          * color scheme to use for rendering synteny features
          */
-        colorBy: types.optional(types.string, 'default'),
+        colorBy: types.optional(types.string, 'strand'),
         /**
          * #property
          * alpha transparency value for synteny drawing (0-1)
@@ -225,27 +241,17 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
 
       /**
        * #getter
-       * cached color scheme config based on colorBy
-       */
-      get colorSchemeConfig() {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        return colorSchemes[self.colorBy as ColorScheme] || colorSchemes.default
-      },
-
-      /**
-       * #getter
        * cached CIGAR colors with alpha applied
        */
       get colorMapWithAlpha() {
         const { alpha } = self
-        const activeColorMap = this.colorSchemeConfig.cigarColors
         return {
-          I: applyAlpha(activeColorMap.I, alpha),
-          N: applyAlpha(activeColorMap.N, alpha),
-          D: applyAlpha(activeColorMap.D, alpha),
-          X: applyAlpha(activeColorMap.X, alpha),
-          M: applyAlpha(activeColorMap.M, alpha),
-          '=': applyAlpha(activeColorMap['='], alpha),
+          I: applyAlpha(cigarColors.I, alpha),
+          N: applyAlpha(cigarColors.N, alpha),
+          D: applyAlpha(cigarColors.D, alpha),
+          X: applyAlpha(cigarColors.X, alpha),
+          M: applyAlpha(cigarColors.M, alpha),
+          '=': applyAlpha(cigarColors['='], alpha),
         }
       },
 
@@ -254,35 +260,30 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
        * cached positive strand color with alpha
        */
       get posColorWithAlpha() {
-        const posColor =
-          self.colorBy === 'strand' ? colorSchemes.strand.posColor : 'red'
-        return applyAlpha(posColor, self.alpha)
+        return applyAlpha(strandPosColor, self.alpha)
       },
 
       /**
        * #getter
-       * cached negative strand color with alpha
+       * cached negative strand color with alpha; tracks the session theme's
+       * primary color so inversions stand out in the deployment's brand color
        */
       get negColorWithAlpha() {
-        const negColor =
-          self.colorBy === 'strand' ? colorSchemes.strand.negColor : 'blue'
-        return applyAlpha(negColor, self.alpha)
+        const { theme } = getSession(self) as { theme?: Theme }
+        return applyAlpha(
+          theme?.palette.primary.main ?? strandNegColor,
+          self.alpha,
+        )
       },
 
       /**
        * #getter
-       * cached query colors with alpha - returns a function that caches results
+       * hue of the session theme's primary color, used as the low end of the
+       * identity color scale and the inversion color; cached per theme color
        */
-      get queryColorWithAlphaMap() {
-        const { alpha } = self
-        const cache = new Map<string, string>()
-        return (queryName: string) => {
-          if (!cache.has(queryName)) {
-            const color = getQueryColor(queryName)
-            cache.set(queryName, applyAlpha(color, alpha))
-          }
-          return cache.get(queryName)!
-        }
+      get themePrimaryHue() {
+        const { theme } = getSession(self) as { theme?: Theme }
+        return colord(theme?.palette.primary.main ?? strandNegColor).toHsl().h
       },
 
       /**

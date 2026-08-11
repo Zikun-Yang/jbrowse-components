@@ -1,4 +1,3 @@
-import { category10 } from '@jbrowse/core/ui/colors'
 import { colord } from '@jbrowse/core/util/colord'
 
 export const MAX_COLOR_RANGE = 255 * 255 * 255 // max color range
@@ -18,35 +17,9 @@ export function getId(r: number, g: number, b: number, unitMultiplier: number) {
   return Math.floor((r * 255 * 255 + g * 255 + b - 1) / unitMultiplier)
 }
 
-// Simple hash function to generate consistent colors for query names
-function hashString(str: string) {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32bit integer
-  }
-  return Math.abs(hash)
-}
-
-// Generate a color from a query name using the category10 color palette
-export function getQueryColor(queryName: string) {
-  const hash = hashString(queryName)
-  return category10[hash % category10.length]!
-}
-
-// Default CIGAR operation colors
-export const defaultCigarColors = {
-  I: '#ff03',
-  N: '#0a03',
-  D: '#00f3',
-  X: 'brown',
-  M: '#f003',
-  '=': '#f003',
-}
-
-// Strand-specific CIGAR operation colors (purple deletion instead of blue)
-export const strandCigarColors = {
+// CIGAR operation colors, used for insertion/deletion ops in every colorBy
+// mode (match ops get the mode-specific color instead)
+export const cigarColors = {
   I: '#ff03',
   N: '#a020f0', // Purple for deletion
   D: '#a020f0', // Purple for deletion
@@ -55,22 +28,43 @@ export const strandCigarColors = {
   '=': '#f003',
 }
 
-// Color scheme configuration
-export const colorSchemes = {
-  default: {
-    cigarColors: defaultCigarColors,
-  },
-  strand: {
-    posColor: 'red',
-    negColor: 'blue',
-    cigarColors: strandCigarColors,
-  },
-  query: {
-    cigarColors: defaultCigarColors,
-  },
+export const strandPosColor = '#757575'
+// fallback only; the display model prefers the session theme's primary color
+// for the reverse strand
+export const strandNegColor = '#4caf50'
+
+// identity below this is rendered as the low end of the scale
+export const IDENTITY_WINDOW_LO = 0.85
+
+// traffic-light scale anchored at the theme primary's hue: themeHue -> yellow
+// (55) -> red (0), interpolated as two hue segments so the midpoint stays a
+// clean yellow instead of the muddy brown an RGB lerp would give
+export function getIdentityColor(
+  identity: number | undefined,
+  themeHue: number,
+) {
+  if (identity === undefined) {
+    return '#999999'
+  }
+  const t = Math.min(
+    1,
+    Math.max(0, (identity - IDENTITY_WINDOW_LO) / (1 - IDENTITY_WINDOW_LO)),
+  )
+  const hue =
+    t < 0.5
+      ? themeHue + (55 - themeHue) * (t * 2)
+      : 55 + (0 - 55) * ((t - 0.5) * 2)
+  // round to keep stable color strings in the face of floating point noise
+  return `hsl(${Math.round(hue * 100) / 100}, 70%, 45%)`
 }
 
-export type ColorScheme = keyof typeof colorSchemes
+// position along the anchor chromosome as a fraction of its length: 0 (5')
+// is blue-violet, 1 (3') is red. keyed to genomic coordinate, not pixel, so
+// horizontally flipped views keep the same colors
+export function getRainbowColor(frac: number) {
+  const f = Math.min(1, Math.max(0, frac))
+  return `hsl(${260 * (1 - f)}, 75%, 50%)`
+}
 
 export function applyAlpha(color: string, alpha: number) {
   // Skip colord processing if alpha is 1 (optimization)

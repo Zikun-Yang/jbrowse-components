@@ -18,6 +18,15 @@ interface TrackEntry {
 }
 
 const useStyles = makeStyles()({
+  // block-level scroll wrapper: bounded by the parent flex chain, scrolls the
+  // whole composite (views + synteny overlays) as one unit. deliberately NOT
+  // the grid itself — a definite-height grid stretches its auto rows, which
+  // would shrink the sub-views and give each its own internal scrolling
+  scrollContainer: {
+    flex: 1,
+    minHeight: 0,
+    overflowY: 'auto',
+  },
   container: {
     display: 'grid',
   },
@@ -50,25 +59,27 @@ const LinearComparativeRenderArea = observer(
     const { views, levels } = model
 
     return (
-      <div className={classes.container}>
-        {views.map((view, i) => (
-          <Fragment key={view.id}>
-            {i > 0 ? (
-              <>
-                <div className={classes.container}>
-                  <Overlays model={model} level={i - 1} />
-                </div>
-                <ResizeHandle
-                  onDrag={n =>
-                    levels[i - 1]?.setHeight((levels[i - 1]?.height || 0) + n)
-                  }
-                  className={classes.resizeHandle}
-                />
-              </>
-            ) : null}
-            <View view={view} />
-          </Fragment>
-        ))}
+      <div className={classes.scrollContainer}>
+        <div className={classes.container}>
+          {views.map((view, i) => (
+            <Fragment key={view.id}>
+              {i > 0 ? (
+                <>
+                  <div className={classes.container}>
+                    <Overlays model={model} level={i - 1} />
+                  </div>
+                  <ResizeHandle
+                    onDrag={n =>
+                      levels[i - 1]?.setHeight((levels[i - 1]?.height || 0) + n)
+                    }
+                    className={classes.resizeHandle}
+                  />
+                </>
+              ) : null}
+              <View view={view} />
+            </Fragment>
+          ))}
+        </div>
       </div>
     )
   },

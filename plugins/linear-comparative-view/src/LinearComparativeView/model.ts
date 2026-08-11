@@ -63,6 +63,27 @@ function stateModelFactory(pluginManager: PluginManager) {
         linkViews: false,
         /**
          * #property
+         * when enabled, navigating in one sub-view re-centers the other
+         * sub-views on the syntenically corresponding position
+         */
+        followSynteny: false,
+        /**
+         * #property
+         * when followSynteny maps a window onto multiple chromosomes, keep
+         * only the top chromosomes (by aligned overlap, descending) whose
+         * cumulative overlap reaches this percentage of the total, filtering
+         * out spurious repeat-induced hits; 100 keeps all
+         */
+        followCumulativePct: 100,
+        /**
+         * #property
+         * index of the sub-view whose genome anchors rainbow (query position)
+         * coloring: features in every synteny display are colored by where
+         * they map onto this genome's coordinates
+         */
+        rainbowAnchor: 0,
+        /**
+         * #property
          */
         interactiveOverlay: false,
         /**
@@ -104,6 +125,30 @@ function stateModelFactory(pluginManager: PluginManager) {
        * avoid showing the import form during loading
        */
       isLoading: false,
+      /**
+       * #volatile
+       * re-entrancy counter while followSynteny applies navigation to the
+       * other sub-views
+       */
+      isFollowing: 0,
+      /**
+       * #volatile
+       * generation counter to invalidate stale async follow applications
+       */
+      followSeq: 0,
+      /**
+       * #volatile
+       * last center each sub-view was set to by followSynteny, used to
+       * suppress echoes of our own navigation
+       */
+      lastApplied: new Map<string, { refName: string; coord: number }>(),
+      /**
+       * #volatile
+       * the sub-view the user most recently navigated while followSynteny was
+       * on; used to re-apply follow once new synteny data renders (e.g. after
+       * a jump into a region whose alignments were not loaded yet)
+       */
+      lastNavSource: undefined as unknown,
     }))
     .views(self => ({
       /**
@@ -148,6 +193,25 @@ function stateModelFactory(pluginManager: PluginManager) {
       get showLoading() {
         return self.isLoading || (!this.initialized && self.views.length > 0)
       },
+
+      /**
+       * #method
+       * synteny-aware follow: re-center other sub-views after a navigation in
+       * the given source sub-view. no-op here, overridden by
+       * LinearSyntenyView
+       */
+      // eslint-disable-next-line @typescript-eslint/require-await
+      async followFromView(_source: unknown) {
+        // no-op
+      },
+    }))
+    .actions(self => ({
+      /**
+       * #action
+       */
+      setLastNavSource(source: unknown) {
+        self.lastNavSource = source
+      },
     }))
     .actions(self => ({
       afterAttach() {
@@ -165,7 +229,7 @@ function stateModelFactory(pluginManager: PluginManager) {
 
               if (self.linkViews && syncActions.includes(rawCall.name)) {
                 const sourcePath = getPath(rawCall.context)
-                next(rawCall)
+                const result = next(rawCall)
                 // Sync to all other views
                 for (const view of self.views) {
                   const viewPath = getPath(view)
@@ -174,10 +238,42 @@ function stateModelFactory(pluginManager: PluginManager) {
                     view[rawCall.name](rawCall.args[0])
                   }
                 }
-                return
+                return result
+              }
+
+              const followActions = [
+                'horizontalScroll',
+                'zoomTo',
+                'setScaleFactor',
+                'moveTo',
+                'centerAt',
+                'navTo',
+                'navToLocString',
+                'showAllRegionsInAssembly',
+              ]
+              if (
+                self.followSynteny &&
+                self.isFollowing === 0 &&
+                followActions.includes(rawCall.name)
+              ) {
+                const source = rawCall.context
+                self.setLastNavSource(source)
+                const result = next(rawCall) as Promise<unknown> | undefined
+                if (result instanceof Promise) {
+                  result
+                    .then(() => self.followFromView(source))
+                    .catch((e: unknown) => {
+                      console.error(e)
+                    })
+                } else {
+                  self.followFromView(source).catch((e: unknown) => {
+                    console.error(e)
+                  })
+                }
+                return result
               }
             }
-            next(rawCall)
+            return next(rawCall)
           }),
         )
       },
@@ -237,6 +333,57 @@ function stateModelFactory(pluginManager: PluginManager) {
        */
       setLinkViews(arg: boolean) {
         self.linkViews = arg
+        if (arg) {
+          self.followSynteny = false
+        }
+      },
+      /**
+       * #action
+       */
+      setFollowSynteny(arg: boolean) {
+        self.followSynteny = arg
+        // don't snap views into alignment on toggle-on; wait for the user's
+        // next navigation
+        self.lastNavSource = undefined
+        if (arg) {
+          self.linkViews = false
+        }
+      },
+      /**
+       * #action
+       */
+      setFollowCumulativePct(arg: number) {
+        self.followCumulativePct = Math.min(100, Math.max(1, Math.round(arg)))
+      },
+      /**
+       * #action
+       */
+      setRainbowAnchor(arg: number) {
+        self.rainbowAnchor = Math.max(0, Math.round(arg))
+      },
+      /**
+       * #action
+       */
+      incFollowing() {
+        self.isFollowing++
+      },
+      /**
+       * #action
+       */
+      decFollowing() {
+        self.isFollowing--
+      },
+      /**
+       * #action
+       */
+      incFollowSeq() {
+        return ++self.followSeq
+      },
+      /**
+       * #action
+       */
+      setLastApplied(id: string, val: { refName: string; coord: number }) {
+        self.lastApplied.set(id, val)
       },
       /**
        * #action
@@ -394,6 +541,9 @@ function stateModelFactory(pluginManager: PluginManager) {
         trackSelectorType,
         showIntraviewLinks,
         linkViews,
+        followSynteny,
+        followCumulativePct,
+        rainbowAnchor,
         interactiveOverlay,
         showDynamicControls,
         viewTrackConfigs,
@@ -404,6 +554,9 @@ function stateModelFactory(pluginManager: PluginManager) {
         ...(trackSelectorType !== 'hierarchical' ? { trackSelectorType } : {}),
         ...(!showIntraviewLinks ? { showIntraviewLinks } : {}),
         ...(linkViews ? { linkViews } : {}),
+        ...(followSynteny ? { followSynteny } : {}),
+        ...(followCumulativePct !== 100 ? { followCumulativePct } : {}),
+        ...(rainbowAnchor !== 0 ? { rainbowAnchor } : {}),
         ...(interactiveOverlay ? { interactiveOverlay } : {}),
         ...(!showDynamicControls ? { showDynamicControls } : {}),
         ...(viewTrackConfigs.length ? { viewTrackConfigs } : {}),

@@ -9,10 +9,15 @@ import type { LinearComparativeViewModel } from '../model.ts'
 
 const useStyles = makeStyles()(theme => ({
   // this helps keep the vertical guide inside the parent view container,
-  // similar style exists in the single LGV's trackscontainer
+  // similar style exists in the single LGV's trackscontainer. the flex chain
+  // gives the render area a bounded height so it can scroll as one unit
   rubberbandContainer: {
     position: 'relative',
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
   },
 
   rubberbandDiv: {

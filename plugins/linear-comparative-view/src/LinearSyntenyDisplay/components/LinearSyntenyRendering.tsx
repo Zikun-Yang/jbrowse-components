@@ -6,6 +6,7 @@ import { transaction } from 'mobx'
 import { observer } from 'mobx-react'
 
 import { MAX_COLOR_RANGE, getId } from '../drawSynteny.ts'
+import SyntenyColorLegend from './SyntenyColorLegend.tsx'
 import SyntenyContextMenu from './SyntenyContextMenu.tsx'
 import { getTooltip, onSynClick, onSynContextClick } from './util.ts'
 
@@ -80,8 +81,8 @@ const LinearSyntenyRendering = observer(function LinearSyntenyRendering({
   // biome-ignore lint/correctness/useExhaustiveDependencies:
   useEffect(() => {
     function onWheel(event: WheelEvent) {
-      event.preventDefault()
       if (event.ctrlKey) {
+        event.preventDefault()
         delta.current += event.deltaY / 500
         for (const v of view.views) {
           v.setScaleFactor(
@@ -105,10 +106,11 @@ const LinearSyntenyRendering = observer(function LinearSyntenyRendering({
           }
           delta.current = 0
         }, 300)
-      } else {
-        if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) {
-          xOffset.current += event.deltaX / 2
-        }
+      } else if (Math.abs(event.deltaX) > Math.abs(2 * event.deltaY)) {
+        // horizontal-dominant wheel: pan. vertical-dominant wheel is left
+        // alone (no preventDefault) so it scrolls the whole view vertically
+        event.preventDefault()
+        xOffset.current += event.deltaX / 2
         if (!scheduled.current) {
           scheduled.current = true
           window.requestAnimationFrame(() => {
@@ -262,6 +264,7 @@ const LinearSyntenyRendering = observer(function LinearSyntenyRendering({
       {mouseoverId && tooltip && currX && currY ? (
         <SyntenyTooltip title={tooltip} />
       ) : null}
+      <SyntenyColorLegend model={model} />
       {anchorEl ? (
         <SyntenyContextMenu
           model={model}
