@@ -121,16 +121,11 @@ test('opens track selector', async () => {
   expect(view.tracks.length).toBe(1)
 }, 30000)
 
-test('opens reference sequence track and expects zoom in message', async () => {
-  const { view, findByTestId, findAllByText } = await createView()
+test('opens reference sequence track and auto-switches to GC content when zoomed out', async () => {
+  const { view, findByTestId } = await createView()
   fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
   view.setNewView(20, 0)
-  await findByTestId(
-    'display-volvox_refseq-LinearReferenceSequenceDisplay',
-    {},
-    delay,
-  )
-  await findAllByText('Zoom in to see sequence')
+  await findByTestId('display-volvox_refseq-LinearGCContentDisplay', {}, delay)
 }, 30000)
 
 test('click to display center line with correct value', async () => {
