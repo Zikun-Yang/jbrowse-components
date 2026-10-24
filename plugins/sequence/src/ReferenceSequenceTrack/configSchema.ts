@@ -34,9 +34,17 @@ export function createReferenceSeqTrackConfig(pluginManager: PluginManager) {
        */
       name: {
         type: 'string',
-        description:
-          'optional track name, otherwise uses the "Reference sequence (assemblyName)"',
-        defaultValue: '',
+        description: 'optional track name, defaults to "Reference sequence"',
+        defaultValue: 'Reference sequence',
+      },
+
+      /**
+       * #slot
+       */
+      category: {
+        description: 'the category and sub-categories of a track',
+        type: 'stringArray',
+        defaultValue: ['Assembly'],
       },
 
       /**

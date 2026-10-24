@@ -68,3 +68,21 @@ test('card track selector - toggle, active tracks, search, about dialog', async 
   )
   await findByText('Configuration', {}, delay)
 }, 60000)
+
+test('assembly reference sequence track is in the Assembly category', async () => {
+  const { findByTestId } = await createView(undefined, true)
+
+  const selector = await findByTestId('hierarchical_track_selector', {}, delay)
+
+  // the track that ships with the assembly config is grouped under its own
+  // "Assembly" category instead of "Uncategorized"
+  const heading = await within(selector).findByText('Assembly', {}, delay)
+  const section = heading.parentElement!
+
+  await within(section).findByTestId(
+    'htsTrackEntry-Tracks,volvox_refseq',
+    {},
+    delay,
+  )
+  await within(section).findByText('Reference sequence', {}, delay)
+}, 60000)
