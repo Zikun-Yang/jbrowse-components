@@ -326,9 +326,15 @@ type Display = { displayId: string } & AnyConfigurationModel
 
 export interface AbstractTrackModel {
   id: string
+  type: string
   displays: AbstractDisplayModel[]
   configuration: AnyConfigurationModel & { displays: Display[] }
   minimized: boolean
+  replaceDisplay(
+    oldDisplayId: string,
+    newDisplayId: string,
+    initialSnapshot?: Record<string, unknown>,
+  ): void
 }
 
 export function isTrackModel(thing: unknown): thing is AbstractTrackModel {

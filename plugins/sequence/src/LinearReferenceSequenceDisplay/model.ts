@@ -1,14 +1,35 @@
-import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
+import {
+  ConfigurationReference,
+  getConf,
+  readConfObject,
+} from '@jbrowse/core/configuration'
 import { getContainingTrack, getContainingView } from '@jbrowse/core/util'
 import { getParentRenderProps } from '@jbrowse/core/util/tracks'
 import { addDisposer, types } from '@jbrowse/mobx-state-tree'
 import { BaseLinearDisplay } from '@jbrowse/plugin-linear-genome-view'
-import { autorun } from 'mobx'
+import { autorun, reaction } from 'mobx'
 
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
+import type { IAnyStateTreeNode } from '@jbrowse/mobx-state-tree'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 type LGV = LinearGenomeViewModel
+
+/**
+ * bpPerPx above which bases cannot be rendered and the display shows "Zoom in
+ * to see sequence"
+ */
+const SEQUENCE_ZOOM_OUT_LIMIT = 3
+
+/**
+ * the LinearGCContentDisplay config of the track that contains this display, if
+ * any (the gccontent plugin registers one for ReferenceSequenceTrack)
+ */
+function getGCContentDisplayConf(node: IAnyStateTreeNode) {
+  return getContainingTrack(node).configuration.displays.find(
+    d => d.type === 'LinearGCContentDisplay',
+  )
+}
 
 /**
  * #stateModel LinearReferenceSequenceDisplay
@@ -138,7 +159,9 @@ export function modelFactory(configSchema: AnyConfigurationSchemaType) {
        */
       regionCannotBeRendered(/* region */) {
         const view = getContainingView(self) as LGV
-        return view.bpPerPx > 3 ? 'Zoom in to see sequence' : undefined
+        return view.bpPerPx > SEQUENCE_ZOOM_OUT_LIMIT
+          ? 'Zoom in to see sequence'
+          : undefined
       },
       /**
        * #getter
@@ -172,13 +195,58 @@ export function modelFactory(configSchema: AnyConfigurationSchemaType) {
           autorun(
             function sequenceHeightAutorun() {
               const view = getContainingView(self) as LGV
-              if (view.bpPerPx > 3) {
+              if (view.bpPerPx > SEQUENCE_ZOOM_OUT_LIMIT) {
                 self.setHeight(50)
               } else {
                 self.setHeight(self.sequenceHeight)
               }
             },
             { name: 'SequenceHeight' },
+          ),
+        )
+        // when the view is zoomed out too far to render bases, hand the track
+        // over to its GC content display (which wraps this track's sequence
+        // adapter). this is always on, and the GC content display hands the
+        // track back when zoomed in again, see
+        // plugins/gccontent/src/LinearGCContentDisplay/stateModel1.ts
+        addDisposer(
+          self,
+          reaction(
+            () =>
+              (getContainingView(self) as LGV).bpPerPx >
+              SEQUENCE_ZOOM_OUT_LIMIT,
+            shouldSwitch => {
+              if (!shouldSwitch) {
+                return
+              }
+              const gcDisplayConf = getGCContentDisplayConf(self)
+              if (!gcDisplayConf) {
+                return
+              }
+              const view = getContainingView(self) as LGV
+              // the GC content adapter computes one stat per window, so size
+              // the windows to the current zoom level instead of leaving the
+              // 100bp default, which computes far more stats than the view has
+              // pixels
+              const windowSize = Math.max(
+                readConfObject(gcDisplayConf, 'windowSize') as number,
+                Math.round(view.bpPerPx * 2),
+              )
+              getContainingTrack(self).replaceDisplay(
+                self.configuration.displayId,
+                gcDisplayConf.displayId,
+                {
+                  autoSwitchGCContent: true,
+                  windowSize,
+                  windowDelta: windowSize,
+                },
+              )
+            },
+            {
+              delay: 300,
+              fireImmediately: true,
+              name: 'AutoSwitchToGCContent',
+            },
           ),
         )
       },
