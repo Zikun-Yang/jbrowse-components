@@ -1156,36 +1156,8 @@ export function stateModelFactory(pluginManager: PluginManager) {
         const { saveAs } = await import('file-saver-es')
 
         if (opts.format === 'png') {
-          const img = new Image()
-          const svgBlob = new Blob([html], { type: 'image/svg+xml' })
-          const url = URL.createObjectURL(svgBlob)
-          await new Promise<void>((resolve, reject) => {
-            img.onload = () => {
-              const canvas = document.createElement('canvas')
-              canvas.width = img.width
-              canvas.height = img.height
-              const ctx = canvas.getContext('2d')!
-              ctx.drawImage(img, 0, 0)
-              URL.revokeObjectURL(url)
-              canvas.toBlob(blob => {
-                if (blob) {
-                  saveAs(blob, opts.filename || 'image.png')
-                  resolve()
-                } else {
-                  reject(
-                    new Error(
-                      `Failed to create PNG. The image may be too large (${img.width}x${img.height}). Try reducing the view size or use SVG format.`,
-                    ),
-                  )
-                }
-              }, 'image/png')
-            }
-            img.onerror = () => {
-              URL.revokeObjectURL(url)
-              reject(new Error('Failed to load SVG for PNG conversion'))
-            }
-            img.src = url
-          })
+          const { svgToPng } = await import('@jbrowse/core/util/svgToPng')
+          saveAs(await svgToPng(html), opts.filename || 'image.png')
         } else {
           saveAs(
             new Blob([html], { type: 'image/svg+xml' }),

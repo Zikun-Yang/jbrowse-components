@@ -13,6 +13,9 @@ export default function LinearSyntenyViewF(pluginManager: PluginManager) {
     return new ViewType({
       name: 'LinearSyntenyViewHelper',
       displayName: 'Linear synteny view (helper)',
+      description:
+        'Internal sub-view used inside linear comparative/synteny views to ' +
+        'render one level. Not meant to be opened directly.',
       viewMetadata: {
         hiddenFromGUI: true,
       },

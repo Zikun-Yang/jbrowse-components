@@ -25,3 +25,20 @@ test_data/soa4
 *.tgz
 debug-storybook.log
 
+# local dev-only data symlinks (never tracked; also required for execenv worktree replay)
+/products/jbrowse-web/public/data
+/products/jbrowse-web/public/home
+/products/jbrowse-web/public/mnt
+/products/jbrowse-web/public/trix
+/cellxgene
+
+# NFS silly-rename leftovers
+.claude/.nfs*
+
+# python bytecode
+**/__pycache__/
+*.pyc
+
+# pi task registry
+.pi/tasks/
+

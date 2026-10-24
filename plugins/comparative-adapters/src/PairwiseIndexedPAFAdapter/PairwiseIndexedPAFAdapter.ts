@@ -16,6 +16,9 @@ import type { FileLocation, Region } from '@jbrowse/core/util/types'
 
 interface PAFOptions extends BaseOptions {
   config?: AnyConfigurationModel
+  // see PAFAdapter: includeCigar: false skips transferring the CIGAR string
+  // for callers rendering only block envelopes (synteny overview zoom)
+  includeCigar?: boolean
 }
 
 export default class PAFAdapter extends BaseFeatureDataAdapter {
@@ -125,7 +128,7 @@ export default class PAFAdapter extends BaseFeatureDataAdapter {
 
             // PIF format already has pre-computed CIGARs for each perspective
             // (q-lines have D↔I swapped relative to t-lines)
-            const CIGAR = extra.cg
+            const CIGAR = opts.includeCigar === false ? undefined : extra.cg
 
             observer.next(
               new SyntenyFeature({

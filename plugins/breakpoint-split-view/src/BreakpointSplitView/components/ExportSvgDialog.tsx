@@ -50,6 +50,10 @@ export default function ExportSvgDialog({
   const offscreenCanvas = typeof OffscreenCanvas !== 'undefined'
   const [rasterizeLayers, setRasterizeLayers] = useState(offscreenCanvas)
   const [showGridlines, setShowGridlines] = useSvgLocal('gridlines', false)
+  const [removeBackground, setRemoveBackground] = useSvgLocal(
+    'removeBackground',
+    true,
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>()
   const [format, setFormat] = useSvgLocal<'svg' | 'png'>('format', 'svg')
@@ -143,6 +147,18 @@ export default function ExportSvgDialog({
           label="Show gridlines"
         />
 
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={removeBackground}
+              onChange={() => {
+                setRemoveBackground(val => !val)
+              }}
+            />
+          }
+          label="Transparent background"
+        />
+
         {offscreenCanvas ? (
           <FormControlLabel
             control={
@@ -187,6 +203,7 @@ export default function ExportSvgDialog({
                 trackLabels,
                 themeName,
                 showGridlines,
+                removeBackground,
               })
               handleClose()
             } catch (e) {

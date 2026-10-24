@@ -245,6 +245,19 @@ export function BaseWebSession({
       get savedSessionMetadata() {
         return self.root.savedSessionMetadata
       },
+
+      /**
+       * #getter
+       * session templates from the `preConfiguredSessions` config slot, shown
+       * on the Recents page
+       */
+      get sessionTemplates(): {
+        name: string
+        description?: string
+        image?: string
+      }[] {
+        return readConfObject(self.jbrowse, 'preConfiguredSessions')
+      },
       /**
        * #getter
        */
@@ -351,6 +364,18 @@ export function BaseWebSession({
        */
       duplicateCurrentSession() {
         return self.root.duplicateCurrentSession()
+      },
+      /**
+       * #action
+       */
+      duplicateSavedSession(id: string) {
+        return self.root.duplicateSavedSession(id)
+      },
+      /**
+       * #action
+       */
+      activateTemplate(template: { name: string }) {
+        return self.root.activateTemplate(template)
       },
       /**
        * #action

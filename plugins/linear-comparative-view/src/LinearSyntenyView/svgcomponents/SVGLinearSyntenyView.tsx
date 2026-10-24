@@ -50,7 +50,18 @@ export async function renderToSvg(
   const heights = views.map(
     v => totalHeight(v.tracks, textHeight, trackLabels) + offset,
   )
-  const totalHeightSvg = sum(heights) + sum(levels.map(l => l.height)) + 100
+  // Each subview is laid out as fontSize (assembly name) + rulerHeight +
+  // fontSize + tracks, and successive subviews are additionally offset by
+  // fontSize + rulerHeight (see the RenderList loop below), so the total
+  // height is sum(heights) + sum(level heights) + (n-1)*rulerHeight +
+  // (n+1)*fontSize. The previous flat `+ 100` undercounted for 3+ subviews,
+  // truncating the bottom of the exported image.
+  const totalHeightSvg =
+    sum(heights) +
+    sum(levels.map(l => l.height)) +
+    (views.length - 1) * rulerHeight +
+    (views.length + 1) * fontSize +
+    10
 
   const displayResults = await Promise.all(
     views.map(
@@ -191,7 +202,9 @@ export async function renderToSvg(
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox={[0, 0, w + shift * 2, totalHeightSvg].toString()}
         >
-          <SVGBackground width={w} height={totalHeightSvg} shift={shift} />
+          {opts.removeBackground ? null : (
+            <SVGBackground width={w} height={totalHeightSvg} shift={shift} />
+          )}
           {RenderList}
         </svg>
       </Wrapper>

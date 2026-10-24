@@ -83,7 +83,9 @@ export async function renderToSvg(model: BSV, opts: ExportSvgOptions) {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox={[0, 0, w + shift * 2, totalHeightSvg].toString()}
         >
-          <SVGBackground width={w} height={totalHeightSvg} shift={shift} />
+          {opts.removeBackground ? null : (
+            <SVGBackground width={w} height={totalHeightSvg} shift={shift} />
+          )}
           {views[0] ? (
             <g transform={`translate(${shift} ${fontSize})`}>
               <g transform={`translate(${trackLabelOffset})`}>

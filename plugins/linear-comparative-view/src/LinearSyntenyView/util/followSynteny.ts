@@ -467,15 +467,18 @@ export function computeFollowTargets({
   ]
   for (let level = sourceIndex; level < levelIndexes.length; level++) {
     const pair = levelIndexes[level]
-    // mapping views[level] -> views[level+1]: fwd's top side is keyed by
-    // views[level] refs; rev's bot side shares that key space and is the
-    // fallback when only reverse coverage is available
-    const index = pair?.fwd ?? pair?.rev
-    const side = pair?.fwd ? 'top' : 'bot'
-    const mapped = index
+    // mapping views[level] -> views[level+1]: fwd's top side and rev's bot
+    // side are both keyed by views[level] refs. query BOTH and merge rather
+    // than falling back only when fwd is absent: either side may have been
+    // fetched over a stale window (e.g. mid-cascade, before the resync
+    // reaction re-fires), so coverage is often partial on one side only
+    const mapped = pair
       ? filterTopCumulative(
           mergeWeighted(
-            current.flatMap(w => mapWindowWeighted(index, side, w)),
+            current.flatMap(w => [
+              ...(pair.fwd ? mapWindowWeighted(pair.fwd, 'top', w) : []),
+              ...(pair.rev ? mapWindowWeighted(pair.rev, 'bot', w) : []),
+            ]),
           ),
           maxCumulativePct,
         )
@@ -489,15 +492,16 @@ export function computeFollowTargets({
   current = [{ ...source, weight: source.end - source.start }]
   for (let level = sourceIndex - 1; level >= 0; level--) {
     const pair = levelIndexes[level]
-    // mapping views[level+1] -> views[level]: rev's top side is keyed by
-    // views[level+1] refs; fwd's bot side shares that key space and is the
-    // fallback when only forward coverage is available
-    const index = pair?.rev ?? pair?.fwd
-    const side = pair?.rev ? 'top' : 'bot'
-    const mapped = index
+    // mapping views[level+1] -> views[level]: rev's top side and fwd's bot
+    // side are both keyed by views[level+1] refs; query both and merge (see
+    // the downward loop above)
+    const mapped = pair
       ? filterTopCumulative(
           mergeWeighted(
-            current.flatMap(w => mapWindowWeighted(index, side, w)),
+            current.flatMap(w => [
+              ...(pair.rev ? mapWindowWeighted(pair.rev, 'top', w) : []),
+              ...(pair.fwd ? mapWindowWeighted(pair.fwd, 'bot', w) : []),
+            ]),
           ),
           maxCumulativePct,
         )

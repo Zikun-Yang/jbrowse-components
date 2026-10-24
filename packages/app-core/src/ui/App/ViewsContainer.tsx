@@ -37,6 +37,7 @@ interface SessionMetadata {
 
 interface Props {
   HeaderButtons?: React.ReactElement
+  SettingsCards?: React.ReactElement
   session: SessionWithFocusedViewAndDrawerWidgets &
     AbstractViewContainer &
     SessionWithDockviewLayout & {
@@ -76,7 +77,7 @@ const ViewsContainer = observer(function ViewsContainer(props: Props) {
         view === 'recents' ? (
           <RecentsDashboard session={session} />
         ) : (
-          <SettingsView session={session} />
+          <SettingsView session={session} extraCards={props.SettingsCards} />
         )
       break
     case 'workspace':

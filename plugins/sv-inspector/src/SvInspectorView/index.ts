@@ -2,6 +2,8 @@ import { lazy } from 'react'
 
 import ViewType from '@jbrowse/core/pluggableElementTypes/ViewType'
 import { getContainingView, getSession } from '@jbrowse/core/util'
+
+import { SvInspectorViewIcon } from '@jbrowse/core/ui/Icons'
 import { type IAnyStateTreeNode, getParent } from '@jbrowse/mobx-state-tree'
 
 import stateModelFactory from './model.ts'
@@ -47,6 +49,12 @@ export default function SvInspectorViewF(pluginManager: PluginManager) {
     return new ViewType({
       name: 'SvInspectorView',
       displayName: 'SV inspector',
+      description:
+        'Structural-variant inspector combining a spreadsheet of SV calls ' +
+        'with a circular genome view. Selecting a variant row can launch ' +
+        'breakpoint split views of its breakpoints. Use it to review and ' +
+        'triage SV call sets.',
+      icon: SvInspectorViewIcon,
       stateModel,
       ReactComponent: lazy(() => import('./components/SvInspectorView.tsx')),
     })

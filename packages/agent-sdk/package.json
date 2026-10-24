@@ -1,0 +1,12 @@
+{
+  "name": "@jbrowse/agent-sdk",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AI-facing SDK for exploring a live JBrowse session. Injected into the page context by jbrowse-agent.",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "echo 'tests run via jbrowse-agent integration' && exit 0"
+  }
+}

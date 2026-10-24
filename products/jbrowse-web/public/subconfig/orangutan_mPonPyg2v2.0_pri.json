@@ -1,0 +1,115 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-mPonPyg2v2.0_pri",
+      "species": "Bornean orangutan (Pongo pygmaeus)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "mPonPyg2-v2.0-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/mPonPyg2-v2.0_pri.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/mPonPyg2-v2.0_pri.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-mPonPyg2v2.0_pri_RefSeq",
+      "name": "T2T-mPonPyg2v2.0_pri_RefSeq",
+      "assemblyNames": ["T2T-mPonPyg2v2.0_pri"],
+      "category": ["Gene Annotations"],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/mPonPyg2-v2.0_pri.sorted.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/mPonPyg2-v2.0_pri.sorted.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      }
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "mPonPyg2v2.0_censat_type",
+      "name": "Centromeric Satellite (Type)",
+      "assemblyNames": ["T2T-mPonPyg2v2.0_pri"],
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/repeats/centromere_satellite/PonPyg.cenSatv2.0.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "mPonPyg2v2.0_censat_strand",
+      "name": "Centromeric Satellite (Strand)",
+      "assemblyNames": ["T2T-mPonPyg2v2.0_pri"],
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/repeats/centromere_satellite/PonPyg.cenSatStrandv2.0.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "mPonPyg2_chromosome_H3K9me3_R1",
+      "name": "Chromosome Level H3K9me3 (MultiAln-kept)",
+      "assemblyNames": ["T2T-mPonPyg2v2.0_pri"],
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "BedGraphAdapter",
+        "bedGraphLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/ideogram/depth/orangutan_h3k9me3_R1.regions.bed.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/ideogram/depth/orangutan_h3k9me3_R1.regions.bed.gz.csi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": []
+}

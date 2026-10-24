@@ -157,6 +157,30 @@ describe('PairwiseIndexedPAFAdapter', () => {
       const cigar = features[0]!.get('CIGAR')
       expect(cigar).toBe('31198M4800I18803M')
     })
+
+    it('omits CIGAR when includeCigar is false', async () => {
+      const adapter = makeAdapter(pifInsPath, ['volvox_ins', 'volvox'])
+
+      const features = await firstValueFrom(
+        adapter
+          .getFeatures(
+            {
+              refName: 'ctgA',
+              start: 0,
+              end: 60000,
+              assemblyName: 'volvox_ins',
+            },
+            { includeCigar: false },
+          )
+          .pipe(toArray()),
+      )
+
+      expect(features.length).toBeGreaterThan(0)
+      expect(features[0]!.get('CIGAR')).toBeUndefined()
+      // coordinates and mate are unaffected
+      expect(features[0]!.get('start')).toBeDefined()
+      expect(features[0]!.get('mate')).toBeDefined()
+    })
   })
 
   describe('deletion test file', () => {

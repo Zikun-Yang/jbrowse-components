@@ -49,6 +49,10 @@ export default function ExportSvgDialog({
   const session = getSession(model)
   const offscreenCanvas = typeof OffscreenCanvas !== 'undefined'
   const [rasterizeLayers, setRasterizeLayers] = useState(offscreenCanvas)
+  const [removeBackground, setRemoveBackground] = useSvgLocal(
+    'removeBackground',
+    true,
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>()
   const [format, setFormat] = useSvgLocal<'svg' | 'png'>('format', 'svg')
@@ -111,6 +115,17 @@ export default function ExportSvgDialog({
             ))}
           </TextField2>
         ) : null}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={removeBackground}
+              onChange={() => {
+                setRemoveBackground(val => !val)
+              }}
+            />
+          }
+          label="Transparent background"
+        />
         {offscreenCanvas ? (
           <FormControlLabel
             control={
@@ -153,6 +168,7 @@ export default function ExportSvgDialog({
                 format,
                 filename,
                 themeName,
+                removeBackground,
               })
               handleClose()
             } catch (e) {

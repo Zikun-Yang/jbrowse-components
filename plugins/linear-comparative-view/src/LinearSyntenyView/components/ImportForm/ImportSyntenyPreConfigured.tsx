@@ -24,9 +24,10 @@ const ImportSyntenyTrackSelector = observer(
   }) {
     const session = getSession(model)
     const { importFormSyntenyTrackSelections } = model
-    const { tracks, sessionTracks = [] } = session
-    const allTracks = [...tracks, ...sessionTracks] as AnyConfigurationModel[]
-    const filteredTracks = allTracks.filter(track => {
+    // note: session.tracks already includes sessionTracks in session
+    // models that have them, so no need to concat them again
+    const { tracks } = session
+    const filteredTracks = (tracks as AnyConfigurationModel[]).filter(track => {
       const assemblyNames = readConfObject(track, 'assemblyNames')
       return (
         assemblyNames.includes(assembly1) &&

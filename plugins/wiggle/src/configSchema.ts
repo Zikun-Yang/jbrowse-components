@@ -25,7 +25,7 @@ const WiggleRenderer = ConfigurationSchema(
     posColor: {
       type: 'color',
       description: 'the color to use when the score is positive',
-      defaultValue: 'blue',
+      defaultValue: '#292421',
       contextVariable: ['feature'],
     },
     /**

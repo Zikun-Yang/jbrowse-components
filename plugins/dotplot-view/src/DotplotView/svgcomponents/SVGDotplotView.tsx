@@ -41,7 +41,9 @@ export async function renderToSvg(
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox={[0, 0, w, height].toString()}
         >
-          <SVGBackground width={w} height={height} />
+          {opts.removeBackground ? null : (
+            <SVGBackground width={w} height={height} />
+          )}
           <VerticalAxisRaw model={model} />
           <g transform={`translate(${borderX} 0)`}>
             <DotplotGrid model={model} />

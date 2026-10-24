@@ -26,7 +26,7 @@ reference the markdown files in our repo of the checked out git tag
 color1: {
       type: 'color',
       description: 'the main color of each feature',
-      defaultValue: 'goldenrod',
+      defaultValue: '#292421',
       contextVariable: ['feature'],
     }
 ```

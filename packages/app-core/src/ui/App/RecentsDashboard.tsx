@@ -1,7 +1,8 @@
 import { makeStyles } from '@jbrowse/core/util/tss-react'
+import { IconButton, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import { AddIcon, DashboardIcon } from '@jbrowse/core/ui/Icons'
+import { AddIcon, DashboardIcon, FileCopyIcon } from '@jbrowse/core/ui/Icons'
 
 const useStyles = makeStyles()(theme => ({
   root: {
@@ -70,6 +71,22 @@ const useStyles = makeStyles()(theme => ({
     position: 'relative',
     overflow: 'hidden',
   },
+  cardAction: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    background: theme.palette.background.paper,
+    border: `1px solid ${theme.palette.divider}`,
+    padding: 2,
+    opacity: 0,
+    transition: 'opacity 150ms ease',
+    '.card:hover &': {
+      opacity: 1,
+    },
+    '&:hover': {
+      background: theme.palette.background.paper,
+    },
+  },
   thumbPlaceholder: {
     position: 'absolute',
     inset: 0,
@@ -77,6 +94,13 @@ const useStyles = makeStyles()(theme => ({
     placeItems: 'center',
     fontSize: 10,
     color: theme.palette.text.secondary,
+  },
+  thumbImage: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
   },
   info: {
     padding: '12px 14px',
@@ -104,6 +128,24 @@ const useStyles = makeStyles()(theme => ({
     color: theme.palette.text.secondary,
     fontSize: 13,
   },
+  section: {
+    padding: '8px 0 24px',
+  },
+  sectionDivider: {
+    borderTop: `1px solid ${theme.palette.divider}`,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    color: theme.palette.text.secondary,
+    marginBottom: 16,
+  },
+  sectionEmpty: {
+    fontSize: 13,
+    color: theme.palette.text.secondary,
+  },
 }))
 
 interface SessionMetadata {
@@ -114,12 +156,23 @@ interface SessionMetadata {
   favorite: boolean
 }
 
+interface SessionTemplate {
+  name: string
+  description?: string
+  image?: string
+}
+
 interface DashboardSession {
   savedSessionMetadata?: SessionMetadata[]
+  sessionTemplates?: SessionTemplate[]
   setShowRecentsDashboard?: (show: boolean) => void
+  setActiveView?: (
+    view: 'landing' | 'workspace' | 'recents' | 'settings',
+  ) => void
   activateSession?: (id: string) => Promise<void>
+  duplicateSavedSession?: (id: string) => Promise<void>
+  activateTemplate?: (template: { name: string }) => void
   setDefaultSession?: () => void
-  addView?: (typeName: string, initialState: Record<string, unknown>) => unknown
 }
 
 function formatDate(date: Date) {
@@ -139,74 +192,138 @@ const RecentsDashboard = observer(function RecentsDashboard({
   session: DashboardSession
 }) {
   const { classes, cx } = useStyles()
-  const { savedSessionMetadata = [] } = session
+  const { savedSessionMetadata = [], sessionTemplates = [] } = session
 
-  const handleNewWorkspace = () => {
-    session.setShowRecentsDashboard?.(false)
-    session.setDefaultSession?.()
+  const goToWorkspace = () => {
+    if (session.setActiveView) {
+      session.setActiveView('workspace')
+    } else {
+      session.setShowRecentsDashboard?.(false)
+    }
   }
 
-  const handleFromTemplate = () => {
-    session.setShowRecentsDashboard?.(false)
-    session.addView?.('LinearGenomeView', {})
+  const handleNewWorkspace = () => {
+    session.setDefaultSession?.()
+    goToWorkspace()
+  }
+
+  const handleTemplate = (template: { name: string }) => {
+    session.activateTemplate?.(template)
+    goToWorkspace()
   }
 
   const handleOpenSession = async (id: string) => {
     await session.activateSession?.(id)
-    session.setShowRecentsDashboard?.(false)
+    goToWorkspace()
+  }
+
+  const handleDuplicateSession = async (id: string) => {
+    await session.duplicateSavedSession?.(id)
+    goToWorkspace()
   }
 
   return (
     <div className={classes.root}>
-      <div className={classes.grid}>
-        <button
-          className={cx(classes.card, classes.newCard)}
-          onClick={handleNewWorkspace}
-          type="button"
-        >
-          <div className={classes.addIcon}>
-            <AddIcon fontSize="small" />
+      <div className={classes.section}>
+        <div className={classes.sectionTitle}>Templates</div>
+        {sessionTemplates.length > 0 ? (
+          <div className={classes.grid}>
+            {sessionTemplates.map(template => (
+              <button
+                key={template.name}
+                className={classes.card}
+                onClick={() => {
+                  handleTemplate(template)
+                }}
+                type="button"
+              >
+                <div className={classes.thumb}>
+                  {template.image ? (
+                    <img
+                      className={classes.thumbImage}
+                      src={template.image}
+                      alt=""
+                    />
+                  ) : (
+                    <div className={classes.thumbPlaceholder}>
+                      <DashboardIcon />
+                    </div>
+                  )}
+                </div>
+                <div className={classes.info}>
+                  <div className={classes.name}>{template.name}</div>
+                  <div className={classes.desc}>
+                    {template.description ?? 'Template'}
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
-          <div className={classes.addLabel}>New Workspace</div>
-          <div className={classes.addDesc}>Start from scratch</div>
-        </button>
+        ) : (
+          <div className={classes.sectionEmpty}>No templates to be loaded.</div>
+        )}
+      </div>
 
-        <button
-          className={cx(classes.card, classes.newCard)}
-          onClick={handleFromTemplate}
-          type="button"
-        >
-          <div className={classes.addIcon}>
-            <DashboardIcon fontSize="small" />
-          </div>
-          <div className={classes.addLabel}>From Template</div>
-          <div className={classes.addDesc}>Use a preset layout</div>
-        </button>
-
-        {savedSessionMetadata.map(meta => (
+      <div className={cx(classes.section, classes.sectionDivider)}>
+        <div className={classes.sectionTitle}>Workspaces</div>
+        <div className={classes.grid}>
           <button
-            key={meta.id}
-            className={classes.card}
-            onClick={() => handleOpenSession(meta.id)}
+            className={cx(classes.card, classes.newCard)}
+            onClick={handleNewWorkspace}
             type="button"
           >
-            <div className={classes.thumb}>
-              <div className={classes.thumbPlaceholder}>workspace preview</div>
+            <div className={classes.addIcon}>
+              <AddIcon fontSize="small" />
             </div>
-            <div className={classes.info}>
-              <div className={classes.name}>{meta.name}</div>
-              <div className={classes.desc}>
-                Opened {formatDate(meta.createdAt)}
+            <div className={classes.addLabel}>New Workspace</div>
+            <div className={classes.addDesc}>Start from scratch</div>
+          </button>
+
+          {savedSessionMetadata.map(meta => (
+            <div
+              key={meta.id}
+              className={cx(classes.card, 'card')}
+              onClick={() => handleOpenSession(meta.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  void handleOpenSession(meta.id)
+                }
+              }}
+            >
+              <div className={classes.thumb}>
+                <div className={classes.thumbPlaceholder}>workspace preview</div>
+                {session.duplicateSavedSession ? (
+                  <Tooltip title="Duplicate session">
+                    <IconButton
+                      className={classes.cardAction}
+                      size="small"
+                      onClick={event => {
+                        event.stopPropagation()
+                        void handleDuplicateSession(meta.id)
+                      }}
+                    >
+                      <FileCopyIcon fontSize="inherit" />
+                    </IconButton>
+                  </Tooltip>
+                ) : null}
+              </div>
+              <div className={classes.info}>
+                <div className={classes.name}>{meta.name}</div>
+                <div className={classes.desc}>
+                  Opened {formatDate(meta.createdAt)}
+                </div>
               </div>
             </div>
-          </button>
-        ))}
+          ))}
 
-        {savedSessionMetadata.length === 0 ? (
-          <div className={classes.empty}>
-            No recent workspaces. Create one to get started.
-          </div>
-        ) : null}
+          {savedSessionMetadata.length === 0 ? (
+            <div className={classes.empty}>
+              No recent workspaces. Create one to get started.
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   )

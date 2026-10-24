@@ -1,0 +1,399 @@
+{
+  "preConfiguredSessions": [
+    {
+      "name": "Human to Macaque synteny",
+      "description": "H - B - C - G - SO - M",
+      "image": "./subconfig/templates/human_to_macaque_synteny.png",
+      "views": [
+        {
+          "id": "bA4lEZ86Gq",
+          "type": "LinearSyntenyView",
+          "levels": [
+            {
+              "id": "8zbudBgQtA",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [
+                {
+                  "id": "yUrtBETfdU",
+                  "type": "SyntenyTrack",
+                  "configuration": "mPanPan1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+                  "displays": [
+                    {
+                      "id": "N2QdNOagbh",
+                      "type": "LinearSyntenyDisplay",
+                      "configuration": "mPanPan1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary-LinearSyntenyDisplay",
+                      "colorBy": "strand",
+                      "alpha": 0.2,
+                      "minAlignmentLength": 0
+                    }
+                  ]
+                }
+              ],
+              "height": 100,
+              "level": 0
+            },
+            {
+              "id": "lxaqjPU5lv",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [
+                {
+                  "id": "6f-pOEQQTZ",
+                  "type": "SyntenyTrack",
+                  "configuration": "mPanTro3v2.0-pri__mPanPan1-v2.0-pri__mm2_asm20_noSecondary",
+                  "displays": [
+                    {
+                      "id": "oqZTSzxPm0",
+                      "type": "LinearSyntenyDisplay",
+                      "configuration": "mPanTro3v2.0-pri__mPanPan1-v2.0-pri__mm2_asm20_noSecondary-LinearSyntenyDisplay",
+                      "colorBy": "strand",
+                      "alpha": 0.2,
+                      "minAlignmentLength": 0
+                    }
+                  ]
+                }
+              ],
+              "height": 100,
+              "level": 1
+            },
+            {
+              "id": "XEPVs0drW0",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [
+                {
+                  "id": "eq4US8uklV",
+                  "type": "SyntenyTrack",
+                  "configuration": "mPanTro3v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary",
+                  "displays": [
+                    {
+                      "id": "oF7aIAU6Ev",
+                      "type": "LinearSyntenyDisplay",
+                      "configuration": "mPanTro3v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary-LinearSyntenyDisplay",
+                      "colorBy": "strand",
+                      "alpha": 0.2,
+                      "minAlignmentLength": 0
+                    }
+                  ]
+                }
+              ],
+              "height": 100,
+              "level": 2
+            },
+            {
+              "id": "c-fDuFQIgN",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [
+                {
+                  "id": "Ychbxy0E7n",
+                  "type": "SyntenyTrack",
+                  "configuration": "mGorGor1v2.1-pri__mPonAbe1v2.0-pri__mm2_asm20_noSecondary",
+                  "displays": [
+                    {
+                      "id": "8Rlo1WFw2f",
+                      "type": "LinearSyntenyDisplay",
+                      "configuration": "mGorGor1v2.1-pri__mPonAbe1v2.0-pri__mm2_asm20_noSecondary-LinearSyntenyDisplay",
+                      "colorBy": "strand",
+                      "alpha": 0.2,
+                      "minAlignmentLength": 0
+                    }
+                  ]
+                }
+              ],
+              "height": 100,
+              "level": 3
+            },
+            {
+              "id": "SV1tMTfBbv",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [
+                {
+                  "id": "a7uCDBWTlp",
+                  "type": "SyntenyTrack",
+                  "configuration": "mPonAbe1v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary",
+                  "displays": [
+                    {
+                      "id": "GzOX5hYNfy",
+                      "type": "LinearSyntenyDisplay",
+                      "configuration": "mPonAbe1v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary-LinearSyntenyDisplay",
+                      "colorBy": "strand",
+                      "alpha": 0.2,
+                      "minAlignmentLength": 0
+                    }
+                  ]
+                }
+              ],
+              "height": 100,
+              "level": 4
+            },
+            {
+              "id": "_QvghZC1ee",
+              "type": "LinearSyntenyViewHelper",
+              "tracks": [],
+              "height": 100,
+              "level": 5
+            }
+          ],
+          "views": [
+            {
+              "id": "wyBP5awN--",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "bpPerPx": 97001.09992006395,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "reversed": false,
+                  "refName": "chr2",
+                  "start": 0,
+                  "end": 242696752,
+                  "assemblyName": "T2T-CHM13v2.0"
+                }
+              ],
+              "trackLabels": "overlapping"
+            },
+            {
+              "id": "ouau7Q92Lw",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "offsetPx": -125,
+              "bpPerPx": 120643.49586629921,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "assemblyName": "T2T-mPanPan1v2.0_pri",
+                  "refName": "chr12_mat_hsa2a",
+                  "reversed": true,
+                  "start": 0,
+                  "end": 126551469,
+                  "parentRegion": {
+                    "refName": "chr12_mat_hsa2a",
+                    "start": 0,
+                    "end": 126551469,
+                    "assemblyName": "T2T-mPanPan1v2.0_pri"
+                  }
+                },
+                {
+                  "assemblyName": "T2T-mPanPan1v2.0_pri",
+                  "refName": "chr13_mat_hsa2b",
+                  "reversed": false,
+                  "start": 0,
+                  "end": 144872268,
+                  "parentRegion": {
+                    "refName": "chr13_mat_hsa2b",
+                    "start": 0,
+                    "end": 144872268,
+                    "assemblyName": "T2T-mPanPan1v2.0_pri"
+                  }
+                }
+              ],
+              "trackLabels": "overlapping"
+            },
+            {
+              "id": "gy1WO9M7Cn",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "offsetPx": -125,
+              "bpPerPx": 118823.92968263845,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "assemblyName": "T2T-mPanTro3v2.0_pri",
+                  "refName": "chr12_hap1_hsa2a",
+                  "reversed": true,
+                  "start": 0,
+                  "end": 122853238,
+                  "parentRegion": {
+                    "refName": "chr12_hap1_hsa2a",
+                    "start": 0,
+                    "end": 122853238,
+                    "assemblyName": "T2T-mPanTro3v2.0_pri"
+                  }
+                },
+                {
+                  "assemblyName": "T2T-mPanTro3v2.0_pri",
+                  "refName": "chr13_hap1_hsa2b",
+                  "reversed": false,
+                  "start": 0,
+                  "end": 144476839,
+                  "parentRegion": {
+                    "refName": "chr13_hap1_hsa2b",
+                    "start": 0,
+                    "end": 144476839,
+                    "assemblyName": "T2T-mPanTro3v2.0_pri"
+                  }
+                }
+              ],
+              "trackLabels": "overlapping"
+            },
+            {
+              "id": "vDr5qLvUYB",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "offsetPx": -125,
+              "bpPerPx": 131635.94141701484,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "assemblyName": "T2T-mGorGor1v2.1_pri",
+                  "refName": "chr12_pat_hsa2a",
+                  "reversed": true,
+                  "start": 0,
+                  "end": 145906006,
+                  "parentRegion": {
+                    "refName": "chr12_pat_hsa2a",
+                    "start": 0,
+                    "end": 145906006,
+                    "assemblyName": "T2T-mGorGor1v2.1_pri"
+                  }
+                },
+                {
+                  "assemblyName": "T2T-mGorGor1v2.1_pri",
+                  "refName": "chr11_mat_hsa2b",
+                  "reversed": false,
+                  "start": 0,
+                  "end": 150248535,
+                  "parentRegion": {
+                    "refName": "chr11_mat_hsa2b",
+                    "start": 0,
+                    "end": 150248535,
+                    "assemblyName": "T2T-mGorGor1v2.1_pri"
+                  }
+                }
+              ],
+              "trackLabels": "overlapping"
+            },
+            {
+              "id": "bShOiW_peA",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "offsetPx": -125,
+              "bpPerPx": 124180.06133878566,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "assemblyName": "T2T-mPonAbe1v2.0_pri",
+                  "refName": "chr12_hap1_hsa2a",
+                  "reversed": true,
+                  "start": 0,
+                  "end": 133183124,
+                  "parentRegion": {
+                    "refName": "chr12_hap1_hsa2a",
+                    "start": 0,
+                    "end": 133183124,
+                    "assemblyName": "T2T-mPonAbe1v2.0_pri"
+                  }
+                },
+                {
+                  "assemblyName": "T2T-mPonAbe1v2.0_pri",
+                  "refName": "chr11_hap1_hsa2b",
+                  "reversed": false,
+                  "start": 0,
+                  "end": 146197178,
+                  "parentRegion": {
+                    "refName": "chr11_hap1_hsa2b",
+                    "start": 0,
+                    "end": 146197178,
+                    "assemblyName": "T2T-mPonAbe1v2.0_pri"
+                  }
+                }
+              ],
+              "trackLabels": "overlapping"
+            },
+            {
+              "id": "3s-sJgwu38",
+              "type": "LinearGenomeView",
+              "tracks": [],
+              "offsetPx": -125,
+              "bpPerPx": 115890.03155836073,
+              "hideHeader": true,
+              "displayedRegions": [
+                {
+                  "assemblyName": "T2T-MFA8v1.1",
+                  "refName": "chr13",
+                  "reversed": true,
+                  "start": 0,
+                  "end": 122129872,
+                  "parentRegion": {
+                    "refName": "chr13",
+                    "start": 0,
+                    "end": 122129872,
+                    "assemblyName": "T2T-MFA8v1.1"
+                  }
+                },
+                {
+                  "assemblyName": "T2T-MFA8v1.1",
+                  "refName": "chr12",
+                  "reversed": false,
+                  "start": 0,
+                  "end": 138599521,
+                  "parentRegion": {
+                    "refName": "chr12",
+                    "start": 0,
+                    "end": 138599521,
+                    "assemblyName": "T2T-MFA8v1.1"
+                  }
+                }
+              ],
+              "trackLabels": "overlapping"
+            }
+          ]
+        }
+      ],
+      "focusedViewId": "bA4lEZ86Gq",
+      "sessionPlugins": [],
+      "activeView": "workspace",
+      "selectedCells": {},
+      "widgets": {
+        "GridBookmark": {
+          "id": "GridBookmark",
+          "type": "GridBookmarkWidget"
+        },
+        "importSessionWidget": {
+          "id": "importSessionWidget",
+          "type": "ImportSessionWidget"
+        }
+      },
+      "dockviewLayout": {
+        "grid": {
+          "root": {
+            "type": "branch",
+            "data": [
+              {
+                "type": "leaf",
+                "data": {
+                  "views": [
+                    "panel-1BZXoXS44n"
+                  ],
+                  "activeView": "panel-1BZXoXS44n",
+                  "id": "1",
+                  "hideHeader": true
+                },
+                "size": 2502
+              }
+            ],
+            "size": 1191
+          },
+          "width": 2502,
+          "height": 1191,
+          "orientation": "HORIZONTAL"
+        },
+        "panels": {
+          "panel-1BZXoXS44n": {
+            "id": "panel-1BZXoXS44n",
+            "contentComponent": "jbrowseView",
+            "params": {
+              "viewId": "bA4lEZ86Gq"
+            },
+            "title": "View"
+          }
+        },
+        "activeGroup": "1"
+      },
+      "panelViewAssignments": {
+        "panel-1BZXoXS44n": [
+          "bA4lEZ86Gq"
+        ]
+      },
+      "activePanelId": "panel-1BZXoXS44n"
+    }
+  ]
+}

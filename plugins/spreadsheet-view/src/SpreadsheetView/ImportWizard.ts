@@ -148,12 +148,10 @@ export default function stateModelFactory() {
        */
       tracksForAssembly(selectedAssembly: string) {
         const session = getSession(self)
-        const { tracks, sessionTracks = [] } = session
-        const allTracks = [
-          ...tracks,
-          ...sessionTracks,
-        ] as AnyConfigurationModel[]
-        return allTracks
+        // note: session.tracks already includes sessionTracks in session
+        // models that have them, so no need to concat them again
+        const { tracks } = session
+        return (tracks as AnyConfigurationModel[])
           .flatMap(track => {
             const assemblyNames = readConfObject(track, 'assemblyNames') ?? []
             if (!assemblyNames.includes(selectedAssembly)) {

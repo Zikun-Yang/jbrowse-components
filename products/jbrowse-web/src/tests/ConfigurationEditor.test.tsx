@@ -43,7 +43,7 @@ test('change color on track', async () => {
       elt.closest('[role="menu"]'),
     )!,
   )
-  const elt = await findByDisplayValue('goldenrod', {}, delay)
+  const elt = await findByDisplayValue('#292421', {}, delay)
   await user.clear(elt)
   await user.type(elt, 'green')
   await new Promise(res => setTimeout(res, 1000))

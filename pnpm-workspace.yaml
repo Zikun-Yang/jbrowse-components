@@ -2,3 +2,11 @@ packages:
   - 'packages/*'
   - 'products/*'
   - 'plugins/*'
+allowBuilds:
+  canvas: set this to true or false
+  core-js-pure: set this to true or false
+  electron: set this to true or false
+  electron-chromedriver: set this to true or false
+  esbuild: set this to true or false
+  puppeteer: set this to true or false
+  unrs-resolver: set this to true or false

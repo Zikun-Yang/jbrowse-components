@@ -42,7 +42,9 @@ export async function renderToSvg(model: CGV, opts: ExportSvgOptions) {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox={[0, 0, width + shift * 2, height].toString()}
         >
-          <SVGBackground width={width} height={height} shift={shift} />
+          {opts.removeBackground ? null : (
+            <SVGBackground width={width} height={height} shift={shift} />
+          )}
           <g transform={`translate(${centerXY}) rotate(${deg})`}>
             {staticSlices.map((slice, i) => (
               /* biome-ignore lint/suspicious/noArrayIndexKey: */
