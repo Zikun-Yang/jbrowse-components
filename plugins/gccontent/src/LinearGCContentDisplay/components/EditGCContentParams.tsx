@@ -17,12 +17,18 @@ const EditGCContentParamsDialog = observer(function EditGCContentParamsDialog({
   model: {
     windowSizeSetting: number
     windowDeltaSetting: number
-    setGCContentParams: (a: { windowSize: number; windowDelta: number }) => void
+    windowSize?: number
+    setGCContentParams: (a: {
+      windowSize?: number
+      windowDelta?: number
+    }) => void
+    resetGCContentParams: () => void
   }
   handleClose: () => void
 }) {
   const [windowSize, setWindowSize] = useState(`${model.windowSizeSetting}`)
   const [windowDelta, setWindowDelta] = useState(`${model.windowDeltaSetting}`)
+  const automatic = model.windowSize === undefined
 
   return (
     <Dialog open onClose={handleClose} title="Edit GC content params">
@@ -33,6 +39,11 @@ const EditGCContentParamsDialog = observer(function EditGCContentParamsDialog({
           Note that small step sizes can result in high CPU over large areas,
           and it is not recommended to make the step size larger than the window
           size as then the sliding window will miss contents.
+        </Typography>
+        <Typography color="text.secondary">
+          {automatic
+            ? 'The window currently follows the view: one window per 2 screen pixels, so the resolution changes as you zoom.'
+            : 'The window size is currently set manually.'}
         </Typography>
         {+windowDelta > +windowSize ? (
           <ErrorMessage error="It is not recommended to make the step size larger than the window size" />
@@ -64,6 +75,16 @@ const EditGCContentParamsDialog = observer(function EditGCContentParamsDialog({
             }}
           >
             Submit
+          </Button>
+          <Button
+            variant="contained"
+            disabled={automatic}
+            onClick={() => {
+              model.resetGCContentParams()
+              handleClose()
+            }}
+          >
+            Follow the view
           </Button>
           <Button
             variant="contained"
