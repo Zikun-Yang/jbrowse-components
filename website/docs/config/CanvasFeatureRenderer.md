@@ -22,6 +22,10 @@ reference the markdown files in our repo of the checked out git tag
 
 #### slot: color1
 
+NOTE: intentional fork default (#292421, a near-black). Upstream defaults to
+`goldenrod`. This is a permanent project decision, locked by
+plugins/linear-genome-view/src/LinearBasicDisplay/model.test.ts
+
 ```js
 color1: {
       type: 'color',
@@ -66,6 +70,128 @@ outline: {
     }
 ```
 
+#### slot: colorScheme
+
+Native color scheme. `default` keeps the existing color1/2/3 behavior (including
+jexl callbacks). The other values compute the feature color without an
+expression.
+
+```js
+colorScheme: {
+      type: 'stringEnum',
+      model: types.enumeration('colorScheme', [
+        'default',
+        'featureField',
+        'score',
+        'strand',
+        'type',
+      ]),
+      description:
+        'how feature colors are chosen: "default" uses color1/color2/color3, "featureField" reads a color from the feature attribute named by colorField (e.g. the BED itemRgb column), "score" maps a numeric attribute through a continuous palette, "strand" uses color1/color3 for +/-, "type" maps the feature type through a categorical palette',
+      defaultValue: 'default',
+    }
+```
+
+#### slot: colorField
+
+```js
+colorField: {
+      type: 'string',
+      description:
+        'feature attribute to read the feature color from when colorScheme is "featureField" (defaults to "color", which the BED/BigBed adapters fill in from itemRgb/reserved)',
+      defaultValue: 'color',
+    }
+```
+
+#### slot: scoreField
+
+```js
+scoreField: {
+      type: 'string',
+      description:
+        'feature attribute that holds the numeric score when colorScheme is "score"',
+      defaultValue: 'score',
+    }
+```
+
+#### slot: scorePalette
+
+```js
+scorePalette: {
+      type: 'string',
+      description:
+        'continuous palette name used by colorScheme "score" (viridis, plasma, inferno, magma, cividis, coolwarm, ylOrRd, or a registered custom palette)',
+      defaultValue: 'viridis',
+    }
+```
+
+#### slot: scoreScale
+
+```js
+scoreScale: {
+      type: 'stringEnum',
+      model: types.enumeration('scoreScale', ['linear', 'quantile']),
+      description:
+        'map scores linearly or by quantile rank of the scores in the current render block when colorScheme is "score"',
+      defaultValue: 'linear',
+    }
+```
+
+#### slot: scoreAutoRange
+
+```js
+scoreAutoRange: {
+      type: 'boolean',
+      description:
+        'when true (default) derive the score min/max from the features in the current block; set false and use scoreMin/scoreMax for a fixed range',
+      defaultValue: true,
+    }
+```
+
+#### slot: scoreMin
+
+```js
+scoreMin: {
+      type: 'number',
+      description:
+        'fixed lower bound for colorScheme "score" (scoreAutoRange false)',
+      defaultValue: 0,
+    }
+```
+
+#### slot: scoreMax
+
+```js
+scoreMax: {
+      type: 'number',
+      description:
+        'fixed upper bound for colorScheme "score" (scoreAutoRange false)',
+      defaultValue: 1000,
+    }
+```
+
+#### slot: typePalette
+
+```js
+typePalette: {
+      type: 'string',
+      description:
+        'categorical palette name used by colorScheme "type" (e.g. polychrome36, set1, set2, tab10)',
+      defaultValue: 'polychrome36',
+    }
+```
+
+#### slot: colorByCDS
+
+```js
+colorByCDS: {
+      type: 'boolean',
+      description:
+        'color CDS features by reading frame instead of using the base feature color',
+      defaultValue: false,
+    }
+```
+
 #### slot: height
 
 ```js
@@ -92,6 +218,22 @@ showLabels: {
 showDescriptions: {
       type: 'boolean',
       defaultValue: true,
+    }
+```
+
+#### slot: labelPlacement
+
+NOTE: intentional fork default (`left`). Upstream always places labels below the
+feature. This is a permanent project decision, locked by
+plugins/linear-genome-view/src/LinearBasicDisplay/model.test.ts
+
+```js
+labelPlacement: {
+      type: 'stringEnum',
+      model: types.enumeration('labelPlacement', ['left', 'below']),
+      description:
+        'label placement: "left" places labels inline to the left of the feature, "below" places labels underneath the feature',
+      defaultValue: 'left',
     }
 ```
 
@@ -224,7 +366,8 @@ maxFeatureGlyphExpansion: {
 ```js
 maxHeight: {
       type: 'integer',
-      description: 'the maximum height to be used in a rendering',
+      description:
+        'the maximum height of the feature layout, i.e. how many stacked feature rows may be drawn. When the layout exceeds this the track shows "Max height reached". This is not the visible track height',
       defaultValue: 5000,
     }
 ```

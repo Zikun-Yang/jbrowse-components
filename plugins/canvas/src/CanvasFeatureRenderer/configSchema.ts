@@ -312,7 +312,8 @@ const CanvasFeatureRenderer = ConfigurationSchema(
      */
     maxHeight: {
       type: 'integer',
-      description: 'the maximum height to be used in a rendering',
+      description:
+        'the maximum height of the feature layout, i.e. how many stacked feature rows may be drawn. When the layout exceeds this the track shows "Max height reached". This is not the visible track height',
       defaultValue: 5000,
     },
 

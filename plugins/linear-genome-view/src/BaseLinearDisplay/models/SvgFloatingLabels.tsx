@@ -1,4 +1,9 @@
 import {
+  FLOATING_LABEL_FONT_SIZE,
+  leftLabelLinePosition,
+} from '@jbrowse/core/util'
+
+import {
   type FeatureLabelData,
   calculateFloatingLabelPosition,
 } from '../components/util.ts'
@@ -15,8 +20,7 @@ export function SvgFloatingLabels({
   viewWidth,
 }: Props) {
   const elements: React.ReactElement[] = []
-  const fontSize = 11
-  const leftLabelGap = 3
+  const fontSize = FLOATING_LABEL_FONT_SIZE
 
   for (const [
     key,
@@ -39,11 +43,18 @@ export function SvgFloatingLabels({
       let y: number
       if (isLeft) {
         // x is the label's right edge - text is right-anchored so stacked
-        // lines align exactly regardless of text-width estimation error
-        const blockHeight = leftLabelCount * fontSize
-        y =
-          topPx + (totalFeatureHeight - blockHeight) / 2 + leftIndex * fontSize
-        x = Math.round(leftPx - leftLabelGap - offsetPx)
+        // lines align exactly regardless of text-width estimation error. The
+        // geometry is shared with the canvas layout and the DOM overlay.
+        const position = leftLabelLinePosition({
+          featureTopPx: topPx,
+          featureHeight: totalFeatureHeight,
+          featureLeftPx: leftPx,
+          lineIndex: leftIndex,
+          lineCount: leftLabelCount,
+          offsetPx,
+        })
+        x = position.x
+        y = position.y
         leftIndex++
       } else {
         y = featureVisualBottom + relativeY

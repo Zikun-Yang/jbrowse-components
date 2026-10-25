@@ -1,6 +1,6 @@
 import { readConfObject } from '@jbrowse/core/configuration'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
-import { bpToPx } from '@jbrowse/core/util'
+import { bpToPx, featureLabelHitBounds } from '@jbrowse/core/util'
 import Flatbush from '@jbrowse/core/util/flatbush'
 import { checkStopToken2 } from '@jbrowse/core/util/stopToken'
 
@@ -103,26 +103,11 @@ export function makeImageData({
     drawFeature(ctx, canvasLayout, drawContext, pluginManager)
 
     // Build hit detection indexes
-    // totalLayoutWidth spans leftPadding + feature width + right padding,
-    // so the rect starts at x - leftPadding to cover left-side arrows/labels
-    const labelBlockHeight = canvasLayout.leftLabelBlockHeight
-    const featureHeight = canvasLayout.height
-    // Left-side label block (e.g. name + description) can be taller than the
-    // feature - grow the rect symmetrically to enclose the text
-    const extraLabelHeight =
-      labelBlockHeight && labelBlockHeight > featureHeight
-        ? (labelBlockHeight - featureHeight) / 2
-        : 0
-    const bounds = {
-      left: canvasLayout.x - canvasLayout.leftPadding,
-      right:
-        canvasLayout.x -
-        canvasLayout.leftPadding +
-        canvasLayout.totalLayoutWidth,
-      top: canvasLayout.y - extraLabelHeight,
-      bottom:
-        canvasLayout.y - extraLabelHeight + canvasLayout.totalLayoutHeight,
-    }
+    // The hit rectangle (which covers leftPadding for left-side arrows and
+    // labels, and grows symmetrically around a feature with left labels) is
+    // derived from the layout by featureLabelHitBounds so it stays in sync
+    // with what labelUtils reserved and with what the label renderers draw
+    const bounds = featureLabelHitBounds(canvasLayout)
 
     const label = String(
       readConfObject(config, ['labels', 'name'], { feature }) || '',

@@ -1,19 +1,29 @@
+import { readConfObject } from '@jbrowse/core/configuration'
+
 import { readCachedConfig } from './renderConfig.ts'
 
 import type { CachedConfig } from './renderConfig.ts'
 
-describe('CachedConfig', () => {
-  describe('readCachedConfig', () => {
-    const mockFeature = {
-      get: (key: string) => {
-        if (key === 'name') {
-          return 'TestFeature'
-        }
-        return undefined
-      },
-    }
+jest.mock('@jbrowse/core/configuration', () => ({
+  readConfObject: jest.fn(() => 'evaluated-color'),
+}))
 
-    it('returns cached value when isCallback is false', () => {
+const mockReadConfObject = readConfObject as jest.MockedFunction<
+  typeof readConfObject
+>
+
+describe('CachedConfig', () => {
+  const mockFeature = {
+    get: (key: string) => (key === 'name' ? 'TestFeature' : undefined),
+  }
+  const config = {} as any
+
+  beforeEach(() => {
+    mockReadConfObject.mockClear()
+  })
+
+  describe('readCachedConfig', () => {
+    it('returns the cached value when the slot is not a callback', () => {
       const cached: CachedConfig<string> = {
         value: 'cachedColor',
         isCallback: false,
@@ -21,69 +31,54 @@ describe('CachedConfig', () => {
 
       const result = readCachedConfig(
         cached,
-        {} as any, // config not used when isCallback is false
+        config,
         'color1',
         mockFeature as any,
       )
 
       expect(result).toBe('cachedColor')
+      expect(mockReadConfObject).not.toHaveBeenCalled()
     })
 
-    it('calls readConfObject when isCallback is true', () => {
-      const cached: CachedConfig<string> = {
-        value: 'defaultColor',
-        isCallback: true,
-      }
-
-      // Since readConfObject is complex, we test the structure
-      // The actual readConfObject call is tested in core
-      expect(cached.isCallback).toBe(true)
-    })
-
-    it('returns cached number value', () => {
-      const cached: CachedConfig<number> = {
-        value: 10,
-        isCallback: false,
-      }
+    it('evaluates a callback per feature with the feature as context', () => {
+      const cached: CachedConfig<string> = { isCallback: true }
 
       const result = readCachedConfig(
         cached,
-        {} as any,
-        'height',
+        config,
+        'color1',
         mockFeature as any,
       )
 
-      expect(result).toBe(10)
+      expect(result).toBe('evaluated-color')
+      expect(mockReadConfObject).toHaveBeenCalledWith(config, 'color1', {
+        feature: mockFeature,
+      })
     })
 
-    it('uses default value for cached callbacks', () => {
-      const cached: CachedConfig<number> = {
-        value: 12, // default value used when isCallback is true
-        isCallback: true,
-      }
+    it('supports nested config paths', () => {
+      const cached: CachedConfig<number> = { isCallback: true }
 
-      // When isCallback is true, the value field contains the default
-      expect(cached.value).toBe(12)
-    })
-  })
+      readCachedConfig(
+        cached,
+        config,
+        ['labels', 'fontSize'],
+        mockFeature as any,
+      )
 
-  describe('CachedConfig structure', () => {
-    it('has correct shape for non-callback', () => {
-      const config: CachedConfig<string> = {
-        value: 'goldenrod',
-        isCallback: false,
-      }
-      expect(config.value).toBe('goldenrod')
-      expect(config.isCallback).toBe(false)
+      expect(mockReadConfObject).toHaveBeenCalledWith(
+        config,
+        ['labels', 'fontSize'],
+        { feature: mockFeature },
+      )
     })
 
-    it('has correct shape for callback', () => {
-      const config: CachedConfig<string> = {
-        value: 'defaultValue',
-        isCallback: true,
-      }
-      expect(config.value).toBe('defaultValue')
-      expect(config.isCallback).toBe(true)
+    it('returns a cached number value', () => {
+      const cached: CachedConfig<number> = { value: 10, isCallback: false }
+
+      expect(
+        readCachedConfig(cached, config, 'height', mockFeature as any),
+      ).toBe(10)
     })
   })
 })

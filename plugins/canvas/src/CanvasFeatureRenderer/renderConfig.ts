@@ -26,11 +26,15 @@ import type { Feature } from '@jbrowse/core/util'
  * A cached config value that may need per-feature evaluation.
  * - If isCallback is false, use `value` directly (fast path)
  * - If isCallback is true, call readCachedConfig() to evaluate per-feature
+ *
+ * A callback has no `value` on purpose: the value would be per-feature, so
+ * there is no single value to cache and no default to duplicate here. Plain
+ * slots are resolved once through readConfObject, which already falls back to
+ * the default declared on the config schema.
  */
-export interface CachedConfig<T> {
-  value: T
-  isCallback: boolean
-}
+export type CachedConfig<T> =
+  | { isCallback: true }
+  | { isCallback: false; value: T }
 
 /**
  * Read a potentially cached config value.
@@ -47,17 +51,22 @@ export function readCachedConfig<T>(
     : cached.value
 }
 
+/**
+ * Read a slot once. Callback slots are only flagged here, never evaluated:
+ * the renderer evaluates them per feature via readCachedConfig. All other
+ * slots go through readConfObject, so the value (and its fallback) comes from
+ * the config schema - never from a hardcoded copy in this file.
+ */
 function createCachedConfig<T>(
   config: AnyConfigurationModel,
   key: string | string[],
-  defaultValue: T,
 ): CachedConfig<T> {
   const configSlot = Array.isArray(key)
     ? key.reduce((acc: any, k) => acc?.[k], config)
     : config[key]
-  const isCallback = configSlot?.isCallback ?? false
-  const value = isCallback ? defaultValue : (readConfObject(config, key) as T)
-  return { value, isCallback }
+  return configSlot?.isCallback
+    ? { isCallback: true }
+    : { isCallback: false, value: readConfObject(config, key) as T }
 }
 
 export interface RenderConfigContext {
@@ -136,10 +145,10 @@ export function createRenderConfigContext(
       'displayDirectionalChevrons',
     ) as boolean,
 
-    color1: createCachedConfig(config, 'color1', '#292421'),
-    color2: createCachedConfig(config, 'color2', '#f0f'),
-    color3: createCachedConfig(config, 'color3', '#357089'),
-    outline: createCachedConfig(config, 'outline', ''),
+    color1: createCachedConfig<string>(config, 'color1'),
+    color2: createCachedConfig<string>(config, 'color2'),
+    color3: createCachedConfig<string>(config, 'color3'),
+    outline: createCachedConfig<string>(config, 'outline'),
 
     colorScheme: {
       kind: readConfObject(config, 'colorScheme') as ColorSchemeConfig['kind'],
@@ -154,14 +163,13 @@ export function createRenderConfigContext(
     },
     colorByCDS: readConfObject(config, 'colorByCDS') as boolean,
 
-    featureHeight: createCachedConfig(config, 'height', 10),
-    fontHeight: createCachedConfig(config, ['labels', 'fontSize'], 12),
-    nameColor: createCachedConfig(config, ['labels', 'nameColor'], 'black'),
-    descriptionColor: createCachedConfig(
-      config,
-      ['labels', 'descriptionColor'],
-      'blue',
-    ),
+    featureHeight: createCachedConfig<number>(config, 'height'),
+    fontHeight: createCachedConfig<number>(config, ['labels', 'fontSize']),
+    nameColor: createCachedConfig<string>(config, ['labels', 'nameColor']),
+    descriptionColor: createCachedConfig<string>(config, [
+      'labels',
+      'descriptionColor',
+    ]),
 
     labelAllowed: displayMode !== 'collapse',
     heightMultiplier: getHeightMultiplier(displayMode),

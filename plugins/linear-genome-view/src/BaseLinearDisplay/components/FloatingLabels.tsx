@@ -1,4 +1,8 @@
-import { getContainingView } from '@jbrowse/core/util'
+import {
+  FLOATING_LABEL_FONT_SIZE,
+  getContainingView,
+  leftLabelLinePosition,
+} from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
 import { observer } from 'mobx-react'
 
@@ -6,9 +10,6 @@ import { calculateFloatingLabelPosition } from './util.ts'
 
 import type { FeatureTrackModel } from '../../LinearBasicDisplay/model.ts'
 import type { LinearGenomeViewModel } from '../../LinearGenomeView/index.ts'
-
-const LABEL_FONT_SIZE = 11
-const LEFT_LABEL_GAP = 3
 
 const useStyles = makeStyles()({
   // Full-size overlay container for floating labels
@@ -28,7 +29,7 @@ const useStyles = makeStyles()({
   // labels can be vertically centered on the feature body
   label: {
     position: 'absolute',
-    fontSize: 11,
+    fontSize: FLOATING_LABEL_FONT_SIZE,
     lineHeight: 1,
     cursor: 'default',
     pointerEvents: 'auto',
@@ -138,15 +139,21 @@ const FloatingLabels = observer(function FloatingLabels({
       let x: number
       let y: number
       if (placement === 'left') {
-        // Inline labels: stacked to the left of the feature, vertically
+        // Inline labels: stacked to the left of the feature and vertically
         // centered on the feature body. x is the label's right edge - the
-        // text is right-anchored so stacked lines align exactly
-        const blockHeight = leftLabelCount * LABEL_FONT_SIZE
-        y =
-          topPx +
-          (totalFeatureHeight - blockHeight) / 2 +
-          leftIndex * LABEL_FONT_SIZE
-        x = Math.round(leftPx - LEFT_LABEL_GAP - offsetPx)
+        // text is right-anchored so stacked lines align exactly. The geometry
+        // is shared with the canvas layout and the SVG export through
+        // @jbrowse/core/util
+        const { x: labelX, y: labelY } = leftLabelLinePosition({
+          featureTopPx: topPx,
+          featureHeight: totalFeatureHeight,
+          featureLeftPx: leftPx,
+          lineIndex: leftIndex,
+          lineCount: leftLabelCount,
+          offsetPx,
+        })
+        x = labelX
+        y = labelY
         leftIndex++
       } else {
         y = featureVisualBottom + relativeY

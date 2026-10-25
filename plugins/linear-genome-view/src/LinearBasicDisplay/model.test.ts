@@ -9,14 +9,21 @@ import {
 import { getSnapshot, types } from '@jbrowse/mobx-state-tree'
 
 import { modelFactory as LinearBasicDisplayModelFactory } from './index.ts'
+import { BASIC_DISPLAY_TRACK_OVERRIDES } from './model.ts'
 import {
   BaseLinearDisplayComponent,
   baseLinearDisplayConfigSchema,
 } from '../BaseLinearDisplay/index.ts'
+import { FEATURE_DISPLAY_TRACK_OVERRIDES } from '../LinearFeatureDisplay/model.ts'
 import { stateModelFactory as LinearGenomeViewModelFactory } from '../LinearGenomeView/index.ts'
 
 import type { MenuItem } from '@jbrowse/core/ui'
 import type { Instance } from '@jbrowse/mobx-state-tree'
+
+const ALL_TRACK_OVERRIDES = [
+  ...FEATURE_DISPLAY_TRACK_OVERRIDES,
+  ...BASIC_DISPLAY_TRACK_OVERRIDES,
+]
 
 const GENE_FILTER = "jexl:get(feature,'type')=='gene'"
 
@@ -307,5 +314,54 @@ describe('LinearBasicDisplay', () => {
     expect('onFeatureContextMenu' in props).toBe(false)
     expect('contextMenuItems' in display).toBe(false)
     expect(props.onFeatureClick).toBeDefined()
+  })
+
+  test('every declared track override is wired end to end', () => {
+    // one table drives getters, rendererConfig, actions and snapshot
+    // persistence; this loops over it so a new setting cannot add only part
+    // of the plumbing
+    const { display } = createDisplay()
+    const d = display
+
+    for (const spec of ALL_TRACK_OVERRIDES) {
+      const { trackProp, getter, slot, action, kind } = spec
+      const initial = d[getter]
+      expect(d[trackProp]).toBeUndefined()
+
+      if (kind === 'toggle') {
+        d[action]()
+        expect(d[getter]).toBe(!initial)
+      } else {
+        const value = typeof initial === 'number' ? 1234 : 'test-value'
+        d[action](value)
+        expect(d[getter]).toBe(value)
+      }
+
+      expect(d.rendererConfig[slot]).toBe(d[getter])
+      expect(getSnapshot(display)).toHaveProperty(trackProp)
+    }
+  })
+
+  test('unset track overrides are pruned from the snapshot', () => {
+    const { display } = createDisplay()
+    const snap = getSnapshot(display)
+    for (const spec of ALL_TRACK_OVERRIDES) {
+      expect(snap).not.toHaveProperty(spec.trackProp)
+    }
+  })
+
+  test('the Show... menu is composed from the featureStyleMenuItems() hook', () => {
+    const { display } = createDisplay()
+    const hookLabels = display
+      .featureStyleMenuItems()
+      .map((item: MenuItem) => ('label' in item ? item.label : undefined))
+    const shownLabels = subMenuLabels(
+      findSubMenuItem(display.trackMenuItems(), 'Show...'),
+    )
+
+    expect(hookLabels.length).toBeGreaterThan(0)
+    for (const label of hookLabels) {
+      expect(shownLabels).toContain(label)
+    }
   })
 })

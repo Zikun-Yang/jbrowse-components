@@ -1,4 +1,4 @@
-import { measureText } from '@jbrowse/core/util'
+import { FLOATING_LABEL_FONT_SIZE, measureText } from '@jbrowse/core/util'
 
 import { readCachedConfig } from './renderConfig.ts'
 import { truncateLabel } from './util.ts'
@@ -7,8 +7,6 @@ import type { RenderConfigContext } from './renderConfig.ts'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
 import type { FloatingLabelData } from '@jbrowse/plugin-linear-genome-view'
-
-export const FLOATING_LABEL_FONT_SIZE = 11
 
 /**
  * Create floating labels for a top-level feature (gene, etc.)
