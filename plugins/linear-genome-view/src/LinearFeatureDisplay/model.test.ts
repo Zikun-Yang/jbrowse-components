@@ -130,6 +130,8 @@ function createTestEnvironment() {
       },
       notifyError() {},
       queueDialog() {},
+      setSelection() {},
+      clearSelection() {},
     }))
 
   return { Session, LinearGenomeModel, mockRpcCall, pluginManager }
@@ -539,5 +541,123 @@ describe('LinearFeatureDisplay mouseover behavior', () => {
     })
 
     expect(mouseoverResult).toBe('Tooltip from renderer')
+  })
+
+  function createHoverDisplay() {
+    const { Session, LinearGenomeModel, mockRpcCall, pluginManager } =
+      createTestEnvironment()
+    mockRpcCall.mockResolvedValue({ feature: mockFeatureData })
+    const session = Session.create({ configuration: {} }, { pluginManager })
+    const view = session.setView(
+      LinearGenomeModel.create({
+        type: 'LinearGenomeView',
+        tracks: [
+          {
+            type: 'FeatureTrack',
+            trackId: 'test_track',
+            displays: [{ type: 'LinearFeatureDisplay' }],
+          },
+        ],
+      }),
+    )
+    view.setWidth(800)
+    view.setDisplayedRegions([
+      { assemblyName: 'volvox', start: 0, end: 10000, refName: 'ctgA' },
+    ])
+    const display = view.tracks[0]!.displays[0]!
+    return { Session, mockRpcCall, pluginManager, session, view, display }
+  }
+
+  test('does not fetch feature details while tooltips are disabled', async () => {
+    const { display, mockRpcCall } = createHoverDisplay()
+    display.setShowTooltips(false)
+    display.setFeatureIdUnderMouse('feature1')
+    jest.advanceTimersByTime(200)
+
+    expect(mockRpcCall).not.toHaveBeenCalled()
+    expect(display.featureUnderMouse).toBeUndefined()
+
+    // enabling tooltips while the mouse is still over the feature fetches it
+    display.setShowTooltips(true)
+    jest.advanceTimersByTime(200)
+    await waitFor(() => {
+      expect(display.featureUnderMouse).toBeDefined()
+    })
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+  })
+
+  test('caches feature details so re-hovering the same feature does not refetch', async () => {
+    const { display, mockRpcCall } = createHoverDisplay()
+
+    display.setFeatureIdUnderMouse('feature1')
+    jest.advanceTimersByTime(200)
+    await waitFor(() => {
+      expect(display.featureUnderMouse).toBeDefined()
+    })
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+
+    // leave and re-enter the same feature
+    display.setFeatureIdUnderMouse(undefined)
+    jest.advanceTimersByTime(200)
+    await waitFor(() => {
+      expect(display.featureUnderMouse).toBeUndefined()
+    })
+
+    display.setFeatureIdUnderMouse('feature1')
+    jest.advanceTimersByTime(200)
+    await waitFor(() => {
+      expect(display.featureUnderMouse).toBeDefined()
+    })
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+  })
+
+  test('de-duplicates in-flight feature detail requests', async () => {
+    const { display, mockRpcCall } = createHoverDisplay()
+    let resolveRpc: ((v: unknown) => void) | undefined
+    mockRpcCall.mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveRpc = resolve
+        }),
+    )
+
+    const p1 = display.fetchFeatureDetails('feature1')
+    const p2 = display.fetchFeatureDetails('feature1')
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+    expect(display.pendingFeatureDetails.size).toBe(1)
+
+    resolveRpc?.({ feature: mockFeatureData })
+    const f1 = await p1
+    const f2 = await p2
+    expect(f1).toBeDefined()
+    expect(f2).toBe(f1)
+    expect(display.pendingFeatureDetails.size).toBe(0)
+  })
+
+  test('feature clicks reuse the hover cache instead of refetching', async () => {
+    const { display, mockRpcCall } = createHoverDisplay()
+    const { onFeatureClick } = display.renderingProps()
+
+    await onFeatureClick(undefined, 'feature1')
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+    expect(display.featureDetailsCache.has('feature1')).toBe(true)
+
+    // same feature clicked again (or hovered) - cached
+    await onFeatureClick(undefined, 'feature1')
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+  })
+
+  test('bounds the number of cached feature details (LRU)', async () => {
+    const { display, mockRpcCall } = createHoverDisplay()
+    const fakeFeature = {} as any
+    for (let i = 0; i < 100; i++) {
+      display.featureDetailsCache.set(`f${i}`, fakeFeature)
+    }
+
+    await display.fetchFeatureDetails('extra')
+    expect(mockRpcCall).toHaveBeenCalledTimes(1)
+    expect(display.featureDetailsCache.size).toBe(100)
+    expect(display.featureDetailsCache.has('f0')).toBe(false)
+    expect(display.featureDetailsCache.has('extra')).toBe(true)
   })
 })

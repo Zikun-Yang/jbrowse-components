@@ -119,6 +119,7 @@ exports[`adapter can fetch features bed with autosql 1`] = `
       0,
     ],
     "cigarettes_per_day": "--",
+    "color": "rgb(0, 0, 0)",
     "days_to_death": "--",
     "dbSNP_RS": "novel",
     "dbSNP_Val_Status": "",
@@ -133,6 +134,7 @@ exports[`adapter can fetch features bed with autosql 1`] = `
     "reserved": "0,0,0",
     "sampleCount": "1",
     "score": 1,
+    "scoreNormalized": 0.001,
     "start": 1,
     "strand": 0,
     "subfeatures": [
@@ -253,11 +255,13 @@ exports[`adapter can fetch features from volvox.sort.bed.gz simple bed3 1`] = `
 exports[`adapter can fetch features from volvox-bed12.bed.gz 1`] = `
 [
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "itemRgb": "0,0,0",
     "name": "EDEN.1",
     "refName": "ctgA",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1049,
     "strand": 1,
     "subfeatures": [
@@ -324,11 +328,13 @@ exports[`adapter can fetch features from volvox-bed12.bed.gz 1`] = `
     "uniqueId": "test-45690",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "itemRgb": "0,0,0",
     "name": "EDEN.2",
     "refName": "ctgA",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1049,
     "strand": 1,
     "subfeatures": [
@@ -385,11 +391,13 @@ exports[`adapter can fetch features from volvox-bed12.bed.gz 1`] = `
     "uniqueId": "test-45787",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "itemRgb": "0,0,0",
     "name": "EDEN.3",
     "refName": "ctgA",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1299,
     "strand": 1,
     "subfeatures": [
@@ -455,11 +463,13 @@ exports[`adapter can fetch features from volvox-bed12.bed.gz 1`] = `
     "uniqueId": "test-45875",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 23000,
     "itemRgb": "0,0,0",
     "name": "rna-Apple3",
     "refName": "ctgA",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 17399,
     "strand": 1,
     "subfeatures": [

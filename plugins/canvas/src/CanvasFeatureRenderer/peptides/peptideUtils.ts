@@ -183,11 +183,9 @@ export async function fetchPeptideData(
   pluginManager: PluginManager,
   renderProps: RenderArgsDeserialized,
   features: Map<string, Feature>,
+  colorByCDS: boolean,
 ): Promise<Map<string, PeptideData>> {
-  const { colorByCDS, bpPerPx } = renderProps as {
-    colorByCDS?: boolean
-    bpPerPx: number
-  }
+  const { bpPerPx } = renderProps
   const peptideDataMap = new Map<string, PeptideData>()
   if (!colorByCDS || !shouldRenderPeptideBackground(bpPerPx)) {
     return peptideDataMap

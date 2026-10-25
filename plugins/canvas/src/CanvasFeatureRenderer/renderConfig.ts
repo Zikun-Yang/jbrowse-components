@@ -1,5 +1,6 @@
 import { readConfObject } from '@jbrowse/core/configuration'
 
+import type { ColorSchemeConfig, ScoreStats } from './colorScheme.ts'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
 
@@ -77,6 +78,21 @@ export interface RenderConfigContext {
   color3: CachedConfig<string>
   outline: CachedConfig<string>
 
+  /**
+   * Native color scheme config. `default` keeps using color1/color2/color3.
+   */
+  colorScheme: ColorSchemeConfig
+  /**
+   * Score distribution for the current render block, filled in by doAll when
+   * the score color scheme is active. Undefined elsewhere.
+   */
+  scoreStats?: ScoreStats
+  /**
+   * Color CDS features by reading frame (was previously a renderProps flag
+   * with no producer).
+   */
+  colorByCDS: boolean
+
   featureHeight: CachedConfig<number>
   fontHeight: CachedConfig<number>
   nameColor: CachedConfig<string>
@@ -124,6 +140,19 @@ export function createRenderConfigContext(
     color2: createCachedConfig(config, 'color2', '#f0f'),
     color3: createCachedConfig(config, 'color3', '#357089'),
     outline: createCachedConfig(config, 'outline', ''),
+
+    colorScheme: {
+      kind: readConfObject(config, 'colorScheme') as ColorSchemeConfig['kind'],
+      colorField: readConfObject(config, 'colorField') as string,
+      scoreField: readConfObject(config, 'scoreField') as string,
+      scorePalette: readConfObject(config, 'scorePalette') as string,
+      scoreScale: readConfObject(config, 'scoreScale') as 'linear' | 'quantile',
+      scoreAutoRange: readConfObject(config, 'scoreAutoRange') as boolean,
+      scoreMin: readConfObject(config, 'scoreMin') as number,
+      scoreMax: readConfObject(config, 'scoreMax') as number,
+      typePalette: readConfObject(config, 'typePalette') as string,
+    },
+    colorByCDS: readConfObject(config, 'colorByCDS') as boolean,
 
     featureHeight: createCachedConfig(config, 'height', 10),
     fontHeight: createCachedConfig(config, ['labels', 'fontSize'], 12),

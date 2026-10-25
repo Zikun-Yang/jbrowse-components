@@ -13,6 +13,9 @@ function findSubMenu(items: MenuItem[], label: string) {
   )
 }
 
+/** jexl expression used by the "Show only genes" filter */
+const GENE_TYPE_FILTER = "jexl:get(feature,'type')=='gene'"
+
 /**
  * #stateModel LinearBasicDisplay
  * #category display
@@ -153,13 +156,14 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
             {
               label: 'Show only genes',
               type: 'checkbox',
-              checked: filters.includes("jexl:get(feature,'type')=='gene'"),
+              checked: filters.includes(GENE_TYPE_FILTER),
               onClick: () => {
-                const geneFilter = "jexl:get(feature,'type')=='gene'"
-                if (filters.includes(geneFilter)) {
-                  self.setJexlFilters(filters.filter(f => f !== geneFilter))
+                if (filters.includes(GENE_TYPE_FILTER)) {
+                  self.setJexlFilters(
+                    filters.filter(f => f !== GENE_TYPE_FILTER),
+                  )
                 } else {
-                  self.setJexlFilters([...filters, geneFilter])
+                  self.setJexlFilters([...filters, GENE_TYPE_FILTER])
                 }
               },
             },

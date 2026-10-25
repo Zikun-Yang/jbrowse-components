@@ -51,7 +51,7 @@ export const cdsGlyph: Glyph = {
       peptideDataMap,
     } = dc
     const { config } = configContext
-    const colorByCDS = dc.colorByCDS ?? false
+    const colorByCDS = configContext.colorByCDS
     const reversed = region.reversed ?? false
 
     const featureStart = feature.get('start')
@@ -85,7 +85,6 @@ export const cdsGlyph: Glyph = {
         feature,
         config,
         configContext,
-        colorByCDS,
         theme,
       })
 

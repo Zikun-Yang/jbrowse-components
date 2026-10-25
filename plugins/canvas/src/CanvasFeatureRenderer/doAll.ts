@@ -1,5 +1,6 @@
 import { renderToAbstractCanvas, updateStatus } from '@jbrowse/core/util'
 
+import { computeScoreStats } from './colorScheme.ts'
 import { layoutFeatures } from './layout/layoutFeatures.ts'
 import { makeImageData } from './makeImageData.ts'
 import { fetchPeptideData } from './peptides/peptideUtils.ts'
@@ -38,6 +39,12 @@ export async function doAll({
   // Create config context ONCE at the start - this reads all config values upfront
   // to avoid expensive readConfObject calls in per-feature hot paths
   const configContext = createRenderConfigContext(config)
+  if (configContext.colorScheme.kind === 'score') {
+    configContext.scoreStats = computeScoreStats(
+      features.values(),
+      configContext.colorScheme.scoreField,
+    )
+  }
 
   const layoutRecords = await updateStatus(
     'Computing feature layout',
@@ -60,7 +67,12 @@ export async function doAll({
     'Fetching peptide data',
     statusCallback,
     async () => {
-      return fetchPeptideData(pluginManager, renderProps, features)
+      return fetchPeptideData(
+        pluginManager,
+        renderProps,
+        features,
+        configContext.colorByCDS,
+      )
     },
   )
 
@@ -76,7 +88,6 @@ export async function doAll({
           layout,
           displayMode: configContext.displayMode,
           peptideDataMap,
-          colorByCDS: (renderProps as any).colorByCDS,
           pluginManager,
         },
         configContext,

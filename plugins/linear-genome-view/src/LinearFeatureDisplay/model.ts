@@ -6,7 +6,7 @@ import {
   readConfObject,
 } from '@jbrowse/core/configuration'
 import SerializableFilterChain from '@jbrowse/core/pluggableElementTypes/renderers/util/serializableFilterChain'
-import { SimpleFeature, getSession } from '@jbrowse/core/util'
+import { getSession } from '@jbrowse/core/util'
 import { getRpcSessionId } from '@jbrowse/core/util/tracks'
 import {
   addDisposer,
@@ -20,14 +20,22 @@ import { reaction, toJS } from 'mobx'
 import { ClearAllIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import { BaseLinearDisplay } from '../BaseLinearDisplay/index.ts'
+import { fetchFeatureByIdRpc } from '../BaseLinearDisplay/util.ts'
 
 import type {
   AnyConfigurationModel,
   AnyConfigurationSchemaType,
 } from '@jbrowse/core/configuration'
 import type { MenuItem } from '@jbrowse/core/ui'
-import type { Feature, SimpleFeatureSerialized } from '@jbrowse/core/util'
+import type { Feature } from '@jbrowse/core/util'
 import type { Instance } from '@jbrowse/mobx-state-tree'
+
+/**
+ * Maximum number of feature detail responses kept per display. Feature details
+ * are immutable per track instance, so a small LRU is enough to make moving
+ * the mouse back and forth over a dense track free of RPC calls.
+ */
+const MAX_FEATURE_DETAILS_CACHE = 100
 
 const SetMaxHeightDialog = lazy(
   () => import('./components/SetMaxHeightDialog.tsx'),
@@ -86,6 +94,18 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
        * via CoreGetFeatureDetails RPC to avoid serializing all features
        */
       featureUnderMouseVolatile: undefined as Feature | undefined,
+      /**
+       * #volatile
+       * LRU cache of feature details fetched via CoreGetFeatureDetails,
+       * keyed by top-level feature id. Not observable (plain Map).
+       */
+      featureDetailsCache: new Map<string, Feature>(),
+      /**
+       * #volatile
+       * In-flight feature detail requests keyed by feature id so that rapid
+       * hover/click on the same feature does not fire duplicate RPCs.
+       */
+      pendingFeatureDetails: new Map<string, Promise<Feature | undefined>>(),
     }))
     .views(self => ({
       /**
@@ -224,6 +244,64 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         return self.featureUnderMouseVolatile
       },
     }))
+    .actions(self => ({
+      /**
+       * #action
+       * Fetch full feature details through CoreGetFeatureDetails, with a small
+       * LRU cache and in-flight de-duplication. Shared by the hover tooltip
+       * reaction and by feature clicks so repeated interactions with the same
+       * feature never issue a second RPC.
+       */
+      async fetchFeatureDetails(featureId: string) {
+        const cached = self.featureDetailsCache.get(featureId)
+        if (cached) {
+          // refresh LRU order
+          self.featureDetailsCache.delete(featureId)
+          self.featureDetailsCache.set(featureId, cached)
+          return cached
+        }
+
+        const pending = self.pendingFeatureDetails.get(featureId)
+        if (pending) {
+          return pending
+        }
+
+        const session = getSession(self)
+        const { parentTrack } = self
+        const promise = fetchFeatureByIdRpc({
+          rpcManager: session.rpcManager,
+          sessionId: getRpcSessionId(self),
+          trackId: parentTrack.id,
+          rendererType: self.rendererTypeName,
+          featureId,
+        })
+          .then(feature => {
+            if (feature) {
+              self.featureDetailsCache.set(featureId, feature)
+              if (self.featureDetailsCache.size > MAX_FEATURE_DETAILS_CACHE) {
+                const oldest = self.featureDetailsCache.keys().next().value
+                if (oldest !== undefined) {
+                  self.featureDetailsCache.delete(oldest)
+                }
+              }
+            }
+            return feature
+          })
+          .finally(() => {
+            self.pendingFeatureDetails.delete(featureId)
+          })
+
+        self.pendingFeatureDetails.set(featureId, promise)
+        return promise
+      },
+      /**
+       * #action
+       */
+      clearFeatureDetailsCache() {
+        self.featureDetailsCache.clear()
+        self.pendingFeatureDetails.clear()
+      },
+    }))
     .views(self => {
       const {
         renderProps: superRenderProps,
@@ -254,30 +332,15 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
           return {
             ...superProps,
             async onFeatureClick(_: unknown, featureId?: string) {
-              const { rpcManager } = session
-              const { parentTrack } = self
+              const f = featureId || self.featureIdUnderMouse
+              if (!f) {
+                self.clearFeatureSelection()
+                return
+              }
               try {
-                const f = featureId || self.featureIdUnderMouse
-                if (!f) {
-                  self.clearFeatureSelection()
-                } else {
-                  const sessionId = getRpcSessionId(self)
-                  const { feature } = (await rpcManager.call(
-                    sessionId,
-                    'CoreGetFeatureDetails',
-                    {
-                      featureId: f,
-                      sessionId,
-                      trackInstanceId: parentTrack.id,
-                      rendererType: self.rendererTypeName,
-                    },
-                  )) as {
-                    feature: SimpleFeatureSerialized | undefined
-                  }
-
-                  if (isAlive(self) && feature) {
-                    self.selectFeature(new SimpleFeature(feature))
-                  }
+                const feature = await self.fetchFeatureDetails(f)
+                if (isAlive(self) && feature) {
+                  self.selectFeature(feature)
                 }
               } catch (e) {
                 console.error(e)
@@ -389,33 +452,23 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
       afterAttach() {
         // Set up a reaction to fetch feature details when hovering
         // This enables custom mouseover jexl expressions that use get(feature, ...)
+        //
+        // The derivation returns the hovered feature id only while tooltips
+        // are enabled, so hovering a dense track with tooltips off (or with
+        // the tooltip setting toggled off) does not hit the RPC at all.
         addDisposer(
           self,
           reaction(
-            () => self.featureIdUnderMouse,
+            () =>
+              self.showTooltipsEnabled ? self.featureIdUnderMouse : undefined,
             async featureId => {
               if (!featureId) {
                 self.setFeatureUnderMouse(undefined)
                 return
               }
 
-              const session = getSession(self)
-              const { rpcManager } = session
-              const { parentTrack } = self
               try {
-                const sessionId = getRpcSessionId(self)
-                const { feature } = (await rpcManager.call(
-                  sessionId,
-                  'CoreGetFeatureDetails',
-                  {
-                    featureId,
-                    sessionId,
-                    trackInstanceId: parentTrack.id,
-                    rendererType: self.rendererTypeName,
-                  },
-                )) as {
-                  feature: SimpleFeatureSerialized | undefined
-                }
+                const feature = await self.fetchFeatureDetails(featureId)
 
                 // Only set if still alive and feature ID hasn't changed
                 if (
@@ -423,7 +476,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
                   feature &&
                   self.featureIdUnderMouse === featureId
                 ) {
-                  self.setFeatureUnderMouse(new SimpleFeature(feature))
+                  self.setFeatureUnderMouse(feature)
                 }
               } catch (e) {
                 // Silently ignore errors for mouseover - don't spam console

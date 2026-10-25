@@ -1,5 +1,6 @@
 import { getFrame, stripAlpha } from '@jbrowse/core/util'
 
+import { resolveFeatureColor } from './colorScheme.ts'
 import { readCachedConfig } from './renderConfig.ts'
 
 import type { RenderConfigContext } from './renderConfig.ts'
@@ -52,22 +53,41 @@ export function getBoxColor({
   feature,
   config,
   configContext,
-  colorByCDS,
   theme,
 }: {
   feature: Feature
   config: AnyConfigurationModel
   configContext: RenderConfigContext
-  colorByCDS: boolean
   theme: Theme
 }) {
-  const { color1, color3 } = configContext
+  const { color1, color3, colorScheme, scoreStats } = configContext
+
+  if (colorScheme.kind === 'strand') {
+    const strand = feature.get('strand')
+    return strand === -1
+      ? readCachedConfig(configContext.color3, config, 'color3', feature)
+      : strand === 1
+        ? readCachedConfig(configContext.color1, config, 'color1', feature)
+        : readCachedConfig(configContext.color2, config, 'color2', feature)
+  }
+
+  if (colorScheme.kind !== 'default') {
+    const color = resolveFeatureColor({
+      feature,
+      scheme: colorScheme,
+      stats: scoreStats,
+    })
+    if (color) {
+      return color
+    }
+  }
 
   let fill: string
   fill = isUTR(feature)
     ? readCachedConfig(color3, config, 'color3', feature)
     : readCachedConfig(color1, config, 'color1', feature)
 
+  const colorByCDS = configContext.colorByCDS
   const featureType: string | undefined = feature.get('type')
   const featureStrand: -1 | 1 | undefined = feature.get('strand')
   const featurePhase: 0 | 1 | 2 | undefined = feature.get('phase')

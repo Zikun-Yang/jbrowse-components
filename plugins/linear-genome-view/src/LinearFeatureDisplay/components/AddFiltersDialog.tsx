@@ -127,7 +127,12 @@ const AddFiltersDialog = observer(function AddFiltersDialog({
           autoFocus
           disabled={!!error}
           onClick={() => {
-            model.setJexlFilters(data.split('\n'))
+            model.setJexlFilters(
+              data
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => !!line),
+            )
             handleClose()
           }}
         >

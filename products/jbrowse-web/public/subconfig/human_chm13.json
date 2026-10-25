@@ -605,7 +605,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -628,7 +628,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -651,7 +651,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -674,7 +674,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -695,7 +695,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -987,7 +987,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -1008,7 +1008,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -1041,7 +1041,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -1062,7 +1062,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]
@@ -1083,7 +1083,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1106,7 +1106,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1129,7 +1129,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1152,7 +1152,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1175,7 +1175,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1198,7 +1198,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1221,7 +1221,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1244,7 +1244,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1267,7 +1267,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1290,7 +1290,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1313,7 +1313,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1336,7 +1336,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1359,7 +1359,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1382,7 +1382,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1405,7 +1405,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1428,7 +1428,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1451,7 +1451,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1474,7 +1474,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1497,7 +1497,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1520,7 +1520,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1543,7 +1543,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1566,7 +1566,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1589,7 +1589,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1612,7 +1612,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1635,7 +1635,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1658,7 +1658,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1681,7 +1681,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1704,7 +1704,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1727,7 +1727,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1750,7 +1750,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1773,7 +1773,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1796,7 +1796,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1819,7 +1819,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1842,7 +1842,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1865,7 +1865,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1888,7 +1888,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1911,7 +1911,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1934,7 +1934,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1957,7 +1957,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -1980,7 +1980,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2003,7 +2003,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2026,7 +2026,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2049,7 +2049,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2072,7 +2072,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2095,7 +2095,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }
@@ -2118,7 +2118,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)",
+            "colorScheme": "featureField",
             "showLabels": false,
             "displayMode": "collapse"
           }

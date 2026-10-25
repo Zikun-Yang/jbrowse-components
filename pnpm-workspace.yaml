@@ -2,11 +2,18 @@ packages:
   - 'packages/*'
   - 'products/*'
   - 'plugins/*'
+# pnpm 10+ requires explicit approval for dependency lifecycle scripts. The
+# placeholder strings committed previously made `pnpm install` fail with
+# ERR_PNPM_IGNORED_BUILDS. `canvas` is required by the image-snapshot jest
+# suites; esbuild/unrs-resolver are needed by tooling. electron,
+# electron-chromedriver and puppeteer are left off because their postinstall
+# downloads large binaries; flip them to true when working on the desktop
+# product or browser tests.
 allowBuilds:
-  canvas: set this to true or false
-  core-js-pure: set this to true or false
-  electron: set this to true or false
-  electron-chromedriver: set this to true or false
-  esbuild: set this to true or false
-  puppeteer: set this to true or false
-  unrs-resolver: set this to true or false
+  canvas: true
+  core-js-pure: false
+  electron: false
+  electron-chromedriver: false
+  esbuild: true
+  puppeteer: false
+  unrs-resolver: true

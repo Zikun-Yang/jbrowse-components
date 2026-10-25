@@ -60,7 +60,6 @@ export function makeImageData({
     stopTokenCheck,
     layout,
     peptideDataMap,
-    colorByCDS,
     pluginManager,
   } = renderArgs
 
@@ -75,7 +74,6 @@ export function makeImageData({
     theme,
     canvasWidth,
     peptideDataMap,
-    colorByCDS,
   }
 
   // Hit detection data
