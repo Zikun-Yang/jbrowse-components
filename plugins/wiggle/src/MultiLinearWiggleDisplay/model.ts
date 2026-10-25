@@ -1,6 +1,5 @@
 import { lazy } from 'react'
 
-import { fromNewick } from '@gmod/hclust'
 import { getConf } from '@jbrowse/core/configuration'
 import { set1 as colors } from '@jbrowse/core/ui/colors'
 import {
@@ -10,22 +9,16 @@ import {
   measureText,
 } from '@jbrowse/core/util'
 import { stopStopToken } from '@jbrowse/core/util/stopToken'
-import { cast, isAlive, types } from '@jbrowse/mobx-state-tree'
-import { ascending } from '@mui/x-charts-vendor/d3-array'
+import { isAlive, types } from '@jbrowse/mobx-state-tree'
 import deepEqual from 'fast-deep-equal'
 
 import { EqualizerIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
-import { cluster, hierarchy } from '../d3-hierarchy2/index.ts'
 import SharedWiggleMixin from '../shared/SharedWiggleMixin.ts'
 import axisPropsFromTickScale from '../shared/axisPropsFromTickScale.ts'
 import { YSCALEBAR_LABEL_OFFSET, getScale } from '../util.ts'
 
 import type { Source } from '../util.ts'
-import type {
-  ClusterHierarchyNode,
-  HoveredTreeNode,
-} from './components/treeTypes.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
 import type { AnyReactComponentType, Feature } from '@jbrowse/core/util'
@@ -42,9 +35,6 @@ const randomColor = () =>
 // lazies
 const Tooltip = lazy(() => import('./components/Tooltip.tsx'))
 const SetColorDialog = lazy(() => import('./components/SetColorDialog.tsx'))
-const WiggleClusterDialog = lazy(
-  () => import('./components/WiggleClusterDialog/WiggleClusterDialog.tsx'),
-)
 
 // using a map because it preserves order
 const rendererTypes = new Map([
@@ -54,6 +44,16 @@ const rendererTypes = new Map([
   ['multiline', 'MultiLineRenderer'],
   ['multirowline', 'MultiRowLineRenderer'],
 ])
+
+// State that older saved sessions can still contain for this display. It was
+// written by the multi-wiggle cluster tree, which has been removed, so it is
+// accepted and dropped when loading instead of making the session fail
+interface LegacyClusterState {
+  clusterTree?: string
+  treeAreaWidth?: number
+  showTreeSetting?: boolean
+  subtreeFilter?: string[]
+}
 
 /**
  * #stateModel MultiLinearWiggleDisplay
@@ -82,24 +82,6 @@ export function stateModelFactory(
          * #property
          */
         showSidebar: true,
-        /**
-         * #property
-         */
-        clusterTree: types.maybe(types.string),
-        /**
-         * #property
-         */
-        treeAreaWidth: types.optional(types.number, 80),
-        /**
-         * #property
-         * When undefined, defaults to true
-         */
-        showTreeSetting: types.maybe(types.boolean),
-        /**
-         * #property
-         * Filter to show only a subtree of samples
-         */
-        subtreeFilter: types.maybe(types.array(types.string)),
       }),
     )
     .volatile(() => ({
@@ -115,18 +97,6 @@ export function stateModelFactory(
        * #volatile
        */
       sourcesVolatile: undefined as Source[] | undefined,
-      /**
-       * #volatile
-       */
-      hoveredTreeNode: undefined as HoveredTreeNode | undefined,
-      /**
-       * #volatile
-       */
-      treeCanvas: undefined as HTMLCanvasElement | undefined,
-      /**
-       * #volatile
-       */
-      mouseoverCanvas: undefined as HTMLCanvasElement | undefined,
     }))
     .actions(self => ({
       /**
@@ -147,68 +117,14 @@ export function stateModelFactory(
       /**
        * #action
        */
-      setLayout(layout: Source[], clearTree = true) {
-        const orderChanged =
-          clearTree &&
-          self.clusterTree &&
-          self.layout.length === layout.length &&
-          self.layout.some(
-            (source: Source, idx: number) => source.name !== layout[idx]?.name,
-          )
-
+      setLayout(layout: Source[]) {
         self.layout = layout
-        if (orderChanged) {
-          self.clusterTree = undefined
-        }
       },
       /**
        * #action
        */
       clearLayout() {
         self.layout = []
-        self.clusterTree = undefined
-      },
-      /**
-       * #action
-       */
-      setClusterTree(tree?: string) {
-        self.clusterTree = tree
-      },
-      /**
-       * #action
-       */
-      setTreeAreaWidth(width: number) {
-        self.treeAreaWidth = width
-      },
-      /**
-       * #action
-       */
-      setShowTree(arg: boolean) {
-        self.showTreeSetting = arg
-      },
-      /**
-       * #action
-       */
-      setSubtreeFilter(names?: string[]) {
-        self.subtreeFilter = names ? cast(names) : undefined
-      },
-      /**
-       * #action
-       */
-      setHoveredTreeNode(node?: HoveredTreeNode) {
-        self.hoveredTreeNode = node
-      },
-      /**
-       * #action
-       */
-      setTreeCanvasRef(ref: HTMLCanvasElement | null) {
-        self.treeCanvas = ref || undefined
-      },
-      /**
-       * #action
-       */
-      setMouseoverCanvasRef(ref: HTMLCanvasElement | null) {
-        self.mouseoverCanvas = ref || undefined
       },
 
       /**
@@ -345,7 +261,7 @@ export function stateModelFactory(
           self.sourcesVolatile?.map(s => [s.name, s]) || [],
         )
         const iter = self.layout.length ? self.layout : self.sourcesVolatile
-        let result = iter
+        return iter
           ?.map(s => ({
             ...sources[s.name],
             ...s,
@@ -356,13 +272,6 @@ export function stateModelFactory(
               s.color ||
               (!this.isMultiRow ? colors[i] || randomColor() : 'blue'),
           }))
-
-        // Filter to subtree if filter is active
-        if (result && self.subtreeFilter?.length) {
-          const filterSet = new Set(self.subtreeFilter)
-          result = result.filter(s => filterSet.has(s.name))
-        }
-        return result
       },
       /**
        * #getter
@@ -378,12 +287,6 @@ export function stateModelFactory(
     }))
 
     .views(self => ({
-      /**
-       * #getter
-       */
-      get showTree() {
-        return self.showTreeSetting ?? true
-      },
       /**
        * #getter
        */
@@ -406,79 +309,6 @@ export function stateModelFactory(
           (getConf(self, 'minimalTicks') as boolean) ||
           this.rowHeightTooSmallForScalebar
         )
-      },
-      /**
-       * #getter
-       */
-      get root() {
-        const newick = self.clusterTree
-        if (!newick) {
-          return undefined
-        }
-        const tree = fromNewick(newick)
-        let root = hierarchy(tree, (d: ClusterHierarchyNode) => d.children)
-          .sum((d: ClusterHierarchyNode) => (d.children ? 0 : 1))
-          .sort((a: ClusterHierarchyNode, b: ClusterHierarchyNode) =>
-            ascending(a.data.height || 1, b.data.height || 1),
-          )
-
-        // If subtree filter is active, find the matching subtree
-        if (self.subtreeFilter?.length) {
-          const filterSet = new Set(self.subtreeFilter)
-          const getLeafNames = (node: ClusterHierarchyNode): string[] => {
-            if (!node.children?.length) {
-              return [node.data.name]
-            }
-            return node.children.flatMap(child => getLeafNames(child))
-          }
-          const findSubtree = (
-            node: ClusterHierarchyNode,
-          ): ClusterHierarchyNode | undefined => {
-            const leafNames = getLeafNames(node)
-            if (
-              leafNames.length === filterSet.size &&
-              leafNames.every(name => filterSet.has(name))
-            ) {
-              return node
-            }
-            if (node.children) {
-              for (const child of node.children) {
-                const found = findSubtree(child)
-                if (found) {
-                  return found
-                }
-              }
-            }
-            return undefined
-          }
-          const subtree = findSubtree(root)
-          if (subtree) {
-            root = subtree
-          }
-        }
-        return root
-      },
-    }))
-    .views(self => ({
-      /**
-       * #getter
-       */
-      get totalHeight() {
-        return self.rowHeight * (self.sources?.length || 1)
-      },
-      /**
-       * #getter
-       */
-      get hierarchy() {
-        const r = self.root
-        if (!r || !self.sources?.length) {
-          return undefined
-        }
-        const clust = cluster()
-        clust.size([self.rowHeight * self.sources.length, self.treeAreaWidth])
-        clust.separation(() => 1)
-        clust(r)
-        return r
       },
     }))
     .views(self => {
@@ -648,29 +478,6 @@ export function stateModelFactory(
                     self.setShowSidebar(!self.showSidebar)
                   },
                 },
-                ...(self.isMultiRow
-                  ? [
-                      {
-                        label: `Show tree${!self.clusterTree ? ' (run clustering first)' : ''}`,
-                        type: 'checkbox',
-                        checked: self.showTree,
-                        disabled: !self.clusterTree,
-                        onClick: () => {
-                          self.setShowTree(!self.showTree)
-                        },
-                      },
-                      ...(self.subtreeFilter?.length
-                        ? [
-                            {
-                              label: 'Clear subtree filter',
-                              onClick: () => {
-                                self.setSubtreeFilter(undefined)
-                              },
-                            },
-                          ]
-                        : []),
-                    ]
-                  : []),
                 ...(self.graphType
                   ? [
                       {
@@ -729,22 +536,6 @@ export function stateModelFactory(
                   },
                 ]
               : []),
-            ...(self.isMultiRow
-              ? [
-                  {
-                    label: 'Cluster rows by score',
-                    onClick: () => {
-                      getSession(self).queueDialog(handleClose => [
-                        WiggleClusterDialog,
-                        {
-                          model: self,
-                          handleClose,
-                        },
-                      ])
-                    },
-                  },
-                ]
-              : []),
             {
               label: 'Edit colors/arrangement...',
               onClick: () => {
@@ -771,15 +562,12 @@ export function stateModelFactory(
               const [
                 { getMultiWiggleSourcesAutorun },
                 { getQuantitativeStatsAutorun },
-                { setupTreeDrawingAutorun },
               ] = await Promise.all([
                 import('../getMultiWiggleSourcesAutorun.ts'),
                 import('../getQuantitativeStatsAutorun.ts'),
-                import('./treeDrawingAutorun.ts'),
               ])
               getQuantitativeStatsAutorun(self)
               getMultiWiggleSourcesAutorun(self)
-              setupTreeDrawingAutorun(self)
             } catch (e) {
               if (isAlive(self)) {
                 console.error(e)
@@ -798,30 +586,28 @@ export function stateModelFactory(
         },
       }
     })
-    .postProcessSnapshot(snap => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!snap) {
-        return snap
-      }
+    .preProcessSnapshot(snap => {
       const {
-        layout,
-        showSidebar,
         clusterTree,
         treeAreaWidth,
         showTreeSetting,
         subtreeFilter,
         ...rest
-      } = snap as Omit<typeof snap, symbol>
+      } = snap as typeof snap & LegacyClusterState
+      return rest
+    })
+    .postProcessSnapshot(snap => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!snap) {
+        return snap
+      }
+      const { layout, showSidebar, ...rest } = snap as Omit<typeof snap, symbol>
       return {
         ...rest,
         // mst types wrong, nullish needed
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         ...(layout?.length ? { layout } : {}),
         ...(!showSidebar ? { showSidebar } : {}),
-        ...(clusterTree !== undefined ? { clusterTree } : {}),
-        ...(treeAreaWidth !== 80 ? { treeAreaWidth } : {}),
-        ...(showTreeSetting !== undefined ? { showTreeSetting } : {}),
-        ...(subtreeFilter?.length ? { subtreeFilter } : {}),
       } as typeof snap
     })
 }

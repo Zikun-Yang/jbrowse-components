@@ -1617,9 +1617,6 @@ importers:
       '@gmod/bbi':
         specifier: ^9.0.9
         version: 9.0.9
-      '@gmod/hclust':
-        specifier: ^3.0.4
-        version: 3.0.4
       '@jbrowse/core':
         specifier: workspace:^
         version: link:../../packages/core

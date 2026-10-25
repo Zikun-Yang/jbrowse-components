@@ -53,46 +53,6 @@ true
 showSidebar: true
 ```
 
-#### property: clusterTree
-
-```js
-// type signature
-IMaybe<ISimpleType<string>>
-// code
-clusterTree: types.maybe(types.string)
-```
-
-#### property: treeAreaWidth
-
-```js
-// type signature
-IOptionalIType<ISimpleType<number>, [undefined]>
-// code
-treeAreaWidth: types.optional(types.number, 80)
-```
-
-#### property: showTreeSetting
-
-When undefined, defaults to true
-
-```js
-// type signature
-IMaybe<ISimpleType<boolean>>
-// code
-showTreeSetting: types.maybe(types.boolean)
-```
-
-#### property: subtreeFilter
-
-Filter to show only a subtree of samples
-
-```js
-// type signature
-IMaybe<IArrayType<ISimpleType<string>>>
-// code
-subtreeFilter: types.maybe(types.array(types.string))
-```
-
 ### MultiLinearWiggleDisplay - Getters
 
 #### getter: featureUnderMouse
@@ -189,13 +149,6 @@ boolean
 ```
 
 #### getter: quantitativeStatsReady
-
-```js
-// type
-boolean
-```
-
-#### getter: showTree
 
 ```js
 // type
@@ -308,7 +261,7 @@ renderProps: () => any
 
 ```js
 // type signature
-renderingProps: () => { displayModel: { id: string; type: "MultiLinearWiggleDisplay"; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; ... 23 more ...; subtreeFilter: (IMSTArray<...> & IStateTreeNode<...>) | undefined; } & ... 38 more ... & IStateTreeNode<...>; }
+renderingProps: () => { displayModel: { id: string; type: "MultiLinearWiggleDisplay"; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; ... 23 more ...; } & ... 38 more ... & IStateTreeNode<...>; }
 ```
 
 #### method: trackMenuItems
@@ -338,7 +291,7 @@ setSourcesLoading: (str: string) => void
 
 ```js
 // type signature
-setLayout: (layout: Source[], clearTree?: boolean) => void
+setLayout: (layout: Source[]) => void
 ```
 
 #### action: clearLayout
@@ -346,55 +299,6 @@ setLayout: (layout: Source[], clearTree?: boolean) => void
 ```js
 // type signature
 clearLayout: () => void
-```
-
-#### action: setClusterTree
-
-```js
-// type signature
-setClusterTree: (tree?: string | undefined) => void
-```
-
-#### action: setTreeAreaWidth
-
-```js
-// type signature
-setTreeAreaWidth: (width: number) => void
-```
-
-#### action: setShowTree
-
-```js
-// type signature
-setShowTree: (arg: boolean) => void
-```
-
-#### action: setSubtreeFilter
-
-```js
-// type signature
-setSubtreeFilter: (names?: string[] | undefined) => void
-```
-
-#### action: setHoveredTreeNode
-
-```js
-// type signature
-setHoveredTreeNode: (node?: HoveredTreeNode | undefined) => void
-```
-
-#### action: setTreeCanvasRef
-
-```js
-// type signature
-setTreeCanvasRef: (ref: HTMLCanvasElement | null) => void
-```
-
-#### action: setMouseoverCanvasRef
-
-```js
-// type signature
-setMouseoverCanvasRef: (ref: HTMLCanvasElement | null) => void
 ```
 
 #### action: setSources

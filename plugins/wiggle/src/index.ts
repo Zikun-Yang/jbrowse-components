@@ -20,8 +20,6 @@ import MultiWiggleAddTrackWorkflowF from './MultiWiggleAddTrackWorkflow/index.ts
 import MultiXYPlotRendererF from './MultiXYPlotRenderer/index.ts'
 import QuantitativeTrackF from './QuantitativeTrack/index.ts'
 import {
-  MultiWiggleClusterScoreMatrix,
-  MultiWiggleGetScoreMatrix,
   MultiWiggleGetSources,
   WiggleGetGlobalQuantitativeStats,
   WiggleGetMultiRegionQuantitativeStats,
@@ -60,8 +58,6 @@ export default class WigglePlugin extends Plugin {
     pm.addRpcMethod(() => new WiggleGetGlobalQuantitativeStats(pm))
     pm.addRpcMethod(() => new WiggleGetMultiRegionQuantitativeStats(pm))
     pm.addRpcMethod(() => new MultiWiggleGetSources(pm))
-    pm.addRpcMethod(() => new MultiWiggleGetScoreMatrix(pm))
-    pm.addRpcMethod(() => new MultiWiggleClusterScoreMatrix(pm))
   }
 
   exports = {

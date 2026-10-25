@@ -3,7 +3,6 @@ import { when } from 'mobx'
 
 import { isReadyOrHasError } from '../svgExportUtil.ts'
 import YScaleBars from './components/YScaleBars.tsx'
-import { makeSidebarSvg } from './makeSidebarSvg.tsx'
 
 import type { WiggleDisplayModel } from './model.ts'
 import type {
@@ -18,7 +17,6 @@ export async function renderSvg(
 ) {
   await when(() => isReadyOrHasError(self))
   const { offsetPx } = getContainingView(self) as LinearGenomeViewModel
-  const sidebarSvg = await makeSidebarSvg(self)
 
   return (
     <>
@@ -26,7 +24,6 @@ export async function renderSvg(
       <g transform={`translate(${Math.max(-offsetPx, 0)})`}>
         <YScaleBars model={self} orientation="left" exportSVG />
       </g>
-      {sidebarSvg}
     </>
   )
 }
