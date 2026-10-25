@@ -11,6 +11,7 @@ import {
 } from '@jbrowse/core/util'
 import Flatbush from '@jbrowse/core/util/flatbush'
 import { NonBlockCanvasDisplayComponent as BaseDisplayComponent } from '@jbrowse/plugin-linear-genome-view'
+import { getYScaleBarLeftPadding } from '@jbrowse/plugin-wiggle'
 import { observer } from 'mobx-react'
 
 import CloudYScaleBar from './CloudYScaleBar.tsx'
@@ -442,7 +443,9 @@ const LinearReadCloudReactComponent = observer(
             style={{
               position: 'absolute',
               top: 0,
-              left: 50,
+              // the y-scale bar sits yScaleBarLeftPadding px from the left edge
+              // of the view (Settings -> Display -> Y-axis left padding)
+              left: getYScaleBarLeftPadding(model),
               pointerEvents: 'none',
               height: model.cloudTicks.height,
               width: 50,

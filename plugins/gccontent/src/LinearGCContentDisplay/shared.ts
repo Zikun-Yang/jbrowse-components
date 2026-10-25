@@ -1,16 +1,31 @@
 import { lazy } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
-import { getSession } from '@jbrowse/core/util'
+import {
+  getBpDisplayStr,
+  getContainingView,
+  getSession,
+} from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
 import { linearWiggleDisplayModelFactory } from '@jbrowse/plugin-wiggle'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
+import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
 
 const EditGCContentParamsDialog = lazy(
   () => import('./components/EditGCContentParams.tsx'),
 )
+
+type LGV = LinearGenomeViewModel
+
+/**
+ * target width in screen pixels of each GC content calculation window. the
+ * adapter computes one value per window, so sizing the windows in pixels keeps
+ * the number of windows in step with the width of the view, and makes the
+ * resolution (bp per window) follow the zoom level
+ */
+const GC_CONTENT_PIXELS_PER_WINDOW = 2
 
 /**
  * #stateModel SharedGCContentModel
@@ -29,6 +44,8 @@ export default function SharedModelF(
       types.model({
         /**
          * #property
+         * manual window size in bp set by the user, undefined means "size the
+         * windows from the view", see windowSizeSetting
          */
         windowSize: types.maybe(types.number),
         /**
@@ -38,23 +55,72 @@ export default function SharedModelF(
       }),
     )
     .actions(self => ({
+      /**
+       * #action
+       */
       setGCContentParams({
         windowSize,
         windowDelta,
       }: {
-        windowSize: number
-        windowDelta: number
+        windowSize?: number
+        windowDelta?: number
       }) {
         self.windowSize = windowSize
         self.windowDelta = windowDelta
       },
+      /**
+       * #action
+       * drop the manual window size and size the windows from the view again
+       */
+      resetGCContentParams() {
+        self.windowSize = undefined
+        self.windowDelta = undefined
+      },
     }))
     .views(self => ({
-      get windowSizeSetting() {
-        return self.windowSize ?? getConf(self, 'windowSize')
+      /**
+       * #getter
+       * window size in bp for the current view: one window per
+       * GC_CONTENT_PIXELS_PER_WINDOW screen pixels, so the resolution grows as
+       * the view zooms out and the number of windows across the view follows
+       * the view width
+       */
+      get windowSizeFromView() {
+        const view = getContainingView(self) as LGV
+        return Math.max(
+          1,
+          Math.round(view.bpPerPx * GC_CONTENT_PIXELS_PER_WINDOW),
+        )
       },
+      /**
+       * #getter
+       * a windowSize of 0 (the default for the GC content display on the
+       * reference sequence track) means the windows are sized from the view
+       */
+      get windowSizeSetting() {
+        const windowSize =
+          self.windowSize ?? (getConf(self, 'windowSize') as number)
+        return windowSize > 0 ? windowSize : this.windowSizeFromView
+      },
+      /**
+       * #getter
+       */
       get windowDeltaSetting() {
-        return self.windowDelta ?? getConf(self, 'windowDelta')
+        const windowDelta =
+          self.windowDelta ?? (getConf(self, 'windowDelta') as number)
+        return windowDelta > 0 ? windowDelta : this.windowSizeFromView
+      },
+      /**
+       * #getter
+       * the window size and step size in bp, shown at the left end of the track
+       * label row (see plugins/linear-genome-view TrackLabelContainer) so that
+       * the resolution behind the plot is readable without opening the track
+       * menu
+       */
+      get trackLabelLeftText() {
+        return `Window size = ${getBpDisplayStr(
+          this.windowSizeSetting,
+        )}, Step size = ${getBpDisplayStr(this.windowDeltaSetting)}`
       },
     }))
     .views(self => {
@@ -67,7 +133,7 @@ export default function SharedModelF(
           return [
             ...superTrackMenuItems(),
             {
-              label: 'Change GC parameters',
+              label: 'Window size',
               onClick: () => {
                 getSession(self).queueDialog(handleClose => [
                   EditGCContentParamsDialog,

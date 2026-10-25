@@ -25,6 +25,7 @@ import {
   ReferenceManagementSessionMixin,
   SessionTracksManagerSessionMixin,
   ThemeManagerSessionMixin,
+  YScaleBarSessionMixin,
 } from '@jbrowse/product-core'
 import { autorun } from 'mobx'
 
@@ -93,6 +94,7 @@ export function BaseWebSession({
         DialogQueueSessionMixin(pluginManager),
         ThemeManagerSessionMixin(pluginManager),
         AutoTrackHeightSessionMixin(pluginManager),
+        YScaleBarSessionMixin(pluginManager),
         MultipleViewsSessionMixin(pluginManager),
       ),
       types.compose(

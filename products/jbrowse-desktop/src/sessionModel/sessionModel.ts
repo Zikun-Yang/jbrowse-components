@@ -16,6 +16,7 @@ import {
   ReferenceManagementSessionMixin,
   ThemeManagerSessionMixin,
   TracksManagerSessionMixin,
+  YScaleBarSessionMixin,
 } from '@jbrowse/product-core'
 
 import { DesktopSessionFactory } from './DesktopSession.ts'
@@ -58,16 +59,18 @@ export default function sessionModelFactory({
     .compose(
       'JBrowseDesktopSessionModel',
       types.compose(
+        'JBrowseDesktopSessionModelGroupA',
         ReferenceManagementSessionMixin(pluginManager),
         ConnectionManagementSessionMixin(pluginManager),
         DrawerWidgetSessionMixin(pluginManager),
         DialogQueueSessionMixin(pluginManager),
         ThemeManagerSessionMixin(pluginManager),
         AutoTrackHeightSessionMixin(pluginManager),
+        YScaleBarSessionMixin(pluginManager),
         TracksManagerSessionMixin(pluginManager),
         MultipleViewsSessionMixin(pluginManager),
-        DesktopSessionFactory(pluginManager),
       ),
+      DesktopSessionFactory(pluginManager),
       SessionAssembliesMixin(pluginManager, assemblyConfigSchema),
       TemporaryAssembliesMixin(pluginManager, assemblyConfigSchema),
       DesktopSessionTrackMenuMixin(pluginManager),

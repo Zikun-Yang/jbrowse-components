@@ -1,8 +1,4 @@
-import {
-  ConfigurationReference,
-  getConf,
-  readConfObject,
-} from '@jbrowse/core/configuration'
+import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
 import { getContainingTrack, getContainingView } from '@jbrowse/core/util'
 import { getParentRenderProps } from '@jbrowse/core/util/tracks'
 import { addDisposer, types } from '@jbrowse/mobx-state-tree'
@@ -223,23 +219,13 @@ export function modelFactory(configSchema: AnyConfigurationSchemaType) {
               if (!gcDisplayConf) {
                 return
               }
-              const view = getContainingView(self) as LGV
-              // the GC content adapter computes one stat per window, so size
-              // the windows to the current zoom level instead of leaving the
-              // 100bp default, which computes far more stats than the view has
-              // pixels
-              const windowSize = Math.max(
-                readConfObject(gcDisplayConf, 'windowSize') as number,
-                Math.round(view.bpPerPx * 2),
-              )
+              // the GC content display sizes its calculation windows from the
+              // view itself (see its windowSizeSetting), so it keeps a
+              // sensible resolution while the user keeps zooming
               getContainingTrack(self).replaceDisplay(
                 self.configuration.displayId,
                 gcDisplayConf.displayId,
-                {
-                  autoSwitchGCContent: true,
-                  windowSize,
-                  windowDelta: windowSize,
-                },
+                { autoSwitchGCContent: true },
               )
             },
             {

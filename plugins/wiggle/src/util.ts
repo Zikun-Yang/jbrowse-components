@@ -1,4 +1,5 @@
 import { readConfObject } from '@jbrowse/core/configuration'
+import { getSession } from '@jbrowse/core/util'
 import {
   scaleLinear,
   scaleLog,
@@ -7,8 +8,29 @@ import {
 
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
+import type { IAnyStateTreeNode } from '@jbrowse/mobx-state-tree'
 
 export const YSCALEBAR_LABEL_OFFSET = 5
+
+/**
+ * fallback distance in px between the left edge of the view and the y-scale
+ * bar, used by sessions that don't have the YScaleBarSessionMixin (see
+ * defaultYScaleBarLeftPadding in @jbrowse/product-core)
+ */
+export const DEFAULT_Y_SCALEBAR_LEFT_PADDING = 10
+
+/**
+ * left offset in px of the y-scale bar of a quantitative display. this is a
+ * global setting (Settings -> Display -> Y-axis left padding) so that all of
+ * the y-scale bars in the app (wiggle, GC content, multi-wiggle, read cloud)
+ * line up
+ */
+export function getYScaleBarLeftPadding(model: IAnyStateTreeNode) {
+  const session = getSession(model) as { yScaleBarLeftPadding?: number }
+  return typeof session.yScaleBarLeftPadding === 'number'
+    ? session.yScaleBarLeftPadding
+    : DEFAULT_Y_SCALEBAR_LEFT_PADDING
+}
 
 // Default color used by wiggle config schema
 export const WIGGLE_COLOR_DEFAULT = '#f0f'

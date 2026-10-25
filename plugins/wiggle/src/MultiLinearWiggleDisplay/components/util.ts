@@ -1,3 +1,5 @@
+import { getYScaleBarLeftPadding } from '../../util.ts'
+
 import type { WiggleDisplayModel } from '../model.ts'
 import type { GridRowId } from '@mui/x-data-grid'
 
@@ -41,6 +43,6 @@ export function moveDown<T extends { name: string }>(
   return arr
 }
 
-export function getOffset(_model: WiggleDisplayModel) {
-  return 10
+export function getOffset(model: WiggleDisplayModel) {
+  return getYScaleBarLeftPadding(model)
 }

@@ -9,10 +9,8 @@ import stateModelF2 from './stateModel2.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 
-const LazyWiggleDisplayComponent = lazy(() =>
-  import('@jbrowse/plugin-wiggle').then(m => ({
-    default: m.LinearWiggleDisplayReactComponent,
-  })),
+const LazyGCContentDisplayComponent = lazy(
+  () => import('./components/GCContentDisplayComponent.tsx'),
 )
 
 export default function LinearGCContentDisplayF(pluginManager: PluginManager) {
@@ -26,7 +24,7 @@ export default function LinearGCContentDisplayF(pluginManager: PluginManager) {
       displayName: 'GC content display',
       trackType: 'ReferenceSequenceTrack',
       viewType: 'LinearGenomeView',
-      ReactComponent: LazyWiggleDisplayComponent,
+      ReactComponent: LazyGCContentDisplayComponent,
     })
   })
 
@@ -40,7 +38,7 @@ export default function LinearGCContentDisplayF(pluginManager: PluginManager) {
       displayName: 'GC content display',
       trackType: 'GCContentTrack',
       viewType: 'LinearGenomeView',
-      ReactComponent: LazyWiggleDisplayComponent,
+      ReactComponent: LazyGCContentDisplayComponent,
     })
   })
 }
