@@ -26,6 +26,24 @@ import type { Feature } from '@jbrowse/core/util'
 
 type LSV = LinearSyntenyViewModel
 
+// parseCigar on long (chain-level) CIGAR strings is expensive and the feat
+// positions reaction re-runs on every pan in rainbow mode; cache parsed
+// cigars per feature object so re-runs only redo the bpToPx math
+const parsedCigarCache = new WeakMap<Feature, string[]>()
+
+function parseCigarCached(f: Feature, cigar: string | undefined): string[] {
+  if (!cigar) {
+    return []
+  }
+  const cached = parsedCigarCache.get(f)
+  if (cached) {
+    return cached
+  }
+  const parsed = MismatchParser.parseCigar(cigar)
+  parsedCigarCache.set(f, parsed)
+  return parsed
+}
+
 export function doAfterAttach(self: LinearSyntenyDisplayModel) {
   addDisposer(
     self,
@@ -116,17 +134,34 @@ export function doAfterAttach(self: LinearSyntenyDisplayModel) {
           alpha: self.alpha,
           themeHue: self.themePrimaryHue,
           rainbowAnchor: view.rainbowAnchor,
-          levelFeatures: view.levels.flatMap(lvl =>
-            (
-              lvl.tracks as {
-                displays: { type: string; features?: Feature[] }[]
-              }[]
-            ).flatMap(track =>
-              track.displays
-                .filter(d => d.type === 'LinearSyntenyDisplay')
-                .map(d => d.features),
-            ),
-          ),
+          // the rainbow axis spans the visible window, so subscribe to the
+          // visible blocks to recolor on pan/zoom — but only in rainbow
+          // mode: feature pixel positions are re-anchored at draw time
+          // (drawRef subtracts the current offsetPx itself), so subscribing
+          // here would re-run the whole position computation on every pan
+          // for no benefit in the other color modes
+          visibleBlocks:
+            self.colorBy === 'rainbow'
+              ? view.views.map(v => v.dynamicBlocks)
+              : undefined,
+          // rainbow coloring maps through the features of every level's
+          // displays; again only subscribe in rainbow mode so that data
+          // updates in sibling displays don't recompute this display's
+          // positions in the other modes
+          levelFeatures:
+            self.colorBy === 'rainbow'
+              ? view.levels.flatMap(lvl =>
+                  (
+                    lvl.tracks as {
+                      displays: { type: string; features?: Feature[] }[]
+                    }[]
+                  ).flatMap(track =>
+                    track.displays
+                      .filter(d => d.type === 'LinearSyntenyDisplay')
+                      .map(d => d.features),
+                  ),
+                )
+              : undefined,
           initialized:
             view.initialized &&
             view.views.every(
@@ -152,7 +187,7 @@ export function doAfterAttach(self: LinearSyntenyDisplayModel) {
 
         // rainbow coloring context: per-level indexes of all synteny display
         // features (WeakMap-cached by features reference) plus a concatenated
-        // coordinate table over the anchor view's displayed regions
+        // coordinate table over the anchor view's visible windows
         let rainbowCtx:
           | {
               levelIndexes: (LevelIndex | undefined)[]
@@ -183,10 +218,12 @@ export function doAfterAttach(self: LinearSyntenyDisplayModel) {
               : undefined
           })
           const anchorAsmName = view.views[anchorLevel]?.assemblyNames[0]
-          // concatenate the anchor view's displayed regions (in display
-          // order) into a single 0..1 axis; reversed regions mirror their
+          // concatenate the anchor view's visible windows (in display order)
+          // into a single 0..1 axis; reversed regions mirror their
           // within-region coordinate so the on-screen gradient always runs
           // left to right
+          const visBlocks =
+            view.views[anchorLevel]?.dynamicBlocks.contentBlocks ?? []
           const regions: {
             refName: string
             start: number
@@ -195,16 +232,25 @@ export function doAfterAttach(self: LinearSyntenyDisplayModel) {
             reversed: boolean
           }[] = []
           let total = 0
-          for (const r of view.views[anchorLevel]?.displayedRegions ?? []) {
-            const len = r.end - r.start
+          const displayed = view.views[anchorLevel]?.displayedRegions ?? []
+          for (const [i, r] of displayed.entries()) {
+            const blocks = visBlocks.filter(b => b.regionNumber === i)
+            if (!blocks.length) {
+              continue
+            }
+            const start = Math.min(...blocks.map(b => b.start))
+            const end = Math.max(...blocks.map(b => b.end))
+            if (end <= start) {
+              continue
+            }
             regions.push({
               refName: canonicalize(anchorAsmName!, r.refName),
-              start: r.start,
-              end: r.end,
+              start,
+              end,
               offset: total,
               reversed: r.reversed ?? false,
             })
-            total += len
+            total += end - start
           }
           rainbowCtx = {
             levelIndexes,
@@ -307,7 +353,7 @@ export function doAfterAttach(self: LinearSyntenyDisplayModel) {
             p21,
             p22,
             f,
-            cigar: MismatchParser.parseCigar(cigar),
+            cigar: parseCigarCached(f, cigar),
             effStrand,
             fill,
           })

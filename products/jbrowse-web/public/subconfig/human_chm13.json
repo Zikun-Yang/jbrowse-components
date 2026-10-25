@@ -10,11 +10,11 @@
         "adapter": {
           "type": "IndexedFastaAdapter",
           "fastaLocation": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa",
             "locationType": "UriLocation"
           },
           "faiLocation": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa.fai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.fa.fai",
             "locationType": "UriLocation"
           }
         }
@@ -23,7 +23,7 @@
           "adapter": {
             "type": "CytobandAdapter",
             "cytobandLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/cytoBandMapped/cytoBandMapped.bed"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/cytoBandMapped/cytoBandMapped.bed"
             }
           }
         }
@@ -39,18 +39,156 @@
       "adapter": {
         "type": "Gff3TabixAdapter",
         "gffGzLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz.tbi",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/T2T-CHM13v2.0.geneOnly.gff.gz.tbi",
             "locationType": "UriLocation"
           },
           "indexType": "TBI"
         }
       },
       "assemblyNames": ["T2T-CHM13v2.0"]
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "CHM13_iPSC(Kolf2.1J)_H3K9me3",
+      "name": "iPSC(Kolf2.1J)_H3K9me3",
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "H3K9me3",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_public_dataset/human_iPSC_NPC_chip_hi-c/002-processed_data/cutandrun/results/03_peak_calling/03_bed_to_bigwig/Kolf2.1J_iPSC_H3K9me3_R1.bigWig"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "IgG",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_public_dataset/human_iPSC_NPC_chip_hi-c/002-processed_data/cutandrun/results/03_peak_calling/03_bed_to_bigwig/Kolf2.1J_iPSC_IgG_R1.bigWig"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "CHM13_iPSC(NL_18)_H3K9me3",
+      "name": "iPSC(NL_18)_H3K9me3",
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "H3K9me3",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_public_dataset/human_iPSC_NPC_chip_hi-c/002-processed_data/cutandrun/results/03_peak_calling/03_bed_to_bigwig/NL_18_iPSC_H3K9me3_R1.bigWig"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "IgG",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_public_dataset/human_iPSC_NPC_chip_hi-c/002-processed_data/cutandrun/results/03_peak_calling/03_bed_to_bigwig/NL_18_iPSC_IgG_R1.bigWig"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "CHM13_chromosome_H3K9me3_Kolf2.1J",
+      "name": "Chromosome Level H3K9me3 (Kolf2.1J, MultiAln-kept)",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "adapter": {
+        "type": "BedGraphAdapter",
+        "bedGraphLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/Kolf2.1J_iPSC_H3K9me3_R1.regions.bed.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/Kolf2.1J_iPSC_H3K9me3_R1.regions.bed.gz.csi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "CHM13_chromosome_H3K9me3_NL_18",
+      "name": "Chromosome Level H3K9me3 (NL_18, MultiAln-kept)",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "adapter": {
+        "type": "BedGraphAdapter",
+        "bedGraphLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/NL_18_iPSC_H3K9me3_R1.regions.bed.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/NL_18_iPSC_H3K9me3_R1.regions.bed.gz.csi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    },
+    {
+      "type": "MultiQuantitativeTrack",
+      "trackId": "CHM13_iPSC(CN1)_H3K9me3",
+      "name": "iPSC(CN1)_H3K9me3",
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "category": ["Epigenetics"],
+      "adapter": {
+        "type": "MultiWiggleAdapter",
+        "subadapters": [
+          {
+            "type": "BigWigAdapter",
+            "name": "H3K9me3",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/002-human_results/03_peak_calling/03_bed_to_bigwig/human_h3k9me3_R1.bigWig"
+            }
+          },
+          {
+            "type": "BigWigAdapter",
+            "name": "IgG",
+            "bigWigLocation": {
+              "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/002-human_results/03_peak_calling/03_bed_to_bigwig/human_igg_R1.bigWig"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "CHM13_chromosome_H3K9me3_CN1_iPSC",
+      "name": "Chromosome Level H3K9me3 (CN1_iPSC, MultiAln-kept)",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "adapter": {
+        "type": "BedGraphAdapter",
+        "bedGraphLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/human_CN1_h3k9me3_R1.regions.bed.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_cutandtag/ideogram/depth/human_CN1_h3k9me3_R1.regions.bed.gz.csi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
     },
     {
       "type": "AlignmentsTrack",
@@ -60,12 +198,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519036.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -81,12 +219,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -102,12 +240,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/iso-seq/SRR12519035_SRR12519036_merged.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -312,12 +450,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/H_brainUHRR_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -333,12 +471,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -354,12 +492,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
+          "uri": "/data/1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
+            "uri": "/data/1/primates_public_dataset/H_HG002_iso_PacBio/002-processed_data/merged.sorted.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -438,12 +576,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam",
+          "uri": "/data/1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam.bai",
+            "uri": "/data/1/primates_public_dataset/HMo_embryo_scRNA_earlyDevResource/PRJNA648709/002-processed_data/001-human_scRNA/002-scRNA_results/cellranger/count/PCW3-01_whole_body_20190614/outs/possorted_genome_bam.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -453,12 +591,12 @@
     },
     {
       "type": "FeatureTrack",
-      "trackId": "chm13v2.0_censat",
-      "name": "chm13v2.0_censat",
+      "trackId": "chm13v2.0_censat_type",
+      "name": "Centromeric Satellite (Type)",
       "category": ["Repeats"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/censat/censat.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/centromere_satellite/chm13v2.0.cenSatv2.1.bb",
         "locationType": "UriLocation"
       },
       "assemblyNames": ["T2T-CHM13v2.0"],
@@ -467,7 +605,55 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_censat_strand",
+      "name": "Centromeric Satellite (Strand)",
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/centromere_satellite/chm13v2.0.SatelliteStrandv2.1.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "chm13v2.0_censat_active",
+      "name": "Centromeric Satellite (Active)",
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/centromere_satellite/chm13v2.0.active.centromeresv2.1.bb",
+        "locationType": "UriLocation"
+      },
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
           }
         }
       ]
@@ -479,7 +665,7 @@
       "category": ["Regulation"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_cCRE/encodeCcreCombined.lifted.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_cCRE/encodeCcreCombined.lifted.bb",
         "locationType": "UriLocation"
       },
       "assemblyNames": ["T2T-CHM13v2.0"],
@@ -500,7 +686,7 @@
       "category": ["Regulation"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_T2T/integrated_chm13v2.0_encode_T2T.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/encode_T2T/integrated_chm13v2.0_encode_T2T.bb",
         "locationType": "UriLocation"
       },
       "assemblyNames": ["T2T-CHM13v2.0"],
@@ -521,7 +707,7 @@
       "category": ["Regulation"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/cpgIslandExt.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/cpgIslandExt.bb",
         "locationType": "UriLocation"
       },
       "assemblyNames": ["T2T-CHM13v2.0"],
@@ -544,7 +730,7 @@
       "adapter": {
         "type": "BigWigAdapter",
         "bigWigLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/chm13v2.0_CHM13_CpG_ont_guppy3.6.0_nanopolish0.13.2.bw"
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/chm13v2.0_CHM13_CpG_ont_guppy3.6.0_nanopolish0.13.2.bw"
         }
       }
     },
@@ -556,12 +742,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG002_ont_r10.4.1_dorado0.4.0_sup4.1.0_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -577,12 +763,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG005_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -598,12 +784,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG00733_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -620,12 +806,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01109_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -642,12 +828,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG01442_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -664,12 +850,12 @@
       "adapter": {
         "type": "BamAdapter",
         "bamLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam",
           "locationType": "UriLocation"
         },
         "index": {
           "location": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/regulation/aligned_methylation/HG02055_ont_r9.4.1_guppy6.1.2_5mCG_5hmCG.wm_2.03.pri.bam.bai",
             "locationType": "UriLocation"
           },
           "indexType": "BAI"
@@ -691,7 +877,7 @@
             "name": "V0-(((HSA,PTR),GGO),PAB)",
             "group": "topology",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
             }
           },
           {
@@ -699,7 +885,7 @@
             "name": "V1-(((HSA,PTR),GGO),PAB)",
             "group": "topology",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
             }
           },
           {
@@ -707,7 +893,7 @@
             "name": "V2-(((HSA,GGO),PTR),PAB)",
             "group": "topology",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
             }
           },
           {
@@ -715,7 +901,7 @@
             "name": "V3-(((PTR,GGO),HSA),PAB)",
             "group": "topology",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
             }
           }
         ]
@@ -731,7 +917,7 @@
       "adapter": {
         "type": "BigWigAdapter",
         "bigWigLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V0.sorted.bw"
         }
       }
     },
@@ -745,7 +931,7 @@
       "adapter": {
         "type": "BigWigAdapter",
         "bigWigLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V1.sorted.bw"
         }
       }
     },
@@ -759,7 +945,7 @@
       "adapter": {
         "type": "BigWigAdapter",
         "bigWigLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V2.sorted.bw"
         }
       }
     },
@@ -773,7 +959,7 @@
       "adapter": {
         "type": "BigWigAdapter",
         "bigWigLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/ils/HSA_PTR_GGO_PAB/merged_V3.sorted.bw"
         }
       },
       "displays": [
@@ -787,13 +973,13 @@
     },
     {
       "type": "FeatureTrack",
-      "trackId": "chm13v2.0_VAMPIRE_tandem_repeat",
-      "name": "chm13v2.0_VAMPIRE_tandem_repeat",
+      "trackId": "CHM13_VAMPIRE_tandem_repeat",
+      "name": "VAMPIRE_tandem_repeat",
       "category": ["Repeats"],
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/vampire.chm13v2.0.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/tandem_repeat/vampire.chm13v2.0.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -808,13 +994,13 @@
     },
     {
       "type": "FeatureTrack",
-      "trackId": "chm13v2.0_TRF_tandem_repeat",
-      "name": "chm13v2.0_TRF_tandem_repeat",
+      "trackId": "CHM13_TRF_tandem_repeat",
+      "name": "TRF_tandem_repeat",
       "category": ["Repeats"],
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/trf.chm13v2.0.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/tandem_repeat/trf.chm13v2.0.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -826,6 +1012,18 @@
           }
         }
       ]
+    },
+    {
+      "type": "HicTrack",
+      "trackId": "CN1_poreC",
+      "name": "CN1_poreC",
+      "category": ["3D genome"],
+      "assemblyNames": ["T2T-CHM13v2.0"],
+      "adapter": {
+        "type": "HicAdapter",
+        "uri": "/data/2/UNCLASSIFIED/20220907-CN1/poreC/results/hi-c/NPL2300245.hic",
+        "locationType": "UriLocation"
+      }
     },
     {
       "type": "FeatureTrack",
@@ -835,7 +1033,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/vamos.chm13v2.0.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/tandem_repeat/vamos.chm13v2.0.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -851,12 +1049,12 @@
     {
       "type": "FeatureTrack",
       "trackId": "chm13v2.0_segdup",
-      "name": "chm13v2.0_segdup",
+      "name": "Segmental Duplications",
       "category": ["Repeats"],
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/segdup/T2TCHM13v2.0.asm.SDs.bb",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/repeats/segmental_duplication/T2TCHM13v2.0.asm.SDs.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -877,7 +1075,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Bono_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Bono_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -900,7 +1098,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Catherine_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Catherine_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -923,7 +1121,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Desmond_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Desmond_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -946,7 +1144,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Dzeeta_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Dzeeta_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -969,7 +1167,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hermien_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hermien_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -992,7 +1190,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hortense_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Hortense_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1015,7 +1213,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kombote_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kombote_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1038,7 +1236,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kosana_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kosana_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1061,7 +1259,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kumbuka_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Kumbuka_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1084,7 +1282,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Natalie_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Bonobo_Natalie_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1107,7 +1305,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286216_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286216_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1130,7 +1328,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286218_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286218_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1153,7 +1351,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286220_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286220_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1176,7 +1374,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286221_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286221_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1199,7 +1397,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286222_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286222_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1222,7 +1420,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286238_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286238_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1245,7 +1443,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286240_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286240_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1268,7 +1466,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286241_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286241_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1291,7 +1489,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286243_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286243_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1314,7 +1512,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286245_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Chimp_ERS1286245_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1337,7 +1535,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Amani_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Amani_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1360,7 +1558,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Banjo_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Banjo_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1383,7 +1581,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Delphi_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Delphi_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1406,7 +1604,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Dian_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Dian_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1429,7 +1627,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kaisi_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kaisi_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1452,7 +1650,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kolo_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Kolo_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1475,7 +1673,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Mimi_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Gorilla_Mimi_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1498,7 +1696,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Babu_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Babu_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1521,7 +1719,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Buschi_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Buschi_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1544,7 +1742,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Dunja_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Dunja_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1567,7 +1765,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Elsi_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Elsi_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1590,7 +1788,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Kiki_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Kiki_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1613,7 +1811,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Napoleon_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Napoleon_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1636,7 +1834,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Nonja_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Nonja_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1659,7 +1857,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Sari_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Sari_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1682,7 +1880,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Tilda_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Orangutan_Tilda_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1705,7 +1903,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_11433-07b_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_11433-07b_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1728,7 +1926,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_23138_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_23138_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1751,7 +1949,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35045_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35045_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1774,7 +1972,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35091_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_35091_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1797,7 +1995,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38550_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38550_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1820,7 +2018,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38572_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38572_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1843,7 +2041,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38615_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38615_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1866,7 +2064,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38629_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38629_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1889,7 +2087,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38655_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38655_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1912,7 +2110,7 @@
       "assemblyNames": ["T2T-CHM13v2.0"],
       "adapter": {
         "type": "BigBedAdapter",
-        "uri": "/mnt/disk1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38660_wssd.bb",
+        "uri": "/data/1/datasets/fastCN.NHP.T2T-CHM13v2.0/wssd/bigbed/Macaque_38660_wssd.bb",
         "locationType": "UriLocation"
       },
       "displays": [
@@ -1960,7 +2158,7 @@
             "type": "BigWigAdapter",
             "name": "AFR",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/AFR_win5000_step5000.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/AFR_win5000_step5000.bw"
             },
             "group": "AFR"
           },
@@ -1968,7 +2166,7 @@
             "type": "BigWigAdapter",
             "name": "nonAFR",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/nonAFR_win5000_step5000.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/pi/nonAFR_win5000_step5000.bw"
             },
             "group": "nonAFR"
           }
@@ -1988,7 +2186,7 @@
             "type": "BigWigAdapter",
             "name": "AFR",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/AFR_win5000_step5000.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/AFR_win5000_step5000.bw"
             },
             "group": "AFR"
           },
@@ -1996,63 +2194,11 @@
             "type": "BigWigAdapter",
             "name": "nonAFR",
             "bigWigLocation": {
-              "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/nonAFR_win5000_step5000.bw"
+              "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/populational_genetics/HGSVC3/tajimaD/nonAFR_win5000_step5000.bw"
             },
             "group": "nonAFR"
           }
         ]
-      }
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "TR_index_log_smoothness",
-      "name": "TR_index_log_smoothness",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "bigWigLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index.bw"
-        }
-      }
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "TR_index_log_smoothness_mad",
-      "name": "TR_index_log_smoothness_mad",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "bigWigLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index_mad.bw"
-        }
-      }
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "TR_index_smoothness_mad",
-      "name": "TR_index_smoothness_mad",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "bigWigLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_index_not_log.bw"
-        }
-      }
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "TR_index_exp",
-      "name": "TR_index_exp",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "bigWigLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/chr22_exp.bw"
-        }
       }
     },
     {
@@ -2093,166 +2239,6 @@
             "uri": "/home/zkyang/job/250326-STR_overexpansion/004-variants/SVs.vcf.gz.tbi",
             "locationType": "UriLocation"
           }
-        }
-      }
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr1_k17",
-      "name": "chr1_k17",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k17.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr1_k13",
-      "name": "chr1_k13",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k13.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr1_k9",
-      "name": "chr1_k9",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k9.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr1_k5",
-      "name": "chr1_k5",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k5.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr1_k3",
-      "name": "chr1_k3",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr1_k3.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr22_k17",
-      "name": "chr22_k17",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k17.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr22_k9",
-      "name": "chr22_k9",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k9.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr22_k5",
-      "name": "chr22_k5",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k5.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "QuantitativeTrack",
-      "trackId": "chr22_k3",
-      "name": "chr22_k3",
-      "category": ["Test"],
-      "adapter": {
-        "type": "BigWigAdapter",
-        "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chr22_k3.bw",
-        "locationType": "UriLocation"
-      },
-      "assemblyNames": ["T2T-CHM13v2.0"]
-    },
-    {
-      "type": "FeatureTrack",
-      "trackId": "chm13_chr1_1-150M-anno",
-      "name": "chm13_chr1_1-150M-anno",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BedAdapter",
-        "bedLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-anno.bed4"
-        }
-      }
-    },
-    {
-      "type": "FeatureTrack",
-      "trackId": "chm13_chr1_1-150M--loose08",
-      "name": "chm13_chr1_1-150M--loose08",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BedAdapter",
-        "bedLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M--loose08.bed4"
-        }
-      }
-    },
-    {
-      "type": "FeatureTrack",
-      "trackId": "chm13_chr1_1-150M-0311",
-      "name": "chm13_chr1_1-150M-0311",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BedAdapter",
-        "bedLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-0311.bed4"
-        }
-      }
-    },
-    {
-      "type": "FeatureTrack",
-      "trackId": "chm13_chr1_1-150M-0312",
-      "name": "chm13_chr1_1-150M-0312",
-      "category": ["Test"],
-      "assemblyNames": ["T2T-CHM13v2.0"],
-      "adapter": {
-        "type": "BedAdapter",
-        "bedLocation": {
-          "uri": "/home/zkyang/project/251029-vampire_revision/001-benchmark/_resource/chm13_chr1_1-150M-0312.bed4"
         }
       }
     },

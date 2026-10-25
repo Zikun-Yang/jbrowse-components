@@ -9,6 +9,7 @@ import TextSearchManager from '@jbrowse/core/TextSearch/TextSearchManager'
 import assemblyConfigSchemaFactory from '@jbrowse/core/assemblyManager/assemblyConfigSchema'
 import { readConfObject } from '@jbrowse/core/configuration'
 import RpcManager from '@jbrowse/core/rpc/RpcManager'
+import { getEnv } from '@jbrowse/core/util'
 import {
   addDisposer,
   cast,
@@ -44,10 +45,11 @@ import {
 
 import packageJSON from '../../package.json' with { type: 'json' }
 import jbrowseWebFactory from '../jbrowseModel.ts'
+import { loadSessionSpec } from '../loadSessionSpec.ts'
 import makeWorkerInstance from '../makeWorkerInstance.ts'
 import { filterSessionInPlace } from '../util.ts'
 
-import type { SessionDB, SessionMetadata } from '../types.ts'
+import type { LayoutNode, SessionDB, SessionMetadata } from '../types.ts'
 import type { Menu } from '@jbrowse/app-core'
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AbstractSessionModel } from '@jbrowse/core/util'
@@ -371,6 +373,58 @@ export default function RootModel({
           this.setSession(ret)
         } else {
           self.session?.notifyError('Session not found')
+        }
+      },
+      /**
+       * #action
+       */
+      async duplicateSavedSession(id: string) {
+        const ret = await self.sessionDB?.get('sessions', id)
+        if (ret) {
+          const { id: _id, ...rest } = ret
+          this.setSession({ ...rest, name: `${rest.name} (copy)` })
+        } else {
+          self.session?.notifyError('Session not found')
+        }
+      },
+      /**
+       * #action
+       * Instantiate a session template (from the `preConfiguredSessions` config
+       * slot) as a new session, leaving the current session untouched.
+       * Templates written by hand can use the "session spec" shorthand (views
+       * without `id`, tracks as trackId strings — same as the URL `spec-`
+       * format); exported session snapshots are used as-is.
+       */
+      activateTemplate(template: Record<string, unknown> & { name: string }) {
+        const {
+          id: _id,
+          name,
+          // display-only fields for the Recents page card, not session state
+          description: _description,
+          image: _image,
+          views,
+          sessionTracks,
+          layout,
+          ...rest
+        } = template as {
+          id?: string
+          description?: string
+          image?: string
+          views?: Record<string, unknown>[]
+          sessionTracks?: Record<string, unknown>[]
+          layout?: LayoutNode
+        }
+        const newName = `${name} ${new Date().toLocaleString()}`
+        // snapshot views always carry an MST `id`; spec views don't
+        const isSpec = views?.length && views.every(v => !('id' in v))
+        if (isSpec) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          loadSessionSpec(
+            { views, sessionTracks, layout, sessionName: newName },
+            getEnv(self).pluginManager,
+          )
+        } else {
+          this.setSession({ ...rest, views, name: newName })
         }
       },
       /**

@@ -120,7 +120,7 @@ export function createRenderConfigContext(
       'displayDirectionalChevrons',
     ) as boolean,
 
-    color1: createCachedConfig(config, 'color1', 'goldenrod'),
+    color1: createCachedConfig(config, 'color1', '#292421'),
     color2: createCachedConfig(config, 'color2', '#f0f'),
     color3: createCachedConfig(config, 'color3', '#357089'),
     outline: createCachedConfig(config, 'outline', ''),

@@ -9,7 +9,9 @@ import { observer } from 'mobx-react'
 import {
   DockviewContext,
   clearPendingMoveAction,
+  notifyDockviewLayoutChanged,
   peekPendingMoveAction,
+  setDockviewApi,
 } from './DockviewContext.tsx'
 import JBrowseViewPanel from './JBrowseViewPanel.tsx'
 import {
@@ -231,9 +233,18 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
     createPanelsForViews(session.views.map(v => v.id))
   }, [])
 
+  // clear the module-level api store on unmount so stale panel counts don't
+  // linger when the workspace view is switched away
+  useEffect(() => {
+    return () => {
+      setDockviewApi(null)
+    }
+  }, [])
+
   const onReady = useCallback(
     (event: DockviewReadyEvent) => {
       setApi(event.api)
+      setDockviewApi(event.api)
 
       event.api.onDidActivePanelChange(e => {
         if (e?.id && isSessionWithDockviewLayout(sessionRef.current)) {
@@ -258,6 +269,7 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
       })
 
       event.api.onDidLayoutChange(() => {
+        notifyDockviewLayoutChanged()
         if (
           !rearrangingRef.current &&
           isSessionWithDockviewLayout(sessionRef.current)
@@ -431,7 +443,10 @@ const TiledViewsContainer = observer(function TiledViewsContainer({
 
   return (
     <DockviewContext.Provider value={contextValue}>
-      <div className={cx(classes.container, classes.noTabs, themeClass)}>
+      <div
+        className={cx(classes.container, classes.noTabs, themeClass)}
+        data-testid="workspace-views"
+      >
         <DockviewReact components={components} onReady={onReady} />
       </div>
     </DockviewContext.Provider>

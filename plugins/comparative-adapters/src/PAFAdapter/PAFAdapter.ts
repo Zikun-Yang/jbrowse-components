@@ -20,6 +20,12 @@ const { parseCigar } = MismatchParser
 
 interface PAFOptions extends BaseOptions {
   config?: AnyConfigurationModel
+  // callers that only render block envelopes (e.g. synteny overview zoom
+  // levels) can pass includeCigar: false to skip transferring the — often
+  // enormous — CIGAR string over RPC; the front end falls back to linear
+  // interpolation between the feature start/end, which is visually
+  // identical when individual cigar ops are sub-pixel
+  includeCigar?: boolean
 }
 
 export default class PAFAdapter extends BaseFeatureDataAdapter {
@@ -137,12 +143,14 @@ export default class PAFAdapter extends BaseFeatureDataAdapter {
         if (refName === qref && doesIntersect2(qstart, qend, start, end)) {
           const { numMatches = 0, blockLen = 1, cg, ...rest } = extra
 
-          let CIGAR = extra.cg
-          if (extra.cg) {
+          let CIGAR: string | undefined
+          if (opts.includeCigar !== false && extra.cg) {
             if (flip && strand === -1) {
               CIGAR = flipCigar(parseCigar(extra.cg)).join('')
             } else if (flip) {
               CIGAR = swapIndelCigar(extra.cg)
+            } else {
+              CIGAR = extra.cg
             }
           }
 

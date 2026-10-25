@@ -27,6 +27,15 @@ export default class ViewType extends PluggableElementBase {
 
   viewMetadata: ViewMetadata = {}
 
+  /**
+   * one-paragraph description of what this view shows and what tasks it is
+   * good for — surfaced to users and AI agents (e.g. jbrowse-agent's
+   * viewTypes()) to help them pick the right view
+   */
+  description?: string
+
+  icon?: React.ComponentType<{ className?: string }>
+
   // extendedName can be used for when you extend a given view type, and want
   // to register all of that view types displays to yourself
   //
@@ -39,16 +48,20 @@ export default class ViewType extends PluggableElementBase {
   constructor(stuff: {
     name: string
     displayName?: string
+    description?: string
     stateModel: IAnyModelType
     extendedName?: string
     viewMetadata?: ViewMetadata
+    icon?: React.ComponentType<{ className?: string }>
     ReactComponent: ViewComponentType
   }) {
     super(stuff)
     this.ReactComponent = stuff.ReactComponent
     this.viewMetadata = stuff.viewMetadata || {}
+    this.description = stuff.description
     this.stateModel = stuff.stateModel
     this.extendedName = stuff.extendedName
+    this.icon = stuff.icon
   }
 
   addDisplayType(display: DisplayType) {

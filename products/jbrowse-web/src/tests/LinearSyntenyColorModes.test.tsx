@@ -46,7 +46,8 @@ interface ColorModeDisplay {
 }
 
 // subset.paf: peach Pp01:28,845,209-28,845,603 <-> grape chr1:315,959-316,369,
-// numMatches=330 blockLen=413 -> identity ~0.799, below the 85% window floor
+// numMatches=330 blockLen=413 -> identity ~0.799, below the 85% window floor.
+// views show windows wider than the alignment so rainbow fractions are not 0.5
 async function makeView() {
   const { rootModel } = getPluginManager(configSnapshot)
   rootModel.setDefaultSession()
@@ -55,8 +56,8 @@ async function makeView() {
   const view = session.addView('LinearSyntenyView', {
     init: {
       views: [
-        { loc: 'Pp01:28,845,209..28,845,603', assembly: 'peach' },
-        { loc: 'chr1:315,959..316,369', assembly: 'grape' },
+        { loc: 'Pp01:28,800,000..28,900,000', assembly: 'peach' },
+        { loc: 'chr1:300,000..330,000', assembly: 'grape' },
       ],
       tracks: [['subset']],
     },
@@ -95,51 +96,46 @@ test('identity mode colors by alignment identity, clamped below 85%', async () =
   expect(hsl.a).toBeCloseTo(0.2, 2)
 }, 90000)
 
-test('rainbow mode colors by position along the displayed regions', async () => {
+test('rainbow mode colors by position within the visible window', async () => {
   const { view, display } = await makeView()
   display.setColorBy('rainbow')
 
-  // anchor defaults to view 0 (peach): the view displays the whole Pp01
-  // chromosome (47,851,208 bp), feature midpoint at 28,845,406
+  // anchor defaults to view 0 (peach): visible window is
+  // Pp01:28,800,000-28,900,000 and the feature midpoint is 28,845,406
   await waitFor(() => expect(display.featPositions![0]!.fill).toBeDefined(), {
     timeout: 10000,
   })
-  const peachFrac = 28845406 / 47851208
+  const peachFrac = (28845406 - 28800000) / 100000
   const hsl0 = colord(display.featPositions![0]!.fill!).toHsl()
   expect(Math.abs(hsl0.h - 260 * (1 - peachFrac))).toBeLessThan(2)
 
-  // switch anchor to view 1 (grape): whole chr1 (23,037,639 bp),
-  // mate midpoint 316,164
+  // switch anchor to view 1 (grape): visible window is
+  // chr1:300,000-330,000 and the mate midpoint is 316,164
   view.setRainbowAnchor(1)
   await waitFor(
     () =>
-      expect(
-        colord(display.featPositions![0]!.fill!).toHsl().h,
-      ).toBeGreaterThan(200),
+      expect(colord(display.featPositions![0]!.fill!).toHsl().h).toBeLessThan(
+        130,
+      ),
     { timeout: 10000 },
   )
-  const grapeFrac = 316164 / 23037639
+  const grapeFrac = (316164 - 300000) / 30000
   const hsl1 = colord(display.featPositions![0]!.fill!).toHsl()
   expect(Math.abs(hsl1.h - 260 * (1 - grapeFrac))).toBeLessThan(2)
 }, 90000)
 
-test('rainbow concatenates multiple displayed regions in order', async () => {
+test('rainbow concatenates multiple visible regions in order', async () => {
   const { view, display } = await makeView()
   display.setColorBy('rainbow')
   await waitFor(() => expect(display.featPositions![0]!.fill).toBeDefined(), {
     timeout: 10000,
   })
 
-  // add a second 100 kb region after the first: total displayed length
-  // doubles, so the feature's fraction halves
-  view.views[0]!.setDisplayedRegions([
-    {
-      assemblyName: 'peach',
-      refName: 'Pp01',
-      start: 28800000,
-      end: 28900000,
-    },
-    { assemblyName: 'peach', refName: 'Pp02', start: 0, end: 100000 },
+  // navigate to two 100 kb windows: the visible axis doubles, so the
+  // feature's fraction halves
+  await view.views[0]!.navToLocations([
+    { refName: 'Pp01', start: 28800000, end: 28900000, assemblyName: 'peach' },
+    { refName: 'Pp02', start: 0, end: 100000, assemblyName: 'peach' },
   ])
   await waitFor(
     () =>
@@ -173,7 +169,7 @@ test('rainbow mode mirrors coordinates when the anchor region is flipped', async
       ).toBeGreaterThan(2),
     { timeout: 10000 },
   )
-  const flippedFrac = (47851208 - 28845406) / 47851208
+  const flippedFrac = (28900000 - 28845406) / 100000
   const hsl = colord(display.featPositions![0]!.fill!).toHsl()
   expect(Math.abs(hsl.h - 260 * (1 - flippedFrac))).toBeLessThan(2)
 }, 90000)

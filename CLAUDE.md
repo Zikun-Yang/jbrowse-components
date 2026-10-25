@@ -127,7 +127,6 @@ Example: `plugins/linear-genome-view/src/index.ts`
 
 JBrowse uses `@jbrowse/mobx-state-tree` (a fork of MST). State is organized as a
 tree:
-
 - **Root model** — `products/jbrowse-web/src/rootModel/rootModel.ts` (or
   equivalent per product)
 - **Session model** — created by the root model, holds views, tracks, selection
@@ -136,6 +135,36 @@ tree:
 
 Use `getSession(model)` and `getRoot(model)` from `@jbrowse/core/util` to
 traverse the tree.
+
+### App Shell (app-core)
+
+The web/desktop app UI lives in `packages/app-core/src/ui/App/` and is shared
+by `jbrowse-web` and `jbrowse-desktop` (both render `<App session={...}/>`).
+
+- **Routed views**: the shell switches on `session.activeView`
+  (`'landing' | 'workspace' | 'recents' | 'settings'`, defined in
+  `packages/web-core/src/BaseWebSession`). In jbrowse-web, `activeView` is
+  two-way synced with react-router paths (`/`, `/workspace`, `/recents`,
+  `/settings`) in `products/jbrowse-web/src/components/JBrowse.tsx`.
+- **Left sidebar** (`LeftSidebar.tsx`) is navigation-only: Home / Recents /
+  Workspace / Settings, plus conditional Bookmarks and Help entries that open
+  widgets (shown only when the corresponding widget type is registered).
+- **Workspace panels** are tiled with dockview (`useDockview` via
+  `DockviewContext.tsx`); `WorkspaceToolbar.tsx` holds Add-view / Undo / Redo /
+  Layout controls.
+- **Product injection points**: `<App>` accepts optional `HeaderButtons`
+  (rendered top-right, e.g. Share/Import/Export in jbrowse-web) and
+  `SettingsCards` (rendered as a "Manage" section on the Settings page) so
+  products can add UI without app-core depending on product code.
+- **Legacy menus**: `rootModel.menus()` (File/Add/Tools/Help) and the
+  `appendToMenu`/`insertInMenu` extension points in
+  `packages/app-core/src/menus.ts` still exist for backward compatibility, but
+  the app shell no longer renders them. Prefer the sidebar, WorkspaceToolbar,
+  or Settings cards for new entries.
+- **View icons**: `ViewType` accepts an optional `icon` component (see
+  `packages/core/src/pluggableElementTypes/ViewType.ts`), shown in the
+  Add-view dropdown. Icons are lucide-react based, exported from
+  `@jbrowse/core/ui/Icons`.
 
 ### Configuration System
 

@@ -15,7 +15,7 @@ const CanvasFeatureRenderer = ConfigurationSchema(
     color1: {
       type: 'color',
       description: 'the main color of each feature',
-      defaultValue: 'goldenrod',
+      defaultValue: '#292421',
       contextVariable: ['feature'],
     },
     /**

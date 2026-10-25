@@ -74,7 +74,7 @@ function stateModelFactory(pluginManager: PluginManager) {
          * cumulative overlap reaches this percentage of the total, filtering
          * out spurious repeat-induced hits; 100 keeps all
          */
-        followCumulativePct: 100,
+        followCumulativePct: 90,
         /**
          * #property
          * index of the sub-view whose genome anchors rainbow (query position)
@@ -555,7 +555,7 @@ function stateModelFactory(pluginManager: PluginManager) {
         ...(!showIntraviewLinks ? { showIntraviewLinks } : {}),
         ...(linkViews ? { linkViews } : {}),
         ...(followSynteny ? { followSynteny } : {}),
-        ...(followCumulativePct !== 100 ? { followCumulativePct } : {}),
+        ...(followCumulativePct !== 90 ? { followCumulativePct } : {}),
         ...(rainbowAnchor !== 0 ? { rainbowAnchor } : {}),
         ...(interactiveOverlay ? { interactiveOverlay } : {}),
         ...(!showDynamicControls ? { showDynamicControls } : {}),

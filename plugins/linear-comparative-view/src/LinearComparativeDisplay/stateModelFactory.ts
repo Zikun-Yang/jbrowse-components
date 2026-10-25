@@ -18,6 +18,15 @@ import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
 import type { Instance } from '@jbrowse/mobx-state-tree'
 
+// above this bpPerPx, individual cigar ops are far below one pixel, so
+// features are fetched without their CIGAR strings: the ribbons are drawn
+// from feature start/end anyway, and hover/follow position mapping falls
+// back to linear interpolation — visually identical at these zoom levels,
+// but avoids transferring the (often enormous) CIGAR of every record over
+// RPC on each navigation. zooming back in across the threshold re-fetches
+// with CIGAR included
+const CIGAR_DETAIL_MAX_BP_PER_PX = 1000
+
 /**
  * #stateModel LinearComparativeDisplay
  * extends
@@ -268,6 +277,7 @@ async function renderBlockEffect(props: ReturnType<typeof renderBlockData>) {
         regions: view.staticBlocks.contentBlocks,
         sessionId,
         adapterConfig,
+        opts: { includeCigar: view.bpPerPx <= CIGAR_DETAIL_MAX_BP_PER_PX },
         statusCallback: (arg: string) => {
           model.setLoadingStatus(arg)
         },
@@ -314,6 +324,7 @@ async function mateRenderBlockEffect(
         regions: view.staticBlocks.contentBlocks,
         sessionId,
         adapterConfig,
+        opts: { includeCigar: view.bpPerPx <= CIGAR_DETAIL_MAX_BP_PER_PX },
       })) as Feature[],
       f => f.id(),
     ),

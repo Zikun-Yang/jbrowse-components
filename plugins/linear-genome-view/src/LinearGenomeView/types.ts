@@ -23,6 +23,7 @@ export interface ExportSvgOptions {
   trackLabels?: string
   themeName?: string
   showGridlines?: boolean
+  removeBackground?: boolean
 }
 
 export interface HighlightType {

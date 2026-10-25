@@ -1,0 +1,41 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "CN1 v1.0.1",
+      "species": "Human (Homo sapiens)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "CN1v1.0.1-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_CN1v1.0.1/CN1_diploid.v1.0.1.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/human_CN1v1.0.1/CN1_diploid.v1.0.1.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "HicTrack",
+      "trackId": "CN1v1.0.1_Pore-C",
+      "name": "CN1 Pore-C",
+      "category": ["3D genome"],
+      "assemblyNames": ["CN1 v1.0.1"],
+      "adapter": {
+        "type": "HicAdapter",
+        "uri": "/data/2/UNCLASSIFIED/20220907-CN1/poreC/CN1_diploid/results/hi-c/NPL2300245.hic",
+        "locationType": "UriLocation"
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": [
+  ]
+}

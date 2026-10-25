@@ -463,6 +463,78 @@ test('computeFollowTargets propagates right through the reverse index as fallbac
   expect(targets.get(1)).toEqual([{ refName: 'ctgB', start: 8000, end: 12000 }])
 })
 
+test('computeFollowTargets uses rev coverage when fwd exists but does not cover the window', () => {
+  // fwd has data, but only over a stale position (mid-cascade); the rev index
+  // covers the source window and must still be consulted
+  const level0fwd = buildLevelIndex(
+    [
+      makeFeature({
+        topStart: 50000,
+        topEnd: 60000,
+        botStart: 50000,
+        botEnd: 60000,
+      }),
+    ],
+    identity,
+  )
+  const level0rev = buildLevelIndex(
+    [
+      makeFeature({
+        topRef: 'ctgB',
+        topStart: 0,
+        topEnd: 20000,
+        botRef: 'ctgA',
+        botStart: 0,
+        botEnd: 10000,
+      }),
+    ],
+    identity,
+  )
+  const targets = computeFollowTargets({
+    sourceIndex: 0,
+    source: { refName: 'ctgA', start: 4000, end: 6000 },
+    levelIndexes: [{ fwd: level0fwd, rev: level0rev }],
+  })
+  expect(targets.get(1)).toEqual([{ refName: 'ctgB', start: 8000, end: 12000 }])
+})
+
+test('computeFollowTargets uses fwd coverage when rev exists but does not cover the window', () => {
+  // leftward mirror of the above: rev has data over a stale position, fwd's
+  // bot side covers the source window
+  const level0fwd = buildLevelIndex(
+    [
+      makeFeature({
+        topRef: 'ctgA',
+        topStart: 0,
+        topEnd: 10000,
+        botRef: 'ctgB',
+        botStart: 0,
+        botEnd: 20000,
+      }),
+    ],
+    identity,
+  )
+  const level0rev = buildLevelIndex(
+    [
+      makeFeature({
+        topRef: 'ctgB',
+        topStart: 50000,
+        topEnd: 60000,
+        botRef: 'ctgA',
+        botStart: 50000,
+        botEnd: 60000,
+      }),
+    ],
+    identity,
+  )
+  const targets = computeFollowTargets({
+    sourceIndex: 1,
+    source: { refName: 'ctgB', start: 8000, end: 12000 },
+    levelIndexes: [{ fwd: level0fwd, rev: level0rev }],
+  })
+  expect(targets.get(0)).toEqual([{ refName: 'ctgA', start: 4000, end: 6000 }])
+})
+
 test('computeFollowTargets stops at gap in coverage', () => {
   const level0 = buildLevelIndex([makeFeature()], identity)
   const level1 = buildLevelIndex(

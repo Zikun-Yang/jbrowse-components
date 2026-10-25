@@ -10,11 +10,11 @@
         "adapter": {
           "type": "IndexedFastaAdapter",
           "fastaLocation": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.chr_only.fa",
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.fa",
             "locationType": "UriLocation"
           },
           "faiLocation": {
-            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.chr_only.fa.fai",
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/GRCh38.p14.fa.fai",
             "locationType": "UriLocation"
           }
         }
@@ -31,7 +31,47 @@
   ],
   "configuration": {},
   "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "GRCh38.p14_gaps",
+      "name": "Assembly Gaps",
+      "category": ["Assembly"],
+      "assemblyNames": ["GRCh38 (hg38)"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/gap/gaps.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "displayMode": "collapse",
+            "showLabels": false
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "GRCh38.p14_VAMPIRE_tandem_repeat",
+      "name": "GRCh38.p14_VAMPIRE_tandem_repeat",
+      "category": ["Repeats"],
+      "assemblyNames": ["GRCh38 (hg38)"],
+      "adapter": {
+        "type": "BigBedAdapter",
+        "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_GRCh38/tandem_repeat/vampire.GRCh38.p14.chr_only.bb",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
 
+          }
+        }
+      ]
+    }
   ],
   "aggregateTextSearchAdapters": [
   ]

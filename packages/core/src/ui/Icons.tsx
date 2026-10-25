@@ -15,8 +15,8 @@ import {
   Camera,
   ChartPie,
   ChartScatter,
-  Check,
-  ChevronDown,
+  ChartNetwork,
+  Check,  ChevronDown,
   ChevronRight,
   ChevronUp,
   ChevronsDown,
@@ -40,6 +40,7 @@ import {
   ExternalLink,
   Eye,
   Files,
+  FlipVertical2,
   Focus,
   FolderOpen,
   Fullscreen,
@@ -58,6 +59,7 @@ import {
   ListChecks,
   ListPlus,
   ListX,
+  LoaderPinwheel,
   Lock,
   LockOpen,
   Menu,
@@ -85,6 +87,7 @@ import {
   Shuffle,
   Signature,
   SlidersVertical,
+  Split,
   Square,
   SquareArrowOutUpRight,
   SquareCheck,
@@ -316,6 +319,16 @@ export const VerticalSplitIcon = createIcon(
 export const ViewColumnIcon = createIcon(Columns3, 'ViewColumnIcon')
 export const ViewComfyIcon = createIcon(Grid2x2, 'ViewComfyIcon')
 export const ViewModuleIcon = createIcon(LayoutGrid, 'ViewModuleIcon')
+export const SyntenyViewIcon = createIcon(FlipVertical2, 'SyntenyViewIcon')
+export const DotplotViewIcon = createIcon(ChartScatter, 'DotplotViewIcon')
+export const CircularViewIcon = createIcon(LoaderPinwheel, 'CircularViewIcon')
+export const SpreadsheetViewIcon = createIcon(Table, 'SpreadsheetViewIcon')
+export const SvInspectorViewIcon = createIcon(Search, 'SvInspectorViewIcon')
+export const BreakpointSplitViewIcon = createIcon(
+  Split,
+  'BreakpointSplitViewIcon',
+)
+export const SingleCellViewIcon = createIcon(ChartNetwork, 'SingleCellViewIcon')
 export const VisibilityIcon = createIcon(Eye, 'VisibilityIcon')
 export const WorkspacesIcon = createIcon(Group, 'WorkspacesIcon')
 export const ZoomInIcon = createIcon(ZoomIn, 'ZoomInIcon')

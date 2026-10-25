@@ -1,0 +1,17 @@
+{
+  "name": "jbrowse-agent",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Execute AI-written scripts against a live JBrowse session (Playwright + @jbrowse/agent-sdk).",
+  "type": "module",
+  "bin": {
+    "jbrowse-agent": "run.mjs"
+  },
+  "scripts": {
+    "agent": "node run.mjs"
+  },
+  "dependencies": {
+    "@jbrowse/agent-sdk": "workspace:*",
+    "playwright-core": "^1.49.0"
+  }
+}

@@ -36,3 +36,47 @@ test('adapter can fetch features from peach_grape.paf', async () => {
   expect(fa1[0]!.get('refName')).toBe('Pp01')
   expect(fa2[0]!.get('refName')).toBe('chr1')
 })
+
+test('includeCigar: false omits the CIGAR but keeps coordinates', async () => {
+  const adapter = new Adapter(
+    MyConfigSchema.create({
+      pafLocation: {
+        localPath: require.resolve('./test_data/peach_grape_cigar.paf'),
+        locationType: 'LocalPathLocation',
+      },
+      assemblyNames: ['peach', 'grape'],
+    }),
+  )
+
+  const withCigar = await firstValueFrom(
+    adapter
+      .getFeatures({
+        refName: 'chr1',
+        start: 0,
+        end: 100000,
+        assemblyName: 'grape',
+      })
+      .pipe(toArray()),
+  )
+  const withoutCigar = await firstValueFrom(
+    adapter
+      .getFeatures(
+        {
+          refName: 'chr1',
+          start: 0,
+          end: 100000,
+          assemblyName: 'grape',
+        },
+        { includeCigar: false },
+      )
+      .pipe(toArray()),
+  )
+
+  expect(withCigar.length).toBe(2)
+  expect(withCigar[0]!.get('CIGAR')).toBe('100M5D100I1151M')
+  expect(withoutCigar.length).toBe(withCigar.length)
+  expect(withoutCigar[0]!.get('CIGAR')).toBeUndefined()
+  expect(withoutCigar[0]!.get('start')).toBe(withCigar[0]!.get('start'))
+  expect(withoutCigar[0]!.get('end')).toBe(withCigar[0]!.get('end'))
+  expect(withoutCigar[0]!.get('mate')).toEqual(withCigar[0]!.get('mate'))
+})

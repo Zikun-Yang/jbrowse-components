@@ -89,7 +89,9 @@ export async function renderToSvg(model: LGV, opts: ExportSvgOptions) {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox={[0, 0, w + shift * 2, height].toString()}
         >
-          <SVGBackground width={w} height={height} shift={shift} />
+          {opts.removeBackground ? null : (
+            <SVGBackground width={w} height={height} shift={shift} />
+          )}
           <g transform={`translate(${shift} 0)`}>
             <g transform={`translate(${trackLabelOffset})`}>
               <SVGHeader

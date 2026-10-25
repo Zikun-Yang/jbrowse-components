@@ -7,6 +7,7 @@ import { observer } from 'mobx-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import FileHandleRestoreBanner from './FileHandleRestoreBanner.tsx'
+import SettingsCards from './SettingsCards.tsx'
 import ShareButton from './ShareButton.tsx'
 import { readQueryParams, setQueryParams } from '../useQueryParam.ts'
 
@@ -120,6 +121,7 @@ const JBrowse = observer(function JBrowse({
         // @ts-expect-error
         session={session}
         HeaderButtons={<ShareButton session={session} />}
+        SettingsCards={<SettingsCards session={session} />}
       />
     </ThemeProvider>
   )

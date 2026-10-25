@@ -36,4 +36,5 @@ export interface ExportSvgOptions {
   themeName?: string
   trackLabels?: string
   showGridlines?: boolean
+  removeBackground?: boolean
 }

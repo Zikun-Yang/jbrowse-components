@@ -123,6 +123,14 @@ export default function stateModelFactory(pluginManager: PluginManager) {
        */
       importFormSyntenyTrackSelections:
         observable.array<ImportFormSyntenyTrack>(),
+      /**
+       * #volatile
+       * set when display data finishes loading while a follow application is
+       * still in progress (the resync reaction cannot re-enter followFromView
+       * at that point); followFromView checks this flag on completion and
+       * re-runs so the level-by-level cascade does not stall
+       */
+      followPending: false,
     }))
     .views(self => ({
       /**
@@ -218,36 +226,8 @@ export default function stateModelFactory(pluginManager: PluginManager) {
         const { saveAs } = await import('file-saver-es')
 
         if (opts.format === 'png') {
-          const img = new Image()
-          const svgBlob = new Blob([html], { type: 'image/svg+xml' })
-          const url = URL.createObjectURL(svgBlob)
-          await new Promise<void>((resolve, reject) => {
-            img.onload = () => {
-              const canvas = document.createElement('canvas')
-              canvas.width = img.width
-              canvas.height = img.height
-              const ctx = canvas.getContext('2d')!
-              ctx.drawImage(img, 0, 0)
-              URL.revokeObjectURL(url)
-              canvas.toBlob(blob => {
-                if (blob) {
-                  saveAs(blob, opts.filename || 'image.png')
-                  resolve()
-                } else {
-                  reject(
-                    new Error(
-                      `Failed to create PNG. The image may be too large (${img.width}x${img.height}). Try reducing the view size or use SVG format.`,
-                    ),
-                  )
-                }
-              }, 'image/png')
-            }
-            img.onerror = () => {
-              URL.revokeObjectURL(url)
-              reject(new Error('Failed to load SVG for PNG conversion'))
-            }
-            img.src = url
-          })
+          const { svgToPng } = await import('@jbrowse/core/util/svgToPng')
+          saveAs(await svgToPng(html), opts.filename || 'image.png')
         } else {
           saveAs(
             new Blob([html], { type: 'image/svg+xml' }),
@@ -558,7 +538,30 @@ export default function stateModelFactory(pluginManager: PluginManager) {
           }
         } finally {
           self.decFollowing()
+          // if display data landed while we were applying navigation, the
+          // resync reaction could not re-enter followFromView and left
+          // followPending set; re-run from the last user-navigated view so
+          // the cascade can proceed to further levels with the fresh data
+          if (self.followPending) {
+            self.setFollowPending(false)
+            if (
+              self.followSynteny &&
+              self.views.includes(self.lastNavSource as (typeof self.views)[0])
+            ) {
+              self.followFromView(self.lastNavSource).catch((e: unknown) => {
+                console.error(e)
+              })
+            }
+          }
         }
+      },
+    }))
+    .actions(self => ({
+      /**
+       * #action
+       */
+      setFollowPending(val: boolean) {
+        self.followPending = val
       },
     }))
     .actions(self => ({
@@ -608,7 +611,15 @@ export default function stateModelFactory(pluginManager: PluginManager) {
                 return
               }
               const src = self.lastNavSource
-              if (!src || self.isFollowing > 0) {
+              if (!src) {
+                return
+              }
+              if (self.isFollowing > 0) {
+                // a follow application is in progress and its navigations are
+                // what triggered this refetch; dropping the notification here
+                // would permanently stall the level-by-level cascade, so flag
+                // it and let followFromView re-run when it finishes
+                self.setFollowPending(true)
                 return
               }
               if (!self.views.includes(src as (typeof self.views)[0])) {

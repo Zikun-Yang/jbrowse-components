@@ -1,24 +1,25 @@
-import { CascadingMenuButton } from '@jbrowse/core/ui'
+import { useState } from 'react'
+
 import EditableTypography from '@jbrowse/core/ui/EditableTypography'
-import { isSessionModelWithWidgets } from '@jbrowse/core/util'
+import { getEnv, isSessionModelWithWidgets } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import { Tooltip } from '@mui/material'
+import { Menu, MenuItem, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
 
 import {
   AccessTimeIcon,
+  BookmarksIcon,
   GridViewIcon,
+  HelpIcon,
   HomeIcon,
-  MoreVertIcon,
+  InfoIcon,
   SettingsIcon,
 } from '@jbrowse/core/ui/Icons'
 
-import type { MenuItem as JBMenuItem } from '@jbrowse/core/ui'
 import type { SnackbarMessage } from '@jbrowse/core/ui/SnackbarModel'
 import type { SessionWithDrawerWidgets } from '@jbrowse/core/util'
 
 type AppSession = SessionWithDrawerWidgets & {
-  menus: () => Menu[]
   snackbarMessages: SnackbarMessage[]
   renameCurrentSession: (arg: string) => void
   popSnackbarMessage: () => unknown
@@ -27,11 +28,6 @@ type AppSession = SessionWithDrawerWidgets & {
     view: 'landing' | 'workspace' | 'recents' | 'settings',
   ) => void
   setShowRecentsDashboard?: (show: boolean) => void
-}
-
-interface Menu {
-  label: string
-  menuItems: JBMenuItem[] | (() => JBMenuItem[])
 }
 
 const useStyles = makeStyles()(theme => ({
@@ -242,20 +238,17 @@ const useStyles = makeStyles()(theme => ({
   },
 }))
 
-function wrapMenuItems(items: JBMenuItem[], session: AppSession): JBMenuItem[] {
-  return items.map(item => ({
-    ...item,
-    ...('onClick' in item
-      ? {
-          onClick: () => {
-            item.onClick(session)
-          },
-        }
-      : {}),
-    ...('subMenu' in item
-      ? { subMenu: wrapMenuItems(item.subMenu, session) }
-      : {}),
-  }))
+function showWidgetById(
+  session: AppSession,
+  type: string,
+  id: string,
+  pluginManager: ReturnType<typeof getEnv>['pluginManager'],
+) {
+  if (!pluginManager.getWidgetType(type)) {
+    return false
+  }
+  session.showWidget(session.widgets.get(id) ?? session.addWidget(type, id))
+  return true
 }
 
 const LeftSidebar = observer(function LeftSidebar({
@@ -264,9 +257,14 @@ const LeftSidebar = observer(function LeftSidebar({
   session: AppSession
 }) {
   const { classes, cx } = useStyles()
-  const { name, menus } = session
+  const { name } = session
+  const { pluginManager } = getEnv(session)
+  const [helpAnchorEl, setHelpAnchorEl] = useState<HTMLElement | null>(null)
   const activeView = session.activeView || 'workspace'
   const autoCollapse = activeView === 'workspace'
+  const hasBookmarks = !!pluginManager.getWidgetType('GridBookmarkWidget')
+  const hasHelp = !!pluginManager.getWidgetType('HelpWidget')
+  const hasAbout = !!pluginManager.getWidgetType('AboutWidget')
 
   const setView = (view: 'landing' | 'workspace' | 'recents' | 'settings') => {
     if (session.setActiveView) {
@@ -284,6 +282,9 @@ const LeftSidebar = observer(function LeftSidebar({
   const handleOpenRecents = () => setView('recents')
   const handleOpenWorkspace = () => setView('workspace')
   const handleOpenSettings = () => setView('settings')
+  const handleOpenBookmarks = () => {
+    showWidgetById(session, 'GridBookmarkWidget', 'GridBookmark', pluginManager)
+  }
 
   return (
     <div
@@ -374,29 +375,79 @@ const LeftSidebar = observer(function LeftSidebar({
           <span className={`${classes.navLabel} sidebar-label`}>Settings</span>
         </button>
 
+        {hasBookmarks ? (
+          <button
+            className={classes.navButton}
+            onClick={handleOpenBookmarks}
+            type="button"
+          >
+            <span className={classes.navIcon}>
+              <BookmarksIcon fontSize="small" />
+            </span>
+            <span className={`${classes.navLabel} sidebar-label`}>
+              Bookmarks
+            </span>
+          </button>
+        ) : null}
+
         <div className={classes.spacer} />
 
-        {menus().map(menu => (
-          <CascadingMenuButton
-            key={menu.label}
-            menuItems={() => {
-              const items =
-                typeof menu.menuItems === 'function'
-                  ? menu.menuItems()
-                  : menu.menuItems
-              return wrapMenuItems(items, session)
-            }}
-          >
-            <button className={classes.navButton}>
+        {hasHelp || hasAbout ? (
+          <>
+            <button
+              className={classes.navButton}
+              onClick={event => {
+                setHelpAnchorEl(event.currentTarget)
+              }}
+              type="button"
+            >
               <span className={classes.navIcon}>
-                <MoreVertIcon fontSize="small" />
+                <HelpIcon fontSize="small" />
               </span>
-              <span className={`${classes.navLabel} sidebar-label`}>
-                {menu.label}
-              </span>
+              <span className={`${classes.navLabel} sidebar-label`}>Help</span>
             </button>
-          </CascadingMenuButton>
-        ))}
+            <Menu
+              anchorEl={helpAnchorEl}
+              open={!!helpAnchorEl}
+              onClose={() => {
+                setHelpAnchorEl(null)
+              }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+              {hasHelp ? (
+                <MenuItem
+                  onClick={() => {
+                    setHelpAnchorEl(null)
+                    showWidgetById(
+                      session,
+                      'HelpWidget',
+                      'helpWidget',
+                      pluginManager,
+                    )
+                  }}
+                >
+                  <HelpIcon fontSize="small" style={{ marginRight: 8 }} /> Help
+                </MenuItem>
+              ) : null}
+              {hasAbout ? (
+                <MenuItem
+                  onClick={() => {
+                    setHelpAnchorEl(null)
+                    showWidgetById(
+                      session,
+                      'AboutWidget',
+                      'aboutWidget',
+                      pluginManager,
+                    )
+                  }}
+                >
+                  <InfoIcon fontSize="small" style={{ marginRight: 8 }} /> About
+                </MenuItem>
+              ) : null}
+            </Menu>
+          </>
+        ) : null}
 
         <div className={classes.footer}>
           <div className={classes.user}>

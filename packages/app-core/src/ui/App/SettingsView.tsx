@@ -75,8 +75,10 @@ interface SettingsSession {
 
 const SettingsView = observer(function SettingsView({
   session,
+  extraCards,
 }: {
   session: SettingsSession
+  extraCards?: React.ReactNode
 }) {
   const { classes } = useStyles()
 
@@ -161,6 +163,13 @@ const SettingsView = observer(function SettingsView({
               slotProps={{ htmlInput: { min: 20, step: 100 } }}
             />
           </div>
+        </div>
+      ) : null}
+
+      {extraCards ? (
+        <div className={classes.section}>
+          <Typography className={classes.sectionTitle}>Manage</Typography>
+          {extraCards}
         </div>
       ) : null}
     </div>

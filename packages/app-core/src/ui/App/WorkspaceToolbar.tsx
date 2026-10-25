@@ -1,20 +1,26 @@
 import { useState } from 'react'
 
-import { getEnv } from '@jbrowse/core/util'
+import { getEnv, isSessionModelWithWidgets } from '@jbrowse/core/util'
 import { makeStyles } from '@jbrowse/core/util/tss-react'
-import { Button, Menu, MenuItem } from '@mui/material'
+import { getSnapshot } from '@jbrowse/mobx-state-tree'
+import { Divider, Menu, MenuItem } from '@mui/material'
 import { observer } from 'mobx-react'
+
+import type { IAnyStateTreeNode } from '@jbrowse/mobx-state-tree'
 
 import {
   AddIcon,
+  Cable,
   DashboardIcon,
+  GetAppIcon,
+  PublishIcon,
   RedoIcon,
   UndoIcon,
   ViewColumnIcon,
   ViewModuleIcon,
 } from '@jbrowse/core/ui/Icons'
 
-import { useDockview } from './DockviewContext.tsx'
+import { getDockviewApi, useDockviewPanelCount } from './DockviewContext.tsx'
 import {
   tilePanelsGrid,
   tilePanelsHorizontally,
@@ -84,6 +90,19 @@ interface ToolbarSession {
   }
 }
 
+function exportSession(session: IAnyStateTreeNode) {
+  const blob = new Blob(
+    [JSON.stringify({ session: getSnapshot(session) }, null, 2)],
+    { type: 'text/plain;charset=utf-8' },
+  )
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'session.json'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 const WorkspaceToolbar = observer(function WorkspaceToolbar({
   session,
 }: {
@@ -95,7 +114,7 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [layoutAnchorEl, setLayoutAnchorEl] = useState<HTMLElement | null>(null)
   const history = session.root.history
-  const { api, rearrangePanels } = useDockview()
+  const panelCount = useDockviewPanelCount()
 
   const handleOpenAdd = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -119,23 +138,21 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
   }
 
   const handleLayoutAction = (action: (api: DockviewApi) => void) => {
+    const api = getDockviewApi()
     if (api) {
-      rearrangePanels(action)
+      action(api)
     }
     handleCloseLayout()
   }
 
-  const hasMultiplePanels = (api?.panels.length ?? 0) > 1
+  const hasMultiplePanels = panelCount > 1
 
   return (
     <div className={classes.toolbar}>
-      <Button
-        className={classes.button}
-        onClick={handleOpenAdd}
-        startIcon={<AddIcon className={classes.icon} />}
-      >
+      <button className={classes.button} onClick={handleOpenAdd} type="button">
+        <AddIcon className={classes.icon} />
         Add
-      </Button>
+      </button>
       <Menu
         anchorEl={anchorEl}
         open={!!anchorEl}
@@ -145,11 +162,29 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
       >
         {viewTypes
           .filter(({ viewMetadata }) => !viewMetadata.hiddenFromGUI)
-          .map(({ displayName, name }) => (
+          .map(({ displayName, name, icon: Icon }) => (
             <MenuItem key={name} onClick={() => handleAddView(name)}>
+              {Icon ? <Icon className={classes.menuIcon} /> : null}
               {displayName}
             </MenuItem>
           ))}
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            handleCloseAdd()
+            if (isSessionModelWithWidgets(session)) {
+              session.showWidget(
+                session.widgets.get('addConnectionWidget') ??
+                  session.addWidget(
+                    'AddConnectionWidget',
+                    'addConnectionWidget',
+                  ),
+              )
+            }
+          }}
+        >
+          <Cable className={classes.menuIcon} /> Add connection…
+        </MenuItem>
       </Menu>
       <button
         className={classes.button}
@@ -169,14 +204,15 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
         <RedoIcon className={classes.icon} />
         Redo
       </button>
-      <Button
+      <button
         className={classes.button}
         onClick={handleOpenLayout}
-        startIcon={<DashboardIcon className={classes.icon} />}
         disabled={!hasMultiplePanels}
+        type="button"
       >
+        <DashboardIcon className={classes.icon} />
         Layout
-      </Button>
+      </button>
       <Menu
         anchorEl={layoutAnchorEl}
         open={!!layoutAnchorEl}
@@ -198,6 +234,35 @@ const WorkspaceToolbar = observer(function WorkspaceToolbar({
           <ViewModuleIcon className={classes.menuIcon} /> Tile grid
         </MenuItem>
       </Menu>
+      <button
+        className={classes.button}
+        onClick={() => {
+          if (
+            isSessionModelWithWidgets(session) &&
+            pluginManager.getWidgetType('ImportSessionWidget')
+          ) {
+            session.showWidget(
+              session.widgets.get('importSessionWidget') ??
+                session.addWidget('ImportSessionWidget', 'importSessionWidget'),
+            )
+          }
+        }}
+        disabled={!pluginManager.getWidgetType('ImportSessionWidget')}
+        type="button"
+      >
+        <PublishIcon className={classes.icon} />
+        Import
+      </button>
+      <button
+        className={classes.button}
+        onClick={() => {
+          exportSession(session as unknown as IAnyStateTreeNode)
+        }}
+        type="button"
+      >
+        <GetAppIcon className={classes.icon} />
+        Export
+      </button>
     </div>
   )
 })

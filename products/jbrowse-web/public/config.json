@@ -1,12 +1,17 @@
 {
   "includes": [
+    "subconfig/templates/human_to_macaque_synteny.json",
     "subconfig/human_chm13.json",
+    "subconfig/human_CN1v1.0.1.json",
     "subconfig/human_hg38.json",
+    "subconfig/human_hg18.json",
     "subconfig/bonobo_mPanPan1v2.0_pri.json",
     "subconfig/chimpanzee_mPanTro3v2.0_pri.json",
     "subconfig/gorilla_mGorGor1v2.1_pri.json",
     "subconfig/orangutan_mPonAbe1v2.0_pri.json",
+    "subconfig/orangutan_mPonPyg2v2.0_pri.json",
     "subconfig/macaque_MFA8v1.1.json",
+    "subconfig/macaque_MMU8v2.0.json",
     "subconfig/mouse_mm39.json",
     "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--pcht_spacer_example.json",
     "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--telo_subtelo_eu_example.json"
@@ -37,128 +42,702 @@
   "tracks": [
     {
       "type": "SyntenyTrack",
-      "trackId": "GRCh38__T2T-CHM13v2.0",
-      "assemblyNames": ["GRCh38 (hg38)", "T2T-CHM13v2.0"],
-      "name": "GRCh38__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "GRCh38__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "GRCh38 (hg38)"
+      ],
+      "name": "GRCh38__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCh38.p14__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCh38.p14__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["GRCh38 (hg38)", "T2T-CHM13v2.0"]
-      }
-    },
-        {
-      "type": "SyntenyTrack",
-      "trackId": "hg18__T2T-CHM13v2.0",
-      "assemblyNames": ["NCBI36 (hg18)", "T2T-CHM13v2.0"],
-      "name": "hg18__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
-      "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/hg18__T2T-CHM13v2.0.chain"
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCh38.p14__T2T-CHM13v2.0.pif.gz"
         },
-        "assemblyNames": ["NCBI36 (hg18)", "T2T-CHM13v2.0"]
-      }
-    },
-    {
-      "type": "SyntenyTrack",
-      "trackId": "mPanPan1v2.0-pri__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-mPanPan1v2.0_pri", "T2T-CHM13v2.0"],
-      "name": "mPanPan1v2.0-pri__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
-      "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanPan1v2.0-pri__T2T-CHM13v2.0.chain"
-        },
-        "assemblyNames": ["T2T-mPanPan1v2.0_pri", "T2T-CHM13v2.0"]
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "GRCh38 (hg38)"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "mPanTro3v2.0-pri__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-mPanTro3v2.0_pri", "T2T-CHM13v2.0"],
-      "category": ["Comparative Genomics"],
-      "name": "mPanTro3v2.0-pri__T2T-CHM13v2.0",
+      "trackId": "hg18__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "NCBI36 (hg18)"
+      ],
+      "name": "hg18__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanTro3v2.0-pri__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/hg18__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["T2T-mPanTro3v2.0_pri", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/hg18__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "NCBI36 (hg18)"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "mGorGor1v2.1-pri__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-mGorGor1v2.1_pri", "T2T-CHM13v2.0"],
-      "name": "mGorGor1v2.1-pri__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "mPanPan1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-mPanPan1v2.0_pri"
+      ],
+      "name": "mPanPan1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mGorGor1v2.1-pri__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanPan1v2.0-pri__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["T2T-mGorGor1v2.1_pri", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanPan1v2.0-pri__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-mPanPan1v2.0_pri"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "mPonAbe1v2.0-pri__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-mPonAbe1v2.0_pri", "T2T-CHM13v2.0"],
-      "name": "mPonAbe1v2.0-pri__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "mPanTro3v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-mPanTro3v2.0_pri"
+      ],
+      "category": [
+        "Comparative Genomics"
+      ],
+      "name": "mPanTro3v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonAbe1v2.0-pri__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanTro3v2.0-pri__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["T2T-mPonAbe1v2.0_pri", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPanTro3v2.0-pri__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-mPanTro3v2.0_pri"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "mPonPyg2v2.0-pri__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-mPonPyg2v2.0_pri", "T2T-CHM13v2.0"],
-      "name": "mPonPyg2v2.0-pri__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "mGorGor1v2.1-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-mGorGor1v2.1_pri"
+      ],
+      "name": "mGorGor1v2.1-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonPyg2v2.0-pri__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mGorGor1v2.1-pri__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["T2T-mPonPyg2v2.0_pri", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mGorGor1v2.1-pri__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-mGorGor1v2.1_pri"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "MFA8v1.1__T2T-CHM13v2.0",
-      "assemblyNames": ["T2T-MFA8v1.1", "T2T-CHM13v2.0"],
-      "name": "MFA8v1.1__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "mPonAbe1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-mPonAbe1v2.0_pri"
+      ],
+      "name": "mPonAbe1v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/MFA8v1.1__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonAbe1v2.0-pri__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["T2T-MFA8v1.1", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonAbe1v2.0-pri__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-mPonAbe1v2.0_pri"
+        ]
       }
     },
     {
       "type": "SyntenyTrack",
-      "trackId": "GRCm39__T2T-CHM13v2.0",
-      "assemblyNames": ["GRCm39 (mm39)", "T2T-CHM13v2.0"],
-      "name": "GRCm39__T2T-CHM13v2.0",
-      "category": ["Comparative Genomics"],
+      "trackId": "mPonPyg2v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-mPonPyg2v2.0_pri"
+      ],
+      "name": "mPonPyg2v2.0-pri__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
       "adapter": {
-        "type": "ChainAdapter",
-        "chainLocation": {
-          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCm39__T2T-CHM13v2.0.chain"
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonPyg2v2.0-pri__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
         },
-        "assemblyNames": ["GRCm39 (mm39)", "T2T-CHM13v2.0"]
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/mPonPyg2v2.0-pri__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-mPonPyg2v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "MFA8v1.1__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "T2T-MFA8v1.1"
+      ],
+      "name": "MFA8v1.1__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/MFA8v1.1__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/MFA8v1.1__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "T2T-MFA8v1.1"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "GRCm39__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-CHM13v2.0",
+        "GRCm39 (mm39)"
+      ],
+      "name": "GRCm39__T2T-CHM13v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCm39__T2T-CHM13v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/human_T2T-CHM13v2.0/comparative_genomics/GRCm39__T2T-CHM13v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-CHM13v2.0",
+          "GRCm39 (mm39)"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPanTro3v2.0-pri__mPanPan1-v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPanPan1v2.0_pri",
+        "T2T-mPanTro3v2.0_pri"
+      ],
+      "name": "mPanTro3v2.0-pri__mPanPan1-v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/comparative_genomics/mPanTro3v2.0-pri__mPanPan1-v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/comparative_genomics/mPanTro3v2.0-pri__mPanPan1-v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPanPan1v2.0_pri",
+          "T2T-mPanTro3v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "T2T-CHM13v2.0__mPanPan1-v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPanPan1v2.0_pri",
+        "T2T-CHM13v2.0"
+      ],
+      "name": "T2T-CHM13v2.0__mPanPan1-v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/comparative_genomics/T2T-CHM13v2.0__mPanPan1-v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bonobo_mPanPan1-v2.0_pri/comparative_genomics/T2T-CHM13v2.0__mPanPan1-v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPanPan1v2.0_pri",
+          "T2T-CHM13v2.0"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "T2T-CHM13v2.0__mPanTro3v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPanTro3v2.0_pri",
+        "T2T-CHM13v2.0"
+      ],
+      "name": "T2T-CHM13v2.0__mPanTro3v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/comparative_genomics/T2T-CHM13v2.0__mPanTro3v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/comparative_genomics/T2T-CHM13v2.0__mPanTro3v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPanTro3v2.0_pri",
+          "T2T-CHM13v2.0"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPanTro3v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mGorGor1v2.1_pri",
+        "T2T-mPanTro3v2.0_pri"
+      ],
+      "name": "mPanTro3v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/gorilla_mGorGor1-v2.1_pri/comparative_genomics/mPanTro3v2.0-pri__mGorGor1v2.1-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/gorilla_mGorGor1-v2.1_pri/comparative_genomics/mPanTro3v2.0-pri__mGorGor1v2.1-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mGorGor1v2.1_pri",
+          "T2T-mPanTro3v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPanPan1v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mGorGor1v2.1_pri",
+        "T2T-mPanPan1v2.0_pri"
+      ],
+      "name": "mPanPan1v2.0-pri__mGorGor1v2.1-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/gorilla_mGorGor1-v2.1_pri/comparative_genomics/mPanPan1v2.0-pri__mGorGor1v2.1-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/gorilla_mGorGor1-v2.1_pri/comparative_genomics/mPanPan1v2.0-pri__mGorGor1v2.1-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mGorGor1v2.1_pri",
+          "T2T-mPanPan1v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mGorGor1v2.1-pri__mPonAbe1v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPonAbe1v2.0_pri",
+        "T2T-mGorGor1v2.1_pri"
+      ],
+      "name": "mGorGor1v2.1-pri__mPonAbe1v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/sumatran_orangutan_mPonAbe1-v2.0_pri/comparative_genomics/mGorGor1v2.1-pri__mPonAbe1v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/sumatran_orangutan_mPonAbe1-v2.0_pri/comparative_genomics/mGorGor1v2.1-pri__mPonAbe1v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPonAbe1v2.0_pri",
+          "T2T-mGorGor1v2.1_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mGorGor1v2.1-pri__mPonPyg2v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPonPyg2v2.0_pri",
+        "T2T-mGorGor1v2.1_pri"
+      ],
+      "name": "mGorGor1v2.1-pri__mPonPyg2v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/comparative_genomics/mGorGor1v2.1-pri__mPonPyg2v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/comparative_genomics/mGorGor1v2.1-pri__mPonPyg2v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPonPyg2v2.0_pri",
+          "T2T-mGorGor1v2.1_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonAbe1v2.0-pri__mPonPyg2v2.0-pri__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-mPonPyg2v2.0_pri",
+        "T2T-mPonAbe1v2.0_pri"
+      ],
+      "name": "mPonAbe1v2.0-pri__mPonPyg2v2.0-pri__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/comparative_genomics/mPonAbe1v2.0-pri__mPonPyg2v2.0-pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/bornean_orangutan_mPonPyg2-v2.0_pri/comparative_genomics/mPonAbe1v2.0-pri__mPonPyg2v2.0-pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPonPyg2v2.0_pri",
+          "T2T-mPonAbe1v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "T2T-CHM13v2.0__MFA8v1.1__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MFA8v1.1",
+        "T2T-CHM13v2.0"
+      ],
+      "name": "T2T-CHM13v2.0__MFA8v1.1__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/T2T-CHM13v2.0__MFA8v1.1.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/T2T-CHM13v2.0__MFA8v1.1.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MFA8v1.1",
+          "T2T-CHM13v2.0"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonAbe1v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MFA8v1.1",
+        "T2T-mPonAbe1v2.0_pri"
+      ],
+      "name": "mPonAbe1v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/mPonAbe1v2.0-pri__MFA8v1.1.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/mPonAbe1v2.0-pri__MFA8v1.1.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MFA8v1.1",
+          "T2T-mPonAbe1v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonPyg2v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MFA8v1.1",
+        "T2T-mPonPyg2v2.0_pri"
+      ],
+      "name": "mPonPyg2v2.0-pri__MFA8v1.1__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/mPonPyg2v2.0-pri__MFA8v1.1.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/crab-eating_macaque_MFA8v1.1/comparative_genomics/mPonPyg2v2.0-pri__MFA8v1.1.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MFA8v1.1",
+          "T2T-mPonPyg2v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "T2T-CHM13v2.0__MMU8v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MMU8v2.0",
+        "T2T-CHM13v2.0"
+      ],
+      "name": "T2T-CHM13v2.0__MMU8v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/T2T-CHM13v2.0__MMU8v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/T2T-CHM13v2.0__MMU8v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MMU8v2.0",
+          "T2T-CHM13v2.0"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "MFA8v1.1__MMU8v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MMU8v2.0",
+        "T2T-MFA8v1.1"
+      ],
+      "name": "MFA8v1.1__MMU8v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/MFA8v1.1__MMU8v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/MFA8v1.1__MMU8v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MMU8v2.0",
+          "T2T-MFA8v1.1"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonAbe1v2.0-pri__MMU8v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MMU8v2.0",
+        "T2T-mPonAbe1v2.0_pri"
+      ],
+      "name": "mPonAbe1v2.0-pri__MMU8v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/mPonAbe1v2.0-pri__MMU8v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/mPonAbe1v2.0-pri__MMU8v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MMU8v2.0",
+          "T2T-mPonAbe1v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonPyg2v2.0-pri__MMU8v2.0__mm2_asm20_noSecondary",
+      "assemblyNames": [
+        "T2T-MMU8v2.0",
+        "T2T-mPonPyg2v2.0_pri"
+      ],
+      "name": "mPonPyg2v2.0-pri__MMU8v2.0__mm2_asm20_noSecondary",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/mPonPyg2v2.0-pri__MMU8v2.0.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/comparative_genomics/mPonPyg2v2.0-pri__MMU8v2.0.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-MMU8v2.0",
+          "T2T-mPonPyg2v2.0_pri"
+        ]
+      }
+    },
+    {
+      "type": "SyntenyTrack",
+      "trackId": "mPonPyg2v2.0_pri__mPanTro3v2.0_pri__mm2_asm20",
+      "assemblyNames": [
+        "T2T-mPanTro3v2.0_pri",
+        "T2T-mPonPyg2v2.0_pri"
+      ],
+      "name": "mPonPyg2v2.0_pri__mPanTro3v2.0_pri__mm2_asm20",
+      "category": [
+        "Comparative Genomics"
+      ],
+      "adapter": {
+        "type": "PairwiseIndexedPAFAdapter",
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/comparative_genomics/mPonPyg2v2.0_pri__mPanTro3v2.0_pri.pif.gz.tbi"
+          },
+          "indexType": "TBI"
+        },
+        "pifGzLocation": {
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/chimpanzee_mPanTro3-v2.0_pri/comparative_genomics/mPonPyg2v2.0_pri__mPanTro3v2.0_pri.pif.gz"
+        },
+        "assemblyNames": [
+          "T2T-mPanTro3v2.0_pri",
+          "T2T-mPonPyg2v2.0_pri"
+        ]
       }
     }
   ],

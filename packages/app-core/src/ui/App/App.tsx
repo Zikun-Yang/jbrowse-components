@@ -40,6 +40,7 @@ interface History {
 
 interface Props {
   HeaderButtons?: React.ReactElement
+  SettingsCards?: React.ReactElement
   session: SessionWithFocusedViewAndDrawerWidgets &
     SessionWithDockviewLayout & {
       menus: () => Menu[]

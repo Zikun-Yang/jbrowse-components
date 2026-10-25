@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { AssemblySelector, SpeciesSelector } from '@jbrowse/core/ui'
 import { getSession, notEmpty } from '@jbrowse/core/util'
@@ -6,7 +6,7 @@ import { cx, makeStyles } from '@jbrowse/core/util/tss-react'
 import { Button, IconButton, Tooltip } from '@mui/material'
 import { observer } from 'mobx-react'
 
-import { ArrowForwardIosIcon, CloseIcon } from '@jbrowse/core/ui/Icons'
+import { ChevronRightIcon, CloseIcon, LinkIcon } from '@jbrowse/core/ui/Icons'
 
 import type { LinearSyntenyViewModel } from '../../model.ts'
 
@@ -17,18 +17,52 @@ const useStyles = makeStyles()(theme => ({
   button: {
     margin: theme.spacing(2),
   },
-  rel: {
+  rowsContainer: {
     position: 'relative',
+    // reserve a gutter on the right for the "]" brackets and circles so the
+    // full-width input fields never overlap them
+    paddingRight: 36,
   },
-  synbutton: {
+  // "]" shaped bracket on the right side, spanning from the vertical middle
+  // of row idx's input fields to the vertical middle of row idx + 1's input
+  // fields, inset slightly so adjacent pairs' ticks don't touch. top/height
+  // are set inline from measured geometry.
+  bracket: {
     position: 'absolute',
-    top: 30,
+    right: 14,
+    width: 14,
+    borderTop: `1px solid ${theme.palette.grey[400]}`,
+    borderRight: `1px solid ${theme.palette.grey[400]}`,
+    borderBottom: `1px solid ${theme.palette.grey[400]}`,
+    borderTopRightRadius: 6,
+    borderBottomRightRadius: 6,
+    pointerEvents: 'none',
   },
-  synbuttonNeedsConfig: {
-    color: theme.palette.warning.main,
+  bracketSelected: {
+    borderColor: theme.palette.primary.main,
   },
-  bg: {
-    background: theme.palette.divider,
+  // clickable circle centered on the bracket's vertical line, at the
+  // junction between the two rows of the pair. top is set inline from
+  // measured geometry.
+  synCircle: {
+    position: 'absolute',
+    right: 14,
+    transform: 'translate(50%, -50%)',
+    width: 28,
+    height: 28,
+    padding: 0,
+    zIndex: 1,
+    backgroundColor: theme.palette.grey[400],
+    color: theme.palette.common.white,
+    '&:hover': {
+      backgroundColor: theme.palette.grey[600],
+    },
+  },
+  synCircleSelected: {
+    backgroundColor: theme.palette.primary.main,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
+    },
   },
 }))
 
@@ -62,6 +96,65 @@ const AssemblyRows = observer(function AssemblyRows({
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>(
     selectedAssemblyNames.map(() => ''),
   )
+
+  // measured vertical centers of each row's input fields, relative to the
+  // rows container, used to draw the "]" brackets exactly aligned with the
+  // input fields rather than the row container (which also contains the
+  // "Row N:" label and helper texts)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const selectorsRefs = useRef(new Map<number, HTMLDivElement>())
+  const [pairGeometry, setPairGeometry] = useState<
+    ({ top: number; height: number } | undefined)[]
+  >([])
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) {
+      return
+    }
+    const update = () => {
+      const containerTop = container.getBoundingClientRect().top
+      const centers = selectedAssemblyNames.map((_, idx) => {
+        const el = selectorsRefs.current.get(idx)
+        if (!el) {
+          return undefined
+        }
+        const r = el.getBoundingClientRect()
+        return r.top + r.height / 2 - containerTop
+      })
+      const next = centers.slice(0, -1).map((a, idx) => {
+        const b = centers[idx + 1]
+        // inset both ends so that adjacent pairs' horizontal ticks, which
+        // would otherwise meet at the shared row's input midpoint, keep a
+        // visible gap. The circle midpoint (a + b) / 2 is unaffected.
+        const inset = 8
+        return a === undefined || b === undefined
+          ? undefined
+          : { top: a + inset, height: b - a - inset * 2 }
+      })
+      // avoid setState with identical geometry, which would loop since this
+      // effect runs after every render
+      setPairGeometry(prev =>
+        prev.length === next.length &&
+        prev.every(
+          (p, i) =>
+            p === next[i] ||
+            (p && next[i] && p.top === next[i].top && p.height === next[i].height),
+        )
+          ? prev
+          : next,
+      )
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(container)
+    for (const el of selectorsRefs.current.values()) {
+      observer.observe(el)
+    }
+    return () => {
+      observer.disconnect()
+    }
+  })
 
   useEffect(() => {
     setSelectedSpecies(prev => {
@@ -99,71 +192,98 @@ const AssemblyRows = observer(function AssemblyRows({
     setSelectedAssemblyNames,
   ])
 
-  return selectedAssemblyNames.map((assemblyName, idx) => (
-    <div key={`${assemblyName}-${idx}`} className={classes.rel}>
-      <span>Row {idx + 1}: </span>
+  return (
+    <div ref={containerRef} className={classes.rowsContainer}>
+      {selectedAssemblyNames.map((assemblyName, idx) => (
+        <div key={`${assemblyName}-${idx}`}>
+          <span>Row {idx + 1}: </span>
 
-      <IconButton
-        disabled={selectedAssemblyNames.length <= 2}
-        onClick={() => {
-          model.importFormRemoveRow(idx)
-          setSelectedAssemblyNames(
-            selectedAssemblyNames
-              .map((asm, idx2) => (idx2 === idx ? undefined : asm))
-              .filter(notEmpty),
-          )
-          setSelectedSpecies(prev => prev.filter((_, idx2) => idx2 !== idx))
-          if (selectedRow >= selectedAssemblyNames.length - 2) {
-            setSelectedRow(0)
-          }
-        }}
-      >
-        <CloseIcon />
-      </IconButton>
-      <SpeciesSelector
-        session={session}
-        selected={selectedSpecies[idx]}
-        onChange={val => {
-          setSelectedSpecies(prev =>
-            prev.map((s, idx2) => (idx2 === idx ? val : s)),
-          )
-        }}
-      />
-      <AssemblySelector
-        label="Genome"
-        helperText=""
-        species={selectedSpecies[idx]}
-        selected={assemblyName}
-        onChange={newAssembly => {
-          setSelectedAssemblyNames(
-            selectedAssemblyNames.map((asm, idx2) =>
-              idx2 === idx ? newAssembly : asm,
-            ),
-          )
-        }}
-        session={session}
-      />
-      {idx !== selectedAssemblyNames.length - 1 ? (
-        <Tooltip title="Click to configure synteny track for this row pair">
           <IconButton
-            data-testid="synbutton"
-            className={cx(
-              classes.synbutton,
-              idx === selectedRow ? classes.bg : undefined,
-              rowNeedsConfiguration(model, idx)
-                ? classes.synbuttonNeedsConfig
-                : undefined,
-            )}
+            disabled={selectedAssemblyNames.length <= 2}
             onClick={() => {
-              setSelectedRow(idx)
+              model.importFormRemoveRow(idx)
+              setSelectedAssemblyNames(
+                selectedAssemblyNames
+                  .map((asm, idx2) => (idx2 === idx ? undefined : asm))
+                  .filter(notEmpty),
+              )
+              setSelectedSpecies(prev => prev.filter((_, idx2) => idx2 !== idx))
+              if (selectedRow >= selectedAssemblyNames.length - 2) {
+                setSelectedRow(0)
+              }
             }}
           >
-            <ArrowForwardIosIcon />
+            <CloseIcon />
           </IconButton>
-        </Tooltip>
-      ) : null}
+          <div
+            ref={el => {
+              if (el) {
+                selectorsRefs.current.set(idx, el)
+              } else {
+                selectorsRefs.current.delete(idx)
+              }
+            }}
+          >
+            <SpeciesSelector
+              session={session}
+              selected={selectedSpecies[idx]}
+              onChange={val => {
+                setSelectedSpecies(prev =>
+                  prev.map((s, idx2) => (idx2 === idx ? val : s)),
+                )
+              }}
+            />
+            <AssemblySelector
+              label="Genome"
+              helperText=""
+              species={selectedSpecies[idx]}
+              selected={assemblyName}
+              onChange={newAssembly => {
+                setSelectedAssemblyNames(
+                  selectedAssemblyNames.map((asm, idx2) =>
+                    idx2 === idx ? newAssembly : asm,
+                  ),
+                )
+              }}
+              session={session}
+            />
+          </div>
+        </div>
+      ))}
+      {pairGeometry.map((geom, idx) =>
+        geom ? (
+          <Fragment key={`pair-${idx}`}>
+            <div
+              className={cx(
+                classes.bracket,
+                idx === selectedRow ? classes.bracketSelected : undefined,
+              )}
+              style={{ top: geom.top, height: geom.height }}
+            />
+            <Tooltip title="Click to configure synteny track for this row pair">
+              <IconButton
+                data-testid="synbutton"
+                className={cx(
+                  classes.synCircle,
+                  idx === selectedRow ? classes.synCircleSelected : undefined,
+                )}
+                style={{ top: geom.top + geom.height / 2 }}
+                onClick={() => {
+                  setSelectedRow(idx)
+                }}
+              >
+                {rowNeedsConfiguration(model, idx) ? (
+                  <ChevronRightIcon fontSize="small" />
+                ) : (
+                  <LinkIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Fragment>
+        ) : null,
+      )}
     </div>
-  ))
+  )
 })
 
 const LeftPanel = observer(function LeftPanel({

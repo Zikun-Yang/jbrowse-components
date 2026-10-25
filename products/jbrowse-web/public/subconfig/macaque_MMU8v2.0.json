@@ -1,0 +1,115 @@
+{
+  "plugins": [],
+  "assemblies": [
+    {
+      "name": "T2T-MMU8v2.0",
+      "species": "Rhesus macaque (Macaca mulatta)",
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "MMU8v2.0-ReferenceSequenceTrack",
+        "adapter": {
+          "type": "IndexedFastaAdapter",
+          "fastaLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/T2T-MMU8v2.0.fa",
+            "locationType": "UriLocation"
+          },
+          "faiLocation": {
+            "uri": "/mnt/disk1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/T2T-MMU8v2.0.fa.fai",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "configuration": {},
+  "tracks": [
+    {
+      "type": "FeatureTrack",
+      "trackId": "T2T-MMU8v2.0_RefSeq",
+      "name": "T2T-MMU8v2.0_RefSeq",
+      "category": ["Gene Annotations"],
+      "adapter": {
+        "type": "Gff3TabixAdapter",
+        "gffGzLocation": {
+          "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/T2T-MMU8v2.0.gff.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/T2T-MMU8v2.0.gff.gz.tbi",
+            "locationType": "UriLocation"
+          },
+          "indexType": "TBI"
+        }
+      },
+      "assemblyNames": ["T2T-MMU8v2.0"]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "MMU8_alpha_satellite",
+      "name": "Alpha Satellite",
+      "assemblyNames": ["T2T-MMU8v2.0"],
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/repeats/centromere_satellite/T2T-MMU8v2.0.alpha_satellite.bed",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureTrack",
+      "trackId": "MMU8_SATR_satellite",
+      "name": "SATR",
+      "assemblyNames": ["T2T-MMU8v2.0"],
+      "category": ["Repeats"],
+      "adapter": {
+        "type": "BedAdapter",
+        "uri": "/data/1/primates_public_dataset/genomes/001-self_polished/rhesus_macaque_MMU8v2.0/repeats/SATR_whole_regions.bed",
+        "locationType": "UriLocation"
+      },
+      "displays": [
+        {
+          "type": "LinearBasicDisplay",
+          "renderer": {
+            "type": "SvgFeatureRenderer",
+            "color1": "jexl:colorFeature(feature)",
+            "showLabels": false,
+            "displayMode": "collapse"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QuantitativeTrack",
+      "trackId": "MMU8_chromosome_H3K9me3_R1",
+      "name": "Chromosome Level H3K9me3 (MultiAln-kept)",
+      "category": ["Epigenetics"],
+      "assemblyNames": ["T2T-MMU8v2.0"],
+      "adapter": {
+        "type": "BedGraphAdapter",
+        "bedGraphLocation": {
+          "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/ideogram/depth/macaque_h3k9me3_R1.regions.bed.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/data/1/primates_private_dataset/260721-primate_epi_h3k9me3_cutandtag/ideogram/depth/macaque_h3k9me3_R1.regions.bed.gz.csi",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "aggregateTextSearchAdapters": []
+}
