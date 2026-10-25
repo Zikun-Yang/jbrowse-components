@@ -31,7 +31,7 @@ const EditGCContentParamsDialog = observer(function EditGCContentParamsDialog({
   const automatic = model.windowSize === undefined
 
   return (
-    <Dialog open onClose={handleClose} title="Edit GC content params">
+    <Dialog open onClose={handleClose} title="Window size">
       <DialogContent>
         <Typography>
           GC content is calculated in a particular sliding window of size N, and

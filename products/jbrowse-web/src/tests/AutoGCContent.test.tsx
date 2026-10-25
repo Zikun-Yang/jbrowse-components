@@ -51,7 +51,7 @@ test('hands the track over to the GC content display when zoomed out, and back w
   }, delay)
 }, 60000)
 
-test('sizes the GC content windows from the view and shows the resolution', async () => {
+test('sizes the GC content windows from the view and shows them in the track label', async () => {
   const { view, findByTestId } = await createView(configWithoutGCWindowSize())
   fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
 
@@ -66,21 +66,21 @@ test('sizes the GC content windows from the view and shows the resolution', asyn
   await waitFor(() => {
     expect(display().windowSizeSetting).toBe(20)
   }, delay)
-  await findByTestId('gc-content-resolution', ...opts)
+  await findByTestId('track-label-info', ...opts)
   await waitFor(() => {
-    expect(screen.getByTestId('gc-content-resolution').textContent).toBe(
-      'resolution: 20bp',
+    expect(screen.getByTestId('track-label-info').textContent).toBe(
+      'Window size = 20bp, Step size = 20bp',
     )
   }, delay)
 
-  // the resolution follows the zoom level
+  // the window follows the zoom level
   view.setNewView(30, 0)
   await waitFor(() => {
     expect(display().windowSizeSetting).toBe(60)
   }, delay)
   await waitFor(() => {
-    expect(screen.getByTestId('gc-content-resolution').textContent).toBe(
-      'resolution: 60bp',
+    expect(screen.getByTestId('track-label-info').textContent).toBe(
+      'Window size = 60bp, Step size = 60bp',
     )
   }, delay)
 
@@ -92,8 +92,8 @@ test('sizes the GC content windows from the view and shows the resolution', asyn
     expect(display().windowSizeSetting).toBe(500)
   }, delay)
   await waitFor(() => {
-    expect(screen.getByTestId('gc-content-resolution').textContent).toBe(
-      'resolution: 500bp',
+    expect(screen.getByTestId('track-label-info').textContent).toBe(
+      'Window size = 500bp, Step size = 500bp',
     )
   }, delay)
 
@@ -102,6 +102,54 @@ test('sizes the GC content windows from the view and shows the resolution', asyn
   })
   await waitFor(() => {
     expect(display().windowSizeSetting).toBe(60)
+  }, delay)
+}, 60000)
+
+test('shows the window size dialog from the track menu item "Window size"', async () => {
+  const { view, findAllByTestId, findByTestId } = await createView(
+    configWithoutGCWindowSize(),
+  )
+  fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
+
+  const display = () => view.tracks.at(-1)!.displays[0]!
+  view.setNewView(10, 0)
+  await waitFor(() => {
+    expect(display().type).toBe('LinearGCContentDisplay')
+  }, delay)
+
+  await openTrackMenu({ findAllByTestId }, 'volvox_refseq')
+  fireEvent.click(await screen.findByText('Window size', ...opts))
+  await screen.findByText('Size of sliding window (bp)', ...opts)
+  await screen.findByText('Step size of sliding window (bp)', ...opts)
+}, 60000)
+
+test('positions the y-scale bar with the global y-axis left padding setting', async () => {
+  const { view, session, findByTestId } = await createView(
+    configWithoutGCWindowSize(),
+  )
+  fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
+
+  const display = () => view.tracks.at(-1)!.displays[0]!
+  view.setNewView(10, 0)
+  await waitFor(() => {
+    expect(display().type).toBe('LinearGCContentDisplay')
+  }, delay)
+
+  // 10px by default, and used by every y-scale bar in the app
+  await screen.findByTestId('y-scale-bar', ...opts)
+  await waitFor(() => {
+    expect(screen.getByTestId('y-scale-bar').style.left).toBe('10px')
+  }, delay)
+
+  act(() => {
+    ;(
+      session as unknown as {
+        setYScaleBarLeftPadding: (n: number) => void
+      }
+    ).setYScaleBarLeftPadding(40)
+  })
+  await waitFor(() => {
+    expect(screen.getByTestId('y-scale-bar').style.left).toBe('40px')
   }, delay)
 }, 60000)
 
@@ -133,4 +181,27 @@ test('does not offer an auto-switch toggle in the track menu', async () => {
   await openTrackMenu({ findAllByTestId }, 'volvox_refseq')
   await screen.findByText('Show forward', ...opts)
   expect(screen.queryByText('Auto-switch to GC content')).toBeNull()
+}, 60000)
+
+test('sets the y-axis left padding from the settings page', async () => {
+  const { session, findByLabelText } = await createView()
+  const settings = session as unknown as {
+    setActiveView: (arg: string) => void
+    yScaleBarLeftPadding: number
+    setYScaleBarLeftPadding: (n: number) => void
+  }
+
+  // the setting is persisted in localStorage, so start from a known value
+  act(() => {
+    settings.setYScaleBarLeftPadding(10)
+    settings.setActiveView('settings')
+  })
+
+  const input = await findByLabelText('Y-axis left padding (px)', ...opts)
+  expect((input as HTMLInputElement).value).toBe('10')
+
+  fireEvent.change(input, { target: { value: '40' } })
+  await waitFor(() => {
+    expect(settings.yScaleBarLeftPadding).toBe(40)
+  }, delay)
 }, 60000)

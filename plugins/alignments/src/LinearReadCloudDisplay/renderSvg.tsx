@@ -11,6 +11,7 @@ import {
 } from '@jbrowse/core/util/offscreenCanvasUtils'
 import { getSnapshot } from '@jbrowse/mobx-state-tree'
 import { SVGLegend } from '@jbrowse/plugin-linear-genome-view'
+import { getYScaleBarLeftPadding } from '@jbrowse/plugin-wiggle'
 
 import { calculateCloudTicks } from '../RenderLinearReadCloudDisplayRPC/drawFeatsCloud.ts'
 import CloudYScaleBar from './components/CloudYScaleBar.tsx'
@@ -111,7 +112,11 @@ export async function renderSvg(
         </g>
       </g>
       {cloudTicks ? (
-        <g transform={`translate(${Math.max(-view.offsetPx, 0)})`}>
+        <g
+          transform={`translate(${
+            Math.max(-view.offsetPx, 0) + getYScaleBarLeftPadding(self)
+          })`}
+        >
           <CloudYScaleBar model={{ cloudTicks }} orientation="left" />
         </g>
       ) : null}
