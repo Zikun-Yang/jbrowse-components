@@ -42,3 +42,7 @@ debug-storybook.log
 # pi task registry
 .pi/tasks/
 
+# agent-generated patch attachments (scratch, never part of the tree)
+*.patch
+*.diff
+
