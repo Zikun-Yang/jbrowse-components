@@ -153,6 +153,44 @@ test('positions the y-scale bar with the global y-axis left padding setting', as
   }, delay)
 }, 60000)
 
+test('keeps the y-scale bar next to the left edge with "overlapping" track labels', async () => {
+  const { view, session, findByTestId } = await createView(
+    configWithoutGCWindowSize(),
+  )
+  fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
+
+  const display = () => view.tracks.at(-1)!.displays[0]!
+  view.setNewView(10, 0)
+  await waitFor(() => {
+    expect(display().type).toBe('LinearGCContentDisplay')
+  }, delay)
+
+  const settings = session as unknown as {
+    setYScaleBarLeftPadding: (n: number) => void
+  }
+
+  // the scale bar used to be pushed right by measureText(track name) + 100 px
+  // whenever the view was in "overlapping" label mode (the default of the
+  // LinearGenomeViewPlugin config), which buried the padding setting: nothing
+  // is drawn over the track, the labels have their own row above it
+  act(() => {
+    settings.setYScaleBarLeftPadding(25)
+    view.setTrackLabels('overlapping')
+  })
+  expect(view.trackLabels).toBe('overlapping')
+
+  await screen.findByTestId('y-scale-bar', ...opts)
+  await waitFor(() => {
+    expect(screen.getByTestId('y-scale-bar').style.left).toBe('25px')
+  }, delay)
+
+  // the setting is persisted in localStorage, so leave it at the default for
+  // the tests that run after this one
+  act(() => {
+    settings.setYScaleBarLeftPadding(10)
+  })
+}, 60000)
+
 test('leaves a GC content display picked by hand alone', async () => {
   const { view, findAllByTestId, findByTestId, findByText } = await createView()
   fireEvent.click(await findByTestId(hts('volvox_refseq'), ...opts))
