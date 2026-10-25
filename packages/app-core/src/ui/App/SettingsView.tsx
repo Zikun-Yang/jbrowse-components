@@ -71,6 +71,8 @@ interface SettingsSession {
   setMinAutoTrackHeight?: (arg: number) => void
   maxAutoTrackHeight?: number
   setMaxAutoTrackHeight?: (arg: number) => void
+  yScaleBarLeftPadding?: number
+  setYScaleBarLeftPadding?: (arg: number) => void
 }
 
 const SettingsView = observer(function SettingsView({
@@ -163,6 +165,30 @@ const SettingsView = observer(function SettingsView({
           </div>
         </div>
       ) : null}
+      {session.setYScaleBarLeftPadding ? (
+        <div className={classes.section}>
+          <Typography className={classes.sectionTitle}>Display</Typography>
+          <div>
+            <TextField
+              type="number"
+              label="Y-axis left padding (px)"
+              value={session.yScaleBarLeftPadding ?? 10}
+              onChange={event => {
+                if (event.target.value !== '') {
+                  session.setYScaleBarLeftPadding?.(+event.target.value)
+                }
+              }}
+              className={classes.field}
+              slotProps={{ htmlInput: { min: 0, step: 1 } }}
+            />
+          </div>
+          <Typography className={classes.helper}>
+            Distance between the left edge of the view and the y-axis scale bar
+            of quantitative tracks (GC content, wiggle, ...).
+          </Typography>
+        </div>
+      ) : null}
+
     </div>
   )
 })

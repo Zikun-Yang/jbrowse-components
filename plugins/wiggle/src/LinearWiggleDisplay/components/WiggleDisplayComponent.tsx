@@ -8,6 +8,7 @@ import { BaseLinearDisplayComponent } from '@jbrowse/plugin-linear-genome-view'
 import { observer } from 'mobx-react'
 
 import YScaleBar from '../../shared/YScaleBar.tsx'
+import { getYScaleBarLeftPadding } from '../../util.ts'
 
 import type { WiggleDisplayModel } from '../model.ts'
 import type { LinearGenomeViewModel } from '@jbrowse/plugin-linear-genome-view'
@@ -28,13 +29,16 @@ const LinearWiggleDisplay = observer(function LinearWiggleDisplay(props: {
       <BaseLinearDisplayComponent {...props} />
       {stats && graphType ? (
         <svg
+          data-testid="y-scale-bar"
           style={{
             position: 'absolute',
             top: 0,
+            // the y-scale bar sits yScaleBarLeftPadding px from the left edge
+            // of the view (Settings -> Display -> Y-axis left padding)
             left:
-              trackLabels === 'overlapping'
+              (trackLabels === 'overlapping'
                 ? measureText(getConf(track, 'name'), 12.8) + 100
-                : 50,
+                : 0) + getYScaleBarLeftPadding(model),
             pointerEvents: 'none',
             height,
             width: 50,

@@ -1,7 +1,11 @@
 import { lazy } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
-import { getContainingView, getSession } from '@jbrowse/core/util'
+import {
+  getBpDisplayStr,
+  getContainingView,
+  getSession,
+} from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
 import { linearWiggleDisplayModelFactory } from '@jbrowse/plugin-wiggle'
 
@@ -106,6 +110,18 @@ export default function SharedModelF(
           self.windowDelta ?? (getConf(self, 'windowDelta') as number)
         return windowDelta > 0 ? windowDelta : this.windowSizeFromView
       },
+      /**
+       * #getter
+       * the window size and step size in bp, shown at the left end of the track
+       * label row (see plugins/linear-genome-view TrackLabelContainer) so that
+       * the resolution behind the plot is readable without opening the track
+       * menu
+       */
+      get trackLabelLeftText() {
+        return `Window size = ${getBpDisplayStr(
+          this.windowSizeSetting,
+        )}, Step size = ${getBpDisplayStr(this.windowDeltaSetting)}`
+      },
     }))
     .views(self => {
       const {
@@ -117,7 +133,7 @@ export default function SharedModelF(
           return [
             ...superTrackMenuItems(),
             {
-              label: 'Change GC parameters',
+              label: 'Window size',
               onClick: () => {
                 getSession(self).queueDialog(handleClose => [
                   EditGCContentParamsDialog,

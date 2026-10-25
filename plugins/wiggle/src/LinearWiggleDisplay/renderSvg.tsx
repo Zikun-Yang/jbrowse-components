@@ -3,6 +3,7 @@ import { when } from 'mobx'
 
 import YScaleBar from '../shared/YScaleBar.tsx'
 import { isReadyOrHasError } from '../svgExportUtil.ts'
+import { getYScaleBarLeftPadding } from '../util.ts'
 
 import type { WiggleDisplayModel } from './model.ts'
 import type {
@@ -22,7 +23,11 @@ export async function renderSvg(
     <>
       <g>{await superRenderSvg(opts)}</g>
       {graphType && stats ? (
-        <g transform={`translate(${Math.max(-offsetPx, 0)})`}>
+        <g
+          transform={`translate(${
+            Math.max(-offsetPx, 0) + getYScaleBarLeftPadding(self)
+          })`}
+        >
           <YScaleBar model={self} orientation="left" />
         </g>
       ) : null}
