@@ -1,7 +1,6 @@
 import { BaseLinearDisplayComponent } from '@jbrowse/plugin-linear-genome-view'
 import { observer } from 'mobx-react'
 
-import MultiWiggleLegendBar from './MultiWiggleLegendBar.tsx'
 import TreeSidebar from './TreeSidebar.tsx'
 import YScaleBars from './YScaleBars.tsx'
 
@@ -14,14 +13,12 @@ const MultiLinearWiggleDisplayComponent = observer(
     const { model } = props
     const { isMultiRow } = model
 
+    // Note: row labels for the multi-row renders are drawn by the ColorLegend
+    // in YScaleBars only (see IndividualScaleBars), so don't add another row
+    // label layer here
     return (
       <div>
-        {isMultiRow ? (
-          <>
-            <TreeSidebar model={model} />
-            <MultiWiggleLegendBar model={model} />
-          </>
-        ) : null}
+        {isMultiRow ? <TreeSidebar model={model} /> : null}
         <BaseLinearDisplayComponent {...props} />
         <YScaleBars model={model} />
       </div>

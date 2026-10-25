@@ -23,20 +23,24 @@ const IndividualScaleBars = observer(function IndividualScaleBars({
     ticks,
     hierarchy,
     showTree,
+    treeAreaWidth,
   } = model
 
-  // Skip ColorLegend when tree is showing - MultiWiggleLegendBar handles labels
-  const treeIsShowing = hierarchy && showTree
+  // The cluster tree sidebar paints an opaque-ish background over the leftmost
+  // treeAreaWidth pixels, so the row labels are shifted right of it to stay
+  // visible. This is the only row label drawn for multi-row renders (see
+  // WiggleDisplayComponent)
+  const labelXOffset = hierarchy && showTree ? treeAreaWidth : 0
 
   return sources?.length ? (
     <>
-      {treeIsShowing ? null : (
+      <g transform={`translate(${labelXOffset} 0)`}>
         <ColorLegend
           exportSVG={exportSVG}
           model={model}
           rowHeight={model.rowHeight}
         />
-      )}
+      </g>
 
       {rowHeightTooSmallForScalebar || needsCustomLegend ? (
         <ScoreLegend model={model} />
