@@ -127,6 +127,7 @@ Example: `plugins/linear-genome-view/src/index.ts`
 
 JBrowse uses `@jbrowse/mobx-state-tree` (a fork of MST). State is organized as a
 tree:
+
 - **Root model** — `products/jbrowse-web/src/rootModel/rootModel.ts` (or
   equivalent per product)
 - **Session model** — created by the root model, holds views, tracks, selection
@@ -138,8 +139,8 @@ traverse the tree.
 
 ### App Shell (app-core)
 
-The web/desktop app UI lives in `packages/app-core/src/ui/App/` and is shared
-by `jbrowse-web` and `jbrowse-desktop` (both render `<App session={...}/>`).
+The web/desktop app UI lives in `packages/app-core/src/ui/App/` and is shared by
+`jbrowse-web` and `jbrowse-desktop` (both render `<App session={...}/>`).
 
 - **Routed views**: the shell switches on `session.activeView`
   (`'landing' | 'workspace' | 'recents' | 'settings'`, defined in
@@ -159,11 +160,11 @@ by `jbrowse-web` and `jbrowse-desktop` (both render `<App session={...}/>`).
 - **Legacy menus**: `rootModel.menus()` (File/Add/Tools/Help) and the
   `appendToMenu`/`insertInMenu` extension points in
   `packages/app-core/src/menus.ts` still exist for backward compatibility, but
-  the app shell no longer renders them. Prefer the sidebar, WorkspaceToolbar,
-  or Settings cards for new entries.
+  the app shell no longer renders them. Prefer the sidebar, WorkspaceToolbar, or
+  Settings cards for new entries.
 - **View icons**: `ViewType` accepts an optional `icon` component (see
-  `packages/core/src/pluggableElementTypes/ViewType.ts`), shown in the
-  Add-view dropdown. Icons are lucide-react based, exported from
+  `packages/core/src/pluggableElementTypes/ViewType.ts`), shown in the Add-view
+  dropdown. Icons are lucide-react based, exported from
   `@jbrowse/core/ui/Icons`.
 
 ### Configuration System
@@ -249,8 +250,8 @@ during reviews or upstream merges without asking the owner first:
 - The right-click **feature** context menu is removed. Right-click on a track
   opens the track menu from `TrackContainer`; `onFeatureContextMenu`,
   `contextMenuItems`, `MenuPage` and `navToFeature` are gone on purpose. Left
-  click still opens the feature details widget. `LinearBasicDisplay/model.test.ts`
-  locks this in.
+  click still opens the feature details widget.
+  `LinearBasicDisplay/model.test.ts` locks this in.
 - `CanvasFeatureRenderer.color1` defaults to `#292421` (upstream: `goldenrod`)
   and `labelPlacement` defaults to `left` (upstream has no such slot). Both are
   project defaults, not accidents.
@@ -275,6 +276,22 @@ during reviews or upstream merges without asking the owner first:
   SDK's `setConfig` calls them by name.
 - Palette and quantile helpers live in `packages/core/src/util/colorPalettes.ts`
   (single-cell re-exports them; feature, wiggle and legend code share them).
+- The FeatureTrack color UI is deliberately one menu entry, `Color by...`: a
+  radio group for the scheme, a palette submenu that only appears for the scheme
+  that uses it, and a `Show legend` checkbox that only appears for schemes with
+  a legend (score, type). Everything else about a color scheme (`scoreField`,
+  `scoreAutoRange`, `scoreMin`, `scoreMax`, `scoreScale`, `colorField`) stays in
+  the track config: it is decided once per track, not per view, so it would only
+  add noise to the menu. Do not add config dialogs or per-scheme pickers without
+  asking the owner.
+- Color legends are built from data the renderer reports, not from re-fetching
+  features: `CanvasFeatureRenderer` returns `legendData` (score range, type
+  counts) with its render result, `serverSideRenderedBlock` stores it per block
+  and `LinearBasicDisplay` merges the visible blocks with
+  `mergeFeatureColorLegendData` before `buildColorLegend` turns it into rows.
+  Any new renderer that wants a legend should use the same `legendData` field.
+  The rows are drawn by the existing `FloatingLegend`/SVGLegend pair through
+  `showLegend` + `legendItems()`, so no separate legend component is needed.
 
 ## Important Notes
 

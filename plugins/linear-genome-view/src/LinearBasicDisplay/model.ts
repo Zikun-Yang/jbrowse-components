@@ -1,6 +1,14 @@
-import { ConfigurationReference } from '@jbrowse/core/configuration'
+import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
+import {
+  getAllCategoricalPaletteNames,
+  getAllContinuousPaletteNames,
+  mergeFeatureColorLegendData,
+} from '@jbrowse/core/util'
 import { types } from '@jbrowse/mobx-state-tree'
 
+import { PaletteIcon } from '@jbrowse/core/ui/Icons'
+
+import { buildColorLegend, hasColorLegend } from './colorLegend.ts'
 import { modelFactory as LinearFeatureDisplayModelFactory } from '../LinearFeatureDisplay/index.ts'
 import { FEATURE_DISPLAY_TRACK_OVERRIDES } from '../LinearFeatureDisplay/model.ts'
 import {
@@ -9,13 +17,28 @@ import {
   trackOverrideViews,
 } from '../LinearFeatureDisplay/trackOverrides.ts'
 
+import type { LegendItem } from '../BaseLinearDisplay/components/FloatingLegend.tsx'
 import type { TrackOverride } from '../LinearFeatureDisplay/trackOverrides.ts'
 import type { AnyConfigurationSchemaType } from '@jbrowse/core/configuration'
 import type { MenuItem } from '@jbrowse/core/ui'
+import type { FeatureColorLegendData } from '@jbrowse/core/util'
 import type { Instance } from '@jbrowse/mobx-state-tree'
 
 /** jexl expression used by the "Show only genes" filter */
 const GENE_TYPE_FILTER = "jexl:get(feature,'type')=='gene'"
+
+/**
+ * The native color schemes offered in the "Color by..." menu. Labels describe
+ * where the color comes from, not the internal slot name, so the menu needs no
+ * documentation to be understood.
+ */
+const COLOR_SCHEME_ITEMS = [
+  { value: 'default', label: 'Track colors' },
+  { value: 'featureField', label: 'Feature color' },
+  { value: 'score', label: 'Score' },
+  { value: 'strand', label: 'Strand' },
+  { value: 'type', label: 'Feature type' },
+] as const
 
 /**
  * Track overrides for the gene/label specific renderer slots. The getter,
@@ -50,6 +73,27 @@ export const BASIC_DISPLAY_TRACK_OVERRIDES = [
     slot: 'displayDirectionalChevrons',
     action: 'toggleDisplayDirectionalChevrons',
     kind: 'toggle',
+  },
+  {
+    trackProp: 'trackColorScheme',
+    getter: 'colorScheme',
+    slot: 'colorScheme',
+    action: 'setColorScheme',
+    kind: 'set',
+  },
+  {
+    trackProp: 'trackScorePalette',
+    getter: 'scorePalette',
+    slot: 'scorePalette',
+    action: 'setScorePalette',
+    kind: 'set',
+  },
+  {
+    trackProp: 'trackTypePalette',
+    getter: 'typePalette',
+    slot: 'typePalette',
+    action: 'setTypePalette',
+    kind: 'set',
   },
 ] as const satisfies readonly TrackOverride[]
 
@@ -93,6 +137,25 @@ interface BasicDisplayOverrideViews {
    * renderer.displayDirectionalChevrons when the track override is not set
    */
   readonly displayDirectionalChevrons: boolean
+  /**
+   * #getter
+   * How feature colors are chosen (default, featureField, score, strand,
+   * type). Falls back to renderer.colorScheme when the track override is not
+   * set
+   */
+  readonly colorScheme: string
+  /**
+   * #getter
+   * Continuous palette used by colorScheme "score". Falls back to
+   * renderer.scorePalette when the track override is not set
+   */
+  readonly scorePalette: string
+  /**
+   * #getter
+   * Categorical palette used by colorScheme "type". Falls back to
+   * renderer.typePalette when the track override is not set
+   */
+  readonly typePalette: string
 }
 
 /** Actions generated from BASIC_DISPLAY_TRACK_OVERRIDES */
@@ -117,6 +180,111 @@ interface BasicDisplayOverrideActions {
    * Toggle directional chevrons on introns
    */
   toggleDisplayDirectionalChevrons(): void
+  /**
+   * #action
+   * Set how feature colors are chosen
+   */
+  setColorScheme(val: string): void
+  /**
+   * #action
+   * Set the continuous palette used by the score color scheme
+   */
+  setScorePalette(val: string): void
+  /**
+   * #action
+   * Set the categorical palette used by the type color scheme
+   */
+  setTypePalette(val: string): void
+}
+
+/** The subset of the display the color menu helpers need */
+interface ColorMenuModel {
+  colorScheme: string
+  scorePalette: string
+  typePalette: string
+  showLegend?: boolean
+  setColorScheme(val: string): void
+  setScorePalette(val: string): void
+  setTypePalette(val: string): void
+  setShowLegend(val: boolean): void
+}
+
+function paletteItems(
+  names: string[],
+  current: string,
+  onSelect: (name: string) => void,
+): MenuItem[] {
+  return names.map(name => ({
+    label: name,
+    type: 'radio' as const,
+    checked: current === name,
+    onClick: () => {
+      onSelect(name)
+    },
+  }))
+}
+
+/**
+ * The "Color by..." submenu: pick where the color comes from, then (only for
+ * the scheme that uses one) the palette, then whether to show the legend.
+ * Everything else about a color scheme (which attribute holds the score, fixed
+ * vs automatic range, linear vs quantile) stays in the track config: it is set
+ * once per track, not per view, so it would only add noise to the menu.
+ */
+function colorByMenu(self: ColorMenuModel): MenuItem {
+  const paletteMenu =
+    self.colorScheme === 'score'
+      ? {
+          label: 'Palette',
+          subMenu: paletteItems(
+            getAllContinuousPaletteNames(),
+            self.scorePalette,
+            name => {
+              self.setScorePalette(name)
+            },
+          ),
+        }
+      : self.colorScheme === 'type'
+        ? {
+            label: 'Palette',
+            subMenu: paletteItems(
+              getAllCategoricalPaletteNames(),
+              self.typePalette,
+              name => {
+                self.setTypePalette(name)
+              },
+            ),
+          }
+        : undefined
+
+  return {
+    label: 'Color by...',
+    icon: PaletteIcon,
+    subMenu: [
+      ...COLOR_SCHEME_ITEMS.map(({ value, label }) => ({
+        label,
+        type: 'radio' as const,
+        checked: self.colorScheme === value,
+        onClick: () => {
+          self.setColorScheme(value)
+        },
+      })),
+      ...(paletteMenu ? [{ type: 'divider' as const }, paletteMenu] : []),
+      ...(hasColorLegend(self.colorScheme)
+        ? [
+            { type: 'divider' as const },
+            {
+              label: 'Show legend',
+              type: 'checkbox' as const,
+              checked: self.showLegend ?? false,
+              onClick: () => {
+                self.setShowLegend(!(self.showLegend ?? false))
+              },
+            },
+          ]
+        : []),
+    ],
+  }
 }
 
 /**
@@ -157,6 +325,18 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         /**
          * #property
          */
+        trackColorScheme: types.maybe(types.string),
+        /**
+         * #property
+         */
+        trackScorePalette: types.maybe(types.string),
+        /**
+         * #property
+         */
+        trackTypePalette: types.maybe(types.string),
+        /**
+         * #property
+         */
         configuration: ConfigurationReference(configSchema),
       }),
     )
@@ -182,6 +362,44 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         BASIC_DISPLAY_TRACK_OVERRIDES,
         self,
       ),
+    }))
+    .views(self => ({
+      /**
+       * #getter
+       * Legend rows for the active color scheme, built from the data the
+       * renderer reported for the visible blocks (score range, feature type
+       * counts). Cached by MobX until a block finishes rendering or the color
+       * config changes.
+       */
+      get colorLegend(): LegendItem[] {
+        const blockData = [...self.blockState.values()].map(
+          block => block.legendData as FeatureColorLegendData | undefined,
+        )
+        return buildColorLegend(
+          {
+            scheme: self.colorScheme,
+            scorePalette: self.scorePalette,
+            scoreScale: getConf(self, ['renderer', 'scoreScale']) as string,
+            scoreAutoRange: getConf(self, [
+              'renderer',
+              'scoreAutoRange',
+            ]) as boolean,
+            scoreMin: getConf(self, ['renderer', 'scoreMin']) as number,
+            scoreMax: getConf(self, ['renderer', 'scoreMax']) as number,
+            typePalette: self.typePalette,
+          },
+          mergeFeatureColorLegendData(blockData),
+        )
+      },
+    }))
+    .views(self => ({
+      /**
+       * #method
+       * Legend shown by BaseLinearDisplay when "Show legend" is enabled
+       */
+      legendItems() {
+        return self.colorLegend
+      },
     }))
     .views(self => {
       const { filterMenuItems: superFilterMenuItems } = self
@@ -272,6 +490,16 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
               })),
             },
           ]
+        },
+
+        /**
+         * #method
+         * "Color by..." menu. Feature colors are rendered by
+         * CanvasFeatureRenderer, so the entries only make sense here (not on
+         * the shared LinearFeatureDisplay that variant tracks also extend).
+         */
+        colorMenuItems(): MenuItem[] {
+          return [colorByMenu(self)]
         },
       }
     })

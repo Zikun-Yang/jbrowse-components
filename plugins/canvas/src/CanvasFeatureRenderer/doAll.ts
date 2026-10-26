@@ -2,6 +2,7 @@ import { renderToAbstractCanvas, updateStatus } from '@jbrowse/core/util'
 
 import { computeScoreStats } from './colorScheme.ts'
 import { layoutFeatures } from './layout/layoutFeatures.ts'
+import { computeLegendData } from './legendData.ts'
 import { makeImageData } from './makeImageData.ts'
 import { fetchPeptideData } from './peptides/peptideUtils.ts'
 import { createRenderConfigContext } from './renderConfig.ts'
@@ -77,21 +78,30 @@ export async function doAll({
   )
 
   return updateStatus('Rendering features', statusCallback, async () => {
-    return renderToAbstractCanvas(width, height, renderProps, ctx =>
-      makeImageData({
-        ctx,
-        layoutRecords,
-        canvasWidth: width,
-        renderArgs: {
-          ...renderProps,
-          features,
-          layout,
-          displayMode: configContext.displayMode,
-          peptideDataMap,
-          pluginManager,
-        },
-        configContext,
-      }),
+    const imageData = await renderToAbstractCanvas(
+      width,
+      height,
+      renderProps,
+      ctx =>
+        makeImageData({
+          ctx,
+          layoutRecords,
+          canvasWidth: width,
+          renderArgs: {
+            ...renderProps,
+            features,
+            layout,
+            displayMode: configContext.displayMode,
+            peptideDataMap,
+            pluginManager,
+          },
+          configContext,
+        }),
     )
+    return {
+      ...imageData,
+      // summary of what was colored, for the display's legend
+      legendData: computeLegendData(configContext, features.values()),
+    }
   })
 }

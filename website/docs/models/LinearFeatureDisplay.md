@@ -221,6 +221,17 @@ parent menu changes, while an override point cannot.
 featureStyleMenuItems: () => MenuItem[]
 ```
 
+#### method: colorMenuItems
+
+Menu entries inserted after "Show..." and before "Display mode". Subclasses add
+color/appearance menus here; the default is empty so displays with a fixed
+palette do not get the entry.
+
+```js
+// type signature
+colorMenuItems: () => MenuItem[]
+```
+
 #### method: trackMenuItems
 
 ```js

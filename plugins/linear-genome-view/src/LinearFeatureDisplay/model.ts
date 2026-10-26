@@ -440,6 +440,16 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
         featureStyleMenuItems(): MenuItem[] {
           return []
         },
+
+        /**
+         * #method
+         * Menu entries inserted after "Show..." and before "Display
+         * mode". Subclasses add color/appearance menus here; the default is
+         * empty so displays with a fixed palette do not get the entry.
+         */
+        colorMenuItems(): MenuItem[] {
+          return []
+        },
       }
     })
     .views(self => {
@@ -482,6 +492,7 @@ function stateModelFactory(configSchema: AnyConfigurationSchemaType) {
                 ...self.featureStyleMenuItems(),
               ],
             },
+            ...self.colorMenuItems(),
             {
               label: 'Display mode',
               icon: VisibilityIcon,

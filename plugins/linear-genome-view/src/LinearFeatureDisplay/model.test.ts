@@ -16,6 +16,7 @@ import {
   baseLinearDisplayConfigSchema,
 } from '../index.ts'
 
+import type { MenuItem } from '@jbrowse/core/ui'
 import type { Instance } from '@jbrowse/mobx-state-tree'
 
 // Mock feature data that would be returned by RPC
@@ -659,5 +660,17 @@ describe('LinearFeatureDisplay mouseover behavior', () => {
     expect(display.featureDetailsCache.size).toBe(100)
     expect(display.featureDetailsCache.has('f0')).toBe(false)
     expect(display.featureDetailsCache.has('extra')).toBe(true)
+  })
+
+  test('does not add a Color by menu by default', () => {
+    // the color menu is a FeatureTrack/canvas concern; variant displays also
+    // extend LinearFeatureDisplay and have their own color controls
+    const { display } = createHoverDisplay()
+    expect(display.colorMenuItems()).toEqual([])
+    expect(
+      display
+        .trackMenuItems()
+        .map((item: MenuItem) => ('label' in item ? item.label : '')),
+    ).not.toContain('Color by...')
   })
 })

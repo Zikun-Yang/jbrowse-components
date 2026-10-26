@@ -1,6 +1,6 @@
 import {
   buildQuantileContext,
-  getCategoricalColor,
+  getCategoricalColorForKey,
   getContinuousHex,
   valueToQuantile,
 } from '@jbrowse/core/util'
@@ -115,17 +115,6 @@ export function computeScoreStats(
   return { min, max, quantiles: buildQuantileContext(values) }
 }
 
-// FNV-1a, used to give each feature type a stable palette slot regardless of
-// which types happen to be visible in the current block
-function hashString(str: string) {
-  let hash = 0x81_1c_9d_c5
-  for (let i = 0; i < str.length; i++) {
-    hash ^= str.charCodeAt(i)
-    hash = Math.imul(hash, 0x01_00_01_93)
-  }
-  return Math.abs(hash)
-}
-
 /**
  * Resolve the color for a feature under the active color scheme. Returns
  * undefined when the scheme cannot produce a color for this feature (missing
@@ -176,7 +165,7 @@ export function resolveFeatureColor({
     case 'type': {
       const type = feature.get('type')
       return typeof type === 'string' && type
-        ? getCategoricalColor(hashString(type), scheme.typePalette)
+        ? getCategoricalColorForKey(type, scheme.typePalette)
         : undefined
     }
     default: {

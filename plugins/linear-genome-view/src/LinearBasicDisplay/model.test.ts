@@ -17,6 +17,7 @@ import {
 import { FEATURE_DISPLAY_TRACK_OVERRIDES } from '../LinearFeatureDisplay/model.ts'
 import { stateModelFactory as LinearGenomeViewModelFactory } from '../LinearGenomeView/index.ts'
 
+import type { LegendItem } from '../BaseLinearDisplay/components/FloatingLegend.tsx'
 import type { MenuItem } from '@jbrowse/core/ui'
 import type { Instance } from '@jbrowse/mobx-state-tree'
 
@@ -48,6 +49,13 @@ function createTestEnvironment() {
         displayDirectionalChevrons: { type: 'boolean', defaultValue: true },
         displayMode: { type: 'string', defaultValue: 'normal' },
         maxHeight: { type: 'integer', defaultValue: 5000 },
+        colorScheme: { type: 'string', defaultValue: 'default' },
+        scorePalette: { type: 'string', defaultValue: 'viridis' },
+        scoreScale: { type: 'string', defaultValue: 'linear' },
+        scoreAutoRange: { type: 'boolean', defaultValue: true },
+        scoreMin: { type: 'number', defaultValue: 0 },
+        scoreMax: { type: 'number', defaultValue: 1000 },
+        typePalette: { type: 'string', defaultValue: 'polychrome36' },
       }),
     },
     {
@@ -363,5 +371,125 @@ describe('LinearBasicDisplay', () => {
     for (const label of hookLabels) {
       expect(shownLabels).toContain(label)
     }
+  })
+
+  test('the Color by... menu offers the native color schemes', () => {
+    const { display } = createDisplay()
+    const colorMenu = findSubMenuItem(display.trackMenuItems(), 'Color by...')
+
+    expect(subMenuLabels(colorMenu)).toEqual(
+      expect.arrayContaining([
+        'Track colors',
+        'Feature color',
+        'Score',
+        'Strand',
+        'Feature type',
+      ]),
+    )
+    expect(
+      findClickableMenuItem(colorMenu?.subMenu ?? [], 'Track colors'),
+    ).toMatchObject({ type: 'radio', checked: true })
+  })
+
+  test('picking a color scheme updates the display and the renderer config', () => {
+    const { display } = createDisplay()
+    const getColorMenu = () =>
+      findSubMenuItem(display.trackMenuItems(), 'Color by...')
+
+    findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Score')?.onClick()
+
+    expect(display.colorScheme).toBe('score')
+    expect(display.rendererConfig.colorScheme).toBe('score')
+    expect(
+      findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Score'),
+    ).toMatchObject({ checked: true })
+  })
+
+  test('the palette entry only appears for the scheme that uses it', () => {
+    const { display } = createDisplay()
+    const getColorMenu = () =>
+      findSubMenuItem(display.trackMenuItems(), 'Color by...')
+
+    // default colors come from color1/2/3, so no palette is offered
+    expect(subMenuLabels(getColorMenu())).not.toContain('Palette')
+
+    findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Score')?.onClick()
+    const scorePalettes = subMenuLabels(
+      findSubMenuItem(getColorMenu()?.subMenu ?? [], 'Palette'),
+    )
+    expect(scorePalettes).toEqual(expect.arrayContaining(['viridis', 'plasma']))
+
+    findClickableMenuItem(
+      getColorMenu()?.subMenu ?? [],
+      'Feature type',
+    )?.onClick()
+    const typePalettes = subMenuLabels(
+      findSubMenuItem(getColorMenu()?.subMenu ?? [], 'Palette'),
+    )
+    expect(typePalettes).toEqual(
+      expect.arrayContaining(['polychrome36', 'tab10']),
+    )
+  })
+
+  test('palette choices are stored as track overrides', () => {
+    const { display } = createDisplay()
+    const getColorMenu = () =>
+      findSubMenuItem(display.trackMenuItems(), 'Color by...')
+
+    findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Score')?.onClick()
+    const paletteMenu = findSubMenuItem(
+      getColorMenu()?.subMenu ?? [],
+      'Palette',
+    )
+    findClickableMenuItem(paletteMenu?.subMenu ?? [], 'plasma')?.onClick()
+
+    expect(display.scorePalette).toBe('plasma')
+    expect(display.rendererConfig.scorePalette).toBe('plasma')
+    expect(getSnapshot(display)).toMatchObject({
+      trackColorScheme: 'score',
+      trackScorePalette: 'plasma',
+    })
+  })
+
+  test('Show legend is only offered for schemes that have one', () => {
+    const { display } = createDisplay()
+    const getColorMenu = () =>
+      findSubMenuItem(display.trackMenuItems(), 'Color by...')
+
+    expect(subMenuLabels(getColorMenu())).not.toContain('Show legend')
+
+    findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Strand')?.onClick()
+    expect(subMenuLabels(getColorMenu())).not.toContain('Show legend')
+
+    findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Score')?.onClick()
+    const legend = findClickableMenuItem(
+      getColorMenu()?.subMenu ?? [],
+      'Show legend',
+    )
+    expect(legend).toMatchObject({ type: 'checkbox', checked: false })
+
+    legend?.onClick()
+    expect(display.showLegend).toBe(true)
+    expect(
+      findClickableMenuItem(getColorMenu()?.subMenu ?? [], 'Show legend'),
+    ).toMatchObject({ checked: true })
+  })
+
+  test('the legend follows the fixed score range from the config', () => {
+    const { display } = createDisplay()
+    display.configuration.renderer.scoreAutoRange.set(false)
+    display.configuration.renderer.scoreMin.set(0)
+    display.configuration.renderer.scoreMax.set(100)
+    display.setColorScheme('score')
+
+    expect(display.legendItems().map((item: LegendItem) => item.label)).toEqual(
+      ['0', '25', '50', '75', '100'],
+    )
+  })
+
+  test('the legend has no rows for the default color scheme', () => {
+    const { display } = createDisplay()
+    expect(display.colorScheme).toBe('default')
+    expect(display.legendItems()).toEqual([])
   })
 })

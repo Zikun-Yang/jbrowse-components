@@ -29,6 +29,7 @@ export interface RenderedProps {
   maxHeightReached: boolean
   renderProps: any
   renderArgs: Record<string, unknown>
+  legendData?: unknown
 }
 // the MST state of a single server-side-rendered block in a display
 const blockState = types
@@ -102,6 +103,12 @@ const blockState = types
     /**
      * #volatile
      */
+    /**
+     * #volatile
+     * Data the renderer returned for building a display legend (e.g. the score
+     * range it colored). Shape is defined by the renderer.
+     */
+    legendData: undefined as unknown,
     renderArgs: undefined as Record<string, unknown> | undefined,
     /**
      * #volatile
@@ -132,6 +139,7 @@ const blockState = types
       self.maxHeightReached = false
       self.renderProps = undefined
       self.renderArgs = undefined
+      self.legendData = undefined
     }
 
     return {
@@ -185,6 +193,7 @@ const blockState = types
           maxHeightReached,
           renderProps,
           renderArgs,
+          legendData,
         } = props
         self.filled = true
         self.isRenderingPending = false
@@ -196,6 +205,7 @@ const blockState = types
         self.maxHeightReached = maxHeightReached
         self.renderProps = renderProps
         self.renderArgs = renderArgs
+        self.legendData = legendData
         self.stopToken = undefined
       },
       /**
@@ -399,7 +409,7 @@ async function renderBlockEffect(
   if (renderProps.notReady || !renderArgs) {
     return undefined
   }
-  const { reactElement, features, layout, maxHeightReached } =
+  const { reactElement, features, layout, maxHeightReached, legendData } =
     await rendererType.renderInClient(rpcManager, {
       ...renderArgs,
       ...renderProps,
@@ -411,6 +421,7 @@ async function renderBlockEffect(
     features,
     layout,
     maxHeightReached,
+    legendData,
     renderProps,
     renderArgs,
   }

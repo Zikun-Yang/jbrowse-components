@@ -74,6 +74,33 @@ IMaybe<ISimpleType<boolean>>
 trackDisplayDirectionalChevrons: types.maybe(types.boolean)
 ```
 
+#### property: trackColorScheme
+
+```js
+// type signature
+IMaybe<ISimpleType<string>>
+// code
+trackColorScheme: types.maybe(types.string)
+```
+
+#### property: trackScorePalette
+
+```js
+// type signature
+IMaybe<ISimpleType<string>>
+// code
+trackScorePalette: types.maybe(types.string)
+```
+
+#### property: trackTypePalette
+
+```js
+// type signature
+IMaybe<ISimpleType<string>>
+// code
+trackTypePalette: types.maybe(types.string)
+```
+
 #### property: configuration
 
 ```js
@@ -125,6 +152,36 @@ renderer.displayDirectionalChevrons when the track override is not set
 boolean
 ```
 
+#### getter: colorScheme
+
+How feature colors are chosen (default, featureField, score, strand, type).
+Falls back to renderer.colorScheme when the track override is not set
+
+```js
+// type
+string
+```
+
+#### getter: scorePalette
+
+Continuous palette used by colorScheme "score". Falls back to
+renderer.scorePalette when the track override is not set
+
+```js
+// type
+string
+```
+
+#### getter: typePalette
+
+Categorical palette used by colorScheme "type". Falls back to
+renderer.typePalette when the track override is not set
+
+```js
+// type
+string
+```
+
 #### getter: trackOverrides
 
 Base feature display overrides plus the gene/label ones
@@ -134,7 +191,27 @@ Base feature display overrides plus the gene/label ones
 readonly TrackOverride[]
 ```
 
+#### getter: colorLegend
+
+Legend rows for the active color scheme, built from the data the renderer
+reported for the visible blocks (score range, feature type counts). Cached by
+MobX until a block finishes rendering or the color config changes.
+
+```js
+// type
+LegendItem[]
+```
+
 ### LinearBasicDisplay - Methods
+
+#### method: legendItems
+
+Legend shown by BaseLinearDisplay when "Show legend" is enabled
+
+```js
+// type signature
+legendItems: () => LegendItem[]
+```
 
 #### method: featureStyleMenuItems
 
@@ -144,6 +221,17 @@ featureStyleMenuItems() hook
 ```js
 // type signature
 featureStyleMenuItems: () => MenuItem[]
+```
+
+#### method: colorMenuItems
+
+"Color by..." menu. Feature colors are rendered by CanvasFeatureRenderer, so the
+entries only make sense here (not on the shared LinearFeatureDisplay that
+variant tracks also extend).
+
+```js
+// type signature
+colorMenuItems: () => MenuItem[]
 ```
 
 ### LinearBasicDisplay - Actions
@@ -182,4 +270,31 @@ Toggle directional chevrons on introns
 ```js
 // type signature
 toggleDisplayDirectionalChevrons: () => void
+```
+
+#### action: setColorScheme
+
+Set how feature colors are chosen
+
+```js
+// type signature
+setColorScheme: (val: string) => void
+```
+
+#### action: setScorePalette
+
+Set the continuous palette used by the score color scheme
+
+```js
+// type signature
+setScorePalette: (val: string) => void
+```
+
+#### action: setTypePalette
+
+Set the categorical palette used by the type color scheme
+
+```js
+// type signature
+setTypePalette: (val: string) => void
 ```

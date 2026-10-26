@@ -237,6 +237,32 @@ export function getCategoricalColor(
   return palette[index % palette.length]!
 }
 
+/**
+ * FNV-1a. Maps a category name (a feature type, a cluster label, ...) to a
+ * stable palette slot, so the same category keeps its color no matter which
+ * other categories happen to be visible in the current block.
+ */
+function hashString(str: string) {
+  let hash = 0x81_1c_9d_c5
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i)
+    hash = Math.imul(hash, 0x01_00_01_93)
+  }
+  return Math.abs(hash)
+}
+
+/**
+ * Color for a named category, derived from the palette and a stable hash of
+ * the name. Used by anything that colors by category without owning the
+ * category list (renderer color schemes, legends).
+ */
+export function getCategoricalColorForKey(
+  key: string,
+  paletteName = DEFAULT_CATEGORICAL_PALETTE,
+): string {
+  return getCategoricalColor(hashString(key), paletteName)
+}
+
 export function getCategoricalColorRGB(
   index: number,
   paletteName = DEFAULT_CATEGORICAL_PALETTE,
@@ -409,6 +435,60 @@ export function getContinuousHex(
       .toString(16)
       .padStart(2, '0')
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
+
+/**
+ * What a feature renderer reports for one render block so that the display can
+ * build a color legend without re-reading the features: the score range it
+ * mapped colors onto, and which feature types it colored.
+ *
+ * Renderers return it as `legendData` in their render result; the display
+ * merges the data of all visible blocks with
+ * `mergeFeatureColorLegendData`.
+ */
+export interface FeatureColorLegendData {
+  min?: number
+  max?: number
+  typeCounts?: [string, number][]
+}
+
+/**
+ * Merge the legend data of several render blocks into one range/type list.
+ * Blocks that returned nothing are ignored.
+ */
+export function mergeFeatureColorLegendData(
+  blocks: Iterable<FeatureColorLegendData | undefined>,
+): FeatureColorLegendData {
+  let min: number | undefined
+  let max: number | undefined
+  const typeCounts = new Map<string, number>()
+
+  for (const block of blocks) {
+    if (!block) {
+      continue
+    }
+    if (block.min !== undefined) {
+      min = min === undefined ? block.min : Math.min(min, block.min)
+    }
+    if (block.max !== undefined) {
+      max = max === undefined ? block.max : Math.max(max, block.max)
+    }
+    for (const [type, count] of block.typeCounts ?? []) {
+      typeCounts.set(type, (typeCounts.get(type) ?? 0) + count)
+    }
+  }
+
+  return {
+    ...(min === undefined ? {} : { min }),
+    ...(max === undefined ? {} : { max }),
+    ...(typeCounts.size
+      ? {
+          typeCounts: [...typeCounts].sort(
+            (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+          ),
+        }
+      : {}),
+  }
 }
 
 export interface QuantileContext {
