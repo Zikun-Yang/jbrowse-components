@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
-import { getContainingView } from '@jbrowse/core/util'
+import { getContainingView, getEnv } from '@jbrowse/core/util'
 import {
   Alert,
   Button,
@@ -13,6 +13,7 @@ import {
 import ReactMarkdown from 'react-markdown'
 
 import ChartCanvas from './ChartCanvas.tsx'
+import { formatFeatureChartDrawerError } from '../../FeatureChartDrawer/drawerErrors.ts'
 import {
   isFeatureChartDrawerResolutionError,
   resolveFeatureChartDrawer,
@@ -34,14 +35,6 @@ interface MaximizeDialogProps {
 
 const DIALOG_WIDTH = 800
 const DIALOG_HEIGHT = 400
-
-/** Same message the canvas placeholder shows, for the dialog. */
-function describeDrawerError(error: string, available: string[]): string {
-  if (available.length === 0) {
-    return `${error}. No drawers are registered.`
-  }
-  return `${error}. Available: ${available.slice(0, 5).join(', ')}`
-}
 
 export default function MaximizeDialog({
   open,
@@ -66,12 +59,15 @@ export default function MaximizeDialog({
     : undefined
 
   const drawerName = getConf(displayModel, ['renderer', 'drawer']) as string
+  // The plugin manager lives in the MST env, not on the session model; it is
+  // the only catalog that contains plugin-contributed drawers.
+  const pluginManager = getEnv(displayModel).pluginManager
   const resolution = useMemo(
-    () => resolveFeatureChartDrawer(drawerName),
-    [drawerName],
+    () => resolveFeatureChartDrawer(drawerName, pluginManager),
+    [drawerName, pluginManager],
   )
   const drawerError = isFeatureChartDrawerResolutionError(resolution)
-    ? describeDrawerError(resolution.error, resolution.available)
+    ? formatFeatureChartDrawerError(resolution)
     : null
 
   const description = contextData?.description

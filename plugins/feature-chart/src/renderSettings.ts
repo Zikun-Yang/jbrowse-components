@@ -20,7 +20,16 @@ export interface FeatureChartRenderSettings {
   maxChartsPerView: number
   minChartSpacingPx: number
   colorScheme: string
+  /**
+   * Free-form per-drawer options, passed to the drawer as `DrawerProps.options`.
+   * Not validated: the drawer documents (and clamps) what it understands, see
+   * `FeatureChartDrawerMeta.optionsSchema`.
+   */
+  drawerOptions: Record<string, unknown>
 }
+
+/** Shared empty value so an unset slot does not allocate per chart. */
+const EMPTY_DRAWER_OPTIONS: Record<string, unknown> = {}
 
 /** Mirrors the `defaultValue`s in `FeatureChartRenderer/configSchema.ts`. */
 export const FEATURE_CHART_RENDER_DEFAULTS: FeatureChartRenderSettings = {
@@ -31,6 +40,7 @@ export const FEATURE_CHART_RENDER_DEFAULTS: FeatureChartRenderSettings = {
   maxChartsPerView: 100,
   minChartSpacingPx: 4,
   colorScheme: DEFAULT_COLOR_SCHEME,
+  drawerOptions: EMPTY_DRAWER_OPTIONS,
 }
 
 function toFiniteNumber(value: unknown, fallback: number): number {
@@ -60,6 +70,17 @@ function toColorScheme(value: unknown): string {
 
 function readSlot(config: AnyConfigurationModel | undefined, slot: string) {
   return config ? readConfObject(config, slot) : undefined
+}
+
+/**
+ * `drawerOptions` is a `frozen` slot: `readConfObject` returns whatever JSON
+ * the user wrote, which may also be a serialized snapshot in the worker. Only
+ * plain objects are accepted, anything else means "no options".
+ */
+function toDrawerOptions(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : EMPTY_DRAWER_OPTIONS
 }
 
 /**
@@ -102,5 +123,8 @@ export function resolveFeatureChartRenderSettings(
       ),
     ),
     colorScheme: toColorScheme(readSlot(config ?? undefined, 'colorScheme')),
+    drawerOptions: toDrawerOptions(
+      readSlot(config ?? undefined, 'drawerOptions'),
+    ),
   }
 }
