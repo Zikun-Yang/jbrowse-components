@@ -14,19 +14,37 @@ http://localhost:3000/?config=test_data/feature-chart/config.json
 
 ## What it proves
 
-| Track                     | Drawer                    | What it demonstrates                                                                   |
-| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| `fc_precomputed`          | _omitted_                 | the schema default (`precomputedBoxPlot`) is a real, registered drawer                 |
-| `fc_raw_box`              | `rawBoxPlot`              | raw observations aggregated at render time; `colorScheme: set2`                        |
-| `fc_violin`               | `rawViolinPlot`           | same adapter/file as `fc_raw_box`, different mark; `colorScheme: viridis`              |
-| `fc_bar`                  | `barPlot`                 | `data.bars`                                                                            |
-| `fc_histogram`            | `histogram`               | `data.values`; `formatAbout.showInfo: false` hides the Track info card for this track  |
-| `fc_broken`               | `tissueBoxPlot`           | unknown drawer → readable placeholder + available names, no track error                |
-| `fc_plugin_heatmap`       | `samplePlugin/heatmap`    | plugin drawer from `plugins/sampleChartDrawers.js`; `drawerOptions` picks the ramp/gap |
-| `fc_plugin_dots`          | `samplePlugin/dotPlot`    | same plugin, second drawer; `drawerOptions` controls radius/jitter/opacity             |
-| `fc_missing_plugin`       | `notLoadedPlugin/heatmap` | placeholder says the _plugin_ is missing and names it                                  |
-| (site-wide `formatAbout`) | —                         | root `configuration.formatAbout.info` is the default text in every About dialog        |
-| (`fc_precomputed`)        | —                         | track-level `formatAbout.info` overrides the site-wide text and uses `{{track.*}}`     |
+| Track                     | Drawer                    | What it demonstrates                                                                                  |
+| ------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `fc_precomputed`          | _omitted_                 | the schema default (`precomputedBoxPlot`) is a real, registered drawer                                |
+| `fc_raw_box`              | `rawBoxPlot`              | raw observations aggregated at render time; `colorScheme: set2`                                       |
+| `fc_violin`               | `rawViolinPlot`           | same adapter/file as `fc_raw_box`, different mark; `colorScheme: viridis`                             |
+| `fc_bar`                  | `barPlot`                 | `data.bars`                                                                                           |
+| `fc_histogram`            | `histogram`               | `data.values`; `formatAbout.showInfo: false` hides the Track info card for this track                 |
+| `fc_broken`               | `tissueBoxPlot`           | unknown drawer → readable placeholder + available names, no track error                               |
+| `fc_plugin_heatmap`       | `samplePlugin/heatmap`    | plugin drawer from `plugins/sampleChartDrawers.js`; `drawerOptions` picks the ramp/gap                |
+| `fc_plugin_dots`          | `samplePlugin/dotPlot`    | same plugin, second drawer; `drawerOptions` controls radius/jitter/opacity                            |
+| `fc_missing_plugin`       | `notLoadedPlugin/heatmap` | placeholder says the _plugin_ is missing and names it                                                 |
+| `fc_spec_box_plain`       | `spec`                    | the same chart as `fc_precomputed` described by a spec — the two tracks must be **pixel-identical**   |
+| `fc_spec_box`             | `spec`                    | the same spec plus `axes.yLabel`, which is the only thing v1 adds to what the old painters could draw |
+| `fc_spec_bar`             | `spec`                    | declarative bar (`category-values`) with the palette in `spec.style.colorScheme`                      |
+| `fc_spec_hist`            | `spec`                    | declarative histogram with `spec.style.bins: 16` (the legacy drawer only ever used 10)                |
+| `fc_spec_broken`          | `spec`                    | illegal `kind` × `data.form` → placeholder naming the path and the allowed forms                      |
+| (site-wide `formatAbout`) | —                         | root `configuration.formatAbout.info` is the default text in every About dialog                       |
+| (`fc_precomputed`)        | —                         | track-level `formatAbout.info` overrides the site-wide text and uses `{{track.*}}`                    |
+
+## Chart specs
+
+Five of the tracks use `renderer.drawer: "spec"` instead of a drawer name: the
+chart is described in the config (`kind` + `data.form` + `data.path`), which is
+the whole point of WP3 — no code in the config, so a spec can travel in a shared
+session. The vocabulary, the examples and the error messages are documented in
+[`plugins/feature-chart/SPEC.md`](../../plugins/feature-chart/SPEC.md) and
+`website/docs/developer_guides/feature_chart_specs.md`.
+
+`fc_spec_broken` is deliberately illegal: the track must stay alive, the chart
+must show a placeholder that names `spec.data.form` and the allowed forms, and
+the maximize dialog must list the problem.
 
 ## The example plugin
 

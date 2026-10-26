@@ -71,17 +71,18 @@ tabix -p bed expression.tsv.gz
 `contextData`，例如换用其它 adapter）。drawer 必须自己兼容这种情况——返回"什么都没画"，而不是抛异常；worker 里抛异常会让整条 track 变成错误。内置 drawer 统一用
 `asDrawerData()`（`src/FeatureChartDrawer/drawerData.ts`）读取，并把每个 group/值过滤成有限数字。
 
-内置五个 drawer。下表是 **当前** 的内置集合，权威来源是
+内置六个 drawer。下表是 **当前** 的内置集合，权威来源是
 `listFeatureChartDrawers()`（见
 [`ARCHITECTURE.md`](./ARCHITECTURE.md#drawer-目录)）：
 
-| Drawer               | 数据形状（`dataShape`） | 输入格式       | 说明                                      | 默认尺寸 |
-| -------------------- | ----------------------- | -------------- | ----------------------------------------- | -------- |
-| `precomputedBoxPlot` | `matrix`                | `data.boxes`   | 处理后数据：预计算 boxplot 统计量（默认） | 120×180  |
-| `rawBoxPlot`         | `tissues`               | `data.tissues` | 原始数据：boxplot，自动计算五数概括       | 120×180  |
-| `rawViolinPlot`      | `tissues`               | `data.tissues` | 原始数据：violin plot，用 KDE 估计分布    | 120×180  |
-| `barPlot`            | `matrix`                | `data.bars`    | 每个分类一个柱子                          | 120×180  |
-| `histogram`          | `series`                | `data.values`  | 单组数值的频数直方图                      | 120×180  |
+| Drawer               | 数据形状（`dataShape`） | 输入格式       | 说明                                       | 默认尺寸 |
+| -------------------- | ----------------------- | -------------- | ------------------------------------------ | -------- |
+| `precomputedBoxPlot` | `summary-stats`         | `data.boxes`   | 处理后数据：预计算 boxplot 统计量（默认）  | 120×180  |
+| `rawBoxPlot`         | `grouped-values`        | `data.tissues` | 原始数据：boxplot，自动计算五数概括        | 120×180  |
+| `rawViolinPlot`      | `grouped-values`        | `data.tissues` | 原始数据：violin plot，用 KDE 估计分布     | 120×180  |
+| `barPlot`            | `category-values`       | `data.bars`    | 每个分类一个柱子                           | 120×180  |
+| `histogram`          | `values`                | `data.values`  | 单组数值的频数直方图                       | 120×180  |
+| `spec`               | `any`                   | 由 `spec` 决定 | 声明式配置驱动的图（见 §3.6 与 `SPEC.md`） | 120×180  |
 
 未显式配置 `drawer` 时使用
 `precomputedBoxPlot`。配置了不存在的名字不会让 track 报错：canvas 与放大弹窗都会显示一个可读的占位块，并在 console 里
@@ -289,7 +290,12 @@ interface FeatureChartDrawerMeta {
   name: string
   displayName: string
   description: string // 一句话：画什么、吃什么数据
-  dataShape: 'tissues' | 'matrix' | 'series' | 'any'
+  dataShape:
+    | 'summary-stats'
+    | 'grouped-values'
+    | 'category-values'
+    | 'values'
+    | 'any'
   defaultSize?: { width: number; height: number }
   optionsSchema?: unknown // 这个 drawer 读哪些 drawerOptions 键：{ key: '文档' } | ['key']；{} = 不读；不写 = 未声明（不校验）
 }
@@ -382,6 +388,39 @@ export default class MyChartDrawers {
   [developer guide](../../website/docs/developer_guides/feature_chart_drawers.md)。
 - `registerFeatureChartDrawer / getFeatureChartDrawer(name)` 保留为
   **legacy**：只在同一份模块实例内部有效（内置 drawer、仓库内调用、单测）。第三方插件必须用扩展点。
+
+#### 声明式 `spec`：配置里描述图，而不是写代码（WP3）
+
+`drawer: "spec"` 时，图由 renderer 的 `spec` slot 描述（`SPEC.md`
+是权威文档，website 有面向用户的页面
+`developer_guides/feature_chart_specs.md`）：
+
+```json
+{
+  "type": "FeatureChartRenderer",
+  "drawer": "spec",
+  "spec": {
+    "specVersion": 1,
+    "kind": "box",
+    "data": { "form": "grouped-values", "path": "tissues" },
+    "axes": { "yLabel": "TPM" },
+    "style": { "colorScheme": "tableau10", "bins": 10 }
+  }
+}
+```
+
+- v1 词汇表**已冻结**：4 种 `kind`（`box`/`violin`/`bar`/`histogram`）× 4 种
+  `data.form`（`summary-stats`/`grouped-values`/`category-values`/`values`），合法组合恰好 5 条，一条对应一个旧 drawer——v1 不多画任何一种今天画不出来的图。
+- `data.path` 只做点路径取值（数字段表示数组下标），没有通配、没有表达式。
+- 校验器**不抛异常**，返回结构化错误：`path` + `message` + `allowed` +
+  `actualKeys`。结构性问题整条 track 画一个占位并在 RPC 结果里带
+  `specError`；数据问题（某一行取不到 path）只影响那一张图；放大弹窗列出全部问题。
+- `axes.yLabel` 是 v1 唯一"新增画出来的东西"；没有它时，spec 与其等价旧 drawer
+  **逐像素一致**（`specEquivalence.test.ts` 断言调用序列完全相同）。
+- **Plotly renderer 暂不支持
+  `spec`**，配置了会显示明确警告，而不是空白图（双后端统一属于 WP4）。
+- 词汇表只加不破：新增 kind 必须同时补 canvas painter；`transform`、多序列、
+  `heatmap` 的触发条件写在 `SPEC.md` §9。
 
 #### `drawerOptions`：一个 drawer 出多种形态
 
@@ -608,12 +647,23 @@ Dialog 中的放大图复用当前 renderer 已加载的 `data` 和
 `Unknown FeatureChart drawer "boxplot". Available: barPlot, histogram, …`。description 仍然照常渲染，"Zoom
 to region" / "Close" 仍然可用。
 
+`drawer: "spec"` 且 spec 非法时同理，但列出**全部**问题（每条含 `path`、
+`message`、`allowed`），例如：
+
+```
+Invalid chart spec (2 problems)
+  spec.data.form: spec.kind "violin" does not accept data.form "summary-stats"
+    allowed: grouped-values
+  spec.style.colorScheme: "plasma" is not a palette
+    allowed: blues, dark2, set2, tableau10, viridis
+```
+
 ---
 
 ## 7. 实现任务清单
 
-状态（WP0、WP2 收口）：插件贡献 drawer 与 `drawerOptions`
-已完成；后续工作见 WP3（声明式 `spec`）与 WP4（双后端统一）。
+状态（WP0、WP2、WP3 收口）：插件贡献 drawer、`drawerOptions` 与声明式 `spec`
+已完成；后续工作见 WP4（双后端统一）。
 
 ### Phase 0：产品接入与地基加固（已完成）
 
@@ -655,9 +705,19 @@ to region" / "Close" 仍然可用。
 - [x] no-build 示例插件 `test_data/feature-chart/plugins/sampleChartDrawers.js`
 - [x] 单测：真实 `PluginManager`、worker 装配顺序、缓存失效、参数透传、示例插件
 
-### Phase 3：增强（后续工作包）
+### Phase 3：声明式 spec（已完成，WP3）
 
-- [ ] 声明式 `spec`（WP3）
+- [x] `SPEC.md`：冻结的 v1 词汇表、合法性矩阵、6 个示例、给 agent 的最小 JSON
+      Schema
+- [x] `ChartModel` + `normalizeFromSpec()` + 校验器（结构化错误）
+- [x] painter 重构为吃 `ChartModel`；5 个旧 drawer 名映射为等价 spec 预设
+- [x] `drawer: "spec"` + `axes.yLabel` + `spec` slot 透传（worker 路径一致）
+- [x] 放大弹窗列出全部 spec 错误；Plotly 后端给出"暂不支持"警告
+- [x] 目录 `dataShape` 词汇与 spec 对齐（旧名降级为 `any` 并 dev warn）
+
+### Phase 4：增强（后续工作包）
+
+- [ ] 双后端统一（WP4）
 - [ ] Plotly 与 canvas 模型统一（WP4）
 - [ ] agent-sdk 字段（WP5）
 - [ ] `descriptionId` + 单独 descriptions 查找表

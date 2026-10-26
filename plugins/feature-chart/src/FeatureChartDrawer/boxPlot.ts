@@ -1,17 +1,21 @@
-import { resolveColorScheme } from './colorSchemes.ts'
+import { type ChartDatum, DEFAULT_SERIES_NAME } from './chartModel.ts'
 import { asDrawerData } from './drawerData.ts'
-import { scaleBand, scaleLinear } from './scales.ts'
+import { paintChartModel } from './painters.ts'
 
-import type { FeatureChartColorScheme } from './colorSchemes.ts'
-import type { DrawerFunction } from './types.ts'
+import type { SummaryStats } from './statistics.ts'
+import type { DrawerFunction, DrawerProps } from './types.ts'
 
-interface BoxStats {
+/**
+ * Legacy drawer: precomputed five-number summaries (`data.boxes`).
+ *
+ * WP3 turned every built-in drawer into an adapter from *its* payload shape to
+ * the normalized `ChartModel`; the painting itself lives in `painters.ts`. The
+ * public name, the payload contract and the pixels are unchanged, which is what
+ * `specEquivalence.test.ts` pins.
+ */
+
+interface PrecomputedBoxEntry extends SummaryStats {
   name: string
-  min: number
-  q1: number
-  median: number
-  q3: number
-  max: number
   color?: string
 }
 
@@ -20,46 +24,19 @@ interface PrecomputedBoxPlotData {
   boxes?: unknown[]
 }
 
-interface RawTissueData {
-  tissues?: Record<string, number[]>
-}
-
-function quantile(sorted: number[], p: number): number {
-  const index = (sorted.length - 1) * p
-  const lower = Math.floor(index)
-  const upper = Math.ceil(index)
-  const weight = index - lower
-  return sorted[lower]! * (1 - weight) + sorted[upper]! * weight
-}
-
-function computeStats(
-  values: number[],
-): Omit<BoxStats, 'name' | 'color'> | undefined {
-  if (values.length === 0) {
-    return undefined
-  }
-  const sorted = [...values].sort((a, b) => a - b)
-  const q1 = quantile(sorted, 0.25)
-  const median = quantile(sorted, 0.5)
-  const q3 = quantile(sorted, 0.75)
-  const iqr = q3 - q1
-  const min = Math.max(sorted[0]!, q1 - 1.5 * iqr)
-  const max = Math.min(sorted[sorted.length - 1]!, q3 + 1.5 * iqr)
-  return { min, q1, median, q3, max }
-}
-
-function normalizeBoxStats(raw: unknown): BoxStats[] {
+export function normalizeBoxStats(raw: unknown): PrecomputedBoxEntry[] {
   const { boxes } = asDrawerData<PrecomputedBoxPlotData>(raw)
   if (!Array.isArray(boxes) || boxes.length === 0) {
     return []
   }
 
   return boxes
-    .map((box): BoxStats | undefined => {
+    .map((box): PrecomputedBoxEntry | undefined => {
       if (!box || typeof box !== 'object') {
         return undefined
       }
-      const { name, min, q1, median, q3, max, color } = box as Partial<BoxStats>
+      const { name, min, q1, median, q3, max, color } =
+        box as Partial<PrecomputedBoxEntry>
       if (
         typeof name !== 'string' ||
         !Number.isFinite(min) ||
@@ -80,223 +57,82 @@ function normalizeBoxStats(raw: unknown): BoxStats[] {
         ...(color ? { color } : {}),
       }
     })
-    .filter((b): b is BoxStats => b !== undefined)
+    .filter((b): b is PrecomputedBoxEntry => b !== undefined)
 }
 
-function normalizeTissueStats(raw: unknown): BoxStats[] {
+/** `data.boxes` → model. Shared with the spec adapter's equivalence test. */
+export function boxModelFromPrecomputed(raw: unknown) {
+  const entries = normalizeBoxStats(raw)
+  const data: ChartDatum[] = entries.map(entry => ({
+    form: 'summary-stats',
+    stats: {
+      min: entry.min,
+      q1: entry.q1,
+      median: entry.median,
+      q3: entry.q3,
+      max: entry.max,
+    },
+    ...(entry.color === undefined ? {} : { color: entry.color }),
+  }))
+  return {
+    kind: 'box' as const,
+    categories: entries.map(entry => entry.name),
+    series: [{ name: DEFAULT_SERIES_NAME, data }],
+    style: {},
+    axes: {},
+  }
+}
+
+export const precomputedBoxPlotDrawer: DrawerFunction = function (
+  props: DrawerProps,
+) {
+  paintChartModel(props, boxModelFromPrecomputed(props.data))
+}
+
+/**
+ * Legacy drawer: raw observations grouped by tissue (`data.tissues`).
+ *
+ * Same story as `precomputedBoxPlotDrawer` — the drawer is now a payload adapter
+ * and the quartiles are computed by the shared box painter.
+ */
+
+interface RawTissueData {
+  tissues?: Record<string, number[]>
+}
+
+export function normalizeTissueGroups(raw: unknown): [string, number[]][] {
   const { tissues } = asDrawerData<RawTissueData>(raw)
   if (!tissues || typeof tissues !== 'object') {
     return []
   }
-  if (Object.keys(tissues).length === 0) {
-    return []
-  }
-
   return Object.entries(tissues)
-    .map(([name, values]) => {
+    .map(([name, values]): [string, number[]] | undefined => {
       // `tissues` is user data: a group may hold `null`, a string, or numbers
       // stored as strings. Only finite numbers can be summarized.
-      const s = Array.isArray(values)
-        ? computeStats(values.filter((v): v is number => Number.isFinite(v)))
-        : undefined
-      return s ? { ...s, name } : undefined
+      if (!Array.isArray(values)) {
+        return undefined
+      }
+      const finite = values.filter((v): v is number => Number.isFinite(v))
+      return finite.length === 0 ? undefined : [name, finite]
     })
-    .filter((s): s is BoxStats => s !== undefined)
+    .filter((entry): entry is [string, number[]] => entry !== undefined)
 }
 
-function computeYDomain(stats: BoxStats[]): [number, number] | undefined {
-  if (stats.length === 0) {
-    return undefined
+export function boxModelFromTissues(raw: unknown) {
+  const groups = normalizeTissueGroups(raw)
+  const data: ChartDatum[] = groups.map(([, values]) => ({
+    form: 'grouped-values',
+    values,
+  }))
+  return {
+    kind: 'box' as const,
+    categories: groups.map(([name]) => name),
+    series: [{ name: DEFAULT_SERIES_NAME, data }],
+    style: {},
+    axes: {},
   }
-  let min = Infinity
-  let max = -Infinity
-  for (const s of stats) {
-    if (s.min < min) {
-      min = s.min
-    }
-    if (s.max > max) {
-      max = s.max
-    }
-  }
-  if (!Number.isFinite(min) || !Number.isFinite(max)) {
-    return undefined
-  }
-  const padding = (max - min) * 0.05 || 1
-  return [min - padding, max + padding]
 }
 
-function drawBoxStats(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  stats: BoxStats[],
-  colorScheme: FeatureChartColorScheme,
-) {
-  const yDomain = computeYDomain(stats)
-  if (!yDomain) {
-    return
-  }
-
-  const padding = {
-    top: height * 0.12,
-    right: width * 0.08,
-    bottom: height * 0.22,
-    left: width * 0.14,
-  }
-
-  const innerWidth = Math.max(0, width - padding.left - padding.right)
-  const innerHeight = Math.max(0, height - padding.top - padding.bottom)
-
-  if (innerWidth <= 0 || innerHeight <= 0) {
-    return
-  }
-
-  const xScale = scaleBand()
-    .domain(stats.map(d => d.name))
-    .range([0, innerWidth])
-    .padding(0.3)
-
-  const yScale = scaleLinear().domain(yDomain).range([innerHeight, 0]).nice()
-
-  // Background panel (ggplot style)
-  ctx.fillStyle = colorScheme.background
-  ctx.fillRect(0, 0, width, height)
-
-  ctx.save()
-  ctx.translate(padding.left, padding.top)
-
-  // Grid lines
-  ctx.strokeStyle = colorScheme.grid
-  ctx.lineWidth = 1
-  for (const tick of yScale.ticks(5)) {
-    const y = yScale(tick)
-    ctx.beginPath()
-    ctx.moveTo(0, y)
-    ctx.lineTo(innerWidth, y)
-    ctx.stroke()
-  }
-
-  // Y axis
-  ctx.strokeStyle = colorScheme.axis
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.moveTo(0, 0)
-  ctx.lineTo(0, innerHeight)
-  ctx.lineTo(innerWidth, innerHeight)
-  ctx.stroke()
-
-  // Y ticks and labels
-  ctx.fillStyle = colorScheme.text
-  ctx.font = `${Math.max(8, Math.min(12, height * 0.05))}px sans-serif`
-  ctx.textAlign = 'right'
-  ctx.textBaseline = 'middle'
-  for (const tick of yScale.ticks(5)) {
-    const y = yScale(tick)
-    ctx.beginPath()
-    ctx.moveTo(-4, y)
-    ctx.lineTo(0, y)
-    ctx.stroke()
-    ctx.fillText(formatTick(tick), -8, y)
-  }
-
-  // X labels and boxes
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'top'
-  for (const [i, d] of stats.entries()) {
-    const x = (xScale(d.name) ?? 0) + xScale.bandwidth() / 2
-    const label = truncateLabel(d.name, xScale.bandwidth())
-    ctx.fillStyle = colorScheme.text
-    ctx.fillText(label, x, innerHeight + 6)
-
-    // Color
-    const color = d.color ?? colorScheme.colors[i % colorScheme.colors.length]!
-
-    const boxX = xScale(d.name) ?? 0
-    const boxW = xScale.bandwidth()
-    const yQ1 = yScale(d.q1)
-    const yQ3 = yScale(d.q3)
-    const yMedian = yScale(d.median)
-    const yMin = yScale(d.min)
-    const yMax = yScale(d.max)
-
-    // Whiskers
-    ctx.strokeStyle = colorScheme.muted
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.moveTo(boxX + boxW / 2, yMin)
-    ctx.lineTo(boxX + boxW / 2, yMax)
-    ctx.stroke()
-
-    // Whisker caps
-    ctx.beginPath()
-    ctx.moveTo(boxX + boxW * 0.25, yMin)
-    ctx.lineTo(boxX + boxW * 0.75, yMin)
-    ctx.moveTo(boxX + boxW * 0.25, yMax)
-    ctx.lineTo(boxX + boxW * 0.75, yMax)
-    ctx.stroke()
-
-    // Box
-    ctx.fillStyle = `${color}33` // 20% opacity
-    ctx.strokeStyle = color
-    ctx.lineWidth = 1.5
-    const boxY = Math.min(yQ1, yQ3)
-    const boxH = Math.abs(yQ3 - yQ1)
-    ctx.fillRect(boxX, boxY, boxW, boxH)
-    ctx.strokeRect(boxX, boxY, boxW, boxH)
-
-    // Median
-    ctx.strokeStyle = colorScheme.axis
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(boxX, yMedian)
-    ctx.lineTo(boxX + boxW, yMedian)
-    ctx.stroke()
-  }
-
-  ctx.restore()
-}
-
-export const precomputedBoxPlotDrawer: DrawerFunction = function (props) {
-  const { ctx, width, height, data } = props
-  const stats = normalizeBoxStats(data)
-  if (stats.length === 0) {
-    return
-  }
-  drawBoxStats(
-    ctx,
-    width,
-    height,
-    stats,
-    props.colorScheme ?? resolveColorScheme(props.theme),
-  )
-}
-
-export const rawBoxPlotDrawer: DrawerFunction = function (props) {
-  const { ctx, width, height, data } = props
-  const stats = normalizeTissueStats(data)
-  if (stats.length === 0) {
-    return
-  }
-  drawBoxStats(
-    ctx,
-    width,
-    height,
-    stats,
-    props.colorScheme ?? resolveColorScheme(props.theme),
-  )
-}
-
-function formatTick(value: number): string {
-  if (Math.abs(value) >= 1000 || (Math.abs(value) < 0.01 && value !== 0)) {
-    return value.toExponential(1)
-  }
-  return Number.isInteger(value) ? String(value) : value.toFixed(1)
-}
-
-function truncateLabel(label: string, maxWidth: number): string {
-  const approxChars = Math.max(3, Math.floor(maxWidth / 6))
-  if (label.length <= approxChars) {
-    return label
-  }
-  return `${label.slice(0, approxChars - 1)}…`
+export const rawBoxPlotDrawer: DrawerFunction = function (props: DrawerProps) {
+  paintChartModel(props, boxModelFromTissues(props.data))
 }

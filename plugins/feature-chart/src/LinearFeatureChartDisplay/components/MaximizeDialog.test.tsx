@@ -126,4 +126,72 @@ describe('MaximizeDialog', () => {
     expect(canvas.width).toBe(640 * dpr)
     expect(canvas.height).toBe(320 * dpr)
   })
+
+  test('lists every problem of an invalid spec instead of rendering blanks', async () => {
+    const spec = {
+      specVersion: 1,
+      kind: 'violin',
+      data: { form: 'summary-stats', path: 'boxes' },
+      style: { colorScheme: 'plasma' },
+    }
+    getConf.mockImplementation((_model: unknown, path: string[] | string) => {
+      const key = Array.isArray(path) ? path[path.length - 1] : path
+      if (key === 'drawer') {
+        return 'spec'
+      }
+      if (key === 'spec') {
+        return spec
+      }
+      return undefined
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+      />,
+    )
+
+    const alert = await screen.findByTestId('feature-chart-spec-error')
+    const text = alert.textContent ?? ''
+    // both the illegal combination and the unknown palette, not just the first
+    expect(text).toContain('2 problems')
+    expect(text).toContain('spec.data.form')
+    expect(text).toContain('grouped-values')
+    expect(text).toContain('spec.style.colorScheme')
+    // the description keeps working while the chart cannot be drawn
+    expect(screen.getByText('**GENE1** expression')).toBeTruthy()
+  })
+
+  test('a valid spec shows the canvas, not an alert', () => {
+    const spec = {
+      specVersion: 1,
+      kind: 'box',
+      data: { form: 'grouped-values', path: 'tissues' },
+    }
+    getConf.mockImplementation((_model: unknown, path: string[] | string) => {
+      const key = Array.isArray(path) ? path[path.length - 1] : path
+      if (key === 'drawer') {
+        return 'spec'
+      }
+      if (key === 'spec') {
+        return spec
+      }
+      return undefined
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+      />,
+    )
+
+    expect(screen.getByTestId('feature-chart-maximize-canvas')).toBeTruthy()
+    expect(screen.queryByTestId('feature-chart-spec-error')).toBeNull()
+  })
 })
