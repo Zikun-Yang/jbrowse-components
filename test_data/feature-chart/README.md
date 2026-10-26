@@ -14,16 +14,35 @@ http://localhost:3000/?config=test_data/feature-chart/config.json
 
 ## What it proves
 
-| Track                     | Drawer          | What it demonstrates                                                                  |
-| ------------------------- | --------------- | ------------------------------------------------------------------------------------- |
-| `fc_precomputed`          | _omitted_       | the schema default (`precomputedBoxPlot`) is a real, registered drawer                |
-| `fc_raw_box`              | `rawBoxPlot`    | raw observations aggregated at render time; `colorScheme: set2`                       |
-| `fc_violin`               | `rawViolinPlot` | same adapter/file as `fc_raw_box`, different mark; `colorScheme: viridis`             |
-| `fc_bar`                  | `barPlot`       | `data.bars`                                                                           |
-| `fc_histogram`            | `histogram`     | `data.values`; `formatAbout.showInfo: false` hides the Track info card for this track |
-| `fc_broken`               | `tissueBoxPlot` | unknown drawer → readable placeholder + available names, no track error               |
-| (site-wide `formatAbout`) | —               | root `configuration.formatAbout.info` is the default text in every About dialog       |
-| (`fc_precomputed`)        | —               | track-level `formatAbout.info` overrides the site-wide text and uses `{{track.*}}`    |
+| Track                     | Drawer                    | What it demonstrates                                                                   |
+| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| `fc_precomputed`          | _omitted_                 | the schema default (`precomputedBoxPlot`) is a real, registered drawer                 |
+| `fc_raw_box`              | `rawBoxPlot`              | raw observations aggregated at render time; `colorScheme: set2`                        |
+| `fc_violin`               | `rawViolinPlot`           | same adapter/file as `fc_raw_box`, different mark; `colorScheme: viridis`              |
+| `fc_bar`                  | `barPlot`                 | `data.bars`                                                                            |
+| `fc_histogram`            | `histogram`               | `data.values`; `formatAbout.showInfo: false` hides the Track info card for this track  |
+| `fc_broken`               | `tissueBoxPlot`           | unknown drawer → readable placeholder + available names, no track error                |
+| `fc_plugin_heatmap`       | `samplePlugin/heatmap`    | plugin drawer from `plugins/sampleChartDrawers.js`; `drawerOptions` picks the ramp/gap |
+| `fc_plugin_dots`          | `samplePlugin/dotPlot`    | same plugin, second drawer; `drawerOptions` controls radius/jitter/opacity             |
+| `fc_missing_plugin`       | `notLoadedPlugin/heatmap` | placeholder says the _plugin_ is missing and names it                                  |
+| (site-wide `formatAbout`) | —                         | root `configuration.formatAbout.info` is the default text in every About dialog        |
+| (`fc_precomputed`)        | —                         | track-level `formatAbout.info` overrides the site-wide text and uses `{{track.*}}`     |
+
+## The example plugin
+
+`plugins/sampleChartDrawers.js` is a dependency-free ES module loaded by
+`config.json` through `plugins[0].esmLoc.uri`. It contributes two canvas drawers
+with `Core-featureChartDrawer` and is the runnable version of
+`website/docs/developer_guides/feature_chart_drawers.md`.
+
+It also sets `globalThis.__sampleChartDrawers = { context, drawers }` in
+`install()`. That is the cheapest way to prove a plugin installed in _both_
+contexts: read it in the page console (main thread) and in the RPC worker.
+`context` is `'main thread'` in one and `'worker'` in the other.
+
+Edit the file and reload — no build step. If the browser or the worker keeps an
+old copy, add a version (`plugins/sampleChartDrawers.js?v=2`) to the `esmLoc`
+URI, or set `window.__jbrowseCacheBuster = true`.
 
 ## Data
 

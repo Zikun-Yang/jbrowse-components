@@ -1,9 +1,9 @@
 # FeatureChartTrack architecture (WP0 contract)
 
 This document is the contract other work packages build on. It covers the drawer
-catalog, the failure semantics, the config boundary, and the seams left open for
-WP2 (plugin-contributed drawers / `drawerOptions`), WP3 (declarative `spec`),
-WP4 (renderer model unification) and WP5 (agent-sdk fields).
+catalog, the failure semantics, the config boundary, plugin-contributed drawers
+(WP2, landed), and the seams left open for WP3 (declarative `spec`), WP4
+(renderer model unification) and WP5 (agent-sdk fields).
 
 Requirements, data formats and config examples live in
 [`FeatureChartTrack.md`](./FeatureChartTrack.md).
@@ -27,8 +27,11 @@ module-level singleton per context; nothing is serialized across the boundary.
 
 ## Drawer catalog
 
-`src/FeatureChartDrawer/drawerRegistry.ts` owns a `Map<string, { meta, draw }>`.
-`meta` is the serializable, enumerable part; `draw` is the function.
+`src/FeatureChartDrawer/drawerRegistry.ts` owns a `Map<string, { meta, draw }>`
+for the module instance, and derives a **per-`PluginManager` catalog** from it
+by merging what plugins contribute through the `Core-featureChartDrawer`
+extension point. `meta` is the serializable, enumerable part; `draw` is the
+function.
 
 ```ts
 interface FeatureChartDrawerMeta {
@@ -37,7 +40,7 @@ interface FeatureChartDrawerMeta {
   description: string // one sentence: what it draws and what it eats
   dataShape: 'tissues' | 'matrix' | 'series' | 'any'
   defaultSize?: { width: number; height: number }
-  optionsSchema?: unknown // reserved for WP2 drawerOptions documentation
+  optionsSchema?: unknown // documentation for drawerOptions keys (not validated)
 }
 ```
 
@@ -50,22 +53,66 @@ interface FeatureChartDrawerMeta {
 | `series`  | one numeric series (`data.values`)                                |
 | `any`     | custom drawers that do not want to declare a shape                |
 
-Public API (also re-exported from the package root):
+Public API (also re-exported from the package root). Every lookup takes an
+optional `pluginManager`; pass it to include plugin-contributed drawers:
 
-- `registerFeatureChartDrawer(name, draw, meta?)` — the third argument is
-  optional. Missing meta is filled with `displayName = name`,
-  `description = 'Custom FeatureChart drawer "<name>"'`, `dataShape = 'any'`, so
-  pre-catalog callers keep working.
-- `getFeatureChartDrawer(name)` — unchanged signature, returns the draw function
-  or `undefined`.
-- `getFeatureChartDrawerMeta(name)` — catalog entry, if registered.
-- `listFeatureChartDrawers()` / `listFeatureChartDrawerNames()` — sorted by
-  `name` with a plain `<` comparison (no `localeCompare`), so ordering is
-  identical in every worker, browser and test run.
-- `resolveFeatureChartDrawer(name)` — `{ drawer, meta }` or
-  `{ error, available }`; never throws.
+- `getFeatureChartDrawer(name, pluginManager?)` — the draw function, or
+  `undefined`.
+- `getFeatureChartDrawerMeta(name, pluginManager?)` — catalog entry.
+- `listFeatureChartDrawers(pluginManager?)` /
+  `listFeatureChartDrawerNames(pluginManager?)` — sorted by `name` with a plain
+  `<` comparison (no `localeCompare`), so ordering is identical in every worker,
+  browser and test run.
+- `resolveFeatureChartDrawer(name, pluginManager?)` — `{ drawer, meta }` or
+  `{ error, available, missingPlugin?, pluginLoaded?, suggestions? }`; never
+  throws.
+- `clearFeatureChartDrawerCache(pluginManager?)` — drop the cached merged
+  catalog for one plugin manager, or all of them when called without arguments.
 - `initBuiltInDrawers()` — registers the five built-ins; idempotent and called
   from `FeatureChartPlugin.install()`.
+- `registerFeatureChartDrawer(name, draw, meta?)` — **legacy**, only for code
+  that shares this module instance (built-ins, in-repo callers, tests). See "Why
+  plugins cannot import this module" below.
+
+### Why the catalog is scoped to the PluginManager
+
+An external plugin is a separate ES module graph. Even bundled, it carries its
+own copy of `drawerRegistry.ts`, so its module-level `Map` is not the host's:
+`registerFeatureChartDrawer` would "succeed" into a map nobody reads, with no
+error. The only shared channel is the `PluginManager`, hence:
+
+```ts
+pluginManager.addToExtensionPoint('Core-featureChartDrawer', drawers => [
+  ...drawers,
+  { name: 'myPlugin/heatmap', draw },
+])
+```
+
+`getCatalog(pluginManager)` evaluates that extension point with the module
+registry's contributions as the extendee, applies the returned entries in order
+(later wins) and caches the result in a `WeakMap` keyed by the plugin manager.
+The module registry stays the base, so a plugin that returns a list without
+spreading the extendee cannot erase the built-ins.
+
+Cache invalidation:
+
+- `registerFeatureChartDrawer` / `initBuiltInDrawers` bump a module-level epoch;
+  every cached catalog compares against it and rebuilds lazily.
+- `clearFeatureChartDrawerCache(pm)` forces one plugin manager to rebuild (hot
+  reload, or a test that adds a callback after `configure()`).
+
+### Registration semantics
+
+- **Naming.** Plugin drawers should be `pluginName/drawerName`. A contribution
+  without a prefix that is not an existing built-in logs a dev warning; nothing
+  is rejected (the catalog stays usable).
+- **Overrides.** An equally named later entry wins, and a dev build logs
+  `drawer "<name>" was overridden by a plugin`. Built-in names are not reserved,
+  because a site may legitimately want its own `barPlot`.
+- **Robustness.** Entries that are not objects, have no `name`, or have no
+  `draw` function are skipped with a dev warning, and an invalid `dataShape` is
+  coerced to `'any'`. A no-build plugin is plain JS, so the catalog must not
+  trust its own input.
 
 Built-ins: `precomputedBoxPlot` (default), `rawBoxPlot`, `rawViolinPlot`,
 `barPlot`, `histogram`.
@@ -108,7 +155,7 @@ via `src/renderSettings.ts`:
 
 ```ts
 resolveFeatureChartRenderSettings(config): {
-  drawer, chartWidth, chartHeight, align,
+  drawer, drawerOptions, chartWidth, chartHeight, align,
   maxChartsPerView, minChartSpacingPx, colorScheme,
 }
 ```
@@ -131,8 +178,25 @@ Consequences:
 Guard: `renderFeatureChart.test.ts` calls `renderFeatureChart()` with a
 config-only `renderProps` object and asserts the drawer receives the width,
 height and palette from config, and that the returned chart height matches
-config. `renderSettings.test.ts` pins the six-field mapping and the sanitizing
-fallbacks.
+config. `renderSettings.test.ts` pins the slot mapping, the `drawerOptions`
+sanitizing (non-objects become `{}`) and the other fallbacks.
+
+## `drawerOptions`
+
+`drawerOptions` is a `frozen` slot on both renderers, resolved by
+`renderSettings.ts` and passed to the drawer as `DrawerProps.options` (always an
+object, `{}` when unset). It is intentionally **not validated**:
+
+- the config editor does not check it, and `meta.optionsSchema` is documentation
+  only, so adding a knob never requires a schema migration;
+- a wrong value shows up as a wrong-looking chart, not an error, which is why
+  the developer guide requires drawers to default and clamp every key;
+- the canvas renderer and the maximize canvas read the same slot from the
+  display's renderer config, so both stay identical.
+
+`FeatureChartPlotlyRenderer` declares the slot as well, so switching renderers
+keeps a track's configuration intact, but the Plotly backend chooses its chart
+with `plotType` and does not consume drawers until WP4 unifies both backends.
 
 ## Color scheme
 
@@ -174,14 +238,23 @@ re-introducing an ESM-only dependency into the product entry points.
 
 ## Seams left for later work packages
 
-- **WP2 — plugin-contributed drawers.** `registerFeatureChartDrawer`'s optional
-  `meta` and `FeatureChartDrawerMeta.optionsSchema` are the intended landing
-  pad. The catalog is sorted and serializable, so an extension point can expose
-  `listFeatureChartDrawers()` verbatim. Until that exists, third-party code
-  should not `import '@jbrowse/plugin-feature-chart'` just to register a drawer;
-  see `FeatureChartTrack.md` §3.5.
+- **WP2 — plugin-contributed drawers (landed).** `Core-featureChartDrawer`, the
+  per-`PluginManager` catalog and `drawerOptions` are documented above.
+  Third-party code must not `import '@jbrowse/plugin-feature-chart'` to
+  register; see `FeatureChartTrack.md` §3.5 and the website developer guide.
+
+  **When to upgrade to a first-class `DrawerType`**
+  (`pluginManager.addDrawerType`): only when a _second_ chart-like track type
+  needs the same catalog / parameter schema / generated docs, or when drawers
+  must be configured outside a renderer config (e.g. a track-level gallery).
+  Until then the extension point is strictly cheaper: no new core surface, no
+  new element type, no extra serialization.
+
 - **WP3 — declarative `spec`.** Reads `config` only, so a spec can be compiled
-  into the same render settings object. No display change required.
+  into the same render settings object. No display change required. The drawer
+  signature is the seam: WP2 keeps `data` and adds `options`; WP3 replaces
+  `data` with the normalized chart model _in the same commit series_, never in
+  parallel, so there is no half-migrated state.
 - **WP4 — renderer unification.** `renderSettings.ts` and the shared
   `computeChartX` / density-warning logic are the current duplication boundary.
 - **WP5 — agent-sdk.** `listFeatureChartDrawers()` (name, displayName,
@@ -190,23 +263,26 @@ re-introducing an ESM-only dependency into the product entry points.
 
 ## Tests that guard this contract
 
-| File                                                           | Guards                                                                                               |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `FeatureChartDrawer/drawerRegistry.test.ts`                    | catalog completeness, stable sorting, legacy registration, resolve/error paths                       |
-| `FeatureChartRenderer/configSchema.test.ts`                    | drawer default is a built-in (regression gate for the old `tissueBoxPlot` default), palette defaults |
-| `FeatureChartRenderer/renderFeatureChart.test.ts`              | config-only rendering, 6 settings from config, unknown drawer placeholder, alignment math            |
-| `renderSettings.test.ts`                                       | config → settings mapping, malformed value fallbacks                                                 |
-| `FeatureChartDrawer/colorSchemes.test.ts`                      | palette shape, default, warn-once fallback, dark-mode behavior                                       |
-| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing           |
-| `chartGeometry.test.ts`                                        | chart-rectangle hit test, alignment math, icon placement/clamping                                    |
-| `corePluginsRegistration.test.ts`                              | all three products depend on and register the plugin                                                 |
+| File                                                           | Guards                                                                                                                                                                       |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FeatureChartDrawer/drawerRegistry.test.ts`                    | catalog completeness, stable sorting, legacy registration, resolve/error paths                                                                                               |
+| `FeatureChartDrawer/pluginDrawerRegistry.test.ts`              | extension point merge, main-thread _and_ worker assembly order, per-`PluginManager` cache + invalidation, override/warn, malformed contributions, missing-plugin diagnostics |
+| `FeatureChartDrawer/samplePlugin.test.ts`                      | the shipped no-build example plugin still registers and paints, `drawerOptions` change the output                                                                            |
+| `FeatureChartRenderer/configSchema.test.ts`                    | drawer default is a built-in (regression gate for the old `tissueBoxPlot` default), palette defaults                                                                         |
+| `FeatureChartRenderer/renderFeatureChart.test.ts`              | config-only rendering, 6 settings from config, unknown drawer placeholder, alignment math                                                                                    |
+| `renderSettings.test.ts`                                       | config → settings mapping, malformed value fallbacks                                                                                                                         |
+| `FeatureChartDrawer/colorSchemes.test.ts`                      | palette shape, default, warn-once fallback, dark-mode behavior                                                                                                               |
+| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing                                                                                   |
+| `chartGeometry.test.ts`                                        | chart-rectangle hit test, alignment math, icon placement/clamping                                                                                                            |
+| `corePluginsRegistration.test.ts`                              | all three products depend on and register the plugin                                                                                                                         |
 
 ## File map
 
 ```
 src/
   FeatureChartDrawer/
-    drawerRegistry.ts     catalog + resolve + built-in registration
+    drawerRegistry.ts     module registry + per-PluginManager merge, resolve, built-ins
+    drawerErrors.ts       shared placeholder/Alert wording (missing plugin, suggestions)
     colorSchemes.ts       palettes + theme resolution
     scales.ts             band/linear scales + tick values (no d3 dependency)
     types.ts              DrawerProps, DrawerFunction, drawer meta
@@ -262,3 +338,12 @@ browser (`pnpm --filter jbrowse-web start`, then
 schema default with `drawer` omitted, an unknown drawer placeholder, a
 track-level `formatAbout.info`, the root `configuration.formatAbout.info`
 fallback, and `formatAbout.showInfo: false`. See the README next to it.
+
+The same config loads `plugins/sampleChartDrawers.js` through
+`plugins[0].esmLoc.uri` and adds three plugin-related tracks:
+
+| Track               | Proves                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| `fc_plugin_heatmap` | a plugin drawer (`samplePlugin/heatmap`) paints in the RPC worker, `drawerOptions` change its form |
+| `fc_plugin_dots`    | the same plugin ships a second drawer; nothing about the first one was special-cased               |
+| `fc_missing_plugin` | `notLoadedPlugin/heatmap` → placeholder that names the missing plugin, track stays alive           |

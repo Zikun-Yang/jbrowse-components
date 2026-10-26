@@ -22,14 +22,31 @@ reference the markdown files in our repo of the checked out git tag
 
 #### slot: drawer
 
-Name of the drawer that paints each chart. Must be one of the built-in drawers
-(see `listFeatureChartDrawers()`) or a drawer registered at runtime; unknown
-names render a placeholder instead of failing the track.
+Name of the drawer that paints each chart. Either one of the built-in drawers
+(`precomputedBoxPlot`, `rawBoxPlot`, `rawViolinPlot`, `barPlot`, `histogram`),
+or a drawer contributed by a plugin as `<pluginName>/<drawerName>` through the
+`Core-featureChartDrawer` extension point. Unknown names render a placeholder
+instead of failing the track; a placeholder that says "missing plugin" usually
+means the drawer's plugin is not listed in `config.plugins`.
 
 ```js
 drawer: {
       type: 'string',
       defaultValue: 'precomputedBoxPlot',
+    }
+```
+
+#### slot: drawerOptions
+
+Arbitrary JSON handed to the drawer as `DrawerProps.options`, so one drawer can
+render several variants (colors, sizes, ramps, …) without a new registration.
+Not validated by the config editor: each drawer documents the keys it reads in
+`FeatureChartDrawerMeta.optionsSchema` and clamps out-of-range values itself.
+
+```js
+drawerOptions: {
+      type: 'frozen',
+      defaultValue: {},
     }
 ```
 
