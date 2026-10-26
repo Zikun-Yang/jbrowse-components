@@ -22,7 +22,9 @@ const DisplayComponent = observer(function DisplayComponent({
       <BaseLinearDisplayComponent model={model} />
       {feature ? (
         <FullscreenIcon
-          onClick={() => setDialogOpen(true)}
+          onClick={() => {
+            setDialogOpen(true)
+          }}
           style={{
             position: 'absolute',
             top: 4,
@@ -38,7 +40,9 @@ const DisplayComponent = observer(function DisplayComponent({
       ) : null}
       <MaximizeDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        onClose={() => {
+          setDialogOpen(false)
+        }}
         feature={feature}
         displayModel={model}
       />

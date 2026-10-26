@@ -9,6 +9,7 @@ import ComparativeAdapters from '@jbrowse/plugin-comparative-adapters'
 import Config from '@jbrowse/plugin-config'
 import DataManagement from '@jbrowse/plugin-data-management'
 import DotplotView from '@jbrowse/plugin-dotplot-view'
+import FeatureChartPlugin from '@jbrowse/plugin-feature-chart'
 import GCContent from '@jbrowse/plugin-gccontent'
 import Gff3 from '@jbrowse/plugin-gff3'
 import GridBookmarkPlugin from '@jbrowse/plugin-grid-bookmark'
@@ -32,6 +33,7 @@ import Wiggle from '@jbrowse/plugin-wiggle'
 const corePlugins = [
   Canvas,
   LinearGenomeView,
+  FeatureChartPlugin,
   Alignments,
   Authentication,
   Bed,

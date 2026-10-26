@@ -1,17 +1,24 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { readConfObject } from '@jbrowse/core/configuration'
 import { observer } from 'mobx-react'
 
-import type { Feature, Region } from '@jbrowse/core/util'
-import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
-import type { BaseLinearDisplayModel } from '@jbrowse/plugin-linear-genome-view'
+import {
+  type FeatureChartColorScheme,
+  resolveColorScheme,
+} from '../../FeatureChartDrawer/colorSchemes.ts'
+import { resolveFeatureChartRenderSettings } from '../../renderSettings.ts'
 
-type PlotlyModule = typeof import('plotly.js-dist-min').default
-type PlotlyData = Partial<import('plotly.js-dist-min').Data>
-type PlotlyLayout = Partial<import('plotly.js-dist-min').Layout>
-type PlotlyConfig = Partial<import('plotly.js-dist-min').Config>
-type PlotlyPlotType = import('plotly.js-dist-min').PlotType
+import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
+import type { Feature, Region } from '@jbrowse/core/util'
+import type { BaseLinearDisplayModel } from '@jbrowse/plugin-linear-genome-view'
+import type { ThemeOptions } from '@mui/material'
+import type {
+  Config as PlotlyConfig,
+  Data as PlotlyData,
+  Layout as PlotlyLayout,
+  PlotlyModule,
+} from 'plotly.js-dist-min'
 
 function computeChartX(
   feature: Feature,
@@ -20,16 +27,15 @@ function computeChartX(
   chartWidth: number,
   align: 'left' | 'right' | 'center',
 ): number {
-  const start = feature.get('start') as number
-  const end = feature.get('end') as number
+  const start = feature.get('start')
+  const end = feature.get('end')
 
   switch (align) {
     case 'left':
       return (start - region.start) / bpPerPx
     case 'right':
       return (end - region.start) / bpPerPx - chartWidth
-    case 'center':
-    default: {
+    case 'center': {
       const center = (start + end) / 2
       return (center - region.start) / bpPerPx - chartWidth / 2
     }
@@ -63,14 +69,26 @@ function checkShouldShowWarning(
   return false
 }
 
+type TraceWithColor = PlotlyData & {
+  marker?: { color?: unknown }
+  line?: { color?: unknown }
+}
+
 function buildTraces(
   plotType: string,
   data: unknown,
   name: string,
+  colorScheme: FeatureChartColorScheme,
 ): PlotlyData[] {
-  // If data is already an array of Plotly traces, use it directly
+  // If data is already an array of Plotly traces, use it directly, filling in
+  // palette colors only for traces that did not specify one.
   if (Array.isArray(data)) {
-    return data as PlotlyData[]
+    return (data as TraceWithColor[]).map((trace, i) => ({
+      ...trace,
+      ...(trace.marker?.color || trace.line?.color
+        ? {}
+        : { marker: { color: pickColor(colorScheme, i) } }),
+    }))
   }
 
   // If data looks like { x: number[], y: number[] }, use it for scatter/line
@@ -84,11 +102,13 @@ function buildTraces(
   ) {
     return [
       {
-        type: plotType === 'line' ? 'scatter' : (plotType as PlotlyPlotType),
+        type: plotType === 'line' ? 'scatter' : plotType,
         mode: plotType === 'line' ? 'lines' : 'markers',
         x: (data as { x: number[] }).x,
         y: (data as { y: number[] }).y,
         name,
+        marker: { color: pickColor(colorScheme, 0) },
+        line: { color: pickColor(colorScheme, 0) },
       },
     ]
   }
@@ -109,26 +129,31 @@ function buildTraces(
         x: entries.map(([k]) => k),
         y: entries.map(([, v]) => Number(v)),
         name,
+        marker: { color: pickColor(colorScheme, 0) },
       },
     ]
   }
 
   // Box or violin: values are arrays of numbers
   if (plotType === 'box') {
-    return entries.map(([category, values]) => ({
+    return entries.map(([category, values], i) => ({
       type: 'box' as const,
       name: category,
       y: values as number[],
       boxpoints: false,
+      marker: { color: pickColor(colorScheme, i) },
+      line: { color: pickColor(colorScheme, i) },
     }))
   }
 
   if (plotType === 'violin') {
-    return entries.map(([category, values]) => ({
+    return entries.map(([category, values], i) => ({
       type: 'violin' as const,
       name: category,
       y: values as number[],
       points: false,
+      marker: { color: pickColor(colorScheme, i) },
+      line: { color: pickColor(colorScheme, i) },
     }))
   }
 
@@ -143,8 +168,13 @@ function buildTraces(
           : Number(v),
       ),
       name,
+      marker: { color: pickColor(colorScheme, 0) },
     },
   ]
+}
+
+function pickColor(colorScheme: FeatureChartColorScheme, index: number) {
+  return colorScheme.colors[index % colorScheme.colors.length]!
 }
 
 const FeatureChartPlotlyRendering = observer(
@@ -157,23 +187,41 @@ const FeatureChartPlotlyRendering = observer(
     blockKey: string
     displayModel: BaseLinearDisplayModel
     config: AnyConfigurationModel
+    theme?: ThemeOptions
   }) {
-    const { features, regions, bpPerPx, width, height, displayModel, config } =
-      props
+    const {
+      features,
+      regions,
+      bpPerPx,
+      width,
+      height,
+      displayModel,
+      config,
+      theme,
+    } = props
     const region = regions[0]!
     const containerRef = useRef<HTMLDivElement>(null)
     const [plotlyModule, setPlotlyModule] = useState<PlotlyModule | null>(null)
 
-    const chartHeight = (readConfObject(config, 'chartHeight') as number) ?? 180
-    const chartWidth = (readConfObject(config, 'chartWidth') as number) ?? 120
-    const align =
-      (readConfObject(config, 'align') as 'left' | 'right' | 'center') ??
-      'center'
-    const plotType = (readConfObject(config, 'plotType') as string) ?? 'box'
-    const maxChartsPerView =
-      (readConfObject(config, 'maxChartsPerView') as number) ?? 100
-    const minChartSpacingPx =
-      (readConfObject(config, 'minChartSpacingPx') as number) ?? 4
+    // Geometry and colors come from this renderer's own config, not from
+    // fields copied into the render props by the display.
+    const settings = resolveFeatureChartRenderSettings(config)
+    const {
+      chartHeight,
+      chartWidth,
+      align,
+      maxChartsPerView,
+      minChartSpacingPx,
+    } = settings
+    const themeMode = theme?.palette?.mode
+    const colorScheme = useMemo(
+      () => resolveColorScheme(theme, settings.colorScheme),
+      // The resolved scheme only depends on the palette name and theme mode.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [themeMode, settings.colorScheme],
+    )
+    const plotType =
+      (readConfObject(config, 'plotType') as string | undefined) ?? 'box'
 
     useEffect(() => {
       let cancelled = false
@@ -183,7 +231,7 @@ const FeatureChartPlotlyRendering = observer(
             setPlotlyModule(mod.default)
           }
         })
-        .catch(error => {
+        .catch((error: unknown) => {
           console.error('Failed to load Plotly', error)
         })
       return () => {
@@ -273,6 +321,7 @@ const FeatureChartPlotlyRendering = observer(
               chartWidth={chartWidth}
               x={x}
               plotlyModule={plotlyModule}
+              colorScheme={colorScheme}
             />
           ))
         )}
@@ -288,6 +337,7 @@ function Chart({
   chartWidth,
   x,
   plotlyModule,
+  colorScheme,
 }: {
   feature: Feature
   plotType: string
@@ -295,6 +345,7 @@ function Chart({
   chartWidth: number
   x: number
   plotlyModule: PlotlyModule | null
+  colorScheme: FeatureChartColorScheme
 }) {
   const divRef = useRef<HTMLDivElement>(null)
   const contextData = feature.get('contextData') as
@@ -308,11 +359,15 @@ function Chart({
   const traces = buildTraces(
     plotType,
     contextData?.data,
-    contextData?.name ?? (feature.get('name') as string) ?? feature.id(),
+    contextData?.name ??
+      (feature.get('name') as string | undefined) ??
+      feature.id(),
+    colorScheme,
   )
 
   useEffect(() => {
-    if (!divRef.current || !plotlyModule || traces.length === 0) {
+    const node = divRef.current
+    if (!node || !plotlyModule || traces.length === 0) {
       return
     }
 
@@ -321,10 +376,24 @@ function Chart({
       height: chartHeight,
       margin: { l: 30, r: 10, t: 20, b: 30 },
       showlegend: false,
-      xaxis: { tickfont: { size: 8 }, automargin: true },
-      yaxis: { tickfont: { size: 8 }, automargin: true },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
+      colorway: colorScheme.colors,
+      font: { size: 8, color: colorScheme.text },
+      xaxis: {
+        tickfont: { size: 8 },
+        automargin: true,
+        gridcolor: colorScheme.grid,
+        linecolor: colorScheme.axis,
+        zerolinecolor: colorScheme.grid,
+      },
+      yaxis: {
+        tickfont: { size: 8 },
+        automargin: true,
+        gridcolor: colorScheme.grid,
+        linecolor: colorScheme.axis,
+        zerolinecolor: colorScheme.grid,
+      },
+      paper_bgcolor: colorScheme.background,
+      plot_bgcolor: colorScheme.background,
     }
 
     const plotlyConfig: PlotlyConfig = {
@@ -333,19 +402,17 @@ function Chart({
     }
 
     plotlyModule
-      .newPlot(divRef.current, traces, layout, plotlyConfig)
+      .newPlot(node, traces, layout, plotlyConfig)
       .catch((error: unknown) => {
         console.error('Plotly render error', error)
       })
 
     return () => {
-      if (divRef.current && plotlyModule) {
-        plotlyModule.purge(divRef.current).catch(() => {
-          // ignore purge errors
-        })
-      }
+      plotlyModule.purge(node).catch(() => {
+        // ignore purge errors
+      })
     }
-  }, [plotlyModule, traces, chartWidth, chartHeight])
+  }, [plotlyModule, traces, chartWidth, chartHeight, colorScheme])
 
   return (
     <div

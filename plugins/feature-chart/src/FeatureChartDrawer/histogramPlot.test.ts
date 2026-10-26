@@ -1,30 +1,5 @@
 import { histogramPlotDrawer } from './histogramPlot.ts'
 
-jest.mock('d3-scale', () => ({
-  scaleLinear: () => {
-    const scale = ((value: number) => {
-      const [min, max] = (scale as any).domainValue as [number, number]
-      const [rMin, rMax] = (scale as any).rangeValue as [number, number]
-      if (max === min) return rMin
-      return rMax + ((value - min) / (max - min)) * (rMin - rMax)
-    }) as any
-    scale.domain = (d?: [number, number]) => {
-      scale.domainValue = d ?? [0, 1]
-      return scale
-    }
-    scale.range = (r?: [number, number]) => {
-      scale.rangeValue = r ?? [0, 1]
-      return scale
-    }
-    scale.nice = () => scale
-    scale.ticks = () => {
-      const [min, max] = (scale.domainValue as [number, number]) ?? [0, 1]
-      return [min, (min + max) / 2, max]
-    }
-    return scale
-  },
-}))
-
 function createMockCanvasContext(width: number, height: number) {
   const ctx = {
     canvas: { width, height },
@@ -68,7 +43,7 @@ describe('histogramPlotDrawer', () => {
   test('draws background panel and histogram bars', () => {
     const ctx = createMockCanvasContext(300, 200)
 
-    histogramPlotDrawer({
+    void histogramPlotDrawer({
       ctx,
       width: 300,
       height: 200,
@@ -87,7 +62,7 @@ describe('histogramPlotDrawer', () => {
 
   test('returns early when no values are provided', () => {
     const ctx = createMockCanvasContext(200, 150)
-    histogramPlotDrawer({
+    void histogramPlotDrawer({
       ctx,
       width: 200,
       height: 150,

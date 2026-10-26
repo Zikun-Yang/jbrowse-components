@@ -1,5 +1,7 @@
-import { scaleBand, scaleLinear } from 'd3-scale'
+import { resolveColorScheme } from './colorSchemes.ts'
+import { scaleBand, scaleLinear } from './scales.ts'
 
+import type { FeatureChartColorScheme } from './colorSchemes.ts'
 import type { DrawerFunction } from './types.ts'
 
 interface BoxStats {
@@ -20,19 +22,6 @@ interface RawTissueData {
   tissues?: Record<string, number[]>
 }
 
-const DEFAULT_COLORS = [
-  '#4e79a7',
-  '#f28e2c',
-  '#e15759',
-  '#76b7b2',
-  '#59a14f',
-  '#edc949',
-  '#af7aa1',
-  '#ff9da7',
-  '#9c755f',
-  '#bab0ab',
-]
-
 function quantile(sorted: number[], p: number): number {
   const index = (sorted.length - 1) * p
   const lower = Math.floor(index)
@@ -44,7 +33,9 @@ function quantile(sorted: number[], p: number): number {
 function computeStats(
   values: number[],
 ): Omit<BoxStats, 'name' | 'color'> | undefined {
-  if (values.length === 0) return undefined
+  if (values.length === 0) {
+    return undefined
+  }
   const sorted = [...values].sort((a, b) => a - b)
   const q1 = quantile(sorted, 0.25)
   const median = quantile(sorted, 0.5)
@@ -93,14 +84,22 @@ function normalizeTissueStats(data: RawTissueData): BoxStats[] {
 }
 
 function computeYDomain(stats: BoxStats[]): [number, number] | undefined {
-  if (stats.length === 0) return undefined
+  if (stats.length === 0) {
+    return undefined
+  }
   let min = Infinity
   let max = -Infinity
   for (const s of stats) {
-    if (s.min < min) min = s.min
-    if (s.max > max) max = s.max
+    if (s.min < min) {
+      min = s.min
+    }
+    if (s.max > max) {
+      max = s.max
+    }
   }
-  if (!Number.isFinite(min) || !Number.isFinite(max)) return undefined
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    return undefined
+  }
   const padding = (max - min) * 0.05 || 1
   return [min - padding, max + padding]
 }
@@ -110,6 +109,7 @@ function drawBoxStats(
   width: number,
   height: number,
   stats: BoxStats[],
+  colorScheme: FeatureChartColorScheme,
 ) {
   const yDomain = computeYDomain(stats)
   if (!yDomain) {
@@ -130,7 +130,7 @@ function drawBoxStats(
     return
   }
 
-  const xScale = scaleBand<string>()
+  const xScale = scaleBand()
     .domain(stats.map(d => d.name))
     .range([0, innerWidth])
     .padding(0.3)
@@ -138,25 +138,25 @@ function drawBoxStats(
   const yScale = scaleLinear().domain(yDomain).range([innerHeight, 0]).nice()
 
   // Background panel (ggplot style)
-  ctx.fillStyle = '#fafafa'
+  ctx.fillStyle = colorScheme.background
   ctx.fillRect(0, 0, width, height)
 
   ctx.save()
   ctx.translate(padding.left, padding.top)
 
   // Grid lines
-  ctx.strokeStyle = '#e0e0e0'
+  ctx.strokeStyle = colorScheme.grid
   ctx.lineWidth = 1
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(0, y)
     ctx.lineTo(innerWidth, y)
     ctx.stroke()
-  })
+  }
 
   // Y axis
-  ctx.strokeStyle = '#333333'
+  ctx.strokeStyle = colorScheme.axis
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(0, 0)
@@ -165,30 +165,30 @@ function drawBoxStats(
   ctx.stroke()
 
   // Y ticks and labels
-  ctx.fillStyle = '#333333'
+  ctx.fillStyle = colorScheme.text
   ctx.font = `${Math.max(8, Math.min(12, height * 0.05))}px sans-serif`
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(-4, y)
     ctx.lineTo(0, y)
     ctx.stroke()
     ctx.fillText(formatTick(tick), -8, y)
-  })
+  }
 
   // X labels and boxes
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
-  stats.forEach((d, i) => {
+  for (const [i, d] of stats.entries()) {
     const x = (xScale(d.name) ?? 0) + xScale.bandwidth() / 2
     const label = truncateLabel(d.name, xScale.bandwidth())
-    ctx.fillStyle = '#333333'
+    ctx.fillStyle = colorScheme.text
     ctx.fillText(label, x, innerHeight + 6)
 
     // Color
-    const color = d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!
+    const color = d.color ?? colorScheme.colors[i % colorScheme.colors.length]!
 
     const boxX = xScale(d.name) ?? 0
     const boxW = xScale.bandwidth()
@@ -199,7 +199,7 @@ function drawBoxStats(
     const yMax = yScale(d.max)
 
     // Whiskers
-    ctx.strokeStyle = '#555555'
+    ctx.strokeStyle = colorScheme.muted
     ctx.lineWidth = 1
     ctx.beginPath()
     ctx.moveTo(boxX + boxW / 2, yMin)
@@ -215,7 +215,7 @@ function drawBoxStats(
     ctx.stroke()
 
     // Box
-    ctx.fillStyle = color + '33' // 20% opacity
+    ctx.fillStyle = `${color}33` // 20% opacity
     ctx.strokeStyle = color
     ctx.lineWidth = 1.5
     const boxY = Math.min(yQ1, yQ3)
@@ -224,13 +224,13 @@ function drawBoxStats(
     ctx.strokeRect(boxX, boxY, boxW, boxH)
 
     // Median
-    ctx.strokeStyle = '#333333'
+    ctx.strokeStyle = colorScheme.axis
     ctx.lineWidth = 2
     ctx.beginPath()
     ctx.moveTo(boxX, yMedian)
     ctx.lineTo(boxX + boxW, yMedian)
     ctx.stroke()
-  })
+  }
 
   ctx.restore()
 }
@@ -241,7 +241,13 @@ export const precomputedBoxPlotDrawer: DrawerFunction = function (props) {
   if (stats.length === 0) {
     return
   }
-  drawBoxStats(ctx, width, height, stats)
+  drawBoxStats(
+    ctx,
+    width,
+    height,
+    stats,
+    props.colorScheme ?? resolveColorScheme(props.theme),
+  )
 }
 
 export const rawBoxPlotDrawer: DrawerFunction = function (props) {
@@ -250,7 +256,13 @@ export const rawBoxPlotDrawer: DrawerFunction = function (props) {
   if (stats.length === 0) {
     return
   }
-  drawBoxStats(ctx, width, height, stats)
+  drawBoxStats(
+    ctx,
+    width,
+    height,
+    stats,
+    props.colorScheme ?? resolveColorScheme(props.theme),
+  )
 }
 
 function formatTick(value: number): string {
@@ -262,6 +274,8 @@ function formatTick(value: number): string {
 
 function truncateLabel(label: string, maxWidth: number): string {
   const approxChars = Math.max(3, Math.floor(maxWidth / 6))
-  if (label.length <= approxChars) return label
+  if (label.length <= approxChars) {
+    return label
+  }
   return `${label.slice(0, approxChars - 1)}…`
 }
