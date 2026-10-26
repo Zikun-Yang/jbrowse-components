@@ -1049,11 +1049,13 @@ export function isSupportedIndexingAdapter(type = '') {
   ].includes(type)
 }
 
+// bp lengths use the SI prefix casing: k is lowercase (kbp), M is uppercase
+// (Mbp)
 export function getBpDisplayStr(total: number) {
   if (Math.floor(total / 1_000_000) > 0) {
     return `${reducePrecision(total / 1_000_000)}Mbp`
   } else if (Math.floor(total / 1_000) > 0) {
-    return `${reducePrecision(total / 1_000)}Kbp`
+    return `${reducePrecision(total / 1_000)}kbp`
   } else {
     return `${Math.floor(total)}bp`
   }
