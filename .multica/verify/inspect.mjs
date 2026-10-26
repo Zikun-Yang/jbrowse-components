@@ -42,15 +42,20 @@ try {
   page.on('console', msg => logs.push(`[${msg.type()}] ${msg.text()}`))
   page.on('pageerror', err => logs.push(`[pageerror] ${err.message}`))
 
-  await page.goto(`http://localhost:${PORT}/?config=test_data/feature-chart/config.json`, {
-    waitUntil: 'domcontentloaded',
-    timeout: 120_000,
-  })
+  await page.goto(
+    `http://localhost:${PORT}/?config=test_data/feature-chart/config.json`,
+    {
+      waitUntil: 'domcontentloaded',
+      timeout: 120_000,
+    },
+  )
 
   await new Promise(resolve => setTimeout(resolve, 8_000))
 
   const info = await page.evaluate(() => {
-    const buttons = [...document.querySelectorAll('button,[role="button"],[role="tab"],a')]
+    const buttons = [
+      ...document.querySelectorAll('button,[role="button"],[role="tab"],a'),
+    ]
       .map(el => ({
         tag: el.tagName,
         text: (el.textContent ?? '').trim().slice(0, 60),

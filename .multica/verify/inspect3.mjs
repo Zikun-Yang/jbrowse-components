@@ -61,7 +61,9 @@ try {
       .slice(0, 12)
       .map(describe)
 
-    const displays = [...document.querySelectorAll('[data-testid="feature-chart-display"]')]
+    const displays = [
+      ...document.querySelectorAll('[data-testid="feature-chart-display"]'),
+    ]
       .slice(0, 12)
       .map(describe)
 

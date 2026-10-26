@@ -13,16 +13,22 @@ const wait = ms => new Promise(r => setTimeout(r, ms))
 const browser = await puppeteer.launch({
   headless: true,
   args: ['--no-sandbox', '--disable-dev-shm-usage'],
-  env: { ...process.env, LD_LIBRARY_PATH: `${libs}:${process.env.LD_LIBRARY_PATH ?? ''}` },
+  env: {
+    ...process.env,
+    LD_LIBRARY_PATH: `${libs}:${process.env.LD_LIBRARY_PATH ?? ''}`,
+  },
 })
 
 try {
   const page = await browser.newPage()
   await page.setViewport({ width: 1600, height: 2000 })
-  await page.goto(`http://localhost:${PORT}/?config=test_data/feature-chart/config.json`, {
-    waitUntil: 'domcontentloaded',
-    timeout: 120_000,
-  })
+  await page.goto(
+    `http://localhost:${PORT}/?config=test_data/feature-chart/config.json`,
+    {
+      waitUntil: 'domcontentloaded',
+      timeout: 120_000,
+    },
+  )
   await wait(8000)
   await page.keyboard.press('Escape')
   await wait(500)
@@ -58,20 +64,34 @@ try {
 
   const scrolled = await page.evaluate(
     ({ viewId, id }) => {
-      const container = document.querySelector('[data-testid="tracksContainer"]')
+      const container = document.querySelector(
+        '[data-testid="tracksContainer"]',
+      )
       const track = document.querySelector(
         `[data-testid="trackRenderingContainer-${viewId}-${id}"]`,
       )
       const delta =
-        track.getBoundingClientRect().top - container.getBoundingClientRect().top
+        track.getBoundingClientRect().top -
+        container.getBoundingClientRect().top
       container.scrollTop = container.scrollTop + delta - 60
       const containerRect = container.getBoundingClientRect()
       const trackRect = track.getBoundingClientRect()
-      const display = track.querySelector('[data-testid="feature-chart-display"]')
+      const display = track.querySelector(
+        '[data-testid="feature-chart-display"]',
+      )
       const displayRect = display?.getBoundingClientRect()
       return {
-        containerRect: { top: containerRect.top, left: containerRect.left, h: containerRect.height },
-        trackRect: { top: trackRect.top, left: trackRect.left, w: trackRect.width, h: trackRect.height },
+        containerRect: {
+          top: containerRect.top,
+          left: containerRect.left,
+          h: containerRect.height,
+        },
+        trackRect: {
+          top: trackRect.top,
+          left: trackRect.left,
+          w: trackRect.width,
+          h: trackRect.height,
+        },
         displayRect: displayRect && {
           top: displayRect.top,
           left: displayRect.left,
@@ -98,14 +118,22 @@ try {
             under: el
               ? `${el.tagName.toLowerCase()}[${el.getAttribute('data-testid') ?? ''}].${(el.className ?? '').toString().slice(0, 30)}`
               : 'none',
-            icon: !!document.querySelector('[data-testid="feature-chart-maximize"]'),
-            iconCount: document.querySelectorAll('[data-testid="feature-chart-maximize"]').length,
+            icon: !!document.querySelector(
+              '[data-testid="feature-chart-maximize"]',
+            ),
+            iconCount: document.querySelectorAll(
+              '[data-testid="feature-chart-maximize"]',
+            ).length,
           }
         },
         { x: rect.left + offset, y },
       )
       if (state.icon) {
-        console.log('ICON FOUND at', { offset, y: y - rect.top }, JSON.stringify(state))
+        console.log(
+          'ICON FOUND at',
+          { offset, y: y - rect.top },
+          JSON.stringify(state),
+        )
         break
       }
       if (offset === 80) {

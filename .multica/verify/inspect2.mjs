@@ -76,7 +76,9 @@ try {
         cls: c.className?.toString().slice(0, 60),
         parentTestId: c.parentElement?.getAttribute('data-testid'),
       })),
-      trackLabels: [...document.querySelectorAll('.track-label')].map(summarize),
+      trackLabels: [...document.querySelectorAll('.track-label')].map(
+        summarize,
+      ),
       testIds: [
         ...new Set(
           [...document.querySelectorAll('[data-testid]')].map(el =>

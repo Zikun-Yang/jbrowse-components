@@ -41,11 +41,7 @@ const logTail = (lines = 25) => {
   if (!fs.existsSync(logFile)) {
     return ''
   }
-  return fs
-    .readFileSync(logFile, 'utf8')
-    .split('\n')
-    .slice(-lines)
-    .join('\n')
+  return fs.readFileSync(logFile, 'utf8').split('\n').slice(-lines).join('\n')
 }
 
 const command = process.argv[2] ?? 'status'

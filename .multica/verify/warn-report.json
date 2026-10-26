@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "name": "the plugin heatmap still paints in the worker after the payload guard",
+      "ok": true,
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":27176,\"warm\":3249}"
+    },
+    {
+      "name": "the worker still installs the drawer plugin",
+      "ok": true,
+      "detail": "5 worker(s)"
+    },
+    {
+      "name": "a typo in drawerOptions warns in the dev build",
+      "ok": true,
+      "detail": "[feature-chart] drawer \"samplePlugin/heatmap\" ignores unknown drawerOptions \"colourRamp\"; it reads: colorRamp, cellGap, maxValue | [feature-chart] drawer \"samplePlugin/heatmap\" ignores unknown drawerOptions \"colourRamp\"; it reads: colorRamp, cellGap, maxValue"
+    },
+    {
+      "name": "the warning says which keys the drawer does read",
+      "ok": true,
+      "detail": "[feature-chart] drawer \"samplePlugin/heatmap\" ignores unknown drawerOptions \"colourRamp\"; it reads: colorRamp, cellGap, maxValue"
+    },
+    {
+      "name": "the warning is deduped per context (one line each, not per chart)",
+      "ok": true,
+      "detail": "2 line(s)"
+    },
+    {
+      "name": "a null data payload paints an empty chart instead of throwing",
+      "ok": true,
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":0,\"warm\":0}"
+    },
+    {
+      "name": "the drawer options warning for the null track is not a data error",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no unexpected console errors",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarns": [
+    "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+    "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.",
+    "[feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] drawer \"samplePlugin/heatmap\" ignores unknown drawerOptions \"colourRamp\"; it reads: colorRamp, cellGap, maxValue",
+    "[feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come from a plugin: add \"notLoadedPlugin\" to config.plugins and reload the page. Did you mean \"samplePlugin/heatmap\"? Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come from a plugin: add \"notLoadedPlugin\" to config.plugins and reload the page. Did you mean \"samplePlugin/heatmap\"? Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] drawer \"samplePlugin/heatmap\" ignores unknown drawerOptions \"colourRamp\"; it reads: colorRamp, cellGap, maxValue"
+  ]
+}

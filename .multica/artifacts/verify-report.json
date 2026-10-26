@@ -13,17 +13,17 @@
     {
       "name": "no \"unknown drawer\" warning for the plugin drawers",
       "ok": true,
-      "detail": ""
+      "detail": "[feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlo | [feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlo | [feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come | [feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come"
     },
     {
       "name": "worker-painted track canvas contains the plugin heatmap ramp",
       "ok": true,
-      "detail": "{\"width\":1600,\"height\":360,\"painted\":26144,\"warm\":3249,\"blue\":0}"
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":27520,\"warm\":3249,\"blue\":0}"
     },
     {
       "name": "worker-painted track canvas contains the plugin dot plot",
       "ok": true,
-      "detail": "{\"width\":1600,\"height\":360,\"painted\":539,\"warm\":82,\"blue\":451}"
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":581,\"warm\":124,\"blue\":451}"
     },
     {
       "name": "maximize dialog for a plugin drawer opens without an alert",
@@ -52,5 +52,12 @@
     }
   ],
   "consoleErrors": [],
-  "consoleWarns": []
+  "consoleWarns": [
+    "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+    "⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.",
+    "[feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] Unknown FeatureChart drawer \"tissueBoxPlot\" Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come from a plugin: add \"notLoadedPlugin\" to config.plugins and reload the page. Did you mean \"samplePlugin/heatmap\"? Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)",
+    "[feature-chart] Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come from a plugin: add \"notLoadedPlugin\" to config.plugins and reload the page. Did you mean \"samplePlugin/heatmap\"? Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 more)"
+  ]
 }

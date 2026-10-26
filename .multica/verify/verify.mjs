@@ -51,7 +51,7 @@ try {
     if (msg.type() === 'error') {
       consoleErrors.push(msg.text())
     }
-    if (msg.type() === 'warning') {
+    if (msg.type() === 'warn' || msg.type() === 'warning') {
       consoleWarns.push(msg.text())
     }
   })
@@ -89,7 +89,9 @@ try {
   const workerProbes = []
   for (const worker of workers) {
     try {
-      workerProbes.push(await worker.evaluate(() => globalThis.__sampleChartDrawers))
+      workerProbes.push(
+        await worker.evaluate(() => globalThis.__sampleChartDrawers),
+      )
     } catch (error) {
       workerProbes.push({ error: String(error) })
     }
@@ -101,11 +103,13 @@ try {
   )
 
   const chartWarnings = consoleWarns.filter(w => w.includes('[feature-chart]'))
+  // Match the warning *about* a plugin drawer, not any message that happens to
+  // contain the name: the missing-plugin placeholder suggests
+  // `samplePlugin/heatmap`, which used to make this check fail spuriously.
   check(
     'no "unknown drawer" warning for the plugin drawers',
-    !chartWarnings.some(
-      w =>
-        w.includes('samplePlugin/heatmap') || w.includes('samplePlugin/dotPlot'),
+    !chartWarnings.some(w =>
+      w.includes('Unknown FeatureChart drawer "samplePlugin/'),
     ),
     chartWarnings.map(w => w.slice(0, 120)).join(' | '),
   )
@@ -113,7 +117,9 @@ try {
   const scrollToTrack = async trackId => {
     const rect = await page.evaluate(
       ({ viewId, trackId: id }) => {
-        const container = document.querySelector('[data-testid="tracksContainer"]')
+        const container = document.querySelector(
+          '[data-testid="tracksContainer"]',
+        )
         const track = document.querySelector(
           `[data-testid="trackRenderingContainer-${viewId}-${id}"]`,
         )
@@ -185,7 +191,13 @@ try {
             blue++
           }
         }
-        return { width: canvas.width, height: canvas.height, painted, warm, blue }
+        return {
+          width: canvas.width,
+          height: canvas.height,
+          painted,
+          warm,
+          blue,
+        }
       },
       { selector, kind },
     )
@@ -198,7 +210,9 @@ try {
       return undefined
     }
     const y = rect.top + 40
-    for (const offset of [60, 120, 200, 300, 420, 560, 700, 860, 1000, 1150, 1300, 1450]) {
+    for (const offset of [
+      60, 120, 200, 300, 420, 560, 700, 860, 1000, 1150, 1300, 1450,
+    ]) {
       if (offset > rect.width - 10) {
         break
       }
@@ -328,6 +342,8 @@ try {
     JSON.stringify({ results, consoleErrors, consoleWarns }, null, 2),
   )
   const failed = results.filter(result => !result.ok)
-  console.log(`\n${results.length - failed.length}/${results.length} checks passed`)
+  console.log(
+    `\n${results.length - failed.length}/${results.length} checks passed`,
+  )
   process.exitCode = failed.length === 0 ? 0 : 1
 }
