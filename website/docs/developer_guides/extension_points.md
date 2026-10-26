@@ -201,6 +201,58 @@ type: synchronous
 
 Return value: New config snapshot object
 
+### Core-trackInfoContext
+
+type: synchronous
+
+Adds extra namespaces to the `formatAbout.info` template context of the "About
+this track" dialog, so a track plugin can expose its own data in track info
+templates without core knowing about it (e.g. `{{feature.*}}` or `{{chart.*}}`).
+
+- `args` - the template context built by core, an object with the namespaces
+  below
+- `props` - an object of the type below
+
+```typescript
+interface props {
+  session: AbstractSessionModel
+  config: AnyConfigurationModel | Record<string, unknown>
+  pluginManager: PluginManager
+  context: TrackInfoContext
+}
+```
+
+The core namespaces are:
+
+- `track` -
+  `{ trackId, name, type, description, category, metadata, adapter, assemblyNames }`
+- `config` - the resolved configuration object that is displayed in the about
+  dialog (with `formatAbout.config` applied, and uris removed when `hideUris` is
+  set)
+- `assembly` - `{ name, displayName, aliases }` of the first assembly of the
+  track
+- `session` - `{ assemblyNames, assemblies: [{ name, displayName, aliases }] }`
+
+Return value: an object with additional namespaces. Core namespaces win when a
+plugin returns a namespace with the same name.
+
+Example: add a `feature` namespace used as `{{feature.source}}`
+
+```typescript
+pluginManager.addToExtensionPoint(
+  'Core-trackInfoContext',
+  (context, { config }) => {
+    return {
+      ...context,
+      feature: { source: 'GEO' },
+    }
+  },
+)
+```
+
+See also: [`formatAbout.info`](/docs/config/FormatAbout) on the track and on the
+root config.
+
 ### Core-replaceWidget
 
 type: synchronous

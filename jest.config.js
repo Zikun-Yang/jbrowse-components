@@ -52,6 +52,22 @@ export default {
       ...baseConfig,
     },
     {
+      // @jbrowse/product-core renders react-markdown, an esm only dependency,
+      // so this project transforms node_modules too (see
+      // config/jest/babelTransformDeps.cjs)
+      displayName: 'product-core',
+      ...baseConfig,
+      testMatch: ['<rootDir>/packages/product-core/**/*.test.{ts,tsx}'],
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/config/jest/fetchMockAfterEnv.js'],
+      transform: {
+        '^.+\\.(ts|tsx|js|jsx)$':
+          '<rootDir>/config/jest/babelTransformDeps.cjs',
+        '^.+\\.css$': '<rootDir>/config/jest/cssTransform.cjs',
+      },
+      transformIgnorePatterns: [],
+    },
+    {
       // All other tests use jsdom with jest-fetch-mock
       displayName: 'default',
       testMatch: [
@@ -62,6 +78,7 @@ export default {
         '/cypress/',
         '/demos/',
         '<rootDir>/products/jbrowse-img/',
+        '<rootDir>/packages/product-core/',
       ],
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/config/jest/fetchMockAfterEnv.js'],
