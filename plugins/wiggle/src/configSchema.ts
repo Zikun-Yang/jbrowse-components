@@ -1,6 +1,8 @@
 import { ConfigurationSchema } from '@jbrowse/core/configuration'
 import { types } from '@jbrowse/mobx-state-tree'
 
+import { WIGGLE_POS_COLOR_DEFAULT } from './util.ts'
+
 /**
  * #config WiggleRenderer
  * this is the "base wiggle renderer config schema"
@@ -25,7 +27,7 @@ const WiggleRenderer = ConfigurationSchema(
     posColor: {
       type: 'color',
       description: 'the color to use when the score is positive',
-      defaultValue: '#292421',
+      defaultValue: WIGGLE_POS_COLOR_DEFAULT,
       contextVariable: ['feature'],
     },
     /**

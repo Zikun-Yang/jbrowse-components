@@ -14,10 +14,18 @@ const ColorLegend = observer(function ColorLegend({
   model,
   rowHeight,
   exportSVG,
+  xOffset,
 }: {
   model: MinimalModel
   rowHeight: number
   exportSVG?: boolean
+  /**
+   * x of the whole legend block, in the coordinate system of the display. the
+   * callers that also draw a y-scale bar pass its position plus the room its
+   * tick labels need, so that the labels follow Settings -> Display -> Y-axis
+   * left padding instead of a hardcoded x
+   */
+  xOffset?: number
 }) {
   const {
     graphType,
@@ -29,9 +37,12 @@ const ColorLegend = observer(function ColorLegend({
   } = model
   const colorBoxWidth = renderColorBoxes ? 20 : 0
   const legendWidth = labelWidth + colorBoxWidth + 5
-  const svgOffset = exportSVG ? 10 : 0
-  const extraOffset =
-    svgOffset || (graphType && !rowHeightTooSmallForScalebar ? 50 : 0)
+  // default when the caller has no scale bar to align with: 10px in an SVG
+  // export (the exporter draws the track content from its left edge) and to
+  // the right of the y-scale bar otherwise
+  const offset =
+    xOffset ??
+    (exportSVG ? 10 : graphType && !rowHeightTooSmallForScalebar ? 50 : 0)
   const theme = useTheme()
 
   const textFillProps = useMemo(
@@ -46,7 +57,7 @@ const ColorLegend = observer(function ColorLegend({
         needsFullHeightScalebar ? (
           <RectBg
             y={0}
-            x={extraOffset}
+            x={offset}
             width={legendWidth}
             height={(sources.length + 0.25) * rowHeight}
           />
@@ -60,8 +71,8 @@ const ColorLegend = observer(function ColorLegend({
           idx={idx}
           model={model}
           rowHeight={rowHeight}
-          exportSVG={exportSVG}
           labelWidth={legendWidth}
+          xOffset={offset}
         />
       ))}
       {/* Then render all text elements on top */}
@@ -72,7 +83,7 @@ const ColorLegend = observer(function ColorLegend({
           idx={idx}
           model={model}
           rowHeight={rowHeight}
-          exportSVG={exportSVG}
+          xOffset={offset}
           textFillProps={textFillProps}
         />
       ))}

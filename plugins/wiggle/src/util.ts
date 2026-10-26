@@ -32,6 +32,14 @@ export function getYScaleBarLeftPadding(model: IAnyStateTreeNode) {
     : DEFAULT_Y_SCALEBAR_LEFT_PADDING
 }
 
+/**
+ * color that a single-sample wiggle track draws its data with when it has no
+ * explicit color: the default posColor of the base wiggle renderer config. it
+ * is also the default color of a multi-row multi-wiggle row, so that a row
+ * looks like a single wiggle track instead of the hardcoded blue used before
+ */
+export const WIGGLE_POS_COLOR_DEFAULT = '#292421'
+
 // Default color used by wiggle config schema
 export const WIGGLE_COLOR_DEFAULT = '#f0f'
 

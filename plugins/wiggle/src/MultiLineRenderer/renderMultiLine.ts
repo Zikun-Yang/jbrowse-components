@@ -8,7 +8,7 @@ import { collectTransferables } from '@jbrowse/core/util/offscreenCanvasPonyfill
 import { createStopTokenChecker } from '@jbrowse/core/util/stopToken'
 
 import { drawLine } from '../drawLine.ts'
-import { serializeWiggleFeature } from '../util.ts'
+import { WIGGLE_POS_COLOR_DEFAULT, serializeWiggleFeature } from '../util.ts'
 
 import type { MultiRenderArgsDeserialized } from '../types.ts'
 import type { Feature } from '@jbrowse/core/util'
@@ -41,7 +41,7 @@ export async function renderMultiLine(
           const { reducedFeatures } = drawLine(ctx, {
             ...renderProps,
             features: groups[source.name] || [],
-            staticColor: source.color || 'blue',
+            staticColor: source.color || WIGGLE_POS_COLOR_DEFAULT,
             colorCallback: () => '', // unused when staticColor is set
             lastCheck,
           })

@@ -21,7 +21,9 @@ const FullHeightScaleBar = observer(function FullHeightScaleBar({
   const { width: viewWidth } = getContainingView(model) as LinearGenomeViewModel
   return (
     <>
-      <g transform={`translate(${!exportSVG ? getOffset(model) : 0},0)`}>
+      {/* the y-scale bar sits at the global y-axis left padding (Settings ->
+          Display -> Y-axis left padding), on screen and in an SVG export */}
+      <g transform={`translate(${getOffset(model)},0)`}>
         <YScaleBar model={model} orientation={orientation} />
       </g>
       <g transform={`translate(${viewWidth - labelWidth - 100},0)`}>

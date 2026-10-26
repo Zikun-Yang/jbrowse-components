@@ -16,7 +16,11 @@ import { EqualizerIcon, VisibilityIcon } from '@jbrowse/core/ui/Icons'
 
 import SharedWiggleMixin from '../shared/SharedWiggleMixin.ts'
 import axisPropsFromTickScale from '../shared/axisPropsFromTickScale.ts'
-import { YSCALEBAR_LABEL_OFFSET, getScale } from '../util.ts'
+import {
+  WIGGLE_POS_COLOR_DEFAULT,
+  YSCALEBAR_LABEL_OFFSET,
+  getScale,
+} from '../util.ts'
 
 import type { Source } from '../util.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
@@ -234,6 +238,22 @@ export function stateModelFactory(
 
       /**
        * #getter
+       * color of a source in a multi-row renderer that doesn't set its own
+       * color. a multi-row wiggle draws one sample per row, so it uses the
+       * same color a single-sample wiggle track uses for positive scores (the
+       * posColor of the renderer config, #292421 by default) instead of the
+       * hardcoded blue it used before, which made every row look the same
+       * anyway
+       */
+      get multiRowColor(): string {
+        return (
+          (self.rendererConfig.posColor as string | undefined) ??
+          WIGGLE_POS_COLOR_DEFAULT
+        )
+      },
+
+      /**
+       * #getter
        */
       get sourcesWithoutLayout() {
         const sources = Object.fromEntries(
@@ -249,7 +269,9 @@ export function stateModelFactory(
             ...s,
             color:
               s.color ||
-              (!this.isMultiRow ? colors[i] || randomColor() : 'blue'),
+              (!this.isMultiRow
+                ? colors[i] || randomColor()
+                : this.multiRowColor),
           }))
       },
 
@@ -270,7 +292,9 @@ export function stateModelFactory(
             ...s,
             color:
               s.color ||
-              (!this.isMultiRow ? colors[i] || randomColor() : 'blue'),
+              (!this.isMultiRow
+                ? colors[i] || randomColor()
+                : this.multiRowColor),
           }))
       },
       /**

@@ -8,7 +8,7 @@ import { collectTransferables } from '@jbrowse/core/util/offscreenCanvasPonyfill
 import { createStopTokenChecker } from '@jbrowse/core/util/stopToken'
 
 import { drawXY } from '../drawXY.ts'
-import { serializeWiggleFeature } from '../util.ts'
+import { WIGGLE_POS_COLOR_DEFAULT, serializeWiggleFeature } from '../util.ts'
 
 import type { MultiRenderArgsDeserialized } from '../types.ts'
 import type { Feature } from '@jbrowse/core/util'
@@ -41,7 +41,7 @@ export async function renderMultiXYPlot(
           const { reducedFeatures: reduced } = drawXY(ctx, {
             ...renderProps,
             features: groups[source.name] || [],
-            colorCallback: () => source.color || 'blue',
+            colorCallback: () => source.color || WIGGLE_POS_COLOR_DEFAULT,
             lastCheck,
           })
           allReducedFeatures = allReducedFeatures.concat(reduced)

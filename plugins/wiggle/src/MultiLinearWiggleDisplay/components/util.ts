@@ -46,3 +46,16 @@ export function moveDown<T extends { name: string }>(
 export function getOffset(model: WiggleDisplayModel) {
   return getYScaleBarLeftPadding(model)
 }
+
+/**
+ * room the y-scale bar of a multi-row multi-wiggle reserves for its tick
+ * labels: YScaleBar draws them from 9px right of the bar and they are at most
+ * about 40px wide at fontSize 10, so the row labels start 50px after it
+ */
+export const ROW_LABEL_OFFSET_FROM_SCALE_BAR = 50
+
+/**
+ * gap between the y-scale bar and the row labels in an SVG export, where the
+ * bar is mirrored and draws its tick labels on its left instead
+ */
+export const ROW_LABEL_OFFSET_IN_EXPORT = 10
