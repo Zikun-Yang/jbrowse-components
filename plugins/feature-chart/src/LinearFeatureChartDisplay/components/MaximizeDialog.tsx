@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
-import { getContainingView, getSession } from '@jbrowse/core/util'
+import { getContainingView } from '@jbrowse/core/util'
 import {
   Alert,
   Button,
@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import ReactMarkdown from 'react-markdown'
 
-import { resolveColorScheme } from '../../FeatureChartDrawer/colorSchemes.ts'
+import ChartCanvas from './ChartCanvas.tsx'
 import {
   isFeatureChartDrawerResolutionError,
   resolveFeatureChartDrawer,
@@ -51,7 +51,6 @@ export default function MaximizeDialog({
   chartWidth = DIALOG_WIDTH,
   chartHeight = DIALOG_HEIGHT,
 }: MaximizeDialogProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const contextData = feature?.get('contextData') as
     | { data?: unknown; description?: string; name?: string }
     | undefined
@@ -74,66 +73,6 @@ export default function MaximizeDialog({
   const drawerError = isFeatureChartDrawerResolutionError(resolution)
     ? describeDrawerError(resolution.error, resolution.available)
     : null
-
-  useEffect(() => {
-    if (!open || !feature || isFeatureChartDrawerResolutionError(resolution)) {
-      return
-    }
-
-    const canvas = canvasRef.current
-    if (!canvas) {
-      return
-    }
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return
-    }
-
-    const view = getContainingView(displayModel) as LinearGenomeViewModel
-    const theme = getSession(displayModel).theme
-
-    // Scale for high-DPI displays
-    const dpr = window.devicePixelRatio || 1
-    canvas.width = chartWidth * dpr
-    canvas.height = chartHeight * dpr
-    canvas.style.width = `${chartWidth}px`
-    canvas.style.height = `${chartHeight}px`
-    ctx.scale(dpr, dpr)
-
-    ctx.clearRect(0, 0, chartWidth, chartHeight)
-
-    void resolution.drawer({
-      ctx,
-      width: chartWidth,
-      height: chartHeight,
-      data: contextData?.data,
-      description: contextData?.description,
-      name: contextData?.name ?? feature.get('name'),
-      region: view.dynamicBlocks.contentBlocks[0] ?? {
-        refName: feature.get('refName'),
-        start: feature.get('start'),
-        end: feature.get('end'),
-        assemblyName: view.assemblyNames[0] ?? '',
-      },
-      bpPerPx: (feature.get('end') - feature.get('start')) / chartWidth,
-      feature,
-      config: displayModel.rendererConfig,
-      theme: theme as any,
-      colorScheme: resolveColorScheme(
-        theme,
-        getConf(displayModel, ['renderer', 'colorScheme']) as string,
-      ),
-      isMaximize: true,
-    })
-  }, [
-    open,
-    feature,
-    chartWidth,
-    chartHeight,
-    contextData,
-    displayModel,
-    resolution,
-  ])
 
   const description = contextData?.description
   const renderedDescription = description
@@ -165,16 +104,14 @@ export default function MaximizeDialog({
           <Alert severity="warning" sx={{ mb: 2 }}>
             {drawerError}
           </Alert>
+        ) : feature ? (
+          <ChartCanvas
+            feature={feature}
+            displayModel={displayModel}
+            width={chartWidth}
+            height={chartHeight}
+          />
         ) : null}
-        <canvas
-          ref={canvasRef}
-          style={{
-            width: chartWidth,
-            height: chartHeight,
-            display: drawerError ? 'none' : 'block',
-            margin: '0 auto 16px',
-          }}
-        />
         {renderedDescription ? (
           <div className="markdown-body">
             <ReactMarkdown>{renderedDescription}</ReactMarkdown>

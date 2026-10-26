@@ -197,7 +197,8 @@ re-introducing an ESM-only dependency into the product entry points.
 | `FeatureChartRenderer/renderFeatureChart.test.ts`              | config-only rendering, 6 settings from config, unknown drawer placeholder, alignment math            |
 | `renderSettings.test.ts`                                       | config → settings mapping, malformed value fallbacks                                                 |
 | `FeatureChartDrawer/colorSchemes.test.ts`                      | palette shape, default, warn-once fallback, dark-mode behavior                                       |
-| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one                                                    |
+| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing           |
+| `chartGeometry.test.ts`                                        | chart-rectangle hit test, alignment math, icon placement/clamping                                    |
 | `corePluginsRegistration.test.ts`                              | all three products depend on and register the plugin                                                 |
 
 ## File map
@@ -216,7 +217,48 @@ src/
     renderFeatureChart.ts canvas rendering, config-only reads, placeholder
   FeatureChartPlotlyRenderer/
     components/FeatureChartPlotlyRendering.tsx  Plotly rendering + palette
+  chartGeometry.ts        chart rectangle, hover hit test, icon placement
   LinearFeatureChartDisplay/
     model.ts              renderProps() only adds config/theme
-    components/MaximizeDialog.tsx              Alert on unknown drawer
+    components/DisplayComponent.tsx  hover state + maximize affordance placement
+    components/ChartCanvas.tsx       the large chart drawn inside the dialog
+    components/MaximizeDialog.tsx    Alert on unknown drawer, markdown description
 ```
+
+## Hover and the maximize affordance
+
+A chart is a **fixed-size widget** (`chartWidth` px) anchored to the feature's
+start/end, so its visual width has nothing to do with how many bases the feature
+covers. Two consequences, both learned the hard way in a real browser:
+
+1. **Hit-testing must use the chart rectangle.** `FeatureChartRendering` used to
+   set the hovered feature by comparing the mouse bp against
+   `feature.start..feature.end`. At a zoomed-out view that is a ~5px target in
+   the middle of a 120px chart, and the maximize affordance was effectively
+   unreachable. `chartGeometry.findFeatureAtChartX()` now answers the question
+   for both the UI and the renderer: it is the single definition of "where is
+   this chart drawn" (`computeChartX`), reused by `renderFeatureChart`.
+2. **Hover state lives on the display wrapper, and the icon sits inside the
+   hovered chart.** The icon used to be pinned to the track's top-right corner.
+   Moving the pointer from the chart to that corner left the chart, cleared
+   `featureUnderMouse`, and unmounted the icon before the click landed — with
+   several charts per track it was also ambiguous which chart it would open.
+   `DisplayComponent` now owns the hover state (and keeps
+   `model.setFeatureIdUnderMouse` in sync for the shared tooltip), and paints
+   the icon at the hovered chart's top-right corner.
+
+`ChartCanvas` is a separate component for the same category of reason: MUI
+`Dialog` mounts its children in a portal _after_ the open commit, so a drawing
+`useEffect` inside the dialog body runs while the canvas ref is still `null`.
+The chart kept its default 300x150 backing store and the dialog looked empty.
+Mounting the canvas as its own component guarantees the effect runs with the
+element attached; `MaximizeDialog.test.tsx` asserts the canvas is resized.
+
+## Demo fixture
+
+`test_data/feature-chart/config.json` exercises all of the above in a real
+browser (`pnpm --filter jbrowse-web start`, then
+`/?config=test_data/feature-chart/config.json`): all five built-in drawers, the
+schema default with `drawer` omitted, an unknown drawer placeholder, a
+track-level `formatAbout.info`, the root `configuration.formatAbout.info`
+fallback, and `formatAbout.showInfo: false`. See the README next to it.

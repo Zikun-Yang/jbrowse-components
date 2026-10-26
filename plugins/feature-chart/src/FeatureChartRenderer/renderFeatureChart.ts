@@ -13,16 +13,14 @@ import {
   isFeatureChartDrawerResolutionError,
   resolveFeatureChartDrawer,
 } from '../FeatureChartDrawer/drawerRegistry.ts'
-import {
-  type FeatureChartAlign,
-  resolveFeatureChartRenderSettings,
-} from '../renderSettings.ts'
+import { computeChartX } from '../chartGeometry.ts'
+import { resolveFeatureChartRenderSettings } from '../renderSettings.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import type { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/FeatureRendererType'
-import type { Feature, Region } from '@jbrowse/core/util'
+import type { Feature } from '@jbrowse/core/util'
 import type { RpcResult } from '@jbrowse/core/util/librpc'
 
 export interface ChartRenderArgs extends RenderArgsDeserialized {
@@ -105,7 +103,7 @@ export async function renderFeatureChart(
   const chartItems = features
     .map(feature => ({
       feature,
-      x: computeChartX(feature, region, bpPerPx, chartWidth, align),
+      x: computeChartX(feature, { region, bpPerPx, chartWidth, align }),
     }))
     .sort((a, b) => a.x - b.x)
 
@@ -185,28 +183,6 @@ export async function renderFeatureChart(
     },
     imageData ? [imageData] : [],
   ) as FeatureChartRenderReturn
-}
-
-export function computeChartX(
-  feature: Feature,
-  region: Region,
-  bpPerPx: number,
-  chartWidth: number,
-  align: FeatureChartAlign,
-): number {
-  const start = feature.get('start')
-  const end = feature.get('end')
-
-  switch (align) {
-    case 'left':
-      return (start - region.start) / bpPerPx
-    case 'right':
-      return (end - region.start) / bpPerPx - chartWidth
-    case 'center': {
-      const center = (start + end) / 2
-      return (center - region.start) / bpPerPx - chartWidth / 2
-    }
-  }
 }
 
 function checkShouldShowWarning(
@@ -347,3 +323,5 @@ function wrapText(
   }
   return lines
 }
+
+export { computeChartX } from '../chartGeometry.ts'

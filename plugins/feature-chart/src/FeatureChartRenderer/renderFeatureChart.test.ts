@@ -3,7 +3,8 @@ import { SimpleFeature } from '@jbrowse/core/util'
 import { Image, createCanvas } from 'canvas'
 import { from } from 'rxjs'
 
-import { computeChartX, renderFeatureChart } from './renderFeatureChart.ts'
+import { computeChartX } from '../chartGeometry.ts'
+import { renderFeatureChart } from './renderFeatureChart.ts'
 import {
   initBuiltInDrawers,
   registerFeatureChartDrawer,
@@ -202,8 +203,9 @@ describe('computeChartX', () => {
   const feature = createFeature('f1', 300, 400)
 
   test('aligns the chart box by start, end or center', () => {
-    expect(computeChartX(feature, region, 1, 50, 'left')).toBe(200)
-    expect(computeChartX(feature, region, 1, 50, 'right')).toBe(250)
-    expect(computeChartX(feature, region, 1, 50, 'center')).toBe(225)
+    const geometry = { region, bpPerPx: 1, chartWidth: 50 }
+    expect(computeChartX(feature, { ...geometry, align: 'left' })).toBe(200)
+    expect(computeChartX(feature, { ...geometry, align: 'right' })).toBe(250)
+    expect(computeChartX(feature, { ...geometry, align: 'center' })).toBe(225)
   })
 })

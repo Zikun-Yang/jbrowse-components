@@ -445,9 +445,17 @@ initBuiltInDrawers()
 
 ### 6.1 触发方式
 
-- 鼠标 hover 到某个 chart 上时，在 chart 右上角显示 `FullscreenIcon`
+- 鼠标 hover 到某个 chart 上时，在**该 chart** 的右上角显示 `FullscreenIcon`
 - 点击图标打开详情 Dialog
 - 同时支持点击 chart 主体触发（可选，需避免和 tooltip 冲突）
+
+实现约束（2026-10 浏览器验收后固化，见
+[`ARCHITECTURE.md`](./ARCHITECTURE.md#hover-and-the-maximize-affordance)）：
+
+- hover 命中判定用
+  **chart 的像素矩形**，不是 feature 的 bp 区间——一个 chart 固定 `chartWidth`
+  像素宽，而 bp 区间在缩小视图下可能只有几像素；
+- 图标画在**被 hover 的 chart 内部**，hover 状态由 display 组件持有；否则从 chart 移向图标的过程会清空 hover 状态，图标在点击前就消失（多 chart 时也无法判断会放大哪一个）。
 
 ### 6.2 Dialog 内容
 

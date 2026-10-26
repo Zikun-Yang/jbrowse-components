@@ -1,0 +1,51 @@
+# FeatureChartTrack demo fixture
+
+A self-contained demo of `FeatureChartTrack` + the generic track info panel. It
+is served by the dev server through `products/jbrowse-web/public/test_data` (→
+this directory), so it can be opened without touching `config.json`:
+
+```
+pnpm --filter jbrowse-web start
+# then open
+http://localhost:3000/?config=test_data/feature-chart/config.json
+```
+
+(The port is `PORT` from the environment, `3000` by default.)
+
+## What it proves
+
+| Track                     | Drawer          | What it demonstrates                                                                  |
+| ------------------------- | --------------- | ------------------------------------------------------------------------------------- |
+| `fc_precomputed`          | _omitted_       | the schema default (`precomputedBoxPlot`) is a real, registered drawer                |
+| `fc_raw_box`              | `rawBoxPlot`    | raw observations aggregated at render time; `colorScheme: set2`                       |
+| `fc_violin`               | `rawViolinPlot` | same adapter/file as `fc_raw_box`, different mark; `colorScheme: viridis`             |
+| `fc_bar`                  | `barPlot`       | `data.bars`                                                                           |
+| `fc_histogram`            | `histogram`     | `data.values`; `formatAbout.showInfo: false` hides the Track info card for this track |
+| `fc_broken`               | `tissueBoxPlot` | unknown drawer → readable placeholder + available names, no track error               |
+| (site-wide `formatAbout`) | —               | root `configuration.formatAbout.info` is the default text in every About dialog       |
+| (`fc_precomputed`)        | —               | track-level `formatAbout.info` overrides the site-wide text and uses `{{track.*}}`    |
+
+## Data
+
+Every file is the documented TSV contract (`chrom`, `start`, `end`, `name`,
+`data` JSON, `description` markdown template), bgzip-compressed and tabix
+indexed with `tabix -p bed`. Values are synthetic (deterministic seed), shaped
+like expression data, with four tissues and six samples per tissue.
+
+Regenerate the archives after editing a `.tsv`:
+
+```bash
+cd test_data/feature-chart
+for f in precomputed-box raw-values bars histogram; do
+  bgzip -c -f "$f.tsv" > "$f.tsv.gz" && tabix -p bed -f "$f.tsv.gz"
+done
+```
+
+Two caveats this fixture surfaced:
+
+- a TSV row must stay on one physical line, so markdown descriptions cannot
+  contain real newlines. Keep a description on one line, or wait for the
+  adapter-level `\n` unescaping tracked in MK-19/MK-21;
+- the site-wide text lives at `configuration.formatAbout.info` in `config.json`,
+  not at the top level — the root config nests `formatAbout` under
+  `configuration` (a track's own `formatAbout` stays at the track's top level).

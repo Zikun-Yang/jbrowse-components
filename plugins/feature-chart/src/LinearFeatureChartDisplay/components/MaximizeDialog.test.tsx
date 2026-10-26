@@ -95,4 +95,32 @@ describe('MaximizeDialog', () => {
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.getByRole('dialog')).toBeTruthy()
   })
+
+  test('sizes the maximize canvas before drawing', async () => {
+    // the dialog reads two slots from the renderer config
+    getConf.mockImplementation((_model: unknown, path: unknown) => {
+      const key = Array.isArray(path) ? path.join('.') : String(path)
+      return key.includes('colorScheme') ? 'tableau10' : 'precomputedBoxPlot'
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+        chartWidth={640}
+        chartHeight={320}
+      />,
+    )
+
+    const canvas = (await screen.findByTestId(
+      'feature-chart-maximize-canvas',
+    ))
+    const dpr = window.devicePixelRatio || 1
+    // regression: the canvas kept its 300x150 default because the drawing effect
+    // ran before MUI had mounted the dialog content
+    expect(canvas.width).toBe(640 * dpr)
+    expect(canvas.height).toBe(320 * dpr)
+  })
 })
