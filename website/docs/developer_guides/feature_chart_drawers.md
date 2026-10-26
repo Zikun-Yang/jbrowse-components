@@ -17,13 +17,19 @@ design.
 
 ## Three ways to change what a chart looks like
 
-| You want                                     | Do this                            | Needs a plugin? |
-| -------------------------------------------- | ---------------------------------- | --------------- |
-| Pick a different existing chart              | `renderer.drawer: "rawViolinPlot"` | no              |
-| Change colors / sizes / a drawer's own knobs | `renderer.drawerOptions: { … }`    | no              |
-| Add a chart that does not exist yet          | contribute a drawer from a plugin  | yes             |
+| You want                                     | Do this                                   | Needs a plugin? |
+| -------------------------------------------- | ----------------------------------------- | --------------- |
+| Pick a different existing chart              | `renderer.drawer: "rawViolinPlot"`        | no              |
+| Change colors / sizes / a drawer's own knobs | `renderer.drawerOptions: { … }`           | no              |
+| Describe a chart in the config itself        | `renderer.drawer: "spec"` + `spec: { … }` | no              |
+| Add a chart that does not exist yet          | contribute a drawer from a plugin         | yes             |
 
-The rest of this page is the third row.
+The `spec` row is the declarative one —
+`{"kind": "box", "data": {"form": "grouped-values", "path": "tissues"}}` instead
+of a drawer name. It covers what the five built-in drawers cover, with no code
+in the config; see [Feature chart specs](./feature_chart_specs).
+
+This page is the last row.
 
 ## The drawer contract
 
@@ -49,6 +55,13 @@ interface DrawerProps {
   colorScheme?: FeatureChartColorScheme
   /** `renderer.drawerOptions`, verbatim. Always an object; may be empty. */
   options?: Record<string, unknown>
+  /**
+   * Normalized chart model, set when the configured drawer is `spec` (see
+   * "Feature chart specs"). Optional: a payload-driven drawer reads `data`.
+   */
+  model?: ChartModel
+  /** Why `model` is absent (`drawer: "spec"` only). */
+  modelErrors?: ChartSpecError[]
   /** True inside the maximize dialog (more room for axes/labels). */
   isMaximize?: boolean
 }
@@ -103,7 +116,7 @@ export default class MyChartDrawers {
         name: 'myPlugin/heatmap',
         displayName: 'Heatmap',
         description: 'One cell per observation, colored by value.',
-        dataShape: 'tissues',
+        dataShape: 'grouped-values',
         optionsSchema: { colorRamp: 'cool | warm', cellGap: 'px, 0-6' },
         draw: ({ ctx, width, height, data, options }) => {
           const ramp = options?.colorRamp ?? 'cool'
@@ -153,9 +166,26 @@ Use `pluginName/drawerName`. Drawers are looked up in one flat catalog, so a
 bare name like `heatmap` will eventually collide with someone else's `heatmap`.
 
 The built-in names (`precomputedBoxPlot`, `rawBoxPlot`, `rawViolinPlot`,
-`barPlot`, `histogram`) are **not reserved**: a plugin may override them. The
-last registration wins and a development build logs a warning, because
+`barPlot`, `histogram`, `spec`) are **not reserved**: a plugin may override
+them. The last registration wins and a development build logs a warning, because
 overriding a built-in silently changes what existing configs render.
+
+### `dataShape` vocabulary
+
+The catalog uses the same words as the chart-spec forms — one spelling per
+shape, in the config and in the catalog:
+
+| `dataShape`       | payload                                |
+| ----------------- | -------------------------------------- |
+| `grouped-values`  | `{ "<category>": number[] }`           |
+| `summary-stats`   | `[{ name, min, q1, median, q3, max }]` |
+| `category-values` | `[{ name, value }]`                    |
+| `values`          | `number[]` (one flat series)           |
+| `any`             | anything else / not declared           |
+
+The pre-WP3 names (`tissues`, `matrix`, `series`) are no longer accepted: a
+drawer that still declares one is treated as `any` and a development build says
+so, so the catalog cannot drift into two vocabularies.
 
 ### Do not import the package to register
 
@@ -305,6 +335,9 @@ The same message appears in the maximize dialog as an `Alert`, so a broken
   register a renderer/display instead (`addRendererType` / `addDisplayType`).
   That path is heavier: you reimplement positioning, hover and the maximize
   affordance, so prefer a drawer unless you really need interactivity.
+- **A chart the built-ins cannot express but the spec vocabulary can** →
+  `renderer.drawer: "spec"` plus a `spec` block; no code, no plugin. See
+  [Feature chart specs](./feature_chart_specs).
 - **A chart kind the built-ins cannot express and you want it in every track** →
   a drawer is still the right unit; a first-class `DrawerType`
   (`pluginManager.addDrawerType`) is deliberately not implemented yet. It

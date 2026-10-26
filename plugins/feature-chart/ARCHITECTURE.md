@@ -2,8 +2,12 @@
 
 This document is the contract other work packages build on. It covers the drawer
 catalog, the failure semantics, the config boundary, plugin-contributed drawers
-(WP2, landed), and the seams left open for WP3 (declarative `spec`), WP4
-(renderer model unification) and WP5 (agent-sdk fields).
+(WP2, landed), declarative chart specs and the normalized `ChartModel` (WP3,
+landed), and the seams left open for WP4 (renderer model unification) and WP5
+(agent-sdk fields).
+
+The user-facing vocabulary is [`SPEC.md`](./SPEC.md); this file explains how it
+is built.
 
 Requirements, data formats and config examples live in
 [`FeatureChartTrack.md`](./FeatureChartTrack.md).
@@ -38,20 +42,30 @@ interface FeatureChartDrawerMeta {
   name: string
   displayName: string
   description: string // one sentence: what it draws and what it eats
-  dataShape: 'tissues' | 'matrix' | 'series' | 'any'
+  dataShape:
+    | 'summary-stats'
+    | 'grouped-values'
+    | 'category-values'
+    | 'values'
+    | 'any'
   defaultSize?: { width: number; height: number }
   optionsSchema?: unknown // keys the drawer reads: { key: 'doc' } | ['key']; {} = reads none; absent = undeclared
 }
 ```
 
-`dataShape` values used by the built-ins:
+`dataShape` uses the **same spelling as the chart-spec forms** (WP3 renamed it
+from `tissues`/`matrix`/`series`, because two vocabularies for one shape is how
+a catalog and a config start lying to each other). A drawer that still declares
+an old name is treated as `any` and gets a development warning rather than
+failing.
 
-| dataShape | meaning                                                           |
-| --------- | ----------------------------------------------------------------- |
-| `tissues` | per-group arrays of raw observations (`data.tissues`)             |
-| `matrix`  | per-category precomputed values/stats (`data.boxes`, `data.bars`) |
-| `series`  | one numeric series (`data.values`)                                |
-| `any`     | custom drawers that do not want to declare a shape                |
+| dataShape         | meaning                                            |
+| ----------------- | -------------------------------------------------- |
+| `summary-stats`   | per-category precomputed five-number summaries     |
+| `grouped-values`  | per-category arrays of raw observations            |
+| `category-values` | one number per category                            |
+| `values`          | one flat numeric series                            |
+| `any`             | custom drawers that do not want to declare a shape |
 
 Public API (also re-exported from the package root). Every lookup takes an
 optional `pluginManager`; pass it to include plugin-contributed drawers:
@@ -116,6 +130,66 @@ Cache invalidation:
 
 Built-ins: `precomputedBoxPlot` (default), `rawBoxPlot`, `rawViolinPlot`,
 `barPlot`, `histogram`.
+
+## Chart model and painters (WP3)
+
+Before WP3, five drawers each carried a full copy of the canvas code. Adding the
+declarative renderer on top of that would have meant a sixth copy, and "the spec
+draws the same thing as `rawBoxPlot`" would have been a promise nobody could
+keep. So the drawing code moved into one place and every drawer became an
+adapter:
+
+```
+feature payload ─┬─▶ legacy adapter (boxPlot.ts, barPlot.ts, …) ─┐
+                 │                                              ├─▶ ChartModel ─▶ painters.ts ─▶ canvas
+renderer.spec ───┴─▶ normalizeFromSpec() ───────────────────────┘
+```
+
+| file              | role                                                                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `chartModel.ts`   | `ChartModel` (kind, categories, one series of datums, style, axes) + a stable `serializeChartModel()` / `chartModelHash()` |
+| `chartSpec.ts`    | vocabulary, legality matrix, `validateChartSpec()`, `normalizeFromSpec()`, `resolveDataPath()`                             |
+| `statistics.ts`   | quartiles / 1.5·IQR summary / KDE, shared by the box and violin painters                                                   |
+| `painters.ts`     | one painter per kind + the shared frame (background, grid, axes, y label)                                                  |
+| `boxPlot.ts` etc. | payload → model adapters; the public drawer names                                                                          |
+| `specDrawer.ts`   | the `spec` drawer: paints `DrawerProps.model` or a spec placeholder                                                        |
+
+Consequences worth knowing:
+
+- **Equivalence is structural.** A legacy drawer and its spec preset build the
+  same model, so they paint the same thing. `specEquivalence.test.ts` asserts it
+  by comparing the full call trace (arguments + canvas state), not a pixel
+  count.
+- **Empty means empty.** A model with no data draws nothing at all — no panel,
+  no axes — which is the pre-WP3 behaviour and what `drawerData.test.ts` pins.
+- **`axes.yLabel` is the only added drawing.** It widens the left margin by a
+  constant and draws one rotated text; without it the trace is identical.
+- **Only the renderer resolves.** `renderFeatureChart()` validates the spec once
+  per render (structural errors ⇒ one placeholder for the whole width), then
+  normalizes per feature (data errors ⇒ one placeholder for that chart).
+  `DrawerProps.model` / `modelErrors` carry the result, so the drawer never
+  parses config.
+
+### The spec drawer protocol
+
+```
+renderer (worker)                          drawer
+validateChartSpec(spec) ─── errors ──▶  placeholder across the render width,
+                                          specError in the RPC result
+normalizeValidatedSpec(spec, data) ──▶  props.model      ──▶ paintChartModel()
+                           └── errors ─▶  props.modelErrors ──▶ placeholder
+```
+
+`drawer: "spec"` is therefore _not_ an ordinary drawer that parses its own
+config: the renderer owns validation (so the diagnosis is track-wide when it
+should be and per-chart when it should be), and the drawer owns painting. Third
+parties invoking the drawer directly must pass a model; plugin drawers keep
+reading `data`.
+
+`FeatureChartPlotlyRenderer` accepts the `spec` slot (so switching renderers
+does not lose config) and refuses to render it, with an explicit "not supported
+here" message. Unifying both backends is WP4; a Plotly-only kind would paint
+nothing in the track, which is the inconsistency WP4 exists to remove.
 
 ## Failure semantics
 
@@ -299,11 +373,11 @@ re-introducing an ESM-only dependency into the product entry points.
   Until then the extension point is strictly cheaper: no new core surface, no
   new element type, no extra serialization.
 
-- **WP3 — declarative `spec`.** Reads `config` only, so a spec can be compiled
-  into the same render settings object. No display change required. The drawer
-  signature is the seam: WP2 keeps `data` and adds `options`; WP3 replaces
-  `data` with the normalized chart model _in the same commit series_, never in
-  parallel, so there is no half-migrated state.
+- **WP3 — declarative `spec` (landed).** `renderer.spec` compiles to a
+  `ChartModel`; painters draw models; `DrawerProps.model` is the unified input
+  (WP2's `data` + `options` remain for payload-driven and plugin drawers, so
+  nothing was half-migrated). The vocabulary is frozen in `SPEC.md` and grows
+  additively only.
 - **WP4 — renderer unification.** `renderSettings.ts` and the shared
   `computeChartX` / density-warning logic are the current duplication boundary.
 - **WP5 — agent-sdk.** `listFeatureChartDrawers()` (name, displayName,
@@ -315,6 +389,10 @@ re-introducing an ESM-only dependency into the product entry points.
 | File                                                           | Guards                                                                                                                                                                       |
 | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `FeatureChartDrawer/drawerRegistry.test.ts`                    | catalog completeness, stable sorting, legacy registration, resolve/error paths                                                                                               |
+| `FeatureChartDrawer/chartSpec.test.ts`                         | the whole 4×4 legality matrix, `data.path` grammar, the four error classes, unknown keys, style/axes bounds                                                                  |
+| `FeatureChartDrawer/chartModel.test.ts`                        | stable serialization regardless of key order, hash changes for every visible field                                                                                           |
+| `FeatureChartDrawer/specEquivalence.test.ts`                   | every legacy drawer == its spec preset: same model _and_ identical canvas call trace                                                                                         |
+| `FeatureChartDrawer/painters.test.ts`                          | empty model draws nothing, `spec.style.colorScheme` wins over the renderer slot, `bins` changes the histogram                                                                |
 | `FeatureChartDrawer/pluginDrawerRegistry.test.ts`              | extension point merge, main-thread _and_ worker assembly order, per-`PluginManager` cache + invalidation, override/warn, malformed contributions, missing-plugin diagnostics |
 | `FeatureChartDrawer/samplePlugin.test.ts`                      | the shipped no-build example plugin still registers and paints, `drawerOptions` change the output                                                                            |
 | `FeatureChartRenderer/configSchema.test.ts`                    | drawer default is a built-in (regression gate for the old `tissueBoxPlot` default), palette defaults                                                                         |
@@ -334,6 +412,12 @@ re-introducing an ESM-only dependency into the product entry points.
 ```
 src/
   FeatureChartDrawer/
+    chartSpec.ts          vocabulary, legality matrix, validate/normalize, data.path
+    chartModel.ts         ChartModel + stable serialization (WP4 cache key)
+    painters.ts           one painter per kind + shared frame (y label lives here)
+    statistics.ts         quartiles / IQR summary / KDE
+    specDrawer.ts         the `spec` drawer + its placeholder
+    placeholder.ts        shared canvas placeholder panel (drawer + spec errors)
     drawerRegistry.ts     module registry + per-PluginManager merge, resolve, built-ins
     drawerErrors.ts       shared placeholder/Alert wording (missing plugin, suggestions)
     drawerOptions.ts      optionsSchema key set + dev-only unknown-key warning
@@ -403,3 +487,7 @@ The same config loads `plugins/sampleChartDrawers.js` through
 | `fc_plugin_heatmap` | a plugin drawer (`samplePlugin/heatmap`) paints in the RPC worker, `drawerOptions` change its form |
 | `fc_plugin_dots`    | the same plugin ships a second drawer; nothing about the first one was special-cased               |
 | `fc_missing_plugin` | `notLoadedPlugin/heatmap` → placeholder that names the missing plugin, track stays alive           |
+| `fc_spec_box`       | `drawer: "spec"` (box / summary-stats) plus `axes.yLabel`, equivalent to `fc_precomputed`          |
+| `fc_spec_bar`       | spec bar with `spec.style.colorScheme`, equivalent to `fc_bar`                                     |
+| `fc_spec_hist`      | spec histogram with `style.bins: 16` — the legacy drawer only ever used 10                         |
+| `fc_spec_broken`    | illegal kind×form → placeholder naming `spec.data.form` and the allowed forms, track stays alive   |
