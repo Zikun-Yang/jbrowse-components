@@ -310,6 +310,87 @@ describe('renderFeatureChart', () => {
     expect(result.value.drawerError).toContain('notLoadedPlugin')
     expect(result.value.imageData).toEqual(expect.any(Object))
   })
+
+  test('warns about drawerOptions the resolved drawer does not declare', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    registerFeatureChartDrawer(
+      'declaredOptionsDrawer',
+      props => {
+        props.ctx.fillRect(0, 0, 1, 1)
+      },
+      { optionsSchema: { colorRamp: 'cool | warm' } },
+    )
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({
+        drawer: 'declaredOptionsDrawer',
+        drawerOptions: { colorRamp: 'warm', colourRamp: 'warm' },
+      }),
+      {} as any,
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('ignores unknown drawerOptions "colourRamp"'),
+    )
+    warn.mockRestore()
+  })
+
+  test('does not warn about drawerOptions the drawer declares', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    registerFeatureChartDrawer(
+      'quietOptionsDrawer',
+      props => {
+        props.ctx.fillRect(0, 0, 1, 1)
+      },
+      { optionsSchema: { colorRamp: 'cool | warm' } },
+    )
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({
+        drawer: 'quietOptionsDrawer',
+        drawerOptions: { colorRamp: 'warm' },
+      }),
+      {} as any,
+    )
+
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining('drawerOptions'),
+    )
+    warn.mockRestore()
+  })
+
+  test('a feature without a parsed payload draws nothing instead of throwing', async () => {
+    // the adapter drops rows whose JSON does not parse, but a feature can still
+    // reach a drawer without `contextData` (a different adapter, a plain
+    // feature source). It used to throw inside the canvas callback, which fails
+    // the whole track in the worker.
+    const draw = jest.fn((props: DrawerProps) => {
+      // exactly what a built-in drawer does with a missing payload
+      const data = (props.data ?? {}) as Record<string, unknown>
+      if (!Array.isArray(data.boxes)) {
+        return
+      }
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    registerFeatureChartDrawer('noPayloadDrawer', draw)
+    mockAdapter([
+      new SimpleFeature({
+        id: 'f-no-context',
+        data: { refName: 'chr1', start: 100, end: 200, name: 'GENE_A' },
+      }),
+    ])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'noPayloadDrawer' }),
+      {} as any,
+    )
+
+    expect(result.value.drawerError).toBeUndefined()
+    expect(draw).toHaveBeenCalledTimes(1)
+    expect(draw.mock.calls[0]![0].data).toBeUndefined()
+  })
 })
 
 describe('computeChartX', () => {

@@ -40,7 +40,7 @@ interface FeatureChartDrawerMeta {
   description: string // one sentence: what it draws and what it eats
   dataShape: 'tissues' | 'matrix' | 'series' | 'any'
   defaultSize?: { width: number; height: number }
-  optionsSchema?: unknown // documentation for drawerOptions keys (not validated)
+  optionsSchema?: unknown // keys the drawer reads: { key: 'doc' } | ['key']; {} = reads none; absent = undeclared
 }
 ```
 
@@ -198,6 +198,55 @@ object, `{}` when unset). It is intentionally **not validated**:
 keeps a track's configuration intact, but the Plotly backend chooses its chart
 with `plotType` and does not consume drawers until WP4 unifies both backends.
 
+### Unknown keys warn in development
+
+`drawerOptions.ts` turns the one silent failure mode that is left — "the key I
+wrote is never read" — into a development `console.warn`, without validating
+anything at runtime:
+
+```ts
+getDrawerOptionKeys(meta) // string[] | undefined
+findUnknownDrawerOptions(meta, o) // sorted unknown keys, no side effects
+warnUnknownDrawerOptions(meta, o) // …and one dev-only warn per drawer + key set
+```
+
+The key set comes from `meta.optionsSchema`, read leniently: an object
+contributes its keys, an array its string entries, `{}`/`[]` mean "reads no
+options", and an **absent schema means undeclared → no warning at all**, so a
+plugin that never shipped a schema is not punished with console noise. The
+built-ins declare `{}` on purpose, which is what makes `drawerOptions` on
+`barPlot` reportable instead of silently ignored.
+
+Call sites are the two places that paint: `renderFeatureChart()` (so the warning
+appears in the worker console that actually renders the chart) and `ChartCanvas`
+in the maximize dialog. Both use `warnOnce`-style dedupe, per context, so a
+track with 40 charts still logs one line. Two contexts therefore means two lines
+for a whole page, which is what the browser check asserts.
+
+`devMode.ts` exists because the obvious dev check does not work here. Webpack
+substitutes **`process.env.NODE_ENV`** with a literal, but does not polyfill
+`process`; in `jbrowse-web` a page evaluation reports
+`typeof process === 'undefined'` while the bundle contains no
+`process.env.NODE_ENV` at all. A guard written as
+`typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'` (the
+pattern also used by `packages/core/src/util/renderTemplate.ts`) therefore
+short-circuits to `false` and disables every warning in exactly the development
+build. `isDevelopmentBuild()` reads the expression directly and falls back to
+"not production" when neither the substitution nor `process` exists, so
+`drawerRegistry.ts`'s override warnings work in the browser too.
+
+### The drawer payload is user data
+
+`DrawerProps.data` is the JSON parsed out of the feature's `data` column. It can
+legitimately be `null`, a number, a string, or missing entirely (a feature
+without `contextData`), and a single bad entry (`boxes: [null]`,
+`tissues: {Brain: null}`) is enough to throw. Drawers therefore read it through
+`asDrawerData()` (`drawerData.ts`), which answers `{}` for anything that is not
+a plain object; each `normalize*()` in the built-ins filters to finite numbers
+before computing a scale. `drawerData.test.ts` runs **every reachable drawer**
+against missing/odd payloads, and `demoDataContract.test.ts` asserts the demo
+TSVs actually carry the key each configured drawer reads.
+
 ## Color scheme
 
 `src/FeatureChartDrawer/colorSchemes.ts` owns the palettes (`tableau10`,
@@ -272,6 +321,10 @@ re-introducing an ESM-only dependency into the product entry points.
 | `FeatureChartRenderer/renderFeatureChart.test.ts`              | config-only rendering, 6 settings from config, unknown drawer placeholder, alignment math                                                                                    |
 | `renderSettings.test.ts`                                       | config → settings mapping, malformed value fallbacks                                                                                                                         |
 | `FeatureChartDrawer/colorSchemes.test.ts`                      | palette shape, default, warn-once fallback, dark-mode behavior                                                                                                               |
+| `FeatureChartDrawer/drawerOptions.test.ts`                     | `optionsSchema` → key set, unknown-key detection, dev warn-once wording, silence for undeclared schemas                                                                      |
+| `FeatureChartDrawer/devMode.test.ts`                           | production vs development detection, including a runtime without `process` (browser bundle)                                                                                  |
+| `FeatureChartDrawer/drawerData.test.ts`                        | every reachable drawer survives `undefined`/`null`/primitive/malformed payloads and still paints the payload it declares                                                     |
+| `FeatureChartDrawer/demoDataContract.test.ts`                  | `test_data/feature-chart` files exist, every row carries the key its configured drawer reads, the drawer paints it, no demo track trips the unknown-key warning              |
 | `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing                                                                                   |
 | `chartGeometry.test.ts`                                        | chart-rectangle hit test, alignment math, icon placement/clamping                                                                                                            |
 | `corePluginsRegistration.test.ts`                              | all three products depend on and register the plugin                                                                                                                         |
@@ -283,6 +336,9 @@ src/
   FeatureChartDrawer/
     drawerRegistry.ts     module registry + per-PluginManager merge, resolve, built-ins
     drawerErrors.ts       shared placeholder/Alert wording (missing plugin, suggestions)
+    drawerOptions.ts      optionsSchema key set + dev-only unknown-key warning
+    devMode.ts            isDevelopmentBuild(): webpack `process.env.NODE_ENV`
+    drawerData.ts         asDrawerData(): payload access that cannot throw
     colorSchemes.ts       palettes + theme resolution
     scales.ts             band/linear scales + tick values (no d3 dependency)
     types.ts              DrawerProps, DrawerFunction, drawer meta

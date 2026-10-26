@@ -1,4 +1,5 @@
 import { resolveColorScheme } from './colorSchemes.ts'
+import { asDrawerData } from './drawerData.ts'
 import { scaleBand, scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
@@ -10,21 +11,26 @@ interface BarEntry {
 }
 
 interface BarPlotData {
-  bars?: BarEntry[]
+  // user data: entries are validated below, not trusted by the type
+  bars?: unknown[]
 }
 
-function normalizeBars(data: BarPlotData): BarEntry[] {
-  if (!Array.isArray(data.bars) || data.bars.length === 0) {
+function normalizeBars(raw: unknown): BarEntry[] {
+  const { bars } = asDrawerData<BarPlotData>(raw)
+  if (!Array.isArray(bars) || bars.length === 0) {
     return []
   }
 
-  return data.bars
+  return bars
     .map((bar): BarEntry | undefined => {
-      const { name, value, color } = bar
+      if (!bar || typeof bar !== 'object') {
+        return undefined
+      }
+      const { name, value, color } = bar as Partial<BarEntry>
       if (typeof name !== 'string' || !Number.isFinite(value)) {
         return undefined
       }
-      return { name, value, ...(color ? { color } : {}) }
+      return { name, value: value!, ...(color ? { color } : {}) }
     })
     .filter((b): b is BarEntry => b !== undefined)
 }
@@ -53,7 +59,7 @@ function computeYDomain(bars: BarEntry[]): [number, number] | undefined {
 export const barPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
   const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
-  const bars = normalizeBars(data as BarPlotData)
+  const bars = normalizeBars(data)
   if (bars.length === 0) {
     return
   }

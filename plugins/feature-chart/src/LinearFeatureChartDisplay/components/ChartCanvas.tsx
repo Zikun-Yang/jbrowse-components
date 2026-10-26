@@ -4,6 +4,7 @@ import { getConf } from '@jbrowse/core/configuration'
 import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
 
 import { resolveColorScheme } from '../../FeatureChartDrawer/colorSchemes.ts'
+import { warnUnknownDrawerOptions } from '../../FeatureChartDrawer/drawerOptions.ts'
 import { resolveFeatureChartDrawer } from '../../FeatureChartDrawer/drawerRegistry.ts'
 
 import type { LinearFeatureChartDisplayModel } from '../model.ts'
@@ -66,6 +67,9 @@ export default function ChartCanvas({
     if (!('drawer' in resolution)) {
       return
     }
+    // Same development warning as the in-track canvas: the maximize dialog is
+    // the place a user usually notices "my option does nothing".
+    warnUnknownDrawerOptions(resolution.meta, drawerOptions)
 
     const view = getContainingView(displayModel) as LinearGenomeViewModel
     const theme = session.theme

@@ -66,6 +66,11 @@ tabix -p bed expression.tsv.gz
 `data`
 列的 JSON 内部结构由具体 drawer 决定，adapter 不做解析，原样透传给 drawer。
 
+注意 `data` 是**用户数据**，不保证是对象：它可以合法地是
+`null`、数字或字符串，也可能整个缺失（feature 没有
+`contextData`，例如换用其它 adapter）。drawer 必须自己兼容这种情况——返回"什么都没画"，而不是抛异常；worker 里抛异常会让整条 track 变成错误。内置 drawer 统一用
+`asDrawerData()`（`src/FeatureChartDrawer/drawerData.ts`）读取，并把每个 group/值过滤成有限数字。
+
 内置五个 drawer。下表是 **当前** 的内置集合，权威来源是
 `listFeatureChartDrawers()`（见
 [`ARCHITECTURE.md`](./ARCHITECTURE.md#drawer-目录)）：
@@ -286,7 +291,7 @@ interface FeatureChartDrawerMeta {
   description: string // 一句话：画什么、吃什么数据
   dataShape: 'tissues' | 'matrix' | 'series' | 'any'
   defaultSize?: { width: number; height: number }
-  optionsSchema?: unknown // 文档用途：这个 drawer 的 drawerOptions 认哪些键
+  optionsSchema?: unknown // 这个 drawer 读哪些 drawerOptions 键：{ key: '文档' } | ['key']；{} = 不读；不写 = 未声明（不校验）
 }
 
 FEATURE_CHART_DRAWER_EXTENSION_POINT = 'Core-featureChartDrawer'
@@ -393,7 +398,20 @@ export default class MyChartDrawers {
 ```
 
 - 读法：`options && options.colorRamp`，为每个键给默认值并做范围裁剪。**不做校验**，参数写错表现为"图不对"而不是报错，所以 drawer 自己必须兜底（示例代码示范）。
-- 可用键由 drawer 自己文档化（`meta.optionsSchema`，只作文档用途，配置编辑器不校验）。
+- 可用键由 drawer 自己声明（`meta.optionsSchema`）。dev 构建下**未知键会
+  `console.warn` 一次**（按 drawer + 键集合去重），例如：
+
+  ```
+  [feature-chart] drawer "myPlugin/heatmap" ignores unknown drawerOptions "colourRamp";
+  it reads: colorRamp, cellHeight
+  ```
+
+  `optionsSchema`
+  三种写法：对象（`{ colorRamp: '...' }`，键即可用键）、字符串数组（`['colorRamp']`）、`{}`/`[]`（声明"不读任何选项"，内置 drawer 就是
+  `{}`，所以在内置 drawer 上写 `drawerOptions` 会被报出来）。**完全不写
+  `optionsSchema` 表示"未声明"，不会警告**
+  —— 插件漏写 schema 只是放弃这个提示，不影响任何配置语义；生产构建不警告。它仍然只是文档，不会拒绝/改写/默认化任何值。
+
 - `FeatureChartPlotlyRenderer`
   也接受该 slot（换 renderer 不丢配置），但 Plotly 后端目前不消费 drawer，见
   `ARCHITECTURE.md` 的 WP4。

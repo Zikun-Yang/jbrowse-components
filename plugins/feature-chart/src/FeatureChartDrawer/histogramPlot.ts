@@ -1,4 +1,5 @@
 import { resolveColorScheme } from './colorSchemes.ts'
+import { asDrawerData } from './drawerData.ts'
 import { scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
@@ -10,11 +11,12 @@ interface HistogramData {
 
 const DEFAULT_BINS = 10
 
-function normalizeValues(data: HistogramData): number[] {
-  if (!Array.isArray(data.values) || data.values.length === 0) {
+function normalizeValues(raw: unknown): number[] {
+  const { values } = asDrawerData<HistogramData>(raw)
+  if (!Array.isArray(values) || values.length === 0) {
     return []
   }
-  return data.values.filter((v): v is number => Number.isFinite(v))
+  return values.filter((v): v is number => Number.isFinite(v))
 }
 
 function computeBins(
@@ -47,15 +49,15 @@ function computeBins(
 export const histogramPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
   const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
-  const values = normalizeValues(data as HistogramData)
+  const payload = asDrawerData<HistogramData>(data)
+  const values = normalizeValues(data)
   if (values.length === 0) {
     return
   }
 
   const binCount =
-    typeof (data as HistogramData).bins === 'number' &&
-    (data as HistogramData).bins! > 0
-      ? (data as HistogramData).bins!
+    typeof payload.bins === 'number' && payload.bins > 0
+      ? payload.bins
       : DEFAULT_BINS
 
   const { edges, counts } = computeBins(values, binCount)
