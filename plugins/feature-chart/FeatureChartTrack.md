@@ -268,15 +268,16 @@ FeatureChartTrack (TrackType)
   `FeatureChartPlotlyRenderer`
 - 提供自定义 `TooltipComponent`
 - `renderProps()` **只**额外传 `config`（renderer 配置）与 `theme`；
-  `drawer / chartWidth / chartHeight / align / maxChartsPerView / minChartSpacingPx / colorScheme`
+  `drawer / drawerOptions / chartWidth / chartHeight / align / maxChartsPerView / minChartSpacingPx / colorScheme`
   一律不再手抄，由 renderer 自读
 - hover chart 时显示 maximize 图标
 - 点击 maximize 图标打开详情 Dialog
 
-### 3.5 Drawer 目录（注册表）
+### 3.5 Drawer 目录与"插件贡献 drawer"
 
-模块级单例，主线程和 worker 共享。内部结构是
-`Map<string, { meta, draw }>`，对外暴露"目录 + 解析"两组 API：
+目录 = **内置 drawer** + **当前 `PluginManager`
+上所有插件贡献的 drawer**。查询 API 都接受可选的
+`pluginManager`，传入时才会把插件贡献合并进来：
 
 ```typescript
 interface FeatureChartDrawerMeta {
@@ -285,38 +286,136 @@ interface FeatureChartDrawerMeta {
   description: string // 一句话：画什么、吃什么数据
   dataShape: 'tissues' | 'matrix' | 'series' | 'any'
   defaultSize?: { width: number; height: number }
-  optionsSchema?: unknown // 预留：WP2 的 drawerOptions 文档化
+  optionsSchema?: unknown // 文档用途：这个 drawer 的 drawerOptions 认哪些键
 }
 
-registerFeatureChartDrawer(name, draw, meta?)
-getFeatureChartDrawer(name): DrawerFunction | undefined
-getFeatureChartDrawerMeta(name): FeatureChartDrawerMeta | undefined
-listFeatureChartDrawers(): FeatureChartDrawerMeta[] // 按 name 稳定排序
-listFeatureChartDrawerNames(): string[]
-resolveFeatureChartDrawer(name): { drawer, meta } | { error, available }
+FEATURE_CHART_DRAWER_EXTENSION_POINT = 'Core-featureChartDrawer'
+
+getFeatureChartDrawer(name, pluginManager?): DrawerFunction | undefined
+getFeatureChartDrawerMeta(name, pluginManager?): FeatureChartDrawerMeta | undefined
+listFeatureChartDrawers(pluginManager?): FeatureChartDrawerMeta[] // 按 name 稳定排序
+listFeatureChartDrawerNames(pluginManager?): string[]
+resolveFeatureChartDrawer(name, pluginManager?):
+  | { drawer, meta }
+  | { error, available, missingPlugin?, pluginLoaded?, suggestions? }
+clearFeatureChartDrawerCache(pluginManager?) // 测试/热重载
 initBuiltInDrawers()
 ```
 
-要点：
-
-- `registerFeatureChartDrawer` 的前两个参数与旧版一致，`meta` 可省略；省略时补
-  `displayName = name`、`dataShape = 'any'`，老调用方不会失效。
-- `getFeatureChartDrawer` 的签名保持不变，仍返回绘制函数本身。
-- 解析失败不抛错，返回 `{ error, available }`，由渲染层决定怎么展示。
+- 合并结果按 `pluginManager` 缓存（`WeakMap`），热重载或测试里调用
+  `clearFeatureChartDrawerCache(pm)`
+  让下次读取重新求值；不带参数则清空全部缓存。
+- 同名时**后注册覆盖先注册**，并在 dev 构建下 `console.warn`
+  一次。内置名字（`precomputedBoxPlot` 等）可以被插件覆盖，但插件应当使用
+  `插件名/图名` 前缀，避免"我的图被悄悄换掉"。
 - 内置抽屉：`precomputedBoxPlot`、`rawBoxPlot`、`rawViolinPlot`、`barPlot`、
   `histogram`（`initBuiltInDrawers()` 在插件 install 时调用，可重复调用）。
 
-#### 第三方注册 drawer
+#### 插件注册 drawer（唯一正确做法）
 
-> WP2 会把"插件贡献 drawer"升级为正式扩展点。在扩展点落地前，包内的
-> `registerFeatureChartDrawer(name, draw, meta?)`
-> 已经可以注册自定义 drawer，但**不推荐**第三方直接 import 本包并调用：请在 WP2 的扩展点规范下注册，这样 drawer 才能被目录、`configdocs`
-> 和 agent-sdk 看到。详见
-> [`ARCHITECTURE.md`](./ARCHITECTURE.md#扩展点留给-wp2wp3-的接缝)。
+插件在 `install(pluginManager)` 里通过扩展点贡献，**不要** import 本包再调用
+`registerFeatureChartDrawer`：外链 ESM 插件会打包出第二份
+`drawerRegistry.ts`，注册"成功"但宿主读不到，而且没有任何报错。
+
+```js
+// myChartDrawers.js —— 可以是 no-build 的单文件 ESM，无需打包
+export default class MyChartDrawers {
+  name = 'MyChartDrawers'
+
+  install(pluginManager) {
+    pluginManager.addToExtensionPoint('Core-featureChartDrawer', drawers => [
+      ...drawers,
+      {
+        name: 'myPlugin/heatmap',
+        displayName: 'Heatmap',
+        description: 'tissue × gene matrix',
+        dataShape: 'matrix',
+        optionsSchema: { colorRamp: 'string', cellHeight: 'number' },
+        draw: ({ ctx, width, height, data, options }) => {
+          /* canvas 2D */
+        },
+      },
+    ])
+  }
+
+  configure() {}
+}
+```
+
+`config.json` 里加载插件，track 上只写名字与参数：
+
+```json
+{
+  "plugins": [{ "esmLoc": { "uri": "plugins/myChartDrawers.js" } }],
+  "tracks": [
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "tissue_expression",
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "expression.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "myPlugin/heatmap",
+            "drawerOptions": { "colorRamp": "warm", "cellHeight": 12 }
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+- 插件在**主线程与 worker 都安装**，所以 `drawer`
+  在 worker 渲染路径下同样可用；两边加载的是同一个 URL，改文件记得带版本号（`?v=2`）或用已有的
+  `__jbrowseCacheBuster`，否则浏览器/worker 可能各拿一份旧文件。
+- 完整示例见 `test_data/feature-chart/plugins/sampleChartDrawers.js` 与
+  [developer guide](../../website/docs/developer_guides/feature_chart_drawers.md)。
+- `registerFeatureChartDrawer / getFeatureChartDrawer(name)` 保留为
+  **legacy**：只在同一份模块实例内部有效（内置 drawer、仓库内调用、单测）。第三方插件必须用扩展点。
+
+#### `drawerOptions`：一个 drawer 出多种形态
+
+`drawerOptions` 是 renderer 的 `frozen` slot，原样透传为 `DrawerProps.options`：
+
+```json
+{
+  "renderer": {
+    "type": "FeatureChartRenderer",
+    "drawer": "myPlugin/heatmap",
+    "drawerOptions": { "colorRamp": "warm", "cellHeight": 12 }
+  }
+}
+```
+
+- 读法：`options && options.colorRamp`，为每个键给默认值并做范围裁剪。**不做校验**，参数写错表现为"图不对"而不是报错，所以 drawer 自己必须兜底（示例代码示范）。
+- 可用键由 drawer 自己文档化（`meta.optionsSchema`，只作文档用途，配置编辑器不校验）。
+- `FeatureChartPlotlyRenderer`
+  也接受该 slot（换 renderer 不丢配置），但 Plotly 后端目前不消费 drawer，见
+  `ARCHITECTURE.md` 的 WP4。
+
+#### 缺失插件时的行为
+
+配置里写了未加载的 drawer 不会让 track 报错；canvas 画占位块、放大弹窗显示
+`Alert`，文案会指出**缺插件**而不是仅仅"未知 drawer"：
+
+```
+Unknown FeatureChart drawer "myPlugin/heatmap"
+Missing plugin? Drawers named "plugin/drawer" come from a plugin:
+add "myPlugin" to config.plugins and reload the page.
+Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
+```
+
+如果该前缀对应的插件**已经加载**，文案改为"插件已加载但不提供这个 drawer"，并在存在相近名字时给出
+`Did you mean "myPlugin/heatMap"?`。
 
 ## 4. 配置示例
 
-> `drawer`、`chartWidth`、`chartHeight`、`align`、`maxChartsPerView`、
+> `drawer`、`drawerOptions`、`chartWidth`、`chartHeight`、`align`、`maxChartsPerView`、
 > `minChartSpacingPx`、`colorScheme`
 > 都是 renderer 的 slot；省略时取 schema 默认值（`drawer` 默认
 > `precomputedBoxPlot`，`colorScheme` 默认 `tableau10`）。
@@ -428,6 +527,19 @@ initBuiltInDrawers()
 }
 ```
 
+同一个 drawer 换形态不加新代码，用
+`drawerOptions`（键的含义由 drawer 决定，详见 §3.5）：
+
+```json
+{
+  "renderer": {
+    "type": "FeatureChartRenderer",
+    "drawer": "samplePlugin/heatmap",
+    "drawerOptions": { "colorRamp": "warm", "cellGap": 2 }
+  }
+}
+```
+
 ---
 
 ## 5. "数据太多" 提示行为
@@ -482,8 +594,8 @@ to region" / "Close" 仍然可用。
 
 ## 7. 实现任务清单
 
-状态（WP0 收口）：全部完成。后续工作见 WP2（插件贡献 drawer /
-`drawerOptions`）与 WP3（声明式 `spec`）。
+状态（WP0、WP2 收口）：插件贡献 drawer 与 `drawerOptions`
+已完成；后续工作见 WP3（声明式 `spec`）与 WP4（双后端统一）。
 
 ### Phase 0：产品接入与地基加固（已完成）
 
@@ -515,9 +627,18 @@ to region" / "Close" 仍然可用。
 - [x] adapter / drawer / renderer / markdown 模板单测
 - [x] 目录、默认值、失败语义、config-only 渲染单测
 
+### Phase 2.5：插件化（已完成，WP2）
+
+- [x] `Core-featureChartDrawer` 扩展点 + `pluginManager` 作用域目录 + `WeakMap`
+      缓存
+- [x] `drawerOptions`（frozen slot）透传为 `DrawerProps.options`
+- [x] 同名覆盖语义（后者胜 + dev warn）与 `插件名/图名` 前缀约定
+- [x] 缺失插件时的占位文案（指出缺哪个插件，并可提示相近名字）
+- [x] no-build 示例插件 `test_data/feature-chart/plugins/sampleChartDrawers.js`
+- [x] 单测：真实 `PluginManager`、worker 装配顺序、缓存失效、参数透传、示例插件
+
 ### Phase 3：增强（后续工作包）
 
-- [ ] 插件贡献 drawer 的正式扩展点、`drawerOptions`（WP2）
 - [ ] 声明式 `spec`（WP3）
 - [ ] Plotly 与 canvas 模型统一（WP4）
 - [ ] agent-sdk 字段（WP5）
@@ -579,10 +700,14 @@ config 覆盖。
    `true`。
 5. ~~第一期 drawer 范围~~：五个内置 drawer 均已实现（见 §2.2 目录）。
 
-仍待 WP2/WP3 决定：
+~~WP2 决定~~（已完成）：插件贡献 drawer 用 `Core-featureChartDrawer` 扩展点；
+`drawerOptions` 用 `frozen` slot 原样透传、**不做校验**，键的含义由 drawer 通过
+`meta.optionsSchema` 自行文档化并在代码里裁剪。
 
-- 插件贡献 drawer 的扩展点形状（`drawerOptions` 如何文档化/校验）。
-- 声明式 `spec` 与 `drawer` / `track info` 的关系。
+仍待 WP3 决定：
+
+- 声明式 `spec` 与 `drawer` / `track info` 的关系（drawer 入参将从 `data`
+  切到规范化图表模型）。
 
 ## 11. 参考文件
 

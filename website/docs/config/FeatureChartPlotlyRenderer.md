@@ -72,3 +72,17 @@ colorScheme: {
       defaultValue: 'tableau10',
     }
 ```
+
+#### slot: drawerOptions
+
+Per-drawer options (`DrawerProps.options`). Accepted here so a track can switch
+between this renderer and `FeatureChartRenderer` without losing its
+configuration. The Plotly backend does not consume drawers yet (see
+ARCHITECTURE.md, WP4): the slot is carried, not applied.
+
+```js
+drawerOptions: {
+      type: 'frozen',
+      defaultValue: {},
+    }
+```

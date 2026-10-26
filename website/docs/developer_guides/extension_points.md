@@ -817,3 +817,13 @@ pluginManager.addToExtensionPoint(
 The naming system, "Core-" just refers to the fact that these extension points
 are from our core codebase. Plugin developers may choose their own prefix to
 avoid collisions.
+
+## Extension points provided by JBrowse plugins
+
+| Extension point           | Producer                        | Contract                                                                                                                                                |
+| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Core-featureChartDrawer` | `@jbrowse/plugin-feature-chart` | Receives the registered drawer list, returns the full list. Append with `[...drawers, myDrawer]`. See [feature chart drawers](./feature_chart_drawers). |
+
+The `Core-featureChartDrawer` extension point is evaluated per `PluginManager`
+and cached, so a drawer contributed here is visible both on the main thread and
+in the RPC worker that paints the charts.

@@ -4,6 +4,13 @@
       "info": "**BioSeek feature-chart demo.** Synthetic data for `test_data/feature-chart`; nothing here comes from a real cohort. Use the track selector to toggle the six demo tracks, hover a chart for the maximize icon, and open a track's About dialog to see this site-wide text."
     }
   },
+  "plugins": [
+    {
+      "esmLoc": {
+        "uri": "plugins/sampleChartDrawers.js"
+      }
+    }
+  ],
   "assemblies": [
     {
       "name": "volvox",
@@ -37,7 +44,10 @@
             "fc_violin",
             "fc_bar",
             "fc_histogram",
-            "fc_broken"
+            "fc_plugin_heatmap",
+            "fc_plugin_dots",
+            "fc_broken",
+            "fc_missing_plugin"
           ]
         }
       }
@@ -217,6 +227,90 @@
           "renderer": {
             "type": "FeatureChartRenderer",
             "drawer": "tissueBoxPlot",
+            "chartWidth": 160,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_plugin_heatmap",
+      "name": "FC · plugin drawer (samplePlugin/heatmap)",
+      "category": ["Feature chart demo"],
+      "description": "Drawer contributed by an external no-build plugin (config.plugins[0].esmLoc.uri → test_data/feature-chart/plugins/sampleChartDrawers.js). `drawerOptions` picks the color ramp and the cell gap, so the same drawer can render several forms.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/raw-values.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_plugin_heatmap-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "samplePlugin/heatmap",
+            "drawerOptions": {
+              "colorRamp": "warm",
+              "cellGap": 2
+            },
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_plugin_dots",
+      "name": "FC · plugin drawer (samplePlugin/dotPlot)",
+      "category": ["Feature chart demo"],
+      "description": "Same plugin, second drawer, different mark. `drawerOptions` controls dot radius, jitter and opacity — one implementation, several looks.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/raw-values.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_plugin_dots-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "samplePlugin/dotPlot",
+            "drawerOptions": {
+              "dotRadius": 2.2,
+              "jitter": 0.8,
+              "fillOpacity": 0.55
+            },
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_missing_plugin",
+      "name": "FC · drawer from a plugin that is not loaded",
+      "category": ["Feature chart demo"],
+      "description": "`notLoadedPlugin/heatmap` is never registered: the track must render a placeholder that says the plugin is missing and names the plugin to add, not just \"unknown drawer\".",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/raw-values.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_missing_plugin-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "notLoadedPlugin/heatmap",
             "chartWidth": 160,
             "chartHeight": 180,
             "align": "left"
