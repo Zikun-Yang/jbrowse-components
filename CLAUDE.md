@@ -283,7 +283,10 @@ during reviews or upstream merges without asking the owner first:
   `scoreAutoRange`, `scoreMin`, `scoreMax`, `scoreScale`, `colorField`) stays in
   the track config: it is decided once per track, not per view, so it would only
   add noise to the menu. Do not add config dialogs or per-scheme pickers without
-  asking the owner.
+  asking the owner. Two additions were offered and rejected, so do not re-raise
+  them: color-swatch previews inside the palette submenu, and a Linear/Quantile
+  toggle for the score scheme (scaling stays config-only). The scheme labels are
+  `Track colors / Feature color / Score / Strand / Feature type`.
 - Color legends are built from data the renderer reports, not from re-fetching
   features: `CanvasFeatureRenderer` returns `legendData` (score range, type
   counts) with its render result, `serverSideRenderedBlock` stores it per block
