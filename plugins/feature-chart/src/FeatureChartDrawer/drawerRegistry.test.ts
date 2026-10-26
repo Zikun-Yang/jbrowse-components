@@ -14,9 +14,16 @@ const BUILT_IN_NAMES = [
   'precomputedBoxPlot',
   'rawBoxPlot',
   'rawViolinPlot',
+  'spec',
 ].sort()
 
-const DATA_SHAPES = ['tissues', 'matrix', 'series', 'any']
+const DATA_SHAPES = [
+  'summary-stats',
+  'grouped-values',
+  'category-values',
+  'values',
+  'any',
+]
 
 describe('feature chart drawer catalog', () => {
   beforeEach(() => {
@@ -97,7 +104,7 @@ describe('resolveFeatureChartDrawer', () => {
       throw new Error('expected a drawer')
     }
     expect(resolution.meta.name).toBe('rawBoxPlot')
-    expect(resolution.meta.dataShape).toBe('tissues')
+    expect(resolution.meta.dataShape).toBe('grouped-values')
   })
 
   test('returns an error plus available names for an unknown drawer', () => {

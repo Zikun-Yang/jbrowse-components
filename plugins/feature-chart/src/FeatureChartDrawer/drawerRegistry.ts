@@ -2,6 +2,7 @@ import { barPlotDrawer } from './barPlot.ts'
 import { precomputedBoxPlotDrawer, rawBoxPlotDrawer } from './boxPlot.ts'
 import { isDevelopmentBuild } from './devMode.ts'
 import { histogramPlotDrawer } from './histogramPlot.ts'
+import { specDrawer } from './specDrawer.ts'
 import { rawViolinPlotDrawer } from './violinPlot.ts'
 
 import type {
@@ -78,9 +79,10 @@ interface FeatureChartDrawerCatalog {
 }
 
 const DATA_SHAPES: FeatureChartDrawerDataShape[] = [
-  'tissues',
-  'matrix',
-  'series',
+  'summary-stats',
+  'grouped-values',
+  'category-values',
+  'values',
   'any',
 ]
 
@@ -128,9 +130,21 @@ function compareNames(a: string, b: string) {
 }
 
 function toDataShape(value: unknown): FeatureChartDrawerDataShape {
-  return typeof value === 'string' && (DATA_SHAPES as string[]).includes(value)
-    ? (value as FeatureChartDrawerDataShape)
-    : 'any'
+  if (value === undefined || value === null) {
+    return 'any'
+  }
+  if (typeof value === 'string' && (DATA_SHAPES as string[]).includes(value)) {
+    return value as FeatureChartDrawerDataShape
+  }
+  // WP3 renamed the vocabulary (`tissues` → `grouped-values`, …) so the catalog
+  // and the chart-spec forms share one spelling. A drawer that still declares an
+  // old name must not fail, but it should not look fine either.
+  warnOnce(
+    `dataShape ${JSON.stringify(value)} is not a known data shape; use ${DATA_SHAPES.map(
+      shape => `"${shape}"`,
+    ).join(', ')}. Treated as "any".`,
+  )
+  return 'any'
 }
 
 /**
@@ -460,7 +474,7 @@ export function initBuiltInDrawers() {
     displayName: 'Precomputed box plot',
     description:
       'One box per category from precomputed five-number statistics (data.boxes).',
-    dataShape: 'matrix',
+    dataShape: 'summary-stats',
     defaultSize: DEFAULT_DRAWER_SIZE,
     optionsSchema: NO_DRAWER_OPTIONS,
   })
@@ -468,14 +482,14 @@ export function initBuiltInDrawers() {
     displayName: 'Box plot (raw values)',
     description:
       'One box per group from raw observations, computing quartiles in the browser (data.tissues).',
-    dataShape: 'tissues',
+    dataShape: 'grouped-values',
     defaultSize: DEFAULT_DRAWER_SIZE,
     optionsSchema: NO_DRAWER_OPTIONS,
   })
   registerFeatureChartDrawer('rawViolinPlot', rawViolinPlotDrawer, {
     displayName: 'Violin plot (raw values)',
     description: 'KDE violin per group from raw observations (data.tissues).',
-    dataShape: 'tissues',
+    dataShape: 'grouped-values',
     defaultSize: DEFAULT_DRAWER_SIZE,
     optionsSchema: NO_DRAWER_OPTIONS,
   })
@@ -483,7 +497,7 @@ export function initBuiltInDrawers() {
     displayName: 'Bar plot',
     description:
       'One bar per category from a single numeric value (data.bars).',
-    dataShape: 'matrix',
+    dataShape: 'category-values',
     defaultSize: DEFAULT_DRAWER_SIZE,
     optionsSchema: NO_DRAWER_OPTIONS,
   })
@@ -491,7 +505,18 @@ export function initBuiltInDrawers() {
     displayName: 'Histogram',
     description:
       'Frequency histogram of one numeric series, with automatic binning (data.values).',
-    dataShape: 'series',
+    dataShape: 'values',
+    defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
+  })
+  // The declarative renderer. Its shape depends on `renderer.spec`, so it declares
+  // `any`; `SPEC.md` is the contract. It reads no `drawerOptions`: styling for a
+  // spec chart lives in `spec.style`.
+  registerFeatureChartDrawer('spec', specDrawer, {
+    displayName: 'Chart spec (declarative)',
+    description:
+      'Paints the declarative `renderer.spec` (kind + data form, see SPEC.md) instead of a named chart.',
+    dataShape: 'any',
     defaultSize: DEFAULT_DRAWER_SIZE,
     optionsSchema: NO_DRAWER_OPTIONS,
   })

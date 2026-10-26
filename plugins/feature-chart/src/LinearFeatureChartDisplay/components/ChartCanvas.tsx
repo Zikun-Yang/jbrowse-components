@@ -3,6 +3,10 @@ import { useEffect, useRef } from 'react'
 import { getConf } from '@jbrowse/core/configuration'
 import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
 
+import {
+  SPEC_DRAWER_NAME,
+  normalizeFromSpec,
+} from '../../FeatureChartDrawer/chartSpec.ts'
 import { resolveColorScheme } from '../../FeatureChartDrawer/colorSchemes.ts'
 import { warnUnknownDrawerOptions } from '../../FeatureChartDrawer/drawerOptions.ts'
 import { resolveFeatureChartDrawer } from '../../FeatureChartDrawer/drawerRegistry.ts'
@@ -36,6 +40,7 @@ export default function ChartCanvas({
   const drawerOptions = getConf(displayModel, ['renderer', 'drawerOptions']) as
     | Record<string, unknown>
     | undefined
+  const spec = getConf(displayModel, ['renderer', 'spec'])
 
   useEffect(() => {
     const canvas = ref.current
@@ -77,6 +82,13 @@ export default function ChartCanvas({
       | { data?: unknown; description?: string; name?: string }
       | undefined
 
+    // `drawer: "spec"`: the model is normalized here, exactly like in the RPC
+    // worker, so the dialog shows the same chart the track does.
+    const normalization =
+      drawerName === SPEC_DRAWER_NAME
+        ? normalizeFromSpec(spec, contextData?.data)
+        : undefined
+
     void resolution.drawer({
       ctx,
       width,
@@ -99,9 +111,22 @@ export default function ChartCanvas({
         getConf(displayModel, ['renderer', 'colorScheme']) as string,
       ),
       options: drawerOptions,
+      ...(normalization?.model === undefined
+        ? normalization === undefined
+          ? {}
+          : { modelErrors: normalization.errors }
+        : { model: normalization.model }),
       isMaximize: true,
     })
-  }, [feature, displayModel, width, height, drawerName, drawerOptions])
+  }, [
+    feature,
+    displayModel,
+    width,
+    height,
+    drawerName,
+    drawerOptions,
+    spec,
+  ])
 
   return (
     <canvas

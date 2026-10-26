@@ -26,10 +26,19 @@ export interface FeatureChartRenderSettings {
    * `FeatureChartDrawerMeta.optionsSchema`.
    */
   drawerOptions: Record<string, unknown>
+  /**
+   * Declarative chart description (`SPEC.md`), used when `drawer` is `"spec"`.
+   * Passed through verbatim: validation is `normalizeFromSpec()`'s job, and one
+   * of the things it must be able to report is "this is not even an object".
+   */
+  spec: unknown
 }
 
 /** Shared empty value so an unset slot does not allocate per chart. */
 const EMPTY_DRAWER_OPTIONS: Record<string, unknown> = {}
+
+/** Same for the `spec` slot: an unset spec is an empty object, not `undefined`. */
+const EMPTY_SPEC: Record<string, unknown> = {}
 
 /** Mirrors the `defaultValue`s in `FeatureChartRenderer/configSchema.ts`. */
 export const FEATURE_CHART_RENDER_DEFAULTS: FeatureChartRenderSettings = {
@@ -41,6 +50,7 @@ export const FEATURE_CHART_RENDER_DEFAULTS: FeatureChartRenderSettings = {
   minChartSpacingPx: 4,
   colorScheme: DEFAULT_COLOR_SCHEME,
   drawerOptions: EMPTY_DRAWER_OPTIONS,
+  spec: EMPTY_SPEC,
 }
 
 function toFiniteNumber(value: unknown, fallback: number): number {
@@ -81,6 +91,15 @@ function toDrawerOptions(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : EMPTY_DRAWER_OPTIONS
+}
+
+/**
+ * The spec is deliberately **not** sanitized: only a missing slot becomes `{}`.
+ * Handing the validator whatever the user wrote is what lets it say "spec must be
+ * an object; found the string \"box\"" instead of rendering an empty chart.
+ */
+function toSpec(value: unknown): unknown {
+  return value === undefined || value === null ? EMPTY_SPEC : value
 }
 
 /**
@@ -126,5 +145,6 @@ export function resolveFeatureChartRenderSettings(
     drawerOptions: toDrawerOptions(
       readSlot(config ?? undefined, 'drawerOptions'),
     ),
+    spec: toSpec(readSlot(config ?? undefined, 'spec')),
   }
 }

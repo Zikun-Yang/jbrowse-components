@@ -13,6 +13,10 @@ import {
 import ReactMarkdown from 'react-markdown'
 
 import ChartCanvas from './ChartCanvas.tsx'
+import {
+  SPEC_DRAWER_NAME,
+  normalizeFromSpec,
+} from '../../FeatureChartDrawer/chartSpec.ts'
 import { formatFeatureChartDrawerError } from '../../FeatureChartDrawer/drawerErrors.ts'
 import {
   isFeatureChartDrawerResolutionError,
@@ -70,6 +74,18 @@ export default function MaximizeDialog({
     ? formatFeatureChartDrawerError(resolution)
     : null
 
+  // `drawer: "spec"`: list *all* problems here, not just the first one the
+  // in-track placeholder could fit. A shape mismatch is almost always a set of
+  // them (wrong kind, wrong form, wrong path), and fixing one at a time is the
+  // slow way to learn the vocabulary.
+  const specErrors =
+    drawerName === SPEC_DRAWER_NAME
+      ? normalizeFromSpec(
+          getConf(displayModel, ['renderer', 'spec']),
+          contextData?.data,
+        ).errors
+      : []
+
   const description = contextData?.description
   const renderedDescription = description
     ? renderMarkdownTemplate(description, {
@@ -99,6 +115,27 @@ export default function MaximizeDialog({
         {drawerError ? (
           <Alert severity="warning" sx={{ mb: 2 }}>
             {drawerError}
+          </Alert>
+        ) : specErrors.length > 0 ? (
+          <Alert
+            severity="warning"
+            sx={{ mb: 2 }}
+            data-testid="feature-chart-spec-error"
+          >
+            Invalid chart spec ({specErrors.length}{' '}
+            {specErrors.length === 1 ? 'problem' : 'problems'})
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20 }}>
+              {specErrors.map(error => (
+                <li key={`${error.path}-${error.message}`}>
+                  <code>{error.path}</code>: {error.message}
+                  {error.allowed && error.allowed.length > 0 ? (
+                    <div style={{ opacity: 0.8 }}>
+                      allowed: {error.allowed.join(', ')}
+                    </div>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
           </Alert>
         ) : feature ? (
           <ChartCanvas

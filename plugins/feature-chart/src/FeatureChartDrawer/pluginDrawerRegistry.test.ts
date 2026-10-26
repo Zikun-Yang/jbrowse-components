@@ -310,7 +310,7 @@ describe('plugin-contributed feature chart drawers', () => {
         name: 'metaPlugin/chart',
         displayName: 'Meta chart',
         description: 'A drawer with rich metadata.',
-        dataShape: 'matrix',
+        dataShape: 'grouped-values',
         defaultSize: { width: 90, height: 90 },
         optionsSchema: { cellHeight: 'number' },
         draw: () => {},
@@ -331,7 +331,7 @@ describe('plugin-contributed feature chart drawers', () => {
       name: 'metaPlugin/chart',
       displayName: 'Meta chart',
       description: 'A drawer with rich metadata.',
-      dataShape: 'matrix',
+      dataShape: 'grouped-values',
       defaultSize: { width: 90, height: 90 },
       optionsSchema: { cellHeight: 'number' },
     })

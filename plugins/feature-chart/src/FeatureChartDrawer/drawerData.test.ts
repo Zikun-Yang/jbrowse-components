@@ -6,6 +6,7 @@ import LinearGenomeViewPlugin from '@jbrowse/plugin-linear-genome-view'
 // @ts-expect-error - plain JS example without types, on purpose
 import SampleChartDrawersModule from '../../../../test_data/feature-chart/plugins/sampleChartDrawers.js'
 import FeatureChartPlugin from '../index.ts'
+import { normalizeFromSpec } from './chartSpec.ts'
 import { asDrawerData } from './drawerData.ts'
 import {
   clearFeatureChartDrawerCache,
@@ -43,6 +44,18 @@ function reachableDrawers(): { name: string; draw: DrawerFunction }[] {
   }))
 }
 
+/**
+ * `spec` is config-driven rather than payload-driven: it paints a normalized
+ * model (`DrawerProps.model`) the renderer computed from `renderer.spec`, so it
+ * does not belong in the "whatever the payload is, draw nothing" sweep. Its own
+ * behaviour (placeholder on bad data, paint on good data) is asserted below.
+ */
+const SPEC_DRAWER = 'spec'
+
+function payloadDrawers() {
+  return reachableDrawers().filter(({ name }) => name !== SPEC_DRAWER)
+}
+
 describe('asDrawerData', () => {
   test('passes plain objects through by reference', () => {
     const data = { boxes: [{ name: 'Brain' }] }
@@ -75,6 +88,7 @@ describe('drawer payload access', () => {
         'rawViolinPlot',
         'barPlot',
         'histogram',
+        'spec',
         'samplePlugin/heatmap',
         'samplePlugin/dotPlot',
       ]),
@@ -95,7 +109,7 @@ describe('drawer payload access', () => {
   ])(
     'every drawer paints nothing and throws nothing for %s',
     (_label, value) => {
-      for (const { name, draw } of reachableDrawers()) {
+      for (const { name, draw } of payloadDrawers()) {
         expect([name, paintCountFor(draw, value)]).toEqual([name, 0])
       }
     },
@@ -113,7 +127,7 @@ describe('drawer payload access', () => {
     ['tissues that is an array', { tissues: [1, 2] }],
     ['tissues that is a string', { tissues: 'nope' }],
   ])('every drawer survives %s', (_label, value) => {
-    for (const { draw } of reachableDrawers()) {
+    for (const { draw } of payloadDrawers()) {
       expect(() => paintCountFor(draw, value)).not.toThrow()
     }
   })
@@ -143,11 +157,40 @@ describe('drawer payload access', () => {
       },
     }
 
-    for (const { name, draw } of reachableDrawers()) {
+    for (const { name, draw } of payloadDrawers()) {
       // a new drawer without a fixture here must fail loudly, not pass silently
       const payload = payloads[name]
       expect([name, payload !== undefined]).toEqual([name, true])
       expect([name, paintCountFor(draw, payload) > 0]).toEqual([name, true])
     }
+  })
+})
+
+describe('the config-driven spec drawer', () => {
+  const SPEC = {
+    specVersion: 1,
+    kind: 'box',
+    data: { form: 'grouped-values', path: 'tissues' },
+  } as const
+
+  function specDraw() {
+    return reachableDrawers().find(({ name }) => name === SPEC_DRAWER)!.draw
+  }
+
+  test('paints the model the renderer normalized from the spec', () => {
+    const data = { tissues: { Brain: [1, 2, 3, 4], Liver: [2, 3, 4, 5] } }
+    const { model } = normalizeFromSpec(SPEC, data)
+    expect([paintCountFor(specDraw(), data, { model }) > 0]).toEqual([true])
+  })
+
+  test('draws a readable placeholder instead of throwing on a bad payload', () => {
+    for (const data of [undefined, null, 42, 'nope', { tissues: 'nope' }]) {
+      const normalization = normalizeFromSpec(SPEC, data)
+      expect([paintCountFor(specDraw(), data, { modelErrors: normalization.errors }) > 0]).toEqual([true])
+    }
+  })
+
+  test('draws a placeholder when it is handed neither a model nor errors', () => {
+    expect(paintCountFor(specDraw(), undefined) > 0).toBe(true)
   })
 })
