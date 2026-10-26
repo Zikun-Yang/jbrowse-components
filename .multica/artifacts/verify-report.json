@@ -1,0 +1,56 @@
+{
+  "results": [
+    {
+      "name": "plugin installs on the main thread",
+      "ok": true,
+      "detail": "{\"context\":\"main thread\",\"drawers\":[\"samplePlugin/heatmap\",\"samplePlugin/dotPlot\"]}"
+    },
+    {
+      "name": "plugin also installs inside the RPC worker",
+      "ok": true,
+      "detail": "4 worker(s): [{\"context\":\"worker\",\"drawers\":[\"samplePlugin/heatmap\",\"samplePlugin/dotPlot\"]},{\"context\":\"worker\",\"drawers\":[\"samplePlugin/heatmap\",\"samplePlugin/dotPlot\"]},{\"context\":\"worker\",\"drawers\":[\"samplePlugin/heatmap\",\"samplePlugin/dotPlot\"]},{\"context\":\"worker\",\"drawers\":[\"samplePlugin/heatmap\",\"samplePlugin/dotPlot\"]}]"
+    },
+    {
+      "name": "no \"unknown drawer\" warning for the plugin drawers",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "worker-painted track canvas contains the plugin heatmap ramp",
+      "ok": true,
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":26144,\"warm\":3249,\"blue\":0}"
+    },
+    {
+      "name": "worker-painted track canvas contains the plugin dot plot",
+      "ok": true,
+      "detail": "{\"width\":1600,\"height\":360,\"painted\":539,\"warm\":82,\"blue\":451}"
+    },
+    {
+      "name": "maximize dialog for a plugin drawer opens without an alert",
+      "ok": true,
+      "detail": "{\"alert\":null,\"canvas\":{\"width\":800,\"height\":400,\"painted\":310440,\"warm\":116415,\"blue\":0}}"
+    },
+    {
+      "name": "maximize dialog paints the plugin heatmap with its warm ramp",
+      "ok": true,
+      "detail": "{\"width\":800,\"height\":400,\"painted\":310440,\"warm\":116415,\"blue\":0}"
+    },
+    {
+      "name": "second drawer of the same plugin paints in the dialog too",
+      "ok": true,
+      "detail": "{\"alert\":null,\"canvas\":{\"width\":800,\"height\":400,\"painted\":570,\"warm\":278,\"blue\":277}}"
+    },
+    {
+      "name": "a drawer whose plugin is not loaded explains the missing plugin",
+      "ok": true,
+      "detail": "Unknown FeatureChart drawer \"notLoadedPlugin/heatmap\" Missing plugin? Drawers named \"plugin/drawer\" come from a plugin: add \"notLoadedPlugin\" to config.plugins and reload the page. Did you mean \"samplePlugin/heatmap\"? Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot (+2 m"
+    },
+    {
+      "name": "no unexpected console errors",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarns": []
+}
