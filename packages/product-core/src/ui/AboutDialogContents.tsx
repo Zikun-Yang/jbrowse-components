@@ -10,9 +10,12 @@ import { observer } from 'mobx-react'
 
 import FileInfoPanel from './FileInfoPanel.tsx'
 import HeaderButtons from './HeaderButtons.tsx'
+import MarkdownPanel from './MarkdownPanel.tsx'
 import RefNameInfoDialog from './RefNameInfoDialog.tsx'
+import { resolveTrackInfo } from './trackInfo.ts'
 import { generateDisplayableConfig, readConf } from './util.ts'
 
+import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { AbstractSessionModel } from '@jbrowse/core/util'
 
@@ -21,6 +24,23 @@ const useStyles = makeStyles()({
     minWidth: 800,
   },
 })
+
+/**
+ * Resolve the track info panel, never let a broken template take down the whole
+ * about dialog
+ */
+function getTrackInfo(
+  config: AnyConfigurationModel | Record<string, unknown>,
+  session: AbstractSessionModel,
+  pluginManager: PluginManager,
+) {
+  try {
+    return resolveTrackInfo(config, session, pluginManager)
+  } catch (e) {
+    console.error('failed to resolve the track info panel', e)
+    return { info: '', visible: false, hideUris: false }
+  }
+}
 
 const AboutDialogContents = observer(function AboutDialogContents({
   config,
@@ -52,8 +72,18 @@ const AboutDialogContents = observer(function AboutDialogContents({
   ) as { name: string; Component: React.FC<any> } | null
   const hideFields = ['displays', 'baseUri', 'refNames', 'formatAbout']
 
+  const trackInfo = getTrackInfo(config, session, pluginManager)
+
   return (
     <div className={classes.content}>
+      {trackInfo.visible ? (
+        <BaseCard title="Track info">
+          <MarkdownPanel
+            markdown={trackInfo.info}
+            hideUris={trackInfo.hideUris}
+          />
+        </BaseCard>
+      ) : null}
       <BaseCard title="Configuration">
         {!hideUris ? (
           <HeaderButtons conf={conf} setShowRefNames={setShowRefNames} />

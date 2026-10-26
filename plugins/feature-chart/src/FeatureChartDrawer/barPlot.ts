@@ -1,4 +1,5 @@
-import { scaleBand, scaleLinear } from 'd3-scale'
+import { resolveColorScheme } from './colorSchemes.ts'
+import { scaleBand, scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
 
@@ -11,19 +12,6 @@ interface BarEntry {
 interface BarPlotData {
   bars?: BarEntry[]
 }
-
-const DEFAULT_COLORS = [
-  '#4e79a7',
-  '#f28e2c',
-  '#e15759',
-  '#76b7b2',
-  '#59a14f',
-  '#edc949',
-  '#af7aa1',
-  '#ff9da7',
-  '#9c755f',
-  '#bab0ab',
-]
 
 function normalizeBars(data: BarPlotData): BarEntry[] {
   if (!Array.isArray(data.bars) || data.bars.length === 0) {
@@ -42,20 +30,29 @@ function normalizeBars(data: BarPlotData): BarEntry[] {
 }
 
 function computeYDomain(bars: BarEntry[]): [number, number] | undefined {
-  if (bars.length === 0) return undefined
+  if (bars.length === 0) {
+    return undefined
+  }
   let min = 0
   let max = -Infinity
   for (const b of bars) {
-    if (b.value < min) min = b.value
-    if (b.value > max) max = b.value
+    if (b.value < min) {
+      min = b.value
+    }
+    if (b.value > max) {
+      max = b.value
+    }
   }
-  if (!Number.isFinite(max)) return undefined
+  if (!Number.isFinite(max)) {
+    return undefined
+  }
   const padding = (max - min) * 0.05 || 1
   return [min - padding, max + padding]
 }
 
 export const barPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
+  const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
   const bars = normalizeBars(data as BarPlotData)
   if (bars.length === 0) {
     return
@@ -80,7 +77,7 @@ export const barPlotDrawer: DrawerFunction = function (props) {
     return
   }
 
-  const xScale = scaleBand<string>()
+  const xScale = scaleBand()
     .domain(bars.map(d => d.name))
     .range([0, innerWidth])
     .padding(0.3)
@@ -89,25 +86,25 @@ export const barPlotDrawer: DrawerFunction = function (props) {
   const baselineY = yScale(0)
 
   // Background panel
-  ctx.fillStyle = '#fafafa'
+  ctx.fillStyle = colorScheme.background
   ctx.fillRect(0, 0, width, height)
 
   ctx.save()
   ctx.translate(padding.left, padding.top)
 
   // Grid lines
-  ctx.strokeStyle = '#e0e0e0'
+  ctx.strokeStyle = colorScheme.grid
   ctx.lineWidth = 1
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(0, y)
     ctx.lineTo(innerWidth, y)
     ctx.stroke()
-  })
+  }
 
   // Y axis
-  ctx.strokeStyle = '#333333'
+  ctx.strokeStyle = colorScheme.axis
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(0, 0)
@@ -116,40 +113,40 @@ export const barPlotDrawer: DrawerFunction = function (props) {
   ctx.stroke()
 
   // Y ticks and labels
-  ctx.fillStyle = '#333333'
+  ctx.fillStyle = colorScheme.text
   ctx.font = `${Math.max(8, Math.min(12, height * 0.05))}px sans-serif`
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(-4, y)
     ctx.lineTo(0, y)
     ctx.stroke()
     ctx.fillText(formatTick(tick), -8, y)
-  })
+  }
 
   // X labels and bars
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
-  bars.forEach((d, i) => {
+  for (const [i, d] of bars.entries()) {
     const x = (xScale(d.name) ?? 0) + xScale.bandwidth() / 2
     const label = truncateLabel(d.name, xScale.bandwidth())
-    ctx.fillStyle = '#333333'
+    ctx.fillStyle = colorScheme.text
     ctx.fillText(label, x, innerHeight + 6)
 
-    const color = d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!
+    const color = d.color ?? colorScheme.colors[i % colorScheme.colors.length]!
     const barX = xScale(d.name) ?? 0
     const barW = xScale.bandwidth()
     const barY = yScale(d.value)
     const barH = baselineY - barY
 
-    ctx.fillStyle = color + '33' // 20% opacity
+    ctx.fillStyle = `${color}33` // 20% opacity
     ctx.strokeStyle = color
     ctx.lineWidth = 1.5
     ctx.fillRect(barX, Math.min(barY, baselineY), barW, Math.abs(barH))
     ctx.strokeRect(barX, Math.min(barY, baselineY), barW, Math.abs(barH))
-  })
+  }
 
   ctx.restore()
 }
@@ -163,6 +160,8 @@ function formatTick(value: number): string {
 
 function truncateLabel(label: string, maxWidth: number): string {
   const approxChars = Math.max(3, Math.floor(maxWidth / 6))
-  if (label.length <= approxChars) return label
+  if (label.length <= approxChars) {
+    return label
+  }
   return `${label.slice(0, approxChars - 1)}…`
 }

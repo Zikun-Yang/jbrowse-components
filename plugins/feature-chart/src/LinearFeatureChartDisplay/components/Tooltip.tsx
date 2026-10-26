@@ -1,6 +1,5 @@
-import { observer } from 'mobx-react'
-
 import BaseTooltip from '@jbrowse/core/ui/BaseTooltip'
+import { observer } from 'mobx-react'
 
 import type { BaseLinearDisplayModel } from '@jbrowse/plugin-linear-genome-view'
 

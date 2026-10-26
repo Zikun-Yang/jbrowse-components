@@ -11,10 +11,13 @@ const FeatureChartRenderer = ConfigurationSchema(
   {
     /**
      * #slot
+     * Name of the drawer that paints each chart. Must be one of the built-in
+     * drawers (see `listFeatureChartDrawers()`) or a drawer registered at
+     * runtime; unknown names render a placeholder instead of failing the track.
      */
     drawer: {
       type: 'string',
-      defaultValue: 'tissueBoxPlot',
+      defaultValue: 'precomputedBoxPlot',
     },
 
     /**
@@ -60,6 +63,8 @@ const FeatureChartRenderer = ConfigurationSchema(
 
     /**
      * #slot
+     * Palette used by the built-in drawers. One of `tableau10`, `viridis`,
+     * `set2`, `dark2`, `blues` (see `listColorSchemeNames()`).
      */
     colorScheme: {
       type: 'string',

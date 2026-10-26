@@ -1,7 +1,7 @@
 import { lazy } from 'react'
 
-import configSchema from './configSchema.ts'
 import FeatureChartRenderer from './FeatureChartRenderer.ts'
+import configSchema from './configSchema.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 

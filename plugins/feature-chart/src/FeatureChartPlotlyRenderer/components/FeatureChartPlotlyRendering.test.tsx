@@ -3,6 +3,9 @@ import { render, waitFor } from '@testing-library/react'
 
 import FeatureChartPlotlyRendering from './FeatureChartPlotlyRendering.tsx'
 
+import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
+import type { BaseLinearDisplayModel } from '@jbrowse/plugin-linear-genome-view'
+
 const mockNewPlot = jest.fn().mockResolvedValue(undefined)
 const mockPurge = jest.fn().mockResolvedValue(undefined)
 
@@ -16,7 +19,7 @@ jest.mock('plotly.js-dist-min', () => ({
 
 const mockDisplayModel = {
   setFeatureIdUnderMouse: jest.fn(),
-} as unknown as import('@jbrowse/plugin-linear-genome-view').BaseLinearDisplayModel
+} as unknown as BaseLinearDisplayModel
 
 function createFeature(id: string, start: number, end: number, data: unknown) {
   return new SimpleFeature({
@@ -41,7 +44,7 @@ const config = {
   plotType: 'box',
   maxChartsPerView: 100,
   minChartSpacingPx: 4,
-} as unknown as import('@jbrowse/core/configuration').AnyConfigurationModel
+} as unknown as AnyConfigurationModel
 
 describe('FeatureChartPlotlyRendering', () => {
   beforeEach(() => {

@@ -1,0 +1,228 @@
+{
+  "configuration": {
+    "formatAbout": {
+      "info": "**BioSeek feature-chart demo.** Synthetic data for `test_data/feature-chart`; nothing here comes from a real cohort. Use the track selector to toggle the six demo tracks, hover a chart for the maximize icon, and open a track's About dialog to see this site-wide text."
+    }
+  },
+  "assemblies": [
+    {
+      "name": "volvox",
+      "displayName": "Volvox (demo)",
+      "aliases": ["vvx"],
+      "sequence": {
+        "type": "ReferenceSequenceTrack",
+        "trackId": "volvox_refseq",
+        "adapter": {
+          "type": "TwoBitAdapter",
+          "twoBitLocation": {
+            "uri": "/test_data/volvox/volvox.2bit",
+            "locationType": "UriLocation"
+          }
+        }
+      }
+    }
+  ],
+  "defaultSession": {
+    "name": "Feature chart demo",
+    "views": [
+      {
+        "id": "feature_chart_demo_view",
+        "type": "LinearGenomeView",
+        "init": {
+          "loc": "ctgA:500-18,500",
+          "assembly": "volvox",
+          "tracks": [
+            "fc_precomputed",
+            "fc_raw_box",
+            "fc_violin",
+            "fc_bar",
+            "fc_histogram",
+            "fc_broken"
+          ]
+        }
+      }
+    ],
+    "widgets": {
+      "hierarchicalTrackSelector": {
+        "id": "hierarchicalTrackSelector",
+        "type": "HierarchicalTrackSelectorWidget",
+        "filterText": "",
+        "view": "feature_chart_demo_view"
+      }
+    },
+    "activeWidgets": {
+      "hierarchicalTrackSelector": "hierarchicalTrackSelector"
+    }
+  },
+  "tracks": [
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_precomputed",
+      "name": "FC · precomputed box (no drawer key)",
+      "category": ["Feature chart demo"],
+      "description": "Omitted `drawer` on purpose: this track proves the schema default is a real drawer. It also carries a track-level `formatAbout.info`, which overrides the site-wide text.",
+      "metadata": {
+        "source": "GTEx v8 (synthetic)"
+      },
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/precomputed-box.tsv.gz"
+      },
+      "formatAbout": {
+        "info": "**{{track.name}}**\n\nPrecomputed five-number summaries, one box per tissue. Source `{{track.metadata.source}}`, adapter `{{track.adapter.type}}`, assembly `{{assembly.displayName}}`. This paragraph lives in the track's `formatAbout.info` and overrides the site-wide default."
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_precomputed-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_raw_box",
+      "name": "FC · raw box plot",
+      "category": ["Feature chart demo"],
+      "description": "Same file as the violin track, different drawer: raw observations are aggregated by the drawer at render time.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "dataLocation": {
+          "uri": "/test_data/feature-chart/raw-values.tsv.gz",
+          "locationType": "UriLocation"
+        },
+        "index": {
+          "location": {
+            "uri": "/test_data/feature-chart/raw-values.tsv.gz.tbi",
+            "locationType": "UriLocation"
+          }
+        }
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_raw_box-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "rawBoxPlot",
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left",
+            "colorScheme": "set2"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_violin",
+      "name": "FC · raw violin plot",
+      "category": ["Feature chart demo"],
+      "description": "Identical adapter and data to the raw box track; only `renderer.drawer` differs.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/raw-values.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_violin-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "rawViolinPlot",
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left",
+            "colorScheme": "viridis"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_bar",
+      "name": "FC · bar plot",
+      "category": ["Feature chart demo"],
+      "description": "`data.bars` — one bar per category, values supplied by the file.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/bars.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_bar-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "barPlot",
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_histogram",
+      "name": "FC · histogram (track info off)",
+      "category": ["Feature chart demo"],
+      "description": "`data.values` — a single numeric series. `formatAbout.showInfo: false` suppresses the info card for this track only; every other demo track shows it.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/histogram.tsv.gz"
+      },
+      "formatAbout": {
+        "showInfo": false
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_histogram-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "histogram",
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_broken",
+      "name": "FC · unknown drawer (failure semantics)",
+      "category": ["Feature chart demo"],
+      "description": "`tissueBoxPlot` was the old (invalid) default. The track must render a readable placeholder with the available drawer names and must not fail the track.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/precomputed-box.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_broken-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "tissueBoxPlot",
+            "chartWidth": 160,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-import { scaleBand, scaleLinear } from 'd3-scale'
+import { resolveColorScheme } from './colorSchemes.ts'
+import { scaleBand, scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
 
@@ -12,19 +13,6 @@ interface ViolinGroup {
   median: number
 }
 
-const DEFAULT_COLORS = [
-  '#4e79a7',
-  '#f28e2c',
-  '#e15759',
-  '#76b7b2',
-  '#59a14f',
-  '#edc949',
-  '#af7aa1',
-  '#ff9da7',
-  '#9c755f',
-  '#bab0ab',
-]
-
 const KDE_STEPS = 40
 
 function quantile(sorted: number[], p: number): number {
@@ -36,7 +24,9 @@ function quantile(sorted: number[], p: number): number {
 }
 
 function standardDeviation(values: number[], mean: number): number {
-  if (values.length <= 1) return 0
+  if (values.length <= 1) {
+    return 0
+  }
   const variance =
     values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
   return Math.sqrt(variance)
@@ -86,7 +76,9 @@ function normalizeViolinGroups(data: RawTissueData): ViolinGroup[] {
 
   return Object.entries(tissues)
     .map(([name, values]) => {
-      if (!Array.isArray(values) || values.length === 0) return undefined
+      if (!Array.isArray(values) || values.length === 0) {
+        return undefined
+      }
       const sorted = [...values].sort((a, b) => a - b)
       return { name, values, median: quantile(sorted, 0.5) }
     })
@@ -94,22 +86,31 @@ function normalizeViolinGroups(data: RawTissueData): ViolinGroup[] {
 }
 
 function computeYDomain(groups: ViolinGroup[]): [number, number] | undefined {
-  if (groups.length === 0) return undefined
+  if (groups.length === 0) {
+    return undefined
+  }
   let min = Infinity
   let max = -Infinity
   for (const g of groups) {
     for (const v of g.values) {
-      if (v < min) min = v
-      if (v > max) max = v
+      if (v < min) {
+        min = v
+      }
+      if (v > max) {
+        max = v
+      }
     }
   }
-  if (!Number.isFinite(min) || !Number.isFinite(max)) return undefined
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    return undefined
+  }
   const padding = (max - min) * 0.05 || 1
   return [min - padding, max + padding]
 }
 
 export const rawViolinPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
+  const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
   const groups = normalizeViolinGroups(data as RawTissueData)
   if (groups.length === 0) {
     return
@@ -134,7 +135,7 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
     return
   }
 
-  const xScale = scaleBand<string>()
+  const xScale = scaleBand()
     .domain(groups.map(d => d.name))
     .range([0, innerWidth])
     .padding(0.3)
@@ -142,25 +143,25 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
   const yScale = scaleLinear().domain(yDomain).range([innerHeight, 0]).nice()
 
   // Background panel
-  ctx.fillStyle = '#fafafa'
+  ctx.fillStyle = colorScheme.background
   ctx.fillRect(0, 0, width, height)
 
   ctx.save()
   ctx.translate(padding.left, padding.top)
 
   // Grid lines
-  ctx.strokeStyle = '#e0e0e0'
+  ctx.strokeStyle = colorScheme.grid
   ctx.lineWidth = 1
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(0, y)
     ctx.lineTo(innerWidth, y)
     ctx.stroke()
-  })
+  }
 
   // Y axis
-  ctx.strokeStyle = '#333333'
+  ctx.strokeStyle = colorScheme.axis
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(0, 0)
@@ -169,29 +170,29 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
   ctx.stroke()
 
   // Y ticks and labels
-  ctx.fillStyle = '#333333'
+  ctx.fillStyle = colorScheme.text
   ctx.font = `${Math.max(8, Math.min(12, height * 0.05))}px sans-serif`
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(-4, y)
     ctx.lineTo(0, y)
     ctx.stroke()
     ctx.fillText(formatTick(tick), -8, y)
-  })
+  }
 
   // X labels and violins
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
-  groups.forEach((g, i) => {
+  for (const [i, g] of groups.entries()) {
     const centerX = (xScale(g.name) ?? 0) + xScale.bandwidth() / 2
     const label = truncateLabel(g.name, xScale.bandwidth())
-    ctx.fillStyle = '#333333'
+    ctx.fillStyle = colorScheme.text
     ctx.fillText(label, centerX, innerHeight + 6)
 
-    const color = DEFAULT_COLORS[i % DEFAULT_COLORS.length]!
+    const color = colorScheme.colors[i % colorScheme.colors.length]!
     const bandwidth = silvermanBandwidth(g.values)
     const densities = computeKde(g.values, bandwidth, yDomain[0], yDomain[1])
     const maxDensity = Math.max(...densities.map(d => d.density))
@@ -214,8 +215,8 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
         ctx.lineTo(px, py)
       }
     }
-    for (let j = 0; j < densities.length; j++) {
-      const { y, density } = densities[j]!
+    for (const density_ of densities) {
+      const { y, density } = density_
       const xOffset = widthScale(density)
       const px = centerX - xOffset
       const py = yScale(y)
@@ -223,7 +224,7 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
     }
     ctx.closePath()
 
-    ctx.fillStyle = color + '33' // 20% opacity
+    ctx.fillStyle = `${color}33` // 20% opacity
     ctx.fill()
     ctx.strokeStyle = color
     ctx.lineWidth = 1.5
@@ -231,13 +232,13 @@ export const rawViolinPlotDrawer: DrawerFunction = function (props) {
 
     // Median line
     const medianY = yScale(g.median)
-    ctx.strokeStyle = '#333333'
+    ctx.strokeStyle = colorScheme.axis
     ctx.lineWidth = 2
     ctx.beginPath()
     ctx.moveTo(centerX - maxHalfWidth * 0.2, medianY)
     ctx.lineTo(centerX + maxHalfWidth * 0.2, medianY)
     ctx.stroke()
-  })
+  }
 
   ctx.restore()
 }
@@ -251,6 +252,8 @@ function formatTick(value: number): string {
 
 function truncateLabel(label: string, maxWidth: number): string {
   const approxChars = Math.max(3, Math.floor(maxWidth / 6))
-  if (label.length <= approxChars) return label
+  if (label.length <= approxChars) {
+    return label
+  }
   return `${label.slice(0, approxChars - 1)}…`
 }

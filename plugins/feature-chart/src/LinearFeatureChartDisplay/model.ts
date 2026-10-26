@@ -1,8 +1,8 @@
 import { lazy } from 'react'
 
 import { ConfigurationReference, getConf } from '@jbrowse/core/configuration'
-import { BaseLinearDisplay } from '@jbrowse/plugin-linear-genome-view'
 import { types } from '@jbrowse/mobx-state-tree'
+import { BaseLinearDisplay } from '@jbrowse/plugin-linear-genome-view'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type {
@@ -10,6 +10,7 @@ import type {
   AnyConfigurationSchemaType,
 } from '@jbrowse/core/configuration'
 import type { AnyReactComponentType } from '@jbrowse/core/util'
+import type { Instance } from '@jbrowse/mobx-state-tree'
 
 const Tooltip = lazy(() => import('./components/Tooltip.tsx'))
 
@@ -67,27 +68,17 @@ function stateModelFactory(
       return {
         /**
          * #method
+         *
+         * Only the renderer config itself is passed through: chart geometry
+         * (drawer, width, height, alignment, density limits) is read from
+         * `config` inside the renderer, so new renderer slots never require a
+         * display change (see `plugins/feature-chart/ARCHITECTURE.md`).
          */
         renderProps() {
           const superProps = superRenderProps()
           return {
             ...superProps,
             config: self.rendererConfig,
-            chartHeight: getConf(self, ['renderer', 'chartHeight']) as number,
-            chartWidth: getConf(self, ['renderer', 'chartWidth']) as number,
-            align: getConf(self, ['renderer', 'align']) as
-              | 'left'
-              | 'right'
-              | 'center',
-            maxChartsPerView: getConf(self, [
-              'renderer',
-              'maxChartsPerView',
-            ]) as number,
-            minChartSpacingPx: getConf(self, [
-              'renderer',
-              'minChartSpacingPx',
-            ]) as number,
-            drawer: getConf(self, ['renderer', 'drawer']) as string,
             theme: superProps.theme,
           }
         },
@@ -99,5 +90,5 @@ export type LinearFeatureChartDisplayStateModel = ReturnType<
   typeof stateModelFactory
 >
 export type LinearFeatureChartDisplayModel =
-  import('@jbrowse/mobx-state-tree').Instance<LinearFeatureChartDisplayStateModel>
+  Instance<LinearFeatureChartDisplayStateModel>
 export default stateModelFactory

@@ -92,6 +92,27 @@ export function createReferenceSeqTrackConfig(pluginManager: PluginManager) {
           type: 'boolean',
           defaultValue: false,
         },
+
+        /**
+         * #slot formatAbout.info
+         */
+        info: {
+          type: 'text',
+          description:
+            'markdown template shown in the "About this track" dialog, supports {{path}} interpolation. If the value starts with "jexl:" it is evaluated as an expression',
+          defaultValue: '',
+          contextVariable: ['track', 'config', 'session', 'assembly'],
+        },
+
+        /**
+         * #slot formatAbout.showInfo
+         */
+        showInfo: {
+          type: 'boolean',
+          description:
+            'set to false to hide the track info section of the "About this track" dialog',
+          defaultValue: true,
+        },
       }),
     },
     {
