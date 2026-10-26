@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 
 import { getConf } from '@jbrowse/core/configuration'
-import { getContainingView, getSession } from '@jbrowse/core/util'
+import { getContainingView, getEnv, getSession } from '@jbrowse/core/util'
 
 import { resolveColorScheme } from '../../FeatureChartDrawer/colorSchemes.ts'
+import { warnUnknownDrawerOptions } from '../../FeatureChartDrawer/drawerOptions.ts'
 import { resolveFeatureChartDrawer } from '../../FeatureChartDrawer/drawerRegistry.ts'
 
 import type { LinearFeatureChartDisplayModel } from '../model.ts'
@@ -32,13 +33,22 @@ export default function ChartCanvas({
 }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const drawerName = getConf(displayModel, ['renderer', 'drawer']) as string
+  const drawerOptions = getConf(displayModel, ['renderer', 'drawerOptions']) as
+    | Record<string, unknown>
+    | undefined
 
   useEffect(() => {
     const canvas = ref.current
     if (!canvas) {
       return
     }
-    const resolution = resolveFeatureChartDrawer(drawerName)
+    const session = getSession(displayModel)
+    // Resolve against the plugin manager (MST env): plugin-contributed drawers
+    // (`pluginName/drawerName`) only exist in that catalog.
+    const resolution = resolveFeatureChartDrawer(
+      drawerName,
+      getEnv(displayModel).pluginManager,
+    )
 
     // size before touching the context: the canvas element keeps its default
     // 300x150 backing store until this runs, which is what a blank dialog looks
@@ -57,9 +67,12 @@ export default function ChartCanvas({
     if (!('drawer' in resolution)) {
       return
     }
+    // Same development warning as the in-track canvas: the maximize dialog is
+    // the place a user usually notices "my option does nothing".
+    warnUnknownDrawerOptions(resolution.meta, drawerOptions)
 
     const view = getContainingView(displayModel) as LinearGenomeViewModel
-    const theme = getSession(displayModel).theme
+    const theme = session.theme
     const contextData = feature.get('contextData') as
       | { data?: unknown; description?: string; name?: string }
       | undefined
@@ -85,9 +98,10 @@ export default function ChartCanvas({
         theme as never,
         getConf(displayModel, ['renderer', 'colorScheme']) as string,
       ),
+      options: drawerOptions,
       isMaximize: true,
     })
-  }, [feature, displayModel, width, height, drawerName])
+  }, [feature, displayModel, width, height, drawerName, drawerOptions])
 
   return (
     <canvas

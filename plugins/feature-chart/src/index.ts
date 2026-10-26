@@ -23,6 +23,8 @@ export default class FeatureChartPlugin extends Plugin {
 }
 
 export {
+  FEATURE_CHART_DRAWER_EXTENSION_POINT,
+  clearFeatureChartDrawerCache,
   getFeatureChartDrawer,
   getFeatureChartDrawerMeta,
   initBuiltInDrawers,
@@ -32,6 +34,10 @@ export {
   registerFeatureChartDrawer,
   resolveFeatureChartDrawer,
 } from './FeatureChartDrawer/drawerRegistry.ts'
+export {
+  describeFeatureChartDrawerError,
+  formatFeatureChartDrawerError,
+} from './FeatureChartDrawer/drawerErrors.ts'
 export {
   DEFAULT_COLOR_SCHEME,
   listColorSchemeNames,
@@ -45,6 +51,7 @@ export type {
 } from './FeatureChartDrawer/types.ts'
 export type { FeatureChartColorScheme } from './FeatureChartDrawer/colorSchemes.ts'
 export type {
+  FeatureChartDrawerContribution,
   FeatureChartDrawerEntry,
   FeatureChartDrawerError,
   FeatureChartDrawerResolution,

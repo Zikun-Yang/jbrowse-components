@@ -1,14 +1,20 @@
+import PluginManager from '@jbrowse/core/PluginManager'
 import { getAdapter } from '@jbrowse/core/data_adapters/dataAdapterCache'
 import { SimpleFeature } from '@jbrowse/core/util'
+import { getSubType } from '@jbrowse/core/util/mst-reflection'
+import LinearGenomeViewPlugin from '@jbrowse/plugin-linear-genome-view'
 import { Image, createCanvas } from 'canvas'
 import { from } from 'rxjs'
 
-import { computeChartX } from '../chartGeometry.ts'
-import { renderFeatureChart } from './renderFeatureChart.ts'
 import {
+  FEATURE_CHART_DRAWER_EXTENSION_POINT,
   initBuiltInDrawers,
   registerFeatureChartDrawer,
 } from '../FeatureChartDrawer/drawerRegistry.ts'
+import { computeChartX } from '../chartGeometry.ts'
+import FeatureChartPlugin from '../index.ts'
+import FeatureChartRendererSchema from './configSchema.ts'
+import { renderFeatureChart } from './renderFeatureChart.ts'
 
 import type { DrawerProps } from '../FeatureChartDrawer/types.ts'
 
@@ -190,6 +196,200 @@ describe('renderFeatureChart', () => {
     expect(result.value.imageData).toEqual(expect.any(Object))
 
     warn.mockRestore()
+  })
+
+  test('passes drawerOptions from config to DrawerProps.options', async () => {
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('optionsDrawer', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({
+        drawer: 'optionsDrawer',
+        drawerOptions: { colorRamp: 'warm', cellGap: 2 },
+      }),
+      {} as any,
+    )
+
+    expect(seen).toHaveLength(1)
+    expect(seen[0]!.options).toEqual({ colorRamp: 'warm', cellGap: 2 })
+  })
+
+  test('a real renderer config model gets its drawerOptions to the drawer', async () => {
+    // The exact production path: an MST config model with the `frozen`
+    // drawerOptions slot, run through the renderer (in the app this happens
+    // inside the RPC worker).
+    const config = getSubType(FeatureChartRendererSchema).create({
+      drawer: 'optionsDrawer',
+      drawerOptions: { colorRamp: 'warm', cellGap: 2 },
+    })
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('optionsDrawer', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    const renderProps = createRenderProps()
+    renderProps.config = config
+    await renderFeatureChart(renderProps, {} as any)
+
+    expect(seen).toHaveLength(1)
+    expect(seen[0]!.options).toEqual({ colorRamp: 'warm', cellGap: 2 })
+  })
+
+  test('drawers always receive an options object, even when unset', async () => {
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('noOptionsDrawer', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({ drawer: 'noOptionsDrawer' }),
+      {} as any,
+    )
+
+    expect(seen[0]!.options).toEqual({})
+  })
+
+  test('renders a drawer contributed by a plugin (worker-side renderer path)', async () => {
+    // This calls the function the RPC worker executes, with a plugin manager
+    // assembled exactly like `initializeWorker` assembles its own: core plugins
+    // plus the runtime plugins, all mapped to instances.
+    const draw = jest.fn((props: DrawerProps) => {
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    class FakeDrawerPlugin {
+      name = 'FakeDrawerPlugin'
+      install(pluginManager: PluginManager) {
+        pluginManager.addToExtensionPoint(
+          FEATURE_CHART_DRAWER_EXTENSION_POINT,
+          (drawers: unknown) => [
+            ...(Array.isArray(drawers) ? drawers : []),
+            { name: 'fakePlugin/chart', draw },
+          ],
+        )
+      }
+      configure() {}
+    }
+    const pluginManager = new PluginManager([
+      new LinearGenomeViewPlugin(),
+      new FeatureChartPlugin(),
+      new FakeDrawerPlugin(),
+    ])
+      .createPluggableElements()
+      .configure()
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'fakePlugin/chart' }),
+      pluginManager,
+    )
+
+    expect(draw).toHaveBeenCalledTimes(1)
+    expect(result.value.drawerError).toBeUndefined()
+  })
+
+  test('the placeholder names the plugin a drawer would come from', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'notLoadedPlugin/heatmap' }),
+      {} as any,
+    )
+
+    // the old placeholder only said "unknown drawer"; a plugin-scoped name must
+    // say that the plugin is what is missing
+    expect(result.value.drawerError).toContain('Missing plugin')
+    expect(result.value.drawerError).toContain('notLoadedPlugin')
+    expect(result.value.imageData).toEqual(expect.any(Object))
+  })
+
+  test('warns about drawerOptions the resolved drawer does not declare', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    registerFeatureChartDrawer(
+      'declaredOptionsDrawer',
+      props => {
+        props.ctx.fillRect(0, 0, 1, 1)
+      },
+      { optionsSchema: { colorRamp: 'cool | warm' } },
+    )
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({
+        drawer: 'declaredOptionsDrawer',
+        drawerOptions: { colorRamp: 'warm', colourRamp: 'warm' },
+      }),
+      {} as any,
+    )
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('ignores unknown drawerOptions "colourRamp"'),
+    )
+    warn.mockRestore()
+  })
+
+  test('does not warn about drawerOptions the drawer declares', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    registerFeatureChartDrawer(
+      'quietOptionsDrawer',
+      props => {
+        props.ctx.fillRect(0, 0, 1, 1)
+      },
+      { optionsSchema: { colorRamp: 'cool | warm' } },
+    )
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    await renderFeatureChart(
+      createRenderProps({
+        drawer: 'quietOptionsDrawer',
+        drawerOptions: { colorRamp: 'warm' },
+      }),
+      {} as any,
+    )
+
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining('drawerOptions'),
+    )
+    warn.mockRestore()
+  })
+
+  test('a feature without a parsed payload draws nothing instead of throwing', async () => {
+    // the adapter drops rows whose JSON does not parse, but a feature can still
+    // reach a drawer without `contextData` (a different adapter, a plain
+    // feature source). It used to throw inside the canvas callback, which fails
+    // the whole track in the worker.
+    const draw = jest.fn((props: DrawerProps) => {
+      // exactly what a built-in drawer does with a missing payload
+      const data = (props.data ?? {}) as Record<string, unknown>
+      if (!Array.isArray(data.boxes)) {
+        return
+      }
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    registerFeatureChartDrawer('noPayloadDrawer', draw)
+    mockAdapter([
+      new SimpleFeature({
+        id: 'f-no-context',
+        data: { refName: 'chr1', start: 100, end: 200, name: 'GENE_A' },
+      }),
+    ])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'noPayloadDrawer' }),
+      {} as any,
+    )
+
+    expect(result.value.drawerError).toBeUndefined()
+    expect(draw).toHaveBeenCalledTimes(1)
+    expect(draw.mock.calls[0]![0].data).toBeUndefined()
   })
 })
 

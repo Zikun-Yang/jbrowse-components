@@ -13,6 +13,9 @@ jest.mock('@jbrowse/core/configuration', () => ({
 }))
 
 jest.mock('@jbrowse/core/util', () => ({
+  // the catalog lives on the plugin manager, which the components read from the
+  // MST environment; this fake display model has none
+  getEnv: jest.fn(() => ({ pluginManager: undefined })),
   getContainingView: jest.fn(() => ({
     assemblyNames: ['hg38'],
     dynamicBlocks: { contentBlocks: [] },
@@ -114,9 +117,9 @@ describe('MaximizeDialog', () => {
       />,
     )
 
-    const canvas = (await screen.findByTestId(
+    const canvas = await screen.findByTestId<HTMLCanvasElement>(
       'feature-chart-maximize-canvas',
-    ))
+    )
     const dpr = window.devicePixelRatio || 1
     // regression: the canvas kept its 300x150 default because the drawing effect
     // ran before MUI had mounted the dialog content

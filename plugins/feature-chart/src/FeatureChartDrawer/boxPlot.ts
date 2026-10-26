@@ -1,4 +1,5 @@
 import { resolveColorScheme } from './colorSchemes.ts'
+import { asDrawerData } from './drawerData.ts'
 import { scaleBand, scaleLinear } from './scales.ts'
 
 import type { FeatureChartColorScheme } from './colorSchemes.ts'
@@ -15,7 +16,8 @@ interface BoxStats {
 }
 
 interface PrecomputedBoxPlotData {
-  boxes?: BoxStats[]
+  // user data: entries are validated below, not trusted by the type
+  boxes?: unknown[]
 }
 
 interface RawTissueData {
@@ -46,14 +48,18 @@ function computeStats(
   return { min, q1, median, q3, max }
 }
 
-function normalizeBoxStats(data: PrecomputedBoxPlotData): BoxStats[] {
-  if (!Array.isArray(data.boxes) || data.boxes.length === 0) {
+function normalizeBoxStats(raw: unknown): BoxStats[] {
+  const { boxes } = asDrawerData<PrecomputedBoxPlotData>(raw)
+  if (!Array.isArray(boxes) || boxes.length === 0) {
     return []
   }
 
-  return data.boxes
+  return boxes
     .map((box): BoxStats | undefined => {
-      const { name, min, q1, median, q3, max, color } = box
+      if (!box || typeof box !== 'object') {
+        return undefined
+      }
+      const { name, min, q1, median, q3, max, color } = box as Partial<BoxStats>
       if (
         typeof name !== 'string' ||
         !Number.isFinite(min) ||
@@ -64,20 +70,35 @@ function normalizeBoxStats(data: PrecomputedBoxPlotData): BoxStats[] {
       ) {
         return undefined
       }
-      return { name, min, q1, median, q3, max, ...(color ? { color } : {}) }
+      return {
+        name,
+        min: min!,
+        q1: q1!,
+        median: median!,
+        q3: q3!,
+        max: max!,
+        ...(color ? { color } : {}),
+      }
     })
     .filter((b): b is BoxStats => b !== undefined)
 }
 
-function normalizeTissueStats(data: RawTissueData): BoxStats[] {
-  const tissues = data.tissues
-  if (!tissues || Object.keys(tissues).length === 0) {
+function normalizeTissueStats(raw: unknown): BoxStats[] {
+  const { tissues } = asDrawerData<RawTissueData>(raw)
+  if (!tissues || typeof tissues !== 'object') {
+    return []
+  }
+  if (Object.keys(tissues).length === 0) {
     return []
   }
 
   return Object.entries(tissues)
     .map(([name, values]) => {
-      const s = computeStats(values)
+      // `tissues` is user data: a group may hold `null`, a string, or numbers
+      // stored as strings. Only finite numbers can be summarized.
+      const s = Array.isArray(values)
+        ? computeStats(values.filter((v): v is number => Number.isFinite(v)))
+        : undefined
       return s ? { ...s, name } : undefined
     })
     .filter((s): s is BoxStats => s !== undefined)
@@ -237,7 +258,7 @@ function drawBoxStats(
 
 export const precomputedBoxPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
-  const stats = normalizeBoxStats(data as PrecomputedBoxPlotData)
+  const stats = normalizeBoxStats(data)
   if (stats.length === 0) {
     return
   }
@@ -252,7 +273,7 @@ export const precomputedBoxPlotDrawer: DrawerFunction = function (props) {
 
 export const rawBoxPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
-  const stats = normalizeTissueStats(data as RawTissueData)
+  const stats = normalizeTissueStats(data)
   if (stats.length === 0) {
     return
   }

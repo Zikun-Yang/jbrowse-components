@@ -1,4 +1,5 @@
 import { resolveColorScheme } from './colorSchemes.ts'
+import { asDrawerData } from './drawerData.ts'
 import { scaleBand, scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
@@ -68,15 +69,24 @@ function computeKde(
   return result
 }
 
-function normalizeViolinGroups(data: RawTissueData): ViolinGroup[] {
-  const tissues = data.tissues
-  if (!tissues || Object.keys(tissues).length === 0) {
+function normalizeViolinGroups(raw: unknown): ViolinGroup[] {
+  const { tissues } = asDrawerData<RawTissueData>(raw)
+  if (!tissues || typeof tissues !== 'object') {
+    return []
+  }
+  if (Object.keys(tissues).length === 0) {
     return []
   }
 
   return Object.entries(tissues)
-    .map(([name, values]) => {
-      if (!Array.isArray(values) || values.length === 0) {
+    .map(([name, rawValues]) => {
+      if (!Array.isArray(rawValues)) {
+        return undefined
+      }
+      const values = rawValues.filter((value): value is number =>
+        Number.isFinite(value),
+      )
+      if (values.length === 0) {
         return undefined
       }
       const sorted = [...values].sort((a, b) => a - b)
@@ -111,7 +121,7 @@ function computeYDomain(groups: ViolinGroup[]): [number, number] | undefined {
 export const rawViolinPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
   const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
-  const groups = normalizeViolinGroups(data as RawTissueData)
+  const groups = normalizeViolinGroups(data)
   if (groups.length === 0) {
     return
   }
