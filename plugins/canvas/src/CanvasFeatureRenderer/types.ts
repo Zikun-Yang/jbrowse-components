@@ -42,6 +42,8 @@ export interface LayoutArgs {
 }
 
 // Context passed to glyph draw functions
+// (the legacy `colorByCDS` renderProps flag was removed - it now lives on the
+// renderer config and is read via configContext.colorByCDS)
 export interface DrawContext {
   region: Region
   bpPerPx: number
@@ -49,7 +51,6 @@ export interface DrawContext {
   theme: Theme
   canvasWidth: number
   peptideDataMap?: Map<string, PeptideData>
-  colorByCDS?: boolean
 }
 
 // Polymorphic glyph interface
@@ -109,7 +110,6 @@ export interface RenderArgs {
   stopToken?: string
   stopTokenCheck?: LastStopTokenCheck
   peptideDataMap?: Map<string, PeptideData>
-  colorByCDS?: boolean
   pluginManager?: PluginManager
 }
 

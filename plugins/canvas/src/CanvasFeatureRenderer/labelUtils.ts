@@ -1,7 +1,10 @@
 import { readConfObject } from '@jbrowse/core/configuration'
-import { measureText } from '@jbrowse/core/util'
+import {
+  leftLabelBlockHeight,
+  leftLabelReservation,
+  measureText,
+} from '@jbrowse/core/util'
 
-import { FLOATING_LABEL_FONT_SIZE } from './floatingLabels.ts'
 import { readCachedConfig } from './renderConfig.ts'
 import { truncateLabel } from './util.ts'
 
@@ -87,21 +90,26 @@ export function applyLabelDimensions(
     // Reserve label space to the left of the feature instead of below it.
     // leftPadding/totalLayoutWidth grow equally so the right-side reservation
     // (used by below-mode labels) is unchanged.
-    if (maxLabelWidthPx > 0) {
-      const gapPx = 3
-      layout.leftPadding += maxLabelWidthPx + gapPx
-      layout.totalLayoutWidth += maxLabelWidthPx + gapPx
-      // Height of the inline text block (name + description lines). Grow the
-      // row to fit it and center the feature vertically, so the text never
-      // extends outside the row (clips at track top / overlaps other rows)
-      const labelLines =
-        (shouldShowName ? 1 : 0) + (shouldShowDescription ? 1 : 0)
-      layout.leftLabelBlockHeight = labelLines * FLOATING_LABEL_FONT_SIZE
-      layout.totalLayoutHeight = Math.max(
-        layout.height,
-        layout.leftLabelBlockHeight,
-      )
-      layout.y += (layout.totalLayoutHeight - layout.height) / 2
+    const labelLineCount =
+      (shouldShowName ? 1 : 0) + (shouldShowDescription ? 1 : 0)
+    const { leftReservation, totalLayoutHeight, yOffset } =
+      leftLabelReservation({
+        labelLineCount,
+        maxLabelWidthPx,
+        featureHeight: layout.height,
+      })
+    if (leftReservation) {
+      layout.leftPadding += leftReservation
+      layout.totalLayoutWidth += leftReservation
+      // Height of the inline text block (name + description lines). Hit
+      // testing and the label renderers read it back from the layout, see
+      // featureLabelHitBounds/leftLabelLinePosition in @jbrowse/core/util
+      layout.leftLabelBlockHeight = leftLabelBlockHeight(labelLineCount)
+      // Grow the row to fit the text and center the feature vertically, so
+      // the text never extends outside the row (clips at track top /
+      // overlaps other rows)
+      layout.totalLayoutHeight = totalLayoutHeight
+      layout.y += yOffset
     }
   } else {
     if (!isOverlayMode) {

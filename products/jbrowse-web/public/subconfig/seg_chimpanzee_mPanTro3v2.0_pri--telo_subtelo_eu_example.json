@@ -38,7 +38,7 @@
           "type": "LinearBasicDisplay",
           "renderer": {
             "type": "SvgFeatureRenderer",
-            "color1": "jexl:colorFeature(feature)"
+            "colorScheme": "featureField"
           }
         }
       ]

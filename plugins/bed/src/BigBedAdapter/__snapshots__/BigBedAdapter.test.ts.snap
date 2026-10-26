@@ -3,6 +3,7 @@
 exports[`adapter can fetch features from volvox.bb 1`] = `
 [
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "geneBioType": "-",
     "geneId": "EDEN",
@@ -12,6 +13,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "refName": "ctgA",
     "reserved": "0,0,0",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1049,
     "strand": 1,
     "subfeatures": [
@@ -79,6 +81,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "uniqueId": "test-bb-358912",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "geneBioType": "-",
     "geneId": "EDEN",
@@ -88,6 +91,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "refName": "ctgA",
     "reserved": "0,0,0",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1049,
     "strand": 1,
     "subfeatures": [
@@ -145,6 +149,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "uniqueId": "test-bb-359006",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 9000,
     "geneBioType": "-",
     "geneId": "EDEN",
@@ -154,6 +159,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "refName": "ctgA",
     "reserved": "0,0,0",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 1299,
     "strand": 1,
     "subfeatures": [
@@ -220,6 +226,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "uniqueId": "test-bb-359091",
   },
   {
+    "color": "rgb(0, 0, 0)",
     "end": 23000,
     "geneBioType": "-",
     "geneId": "rna-Apple3",
@@ -229,6 +236,7 @@ exports[`adapter can fetch features from volvox.bb 1`] = `
     "refName": "ctgA",
     "reserved": "0,0,0",
     "score": 1000,
+    "scoreNormalized": 1,
     "start": 17399,
     "strand": 1,
     "subfeatures": [

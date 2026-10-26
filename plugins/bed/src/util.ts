@@ -140,6 +140,40 @@ function parseStrand(strand: unknown) {
   return 0
 }
 
+/**
+ * BED stores per-feature colors in the `itemRgb` column (or `reserved` when an
+ * autosql definition renames it). The value is a "r,g,b" triplet, which is not
+ * a valid CSS color as-is. This converts it to `rgb(r, g, b)` so that
+ * `jexl:get(feature,'color')` and the native `colorScheme: "featureField"`
+ * option can use it directly. Returns undefined for missing/malformed values.
+ */
+export function itemRgbToCssColor(value: unknown): string | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined
+  }
+  const parts = String(value).split(',')
+  if (parts.length !== 3) {
+    return undefined
+  }
+  const nums = parts.map(p => Number.parseInt(p.trim(), 10))
+  if (nums.some(n => !Number.isFinite(n))) {
+    return undefined
+  }
+  const [r, g, b] = nums.map(n => Math.max(0, Math.min(255, n)))
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+/**
+ * BED scores are defined as 0-1000 by the spec. This normalizes a score to
+ * the 0-1 range (clamped) so that color scales do not depend on every consumer
+ * re-implementing the divisor. Returns undefined when there is no score.
+ */
+export function normalizeBedScore(score: number | undefined) {
+  return score === undefined || !Number.isFinite(score)
+    ? undefined
+    : Math.max(0, Math.min(1, score / 1000))
+}
+
 interface FeatureData {
   uniqueId: string
   refName: string
@@ -188,6 +222,16 @@ export function featureData2({
   const score = scoreColumn ? +data[scoreColumn] : score2 ? +score2 : undefined
   const strand = parseStrand(strand2)
 
+  // Normalize the BED color columns once, at the data layer, so all renderers,
+  // SVG exports, jexl expressions and the agent see the same canonical field.
+  // A `color` field already present in the source data is left untouched.
+  const itemRgb = itemRgbToCssColor(rest.itemRgb ?? rest.reserved)
+  const scoreNormalized = normalizeBedScore(score)
+  const colorFields = {
+    ...(itemRgb !== undefined && rest.color == null ? { color: itemRgb } : {}),
+    ...(scoreNormalized !== undefined ? { scoreNormalized } : {}),
+  }
+
   const subfeatures = rest.blockCount
     ? makeBlocks({
         start,
@@ -223,6 +267,7 @@ export function featureData2({
     } = rest
     return generateRepeatMaskerFeature({
       ...rest2,
+      ...colorFields,
       description,
       uniqueId,
       score,
@@ -245,6 +290,7 @@ export function featureData2({
   ) {
     return generateUcscTranscript({
       ...rest,
+      ...colorFields,
       score,
       start,
       end,
@@ -259,6 +305,7 @@ export function featureData2({
 
   return {
     ...rest,
+    ...colorFields,
     uniqueId,
     score,
     start,

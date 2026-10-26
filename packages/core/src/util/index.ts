@@ -61,6 +61,8 @@ export * from './offscreenCanvasPonyfill.tsx'
 export * from './offscreenCanvasUtils.tsx'
 export * from './rpc.ts'
 export * from './crypto.ts'
+export * from './colorPalettes.ts'
+export * from './featureLabelLayout.ts'
 
 // WeakMap caches for containing model lookups to avoid repeated tree traversal
 const containingDisplayCache = new WeakMap<

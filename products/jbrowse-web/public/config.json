@@ -16,14 +16,6 @@
     "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--pcht_spacer_example.json",
     "subconfig/seg_chimpanzee_mPanTro3v2.0_pri--telo_subtelo_eu_example.json"
   ],
-  "plugins": [
-    {
-      "name": "bedfeaturecoloring",
-      "esmLoc": {
-        "uri": "plugins/bedfeaturecoloring.js"
-      }
-    }
-  ],
   "assemblies": [],
   "configuration": {
     "SingleCellPlugin": {

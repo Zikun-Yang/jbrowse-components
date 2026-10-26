@@ -1,6 +1,8 @@
 import { renderToAbstractCanvas, updateStatus } from '@jbrowse/core/util'
 
+import { computeScoreStats } from './colorScheme.ts'
 import { layoutFeatures } from './layout/layoutFeatures.ts'
+import { computeLegendData } from './legendData.ts'
 import { makeImageData } from './makeImageData.ts'
 import { fetchPeptideData } from './peptides/peptideUtils.ts'
 import { createRenderConfigContext } from './renderConfig.ts'
@@ -38,6 +40,12 @@ export async function doAll({
   // Create config context ONCE at the start - this reads all config values upfront
   // to avoid expensive readConfObject calls in per-feature hot paths
   const configContext = createRenderConfigContext(config)
+  if (configContext.colorScheme.kind === 'score') {
+    configContext.scoreStats = computeScoreStats(
+      features.values(),
+      configContext.colorScheme.scoreField,
+    )
+  }
 
   const layoutRecords = await updateStatus(
     'Computing feature layout',
@@ -60,27 +68,40 @@ export async function doAll({
     'Fetching peptide data',
     statusCallback,
     async () => {
-      return fetchPeptideData(pluginManager, renderProps, features)
+      return fetchPeptideData(
+        pluginManager,
+        renderProps,
+        features,
+        configContext.colorByCDS,
+      )
     },
   )
 
   return updateStatus('Rendering features', statusCallback, async () => {
-    return renderToAbstractCanvas(width, height, renderProps, ctx =>
-      makeImageData({
-        ctx,
-        layoutRecords,
-        canvasWidth: width,
-        renderArgs: {
-          ...renderProps,
-          features,
-          layout,
-          displayMode: configContext.displayMode,
-          peptideDataMap,
-          colorByCDS: (renderProps as any).colorByCDS,
-          pluginManager,
-        },
-        configContext,
-      }),
+    const imageData = await renderToAbstractCanvas(
+      width,
+      height,
+      renderProps,
+      ctx =>
+        makeImageData({
+          ctx,
+          layoutRecords,
+          canvasWidth: width,
+          renderArgs: {
+            ...renderProps,
+            features,
+            layout,
+            displayMode: configContext.displayMode,
+            peptideDataMap,
+            pluginManager,
+          },
+          configContext,
+        }),
     )
+    return {
+      ...imageData,
+      // summary of what was colored, for the display's legend
+      legendData: computeLegendData(configContext, features.values()),
+    }
   })
 }

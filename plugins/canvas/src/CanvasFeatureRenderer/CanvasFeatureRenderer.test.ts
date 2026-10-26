@@ -941,4 +941,88 @@ describe('CanvasFeatureRenderer', () => {
       expect(canvasToBuffer(canvas)).toMatchImageSnapshot()
     })
   })
+
+  describe('colorScheme', () => {
+    function getPixel(
+      canvas: ReturnType<typeof createCanvas>,
+      x: number,
+      y: number,
+    ) {
+      const ctx = canvas.getContext('2d')
+      return Array.from(ctx.getImageData(x, y, 1, 1).data)
+    }
+
+    test('featureField reads the color from the feature attribute', () => {
+      const feature = new SimpleFeature({
+        uniqueId: 'colored',
+        refName: 'ctgA',
+        start: 100,
+        end: 200,
+        name: 'Colored',
+        color: 'rgb(10, 20, 30)',
+      })
+      const features = new Map([['colored', feature]])
+      const args = createRenderArgs(features, defaultRegion, {
+        colorScheme: 'featureField',
+      })
+      const layoutRecords = doLayout(args, features)
+      const canvas = renderToCanvas(args, features, layoutRecords, 100)
+
+      expect(getPixel(canvas, 150, 5)).toEqual([10, 20, 30, 255])
+    })
+
+    test('featureField falls back to color1 without a color attribute', () => {
+      const feature = new SimpleFeature({
+        uniqueId: 'uncolored',
+        refName: 'ctgA',
+        start: 100,
+        end: 200,
+        name: 'Uncolored',
+      })
+      const features = new Map([['uncolored', feature]])
+      const args = createRenderArgs(features, defaultRegion, {
+        colorScheme: 'featureField',
+        color1: '#ff0000',
+      })
+      const layoutRecords = doLayout(args, features)
+      const canvas = renderToCanvas(args, features, layoutRecords, 100)
+
+      expect(getPixel(canvas, 150, 5)).toEqual([255, 0, 0, 255])
+    })
+
+    test('strand uses color1 for + features and color3 for - features', () => {
+      const features = new Map([
+        [
+          'forward',
+          new SimpleFeature({
+            uniqueId: 'forward',
+            refName: 'ctgA',
+            start: 100,
+            end: 200,
+            strand: 1,
+          }),
+        ],
+        [
+          'reverse',
+          new SimpleFeature({
+            uniqueId: 'reverse',
+            refName: 'ctgA',
+            start: 600,
+            end: 700,
+            strand: -1,
+          }),
+        ],
+      ])
+      const args = createRenderArgs(features, defaultRegion, {
+        colorScheme: 'strand',
+        color1: '#ff0000',
+        color3: '#0000ff',
+      })
+      const layoutRecords = doLayout(args, features)
+      const canvas = renderToCanvas(args, features, layoutRecords, 100)
+
+      expect(getPixel(canvas, 150, 5)).toEqual([255, 0, 0, 255])
+      expect(getPixel(canvas, 650, 5)).toEqual([0, 0, 255, 255])
+    })
+  })
 })

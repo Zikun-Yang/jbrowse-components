@@ -32,18 +32,20 @@ const SetMaxHeightDialog = observer(function SetMaxHeightDialog({
   const [max, setMax] = useState(`${maxHeight}`)
   const ok = max !== '' && !Number.isNaN(+max)
   return (
-    <Dialog open onClose={handleClose} title="Set max track height">
+    <Dialog open onClose={handleClose} title="Set max layout height">
       <DialogContent className={classes.root}>
         <Typography>
-          Set max layout height for the track. For example, you can increase
-          this if the layout says &quot;Max height reached&quot;
+          Set the maximum layout height for the track, i.e. how many stacked
+          feature rows the renderer may draw. Increase it if the layout says
+          &quot;Max height reached&quot;. This is not the visible track height -
+          drag the track edge for that.
         </Typography>
         <TextField
           value={max}
           onChange={event => {
             setMax(event.target.value)
           }}
-          placeholder="Enter max score"
+          placeholder="Enter max layout height"
         />
         {!ok ? <div style={{ color: 'red' }}>Invalid number</div> : null}
       </DialogContent>

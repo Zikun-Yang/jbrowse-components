@@ -50,7 +50,6 @@ export const boxGlyph: Glyph = {
     const { feature } = layout
     const { region, bpPerPx, configContext, theme, canvasWidth } = dc
     const { config } = configContext
-    const colorByCDS = dc.colorByCDS ?? false
 
     const { start, end } = region
     const screenWidth = Math.ceil((end - start) / bpPerPx)
@@ -80,7 +79,6 @@ export const boxGlyph: Glyph = {
       feature,
       config,
       configContext,
-      colorByCDS,
       theme,
     })
 

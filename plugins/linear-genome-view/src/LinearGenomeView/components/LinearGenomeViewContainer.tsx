@@ -63,20 +63,10 @@ const LinearGenomeViewContainer = observer(function LinearGenomeViewContainer({
     <div
       className={classes.root}
       ref={ref}
-      onMouseLeave={() => {
-        session.setHovered(undefined)
-      }}
-      onMouseMove={event => {
-        const c = ref.current
-        if (!c) {
-          return
-        }
-        const { tracks } = model
-        const leftPx = event.clientX - c.getBoundingClientRect().left
-        const hoverPosition = model.pxToBp(leftPx)
-        const hoverFeature = tracks.find(t => t.displays[0].featureUnderMouse)
-        session.setHovered({ hoverPosition, hoverFeature })
-      }}
+      // NOTE: the session-wide `hovered` producer that used to live here was
+      // removed: nothing consumes `session.hovered`, and the old handler did a
+      // `tracks.find(...featureUnderMouse)` scan (and allocated a new object)
+      // on every mouse move, re-rendering this container while hovering.
     >
       <div className={classes.header}>
         <HeaderComponent model={model} />

@@ -94,6 +94,46 @@ jexlFiltersSetting: types.maybe(types.array(types.string))
 
 ### LinearFeatureDisplay - Getters
 
+#### getter: showLabels
+
+Whether to show feature labels. Falls back to renderer.showLabels when the track
+override is not set
+
+```js
+// type
+boolean
+```
+
+#### getter: showDescriptions
+
+Whether to show feature descriptions. Falls back to renderer.showDescriptions
+when the track override is not set
+
+```js
+// type
+boolean
+```
+
+#### getter: displayMode
+
+Display mode (normal, compact, reducedRepresentation, collapse). Falls back to
+renderer.displayMode when the track override is not set
+
+```js
+// type
+string
+```
+
+#### getter: maxHeight
+
+Maximum layout height. Falls back to renderer.maxHeight when the track override
+is not set
+
+```js
+// type
+number
+```
+
 #### getter: rendererTypeName
 
 ```js
@@ -108,44 +148,22 @@ any
 any
 ```
 
-#### getter: showLabels
+#### getter: trackOverrides
+
+Track overrides merged into rendererConfig. Subclasses extend this list to add
+their own overrides; the getters, actions and snapshot pruning are generated
+from it by ./trackOverrides.ts
 
 ```js
 // type
-any
-```
-
-#### getter: showDescriptions
-
-```js
-// type
-any
-```
-
-#### getter: maxHeight
-
-```js
-// type
-any
-```
-
-#### getter: displayMode
-
-```js
-// type
-any
+readonly TrackOverride[]
 ```
 
 #### getter: rendererConfig
 
 ```js
 // type
-{
-  showLabels: any
-  showDescriptions: any
-  displayMode: any
-  maxHeight: any
-}
+any
 ```
 
 #### getter: featureUnderMouse
@@ -172,12 +190,7 @@ activeFilters: () => string[]
 ```js
 // type signature
 renderProps: () => {
-  config: {
-    showLabels: any
-    showDescriptions: any
-    displayMode: any
-    maxHeight: any
-  }
+  config: any
   filters: SerializableFilterChain
   sequenceAdapter: any
 }
@@ -187,7 +200,7 @@ renderProps: () => {
 
 ```js
 // type signature
-renderingProps: () => { onFeatureClick(_: unknown, featureId?: string | undefined): Promise<void>; onFeatureContextMenu(_: unknown, featureId?: string | undefined): Promise<void>; displayModel: { ...; } & ... 3 more ... & IStateTreeNode<...>; }
+renderingProps: () => { onFeatureClick(_: unknown, featureId?: string | undefined): Promise<void>; displayModel: { id: string; type: string; rpcDriverName: string | undefined; } & NonEmptyObject & { ...; } & { ...; } & IStateTreeNode<...>; }
 ```
 
 #### method: filterMenuItems
@@ -195,6 +208,28 @@ renderingProps: () => { onFeatureClick(_: unknown, featureId?: string | undefine
 ```js
 // type signature
 filterMenuItems: () => MenuItem[]
+```
+
+#### method: featureStyleMenuItems
+
+Style items appended to the "Show..." menu. Subclasses override this instead of
+locating the submenu by label: a label lookup silently drops its items when the
+parent menu changes, while an override point cannot.
+
+```js
+// type signature
+featureStyleMenuItems: () => MenuItem[]
+```
+
+#### method: colorMenuItems
+
+Menu entries inserted after "Show..." and before "Display mode". Subclasses add
+color/appearance menus here; the default is empty so displays with a fixed
+palette do not get the entry.
+
+```js
+// type signature
+colorMenuItems: () => MenuItem[]
 ```
 
 #### method: trackMenuItems
@@ -205,6 +240,42 @@ trackMenuItems: () => MenuItem[]
 ```
 
 ### LinearFeatureDisplay - Actions
+
+#### action: toggleShowLabels
+
+Toggle whether feature labels are shown
+
+```js
+// type signature
+toggleShowLabels: () => void
+```
+
+#### action: toggleShowDescriptions
+
+Toggle whether feature descriptions are shown
+
+```js
+// type signature
+toggleShowDescriptions: () => void
+```
+
+#### action: setDisplayMode
+
+Set the display mode of the track
+
+```js
+// type signature
+setDisplayMode: (val: string) => void
+```
+
+#### action: setMaxHeight
+
+Set the maximum layout height of the track
+
+```js
+// type signature
+setMaxHeight: (val?: number | undefined) => void
+```
 
 #### action: setJexlFilters
 
@@ -220,30 +291,21 @@ setJexlFilters: (f?: string[] | undefined) => void
 setFeatureUnderMouse: (feat?: Feature | undefined) => void
 ```
 
-#### action: toggleShowLabels
+#### action: fetchFeatureDetails
+
+Fetch full feature details through CoreGetFeatureDetails, with a small LRU cache
+and in-flight de-duplication. Shared by the hover tooltip reaction and by
+feature clicks so repeated interactions with the same feature never issue a
+second RPC.
 
 ```js
 // type signature
-toggleShowLabels: () => void
+fetchFeatureDetails: (featureId: string) => Promise<Feature | undefined>
 ```
 
-#### action: toggleShowDescriptions
+#### action: clearFeatureDetailsCache
 
 ```js
 // type signature
-toggleShowDescriptions: () => void
-```
-
-#### action: setDisplayMode
-
-```js
-// type signature
-setDisplayMode: (val: string) => void
-```
-
-#### action: setMaxHeight
-
-```js
-// type signature
-setMaxHeight: (val?: number | undefined) => void
+clearFeatureDetailsCache: () => void
 ```
