@@ -114,6 +114,7 @@
     "./util/parseLineByLine": "./src/util/parseLineByLine.ts",
     "./util/QuickLRU": "./src/util/QuickLRU/index.ts",
     "./util/range": "./src/util/range.ts",
+    "./util/renderTemplate": "./src/util/renderTemplate.ts",
     "./util/rxjs": "./src/util/rxjs.ts",
     "./util/simpleFeature": "./src/util/simpleFeature.ts",
     "./util/stats": "./src/util/stats.ts",
@@ -567,6 +568,10 @@
         "types": "./esm/util/range.d.ts",
         "import": "./esm/util/range.js"
       },
+      "./util/renderTemplate": {
+        "types": "./esm/util/renderTemplate.d.ts",
+        "import": "./esm/util/renderTemplate.js"
+      },
       "./util/rxjs": {
         "types": "./esm/util/rxjs.d.ts",
         "import": "./esm/util/rxjs.js"
@@ -919,6 +924,9 @@
         ],
         "util/range": [
           "esm/util/range.d.ts"
+        ],
+        "util/renderTemplate": [
+          "esm/util/renderTemplate.d.ts"
         ],
         "util/rxjs": [
           "esm/util/rxjs.d.ts"
