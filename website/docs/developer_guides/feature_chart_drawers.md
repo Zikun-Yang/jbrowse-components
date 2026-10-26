@@ -62,6 +62,23 @@ Rules that matter in practice:
   feature's start/end. Do not try to scale with `bpPerPx`.
 - **Never throw for bad data.** Throw inside a worker and the whole track turns
   into an error. Return early when the data shape is not what you expect.
+- **`data` is not guaranteed to be an object.** It is "whatever the `data`
+  column contained, JSON parsed", so it can be `null`, a number, a string — or
+  `undefined` when the feature carries no payload at all. Read it defensively;
+  the built-ins all go through an `asDrawerData()` helper that answers `{}` for
+  anything that is not a plain object:
+
+  ```js
+  const payload = data && typeof data === 'object' ? data : {}
+  const rows = Array.isArray(payload.boxes) ? payload.boxes : []
+  if (rows.length === 0) {
+    return // nothing to draw: an empty chart, not a broken track
+  }
+  ```
+
+  The same rule applies one level down: a group can be `null`, a value can be a
+  string or `NaN`. Filter to finite numbers before computing a scale.
+
 - **Respect `isMaximize`** if the small and large versions should differ (axis
   labels, tick counts).
 - Colors are `colorScheme.colors` (already theme-adjusted) or plain `#rrggbb`
@@ -218,9 +235,9 @@ looks:
 }
 ```
 
-- **Not validated.** The config editor does not check it, so a typo shows up as
-  a wrong-looking chart, not an error. Always default and clamp inside the
-  drawer:
+- **Not validated.** The config editor does not check it, and a bad value shows
+  up as a wrong-looking chart rather than an error. Always default and clamp
+  inside the drawer:
 
   ```js
   const gap = clamp(
@@ -230,7 +247,10 @@ looks:
   )
   ```
 
-- **Document the keys** in the catalog so users and agents can discover them:
+- **Unknown keys warn once in development.** Declare the keys you read in the
+  catalog and a development build logs one `console.warn` per drawer and key set
+  when a config passes a key you never look at — the "my option does nothing"
+  case is the one thing a value check cannot find for you:
 
   ```js
   {
@@ -240,7 +260,28 @@ looks:
   }
   ```
 
-  `optionsSchema` is documentation only; nothing validates against it.
+  ```
+  [feature-chart] drawer "myPlugin/heatmap" ignores unknown drawerOptions "colourRamp";
+  it reads: colorRamp, cellGap
+  ```
+
+  `optionsSchema` takes an object (`{ key: 'human readable description' }`) or a
+  plain array of keys. Its semantics are:
+
+  | `optionsSchema`                 | Meaning                                       | Unknown key  |
+  | ------------------------------- | --------------------------------------------- | ------------ |
+  | `{ colorRamp: 'cool \| warm' }` | these keys are read                           | warns        |
+  | `{}` / `[]`                     | reads no options (the built-ins declare `{}`) | warns        |
+  | omitted / `null`                | undeclared — cannot be checked                | stays silent |
+
+  It is still **documentation, not validation**: nothing is rejected, coerced or
+  defaulted, and production builds never warn. A plugin that omits
+  `optionsSchema` therefore keeps its options working exactly as before, it just
+  gives up the typo warning.
+
+- The same warning fires from the in-track canvas (the RPC worker's console) and
+  from the maximize dialog, so a typo is visible without opening devtools on the
+  worker specifically.
 
 - `FeatureChartPlotlyRenderer` accepts the slot too (so switching renderers does
   not lose configuration) but the Plotly backend does not consume drawers yet.

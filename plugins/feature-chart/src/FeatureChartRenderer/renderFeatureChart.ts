@@ -12,6 +12,7 @@ import {
   describeFeatureChartDrawerError,
   formatFeatureChartDrawerError,
 } from '../FeatureChartDrawer/drawerErrors.ts'
+import { warnUnknownDrawerOptions } from '../FeatureChartDrawer/drawerOptions.ts'
 import {
   type FeatureChartDrawerError,
   isFeatureChartDrawerResolutionError,
@@ -107,10 +108,14 @@ export async function renderFeatureChart(
   const drawer = isFeatureChartDrawerResolutionError(drawerResolution)
     ? undefined
     : drawerResolution.drawer
-  if (drawerError) {
+  if (isFeatureChartDrawerResolutionError(drawerResolution)) {
     console.warn(
-      `[feature-chart] ${formatFeatureChartDrawerError(drawerError)}`,
+      `[feature-chart] ${formatFeatureChartDrawerError(drawerResolution)}`,
     )
+  } else {
+    // `drawerOptions` is not validated, so this is the only signal that a key
+    // is misspelled or belongs to a different drawer. Development builds only.
+    warnUnknownDrawerOptions(drawerResolution.meta, drawerOptions)
   }
 
   const chartItems = features

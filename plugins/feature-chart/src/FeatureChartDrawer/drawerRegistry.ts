@@ -1,5 +1,6 @@
 import { barPlotDrawer } from './barPlot.ts'
 import { precomputedBoxPlotDrawer, rawBoxPlotDrawer } from './boxPlot.ts'
+import { isDevelopmentBuild } from './devMode.ts'
 import { histogramPlotDrawer } from './histogramPlot.ts'
 import { rawViolinPlotDrawer } from './violinPlot.ts'
 
@@ -113,15 +114,9 @@ let legacyCatalog:
 
 const warnedMessages = new Set<string>()
 
-function isDevelopment() {
-  // `process` is not available in every runtime (webpack replaces
-  // `process.env.NODE_ENV` statically at build time), so guard the access
-  return typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
-}
-
 /** Log once per message, and only in development builds. */
 function warnOnce(message: string) {
-  if (!isDevelopment() || warnedMessages.has(message)) {
+  if (!isDevelopmentBuild() || warnedMessages.has(message)) {
     return
   }
   warnedMessages.add(message)
@@ -453,6 +448,13 @@ export function isFeatureChartDrawerResolutionError(
   return 'error' in resolution
 }
 
+/**
+ * Built-in drawers take no `drawerOptions`. Declaring an empty schema is what
+ * lets the development build report `drawerOptions` written against a built-in
+ * (an absent schema means "undeclared", which cannot be checked).
+ */
+const NO_DRAWER_OPTIONS: Record<string, never> = {}
+
 export function initBuiltInDrawers() {
   registerFeatureChartDrawer('precomputedBoxPlot', precomputedBoxPlotDrawer, {
     displayName: 'Precomputed box plot',
@@ -460,6 +462,7 @@ export function initBuiltInDrawers() {
       'One box per category from precomputed five-number statistics (data.boxes).',
     dataShape: 'matrix',
     defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
   })
   registerFeatureChartDrawer('rawBoxPlot', rawBoxPlotDrawer, {
     displayName: 'Box plot (raw values)',
@@ -467,12 +470,14 @@ export function initBuiltInDrawers() {
       'One box per group from raw observations, computing quartiles in the browser (data.tissues).',
     dataShape: 'tissues',
     defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
   })
   registerFeatureChartDrawer('rawViolinPlot', rawViolinPlotDrawer, {
     displayName: 'Violin plot (raw values)',
     description: 'KDE violin per group from raw observations (data.tissues).',
     dataShape: 'tissues',
     defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
   })
   registerFeatureChartDrawer('barPlot', barPlotDrawer, {
     displayName: 'Bar plot',
@@ -480,6 +485,7 @@ export function initBuiltInDrawers() {
       'One bar per category from a single numeric value (data.bars).',
     dataShape: 'matrix',
     defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
   })
   registerFeatureChartDrawer('histogram', histogramPlotDrawer, {
     displayName: 'Histogram',
@@ -487,5 +493,6 @@ export function initBuiltInDrawers() {
       'Frequency histogram of one numeric series, with automatic binning (data.values).',
     dataShape: 'series',
     defaultSize: DEFAULT_DRAWER_SIZE,
+    optionsSchema: NO_DRAWER_OPTIONS,
   })
 }
