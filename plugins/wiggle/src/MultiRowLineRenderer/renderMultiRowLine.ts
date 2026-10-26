@@ -8,7 +8,7 @@ import { collectTransferables } from '@jbrowse/core/util/offscreenCanvasPonyfill
 import { createStopTokenChecker } from '@jbrowse/core/util/stopToken'
 
 import { drawLine } from '../drawLine.ts'
-import { WIGGLE_POS_COLOR_DEFAULT, serializeWiggleFeature } from '../util.ts'
+import { getMultiRowColorCallback, serializeWiggleFeature } from '../util.ts'
 
 import type { MultiRenderArgsDeserialized } from '../types.ts'
 import type { Feature } from '@jbrowse/core/util'
@@ -44,8 +44,12 @@ export async function renderMultiRowLine(
             ...renderProps,
             features: groups[source.name] || [],
             height: rowHeight,
-            staticColor: source.color || WIGGLE_POS_COLOR_DEFAULT,
-            colorCallback: () => '', // unused when staticColor is set
+            // an explicit source color is drawn as one batched stroke, a
+            // derived default uses the bicolor callback of the config so that
+            // negative scores are red like in a single-sample wiggle
+            staticColor:
+              source.color && !source.colorIsDefault ? source.color : undefined,
+            colorCallback: getMultiRowColorCallback(source, renderProps.config),
             lastCheck,
           })
           ctx.strokeStyle = 'rgba(200,200,200,0.8)'

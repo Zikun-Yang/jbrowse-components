@@ -6,7 +6,6 @@ import { observer } from 'mobx-react'
 
 import LegendItem from './LegendItem.tsx'
 import LegendItemText from './LegendItemText.tsx'
-import RectBg from './RectBg.tsx'
 
 import type { MinimalModel } from './types.ts'
 
@@ -27,16 +26,7 @@ const ColorLegend = observer(function ColorLegend({
    */
   xOffset?: number
 }) {
-  const {
-    graphType,
-    needsFullHeightScalebar,
-    rowHeightTooSmallForScalebar,
-    renderColorBoxes,
-    sources,
-    labelWidth,
-  } = model
-  const colorBoxWidth = renderColorBoxes ? 20 : 0
-  const legendWidth = labelWidth + colorBoxWidth + 5
+  const { graphType, rowHeightTooSmallForScalebar, sources } = model
   // default when the caller has no scale bar to align with: 10px in an SVG
   // export (the exporter draws the track content from its left edge) and to
   // the right of the y-scale bar otherwise
@@ -52,18 +42,9 @@ const ColorLegend = observer(function ColorLegend({
 
   return sources ? (
     <>
-      {
-        /* 0.25 for hanging letters like g */
-        needsFullHeightScalebar ? (
-          <RectBg
-            y={0}
-            x={offset}
-            width={legendWidth}
-            height={(sources.length + 0.25) * rowHeight}
-          />
-        ) : null
-      }
-      {/* Render all background rectangles first */}
+      {/* No background rectangle behind the labels: it hid the track data and
+          was removed on request. LegendItemText keeps the names readable over
+          the data with a thin outline instead. */}
       {sources.map((source, idx) => (
         <LegendItem
           key={`${source.name}-${idx}`}
@@ -71,7 +52,6 @@ const ColorLegend = observer(function ColorLegend({
           idx={idx}
           model={model}
           rowHeight={rowHeight}
-          labelWidth={legendWidth}
           xOffset={offset}
         />
       ))}

@@ -69,12 +69,31 @@ export function getColorCallback(
   if (opts?.defaultColor) {
     return () => opts.defaultColor!
   }
-  // Bicolor pivot logic
-  const pivotValue = readConfObject(config, 'bicolorPivotValue')
-  const negColor = readConfObject(config, 'negColor')
-  const posColor = readConfObject(config, 'posColor')
+  // Bicolor pivot logic. a plain config object (the rendererConfig the display
+  // passes to the renderer) can have a 0/'' value, which readConfObject reports
+  // as undefined for plain objects, so fall back to the config schema defaults
+  const pivotValue = readConfObject(config, 'bicolorPivotValue') ?? 0
+  const negColor = readConfObject(config, 'negColor') ?? 'red'
+  const posColor =
+    readConfObject(config, 'posColor') ?? WIGGLE_POS_COLOR_DEFAULT
   return (_feature: Feature, score: number) =>
     score < pivotValue ? negColor : posColor
+}
+
+/**
+ * color callback of one source of a multi-row renderer. an explicit source
+ * color (a subadapter color or one the user picked in the color editor) is
+ * used as-is; a derived default uses the same bicolor callback as a
+ * single-sample wiggle, so negative scores are drawn in negColor (red by
+ * default) instead of the whole row being one flat color
+ */
+export function getMultiRowColorCallback(
+  source: Source,
+  config: AnyConfigurationModel,
+) {
+  return source.color && !source.colorIsDefault
+    ? () => source.color!
+    : getColorCallback(config)
 }
 
 export interface ScaleOpts {
@@ -94,6 +113,13 @@ export interface Source {
   name: string
   source: string
   color?: string
+  /**
+   * true when `color` was derived by the display (palette or posColor) instead
+   * of being chosen by the user or configured on the subadapter, so a multi-row
+   * renderer can use the bicolor posColor/negColor callback for that row
+   * instead of the derived static color
+   */
+  colorIsDefault?: boolean
   group?: string
 }
 

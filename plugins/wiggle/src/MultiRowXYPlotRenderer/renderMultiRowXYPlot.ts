@@ -8,7 +8,7 @@ import { rpcResult } from '@jbrowse/core/util/librpc'
 import { collectTransferables } from '@jbrowse/core/util/offscreenCanvasPonyfill'
 
 import { drawXY } from '../drawXY.ts'
-import { WIGGLE_POS_COLOR_DEFAULT, serializeWiggleFeature } from '../util.ts'
+import { getMultiRowColorCallback, serializeWiggleFeature } from '../util.ts'
 
 import type { MultiRenderArgsDeserialized } from '../types.ts'
 import type { Feature } from '@jbrowse/core/util'
@@ -44,7 +44,7 @@ export async function renderMultiRowXYPlot(
             ...renderProps,
             features: groups[source.name] || [],
             height: rowHeight,
-            colorCallback: () => source.color || WIGGLE_POS_COLOR_DEFAULT,
+            colorCallback: getMultiRowColorCallback(source, renderProps.config),
             lastCheck,
           })
           allReducedFeatures = allReducedFeatures.concat(reduced)

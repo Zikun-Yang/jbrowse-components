@@ -8,6 +8,7 @@ import {
   max,
   measureText,
 } from '@jbrowse/core/util'
+import { randomColor } from '@jbrowse/core/util/color'
 import { stopStopToken } from '@jbrowse/core/util/stopToken'
 import { isAlive, types } from '@jbrowse/mobx-state-tree'
 import deepEqual from 'fast-deep-equal'
@@ -21,6 +22,7 @@ import {
   YSCALEBAR_LABEL_OFFSET,
   getScale,
 } from '../util.ts'
+import { stripLegacyMultiRowColors } from './util.ts'
 
 import type { Source } from '../util.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
@@ -32,9 +34,6 @@ import type {
   ExportSvgDisplayOptions,
   LinearGenomeViewModel,
 } from '@jbrowse/plugin-linear-genome-view'
-
-const randomColor = () =>
-  '#000000'.replaceAll('0', () => (~~(Math.random() * 16)).toString(16))
 
 // lazies
 const Tooltip = lazy(() => import('./components/Tooltip.tsx'))
@@ -246,10 +245,44 @@ export function stateModelFactory(
        * anyway
        */
       get multiRowColor(): string {
-        return (
-          (self.rendererConfig.posColor as string | undefined) ??
-          WIGGLE_POS_COLOR_DEFAULT
-        )
+        const { posColor } = self.rendererConfig
+        // a color slot can be a jexl callback, which has no single css value
+        return typeof posColor === 'string'
+          ? posColor
+          : WIGGLE_POS_COLOR_DEFAULT
+      },
+
+      /**
+       * #method
+       * color of a source that has no explicit color. this is the single
+       * source of truth for the color a display gives itself:
+       *
+       * - a multi-row renderer draws one sample per row, so every row uses the
+       *   color a single-sample wiggle uses for positive scores (the posColor
+       *   of the renderer config, #292421 by default); this makes a row look
+       *   like a single wiggle track and replaces the hardcoded blue that made
+       *   every row look the same anyway
+       * - the overlaid renderers (xyplot/multiline) draw all samples into one
+       *   canvas, so they need one palette color per sample to stay
+       *   distinguishable
+       *
+       * the color is also used by the color/arrangement editor, which keeps
+       * these derived colors out of the saved layout (see stripDefaultColors)
+       */
+      defaultSourceColor(idx: number, name: string) {
+        return this.isMultiRow
+          ? this.multiRowColor
+          : colors[idx] || randomColor(name)
+      },
+
+      /**
+       * #method
+       * default color of a source by name. used by the color/arrangement
+       * editor to tell a derived color from a color the user picked
+       */
+      defaultSourceColorFor(name: string) {
+        const idx = this.sources?.findIndex(s => s.name === name) ?? -1
+        return idx === -1 ? undefined : this.defaultSourceColor(idx, name)
       },
 
       /**
@@ -267,11 +300,8 @@ export function stateModelFactory(
           }))
           .map((s, i) => ({
             ...s,
-            color:
-              s.color ||
-              (!this.isMultiRow
-                ? colors[i] || randomColor()
-                : this.multiRowColor),
+            color: s.color || this.defaultSourceColor(i, s.name),
+            colorIsDefault: !s.color,
           }))
       },
 
@@ -290,11 +320,8 @@ export function stateModelFactory(
           }))
           .map((s, i) => ({
             ...s,
-            color:
-              s.color ||
-              (!this.isMultiRow
-                ? colors[i] || randomColor()
-                : this.multiRowColor),
+            color: s.color || this.defaultSourceColor(i, s.name),
+            colorIsDefault: !s.color,
           }))
       },
       /**
@@ -355,14 +382,17 @@ export function stateModelFactory(
          * #getter
          */
         get ticks() {
-          const { scaleType, domain, isMultiRow, rowHeight, useMinimalTicks } =
-            self
+          const { scaleType, domain, rowHeight, useMinimalTicks } = self
 
           if (!domain) {
             return undefined
           }
 
-          const offset = isMultiRow ? 0 : YSCALEBAR_LABEL_OFFSET
+          // the same inset a single-sample wiggle uses: the extreme tick
+          // labels of a multi-row wiggle used to sit exactly on the row edges
+          // (offset 0), where the 10px label was cut in half by the top and
+          // bottom of the track
+          const offset = YSCALEBAR_LABEL_OFFSET
           const ticks = axisPropsFromTickScale(
             getScale({
               scaleType,
@@ -433,7 +463,10 @@ export function stateModelFactory(
           ticks: self.ticks,
           stats: self.stats,
           scaleOpts: self.scaleOpts,
-          offset: self.isMultiRow ? 0 : YSCALEBAR_LABEL_OFFSET,
+          // has to match the range of the ticks getter, including the inset
+          // of a multi-row wiggle, otherwise the data and the scale bar drift
+          // apart at the top and bottom of every row
+          offset: YSCALEBAR_LABEL_OFFSET,
         }
       },
       /**
@@ -616,9 +649,17 @@ export function stateModelFactory(
         treeAreaWidth,
         showTreeSetting,
         subtreeFilter,
+        layout,
         ...rest
       } = snap as typeof snap & LegacyClusterState
-      return rest
+      return {
+        ...rest,
+        // multi-row displays used to write the hardcoded blue into the layout
+        // (through the cluster dialog and the color editor), where it then
+        // looked like a color the user had picked. drop that legacy default so
+        // the display goes back to deriving its color
+        ...(layout ? { layout: stripLegacyMultiRowColors(layout) } : {}),
+      } as typeof snap
     })
     .postProcessSnapshot(snap => {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

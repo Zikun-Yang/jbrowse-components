@@ -367,6 +367,11 @@ export default function SharedWiggleMixin(
           negColor: negColor ?? conf?.negColor?.value,
           posColor: posColor ?? conf?.posColor?.value,
           minSize: minSize ?? conf?.minSize?.value,
+          // the bicolor pivot is part of what a renderer needs to decide the
+          // color of a score (posColor/negColor in the single wiggle and
+          // multi-row renderers, the diverging density scale)
+          bicolorPivot: conf?.bicolorPivot?.value,
+          bicolorPivotValue: conf?.bicolorPivotValue?.value,
         }
       },
 

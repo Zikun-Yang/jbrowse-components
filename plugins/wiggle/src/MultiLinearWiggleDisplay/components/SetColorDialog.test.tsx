@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 import SetColorDialog from './SetColorDialog.tsx'
 
@@ -192,6 +192,33 @@ describe('SetColorDialog', () => {
       )
     }).not.toThrow()
   })
+  test('submit keeps derived default colors out of the layout', () => {
+    const sources: Source[] = [
+      { name: 'k1', source: 'k1', color: '#292421' },
+      { name: 'k2', source: 'k2', color: '#e41a1c' },
+      { name: 'k3', source: 'k3' },
+    ]
+    const setLayout = jest.fn()
+    const model = {
+      sources,
+      setLayout,
+      clearLayout: jest.fn(),
+      defaultSourceColorFor: (name: string) =>
+        name === 'k1' ? '#292421' : '#377eb8',
+    }
+    render(<SetColorDialog model={model} handleClose={jest.fn()} />)
+    fireEvent.click(screen.getByText('Submit'))
+
+    // k1 had the default color of the display, so it is not a user choice and
+    // must not be saved, otherwise a later change to the default would never
+    // reach this session
+    expect(setLayout).toHaveBeenCalledWith([
+      { name: 'k1', source: 'k1' },
+      { name: 'k2', source: 'k2', color: '#e41a1c' },
+      { name: 'k3', source: 'k3' },
+    ])
+  })
+
   test('row palettizer - setLayout receives modified sources with group changes', () => {
     const testSources: Source[] = [
       {

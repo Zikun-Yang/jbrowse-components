@@ -2,7 +2,6 @@ import type { Source } from '../types.ts'
 
 export interface MinimalModel {
   graphType: boolean
-  needsFullHeightScalebar: boolean
   rowHeightTooSmallForScalebar: boolean
   sources: Source[] | undefined
   renderColorBoxes: boolean

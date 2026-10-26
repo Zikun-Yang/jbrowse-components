@@ -8,6 +8,7 @@ import { Button, DialogActions, DialogContent } from '@mui/material'
 import SetColorDialogBulkEditPanel from './SetColorDialogBulkEditPanel.tsx'
 import SetColorDialogHelpfulTips from './SetColorDialogHelpfulTips.tsx'
 import SetColorDialogRowPalettizer from './SetColorDialogRowPalettizer.tsx'
+import { stripDefaultColors } from '../../util.ts'
 
 const useStyles = makeStyles()({
   content: {
@@ -28,6 +29,14 @@ interface SetColorDialogProps {
     }[]
     setLayout: (s: { name: string; [key: string]: unknown }[]) => void
     clearLayout: () => void
+    /**
+     * color the display would give this source by itself (see
+     * defaultSourceColor in the display model). the editor keeps those derived
+     * colors out of the saved layout, so changing a default later still
+     * applies and switching between multi-row and overlaid renderers does not
+     * freeze the colors of a display
+     */
+    defaultSourceColorFor?: (name: string) => string | undefined
   }
   handleClose: () => void
   title?: string
@@ -137,7 +146,11 @@ export default function SetColorDialog({
               color="primary"
               type="submit"
               onClick={() => {
-                model.setLayout(currLayout)
+                model.setLayout(
+                  stripDefaultColors(currLayout, name =>
+                    model.defaultSourceColorFor?.(name),
+                  ),
+                )
                 handleClose()
               }}
             >
