@@ -1,45 +1,5 @@
 import { rawViolinPlotDrawer } from './violinPlot.ts'
 
-jest.mock('d3-scale', () => ({
-  scaleBand: () => {
-    const scale = ((value: string) => {
-      const domain = (scale as any).domainValue as string[]
-      const index = domain.indexOf(value)
-      return index * 40
-    }) as any
-    scale.domain = (d?: string[]) => {
-      scale.domainValue = d ?? []
-      return scale
-    }
-    scale.range = () => scale
-    scale.padding = () => scale
-    scale.bandwidth = () => 40
-    return scale
-  },
-  scaleLinear: () => {
-    const scale = ((value: number) => {
-      const [min, max] = (scale as any).domainValue as [number, number]
-      const [rMin, rMax] = (scale as any).rangeValue as [number, number]
-      if (max === min) return rMin
-      return rMax + ((value - min) / (max - min)) * (rMin - rMax)
-    }) as any
-    scale.domain = (d?: [number, number]) => {
-      scale.domainValue = d ?? [0, 1]
-      return scale
-    }
-    scale.range = (r?: [number, number]) => {
-      scale.rangeValue = r ?? [0, 1]
-      return scale
-    }
-    scale.nice = () => scale
-    scale.ticks = () => {
-      const [min, max] = (scale.domainValue as [number, number]) ?? [0, 1]
-      return [min, (min + max) / 2, max]
-    }
-    return scale
-  },
-}))
-
 function createMockCanvasContext(width: number, height: number) {
   const ctx = {
     canvas: { width, height },
@@ -75,7 +35,9 @@ const baseProps = {
   feature: {
     id: () => 'f1',
     get: (key: string) => {
-      if (key === 'name') return 'GENE1'
+      if (key === 'name') {
+        return 'GENE1'
+      }
       return undefined
     },
     toJSON: () => ({}),
@@ -90,7 +52,7 @@ describe('rawViolinPlotDrawer', () => {
     const height = 200
     const ctx = createMockCanvasContext(width, height)
 
-    rawViolinPlotDrawer({
+    void rawViolinPlotDrawer({
       ctx,
       width,
       height,
@@ -113,7 +75,7 @@ describe('rawViolinPlotDrawer', () => {
 
   test('returns early when no tissue data is provided', () => {
     const ctx = createMockCanvasContext(200, 150)
-    rawViolinPlotDrawer({
+    void rawViolinPlotDrawer({
       ctx,
       width: 200,
       height: 150,

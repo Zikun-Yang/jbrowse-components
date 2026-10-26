@@ -1,7 +1,6 @@
+import { TabixIndexedFile } from '@gmod/tabix'
 import { firstValueFrom } from 'rxjs'
 import { toArray } from 'rxjs/operators'
-
-import { TabixIndexedFile } from '@gmod/tabix'
 
 import FeatureChartTabixAdapter from './FeatureChartTabixAdapter.ts'
 import configSchema from './configSchema.ts'
@@ -70,7 +69,12 @@ describe('FeatureChartTabixAdapter', () => {
 
     const features = await firstValueFrom(
       adapter
-        .getFeatures({ refName: 'chr1', start: 0, end: 1000 })
+        .getFeatures({
+          refName: 'chr1',
+          start: 0,
+          end: 1000,
+          assemblyName: 'hg38',
+        })
         .pipe(toArray()),
     )
 
@@ -100,7 +104,12 @@ describe('FeatureChartTabixAdapter', () => {
 
     const features = await firstValueFrom(
       adapter
-        .getFeatures({ refName: 'chr1', start: 0, end: 1000 })
+        .getFeatures({
+          refName: 'chr1',
+          start: 0,
+          end: 1000,
+          assemblyName: 'hg38',
+        })
         .pipe(toArray()),
     )
 

@@ -1,7 +1,11 @@
 # FeatureChartTrack 需求与实现 TODO
 
 > 文档用途：记录 `FeatureChartTrack`
-> 的设计方案、数据格式和实现任务清单。状态：需求讨论已完成，待开工实现。
+> 的设计方案、数据格式和实现任务清单。状态：已落地并接入三个产品（jbrowse-web /
+> jbrowse-desktop / jbrowse-react-app）。
+>
+> **契约速查请先读
+> [`ARCHITECTURE.md`](./ARCHITECTURE.md)**：drawer 目录形状、失败语义、"renderer 只从自己 config 读"的原因都在那里。本文保留需求、数据格式与配置示例。
 
 ---
 
@@ -62,15 +66,21 @@ tabix -p bed expression.tsv.gz
 `data`
 列的 JSON 内部结构由具体 drawer 决定，adapter 不做解析，原样透传给 drawer。
 
-目前内置五个 drawer：
+内置五个 drawer。下表是 **当前** 的内置集合，权威来源是
+`listFeatureChartDrawers()`（见
+[`ARCHITECTURE.md`](./ARCHITECTURE.md#drawer-目录)）：
 
-| Drawer               | 输入格式       | 说明                                   |
-| -------------------- | -------------- | -------------------------------------- |
-| `precomputedBoxPlot` | `data.boxes`   | 处理后数据：预计算 boxplot 统计量      |
-| `rawBoxPlot`         | `data.tissues` | 原始数据：boxplot，自动计算五数概括    |
-| `rawViolinPlot`      | `data.tissues` | 原始数据：violin plot，用 KDE 估计分布 |
-| `barPlot`            | `data.bars`    | 每个分类一个柱子                       |
-| `histogram`          | `data.values`  | 单组数值的频数直方图                   |
+| Drawer               | 数据形状（`dataShape`） | 输入格式       | 说明                                      | 默认尺寸 |
+| -------------------- | ----------------------- | -------------- | ----------------------------------------- | -------- |
+| `precomputedBoxPlot` | `matrix`                | `data.boxes`   | 处理后数据：预计算 boxplot 统计量（默认） | 120×180  |
+| `rawBoxPlot`         | `tissues`               | `data.tissues` | 原始数据：boxplot，自动计算五数概括       | 120×180  |
+| `rawViolinPlot`      | `tissues`               | `data.tissues` | 原始数据：violin plot，用 KDE 估计分布    | 120×180  |
+| `barPlot`            | `matrix`                | `data.bars`    | 每个分类一个柱子                          | 120×180  |
+| `histogram`          | `series`                | `data.values`  | 单组数值的频数直方图                      | 120×180  |
+
+未显式配置 `drawer` 时使用
+`precomputedBoxPlot`。配置了不存在的名字不会让 track 报错：canvas 与放大弹窗都会显示一个可读的占位块，并在 console 里
+`warn` 一次。
 
 #### `precomputedBoxPlot`：标准 boxplot 模板格式（推荐）
 
@@ -228,8 +238,15 @@ FeatureChartTrack (TrackType)
   - `left`：chart 左边缘对齐 `start`
   - `right`：chart 右边缘对齐 `end`
   - `center`：chart 中心对齐 `(start + end) / 2`
-- 通过 drawer 名称从注册表获取 drawer 函数并调用
+- **所有绘图参数都从自己的 `config` 读取**
+  （`drawer / chartWidth / chartHeight / align / maxChartsPerView / minChartSpacingPx / colorScheme`，见
+  `src/renderSettings.ts`）；display 只负责把 `config` 传下来
+- 通过 drawer 名称从注册表获取 drawer 函数并调用，同时把
+  `resolveColorScheme(theme, colorScheme)` 的结果作为 `props.colorScheme` 传入
 - 当视图内 chart 数量超过阈值或空间过挤时，渲染"数据太多，请放大查看"的提示（黄色），不绘制单个 chart
+- drawer 名字无法解析时 **不抛错**：`renderToAbstractCanvas`
+  里画一个占位块（错误文本 + 前 5 个可用 drawer 名），并在结果里带上
+  `drawerError` 字段
 
 ### 3.3 FeatureChartPlotlyRenderer
 
@@ -239,6 +256,10 @@ FeatureChartTrack (TrackType)
 - 支持 `box`、`violin`、`bar`、`scatter`、`line` 等常见图表类型
 - 每个 feature 对应一个独立 Plotly 图表，位置计算与 canvas renderer 一致
 - 图表支持 Plotly 内置悬停、缩放等交互
+- 与 canvas renderer 一样从自身 config 读取尺寸/对齐/密度阈值与
+  `colorScheme`（共用
+  `resolveFeatureChartRenderSettings()`），并把 palette 写进 trace 颜色与
+  `layout.colorway`；深色主题会切到深色面板并提亮 palette
 
 ### 3.4 LinearFeatureChartDisplay
 
@@ -246,36 +267,59 @@ FeatureChartTrack (TrackType)
 - `rendererTypeName` 从 display 配置读取，可切换 `FeatureChartRenderer` 或
   `FeatureChartPlotlyRenderer`
 - 提供自定义 `TooltipComponent`
-- `chartHeight`、`chartWidth`、`align` 作为显示配置
+- `renderProps()` **只**额外传 `config`（renderer 配置）与 `theme`；
+  `drawer / chartWidth / chartHeight / align / maxChartsPerView / minChartSpacingPx / colorScheme`
+  一律不再手抄，由 renderer 自读
 - hover chart 时显示 maximize 图标
 - 点击 maximize 图标打开详情 Dialog
 
-### 3.5 Drawer 注册表
+### 3.5 Drawer 目录（注册表）
 
-模块级单例，主线程和 worker 共享：
+模块级单例，主线程和 worker 共享。内部结构是
+`Map<string, { meta, draw }>`，对外暴露"目录 + 解析"两组 API：
 
 ```typescript
-const registry = new Map<string, DrawerFunction>()
+interface FeatureChartDrawerMeta {
+  name: string
+  displayName: string
+  description: string // 一句话：画什么、吃什么数据
+  dataShape: 'tissues' | 'matrix' | 'series' | 'any'
+  defaultSize?: { width: number; height: number }
+  optionsSchema?: unknown // 预留：WP2 的 drawerOptions 文档化
+}
 
-export function registerFeatureChartDrawer(name: string, drawer: DrawerFunction)
-export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
+registerFeatureChartDrawer(name, draw, meta?)
+getFeatureChartDrawer(name): DrawerFunction | undefined
+getFeatureChartDrawerMeta(name): FeatureChartDrawerMeta | undefined
+listFeatureChartDrawers(): FeatureChartDrawerMeta[] // 按 name 稳定排序
+listFeatureChartDrawerNames(): string[]
+resolveFeatureChartDrawer(name): { drawer, meta } | { error, available }
+initBuiltInDrawers()
 ```
 
-内置 drawer：
+要点：
 
-- `precomputedBoxPlot`
-- `rawBoxPlot`
-- `rawViolinPlot`
-- `barPlot`
-- `histogram`
+- `registerFeatureChartDrawer` 的前两个参数与旧版一致，`meta` 可省略；省略时补
+  `displayName = name`、`dataShape = 'any'`，老调用方不会失效。
+- `getFeatureChartDrawer` 的签名保持不变，仍返回绘制函数本身。
+- 解析失败不抛错，返回 `{ error, available }`，由渲染层决定怎么展示。
+- 内置抽屉：`precomputedBoxPlot`、`rawBoxPlot`、`rawViolinPlot`、`barPlot`、
+  `histogram`（`initBuiltInDrawers()` 在插件 install 时调用，可重复调用）。
 
-第三方插件通过
-`import { registerFeatureChartDrawer } from '@jbrowse/plugin-feature-chart'`
-注册自定义 drawer。
+#### 第三方注册 drawer
 
----
+> WP2 会把"插件贡献 drawer"升级为正式扩展点。在扩展点落地前，包内的
+> `registerFeatureChartDrawer(name, draw, meta?)`
+> 已经可以注册自定义 drawer，但**不推荐**第三方直接 import 本包并调用：请在 WP2 的扩展点规范下注册，这样 drawer 才能被目录、`configdocs`
+> 和 agent-sdk 看到。详见
+> [`ARCHITECTURE.md`](./ARCHITECTURE.md#扩展点留给-wp2wp3-的接缝)。
 
 ## 4. 配置示例
+
+> `drawer`、`chartWidth`、`chartHeight`、`align`、`maxChartsPerView`、
+> `minChartSpacingPx`、`colorScheme`
+> 都是 renderer 的 slot；省略时取 schema 默认值（`drawer` 默认
+> `precomputedBoxPlot`，`colorScheme` 默认 `tableau10`）。
 
 ### 4.1 Canvas renderer 配置示例
 
@@ -356,15 +400,37 @@ export function getFeatureChartDrawer(name: string): DrawerFunction | undefined
 
 `plotType` 可选值：`box`、`violin`、`bar`、`scatter`、`line`。
 
+### 4.3 最小配置（省略 drawer）与配色
+
+只写 `renderer.type` 也能出图，默认用 `precomputedBoxPlot`（`data.boxes`）：
+
+```json
+{
+  "displays": [
+    {
+      "type": "LinearFeatureChartDisplay",
+      "renderer": { "type": "FeatureChartRenderer" }
+    }
+  ]
+}
+```
+
+换配色只需加一个 slot（可选值：`tableau10` / `viridis` / `set2` / `dark2` /
+`blues`，未知值回退到 `tableau10` 并 `warn` 一次）：
+
+```json
+{
+  "renderer": {
+    "type": "FeatureChartRenderer",
+    "drawer": "rawBoxPlot",
+    "colorScheme": "viridis"
+  }
+}
+```
+
 ---
 
 ## 5. "数据太多" 提示行为
-
-当当前视图内 chart 数量过多，或 chart 之间重叠严重时（例如每像素需要展示多个 chart），renderer 不绘制单个 chart，而是渲染一条黄色提示带：
-
-```
-Too many charts in this region — zoom in to view individual charts
-```
 
 判定条件（可选配置，默认自适应）：
 
@@ -379,9 +445,17 @@ Too many charts in this region — zoom in to view individual charts
 
 ### 6.1 触发方式
 
-- 鼠标 hover 到某个 chart 上时，在 chart 右上角显示 `FullscreenIcon`
+- 鼠标 hover 到某个 chart 上时，在**该 chart** 的右上角显示 `FullscreenIcon`
 - 点击图标打开详情 Dialog
 - 同时支持点击 chart 主体触发（可选，需避免和 tooltip 冲突）
+
+实现约束（2026-10 浏览器验收后固化，见
+[`ARCHITECTURE.md`](./ARCHITECTURE.md#hover-and-the-maximize-affordance)）：
+
+- hover 命中判定用
+  **chart 的像素矩形**，不是 feature 的 bp 区间——一个 chart 固定 `chartWidth`
+  像素宽，而 bp 区间在缩小视图下可能只有几像素；
+- 图标画在**被 hover 的 chart 内部**，hover 状态由 display 组件持有；否则从 chart 移向图标的过程会清空 hover 状态，图标在点击前就消失（多 chart 时也无法判断会放大哪一个）。
 
 ### 6.2 Dialog 内容
 
@@ -397,68 +471,81 @@ Too many charts in this region — zoom in to view individual charts
 Dialog 中的放大图复用当前 renderer 已加载的 `data` 和
 `description`，不需要重新 fetch。
 
+### 6.4 失败语义
+
+`drawer` 名字无法解析时，Dialog **不再静默空白**：改为显示 MUI `Alert`
+（`severity="warning"`），文案与 canvas 占位块一致，例如
+`Unknown FeatureChart drawer "boxplot". Available: barPlot, histogram, …`。description 仍然照常渲染，"Zoom
+to region" / "Close" 仍然可用。
+
 ---
 
 ## 7. 实现任务清单
 
-### Phase 1：基础框架
+状态（WP0 收口）：全部完成。后续工作见 WP2（插件贡献 drawer /
+`drawerOptions`）与 WP3（声明式 `spec`）。
 
-- [ ] 创建 `FeatureChartDrawer/drawerRegistry.ts` 和 `types.ts`
-- [ ] 实现内置 `tissueBoxPlot` drawer（`FeatureChartDrawer/tissueBoxPlot.ts`）
-- [ ] 创建 `FeatureChartTabixAdapter/configSchema.ts`
-- [ ] 实现 `FeatureChartTabixAdapter/FeatureChartTabixAdapter.ts`
-  - 复用 JBrowse Tabix 读取能力
-  - 解析 TSV 行，提取 JSON payload 和 description
-  - 返回携带 `contextData` 的 SimpleFeature
-- [ ] 创建 `FeatureChartRenderer/configSchema.ts`
-- [ ] 实现 `FeatureChartRenderer/FeatureChartRenderer.ts`
-- [ ] 实现 `FeatureChartRenderer/renderFeatureChart.ts`
-  - 支持 `chartWidth`、`chartHeight`、`align` 计算 chart 位置和大小
-  - 支持 "数据太多" 提示渲染
-- [ ] 创建 `LinearFeatureChartDisplay/configSchema.ts` 和 `model.ts`
-- [ ] 创建 `FeatureChartTrack/configSchema.ts` 和 `index.ts`
-- [ ] 在 `plugins/single-cell/src/index.ts` 注册所有元素并调用
-      `initBuiltInDrawers()`
+### Phase 0：产品接入与地基加固（已完成）
 
-### Phase 2：交互与测试
+- [x] 三个产品注册 `@jbrowse/plugin-feature-chart` （`corePlugins.ts` +
+      `package.json`，worker 复用同一份 `corePlugins`）
+- [x] `drawer` 默认值修正为 `precomputedBoxPlot`，并加默认值回归测试
+- [x] renderer 从自身 `config` 读取全部绘图参数，display 不再手抄
+- [x] drawer 目录（`FeatureChartDrawerMeta` + `listFeatureChartDrawers()`）
+- [x] 失败语义：`resolveFeatureChartDrawer()` + canvas 占位块 + Dialog `Alert`
+- [x] `colorScheme` 落地（5 个 palette + 深色主题可读性）
+- [x] 本文件与 `configdocs` 重新生成；新增 `ARCHITECTURE.md`
 
-- [ ] 实现 Markdown 模板渲染工具（`{{variable}}` 替换）
-- [ ] 实现 `LinearFeatureChartDisplay/components/Tooltip.tsx`
-- [ ] 支持鼠标 hover 时显示 maximize 图标
-- [ ] 实现详情 Dialog（放大图 + description）
-- [ ] 编写 `FeatureChartTabixAdapter.test.ts`
-- [ ] 编写 `tissueBoxPlot.test.ts`
-- [ ] 编写 `FeatureChartRenderer.test.ts`
-- [ ] 编写 Markdown 模板渲染测试
-- [ ] 在 `products/jbrowse-web` 中手动验证 track 渲染和 maximize 功能
+### Phase 1：基础框架（已完成）
 
-### Phase 3：增强（可选）
+- [x] `FeatureChartDrawer/drawerRegistry.ts`、`types.ts`
+- [x] 内置 drawer：`precomputedBoxPlot`、`rawBoxPlot`、`rawViolinPlot`、
+      `barPlot`、`histogram`
+- [x] `FeatureChartTabixAdapter`（configSchema + 实现）
+- [x] `FeatureChartRenderer`（configSchema + canvas 渲染 + "数据太多"提示）
+- [x] `LinearFeatureChartDisplay`（configSchema + model）
+- [x] `FeatureChartTrack`
+- [x] `FeatureChartPlugin` 注册全部元素并调用 `initBuiltInDrawers()`
 
-- [ ] 支持 `descriptionId` + 单独 descriptions 查找表，优化重复 description
-- [ ] 支持从 LGV feature 右键菜单自动生成 FeatureChartTrack
-- [ ] 支持 drawer 通过扩展点注册
-- [ ] 支持更多内置 drawer：`violinPlot`、`barPlot`
-- [ ] 支持 BED + 外部 JSON 文件引用格式
-- [ ] 支持长格式 TSV（非 JSON payload）
+### Phase 2：交互与测试（已完成）
 
----
+- [x] Markdown 模板渲染（`{{variable}}`）
+- [x] `Tooltip` 与 hover maximize 图标
+- [x] 详情 Dialog（放大图 + description）
+- [x] adapter / drawer / renderer / markdown 模板单测
+- [x] 目录、默认值、失败语义、config-only 渲染单测
+
+### Phase 3：增强（后续工作包）
+
+- [ ] 插件贡献 drawer 的正式扩展点、`drawerOptions`（WP2）
+- [ ] 声明式 `spec`（WP3）
+- [ ] Plotly 与 canvas 模型统一（WP4）
+- [ ] agent-sdk 字段（WP5）
+- [ ] `descriptionId` + 单独 descriptions 查找表
+- [ ] 从 LGV feature 右键菜单生成 FeatureChartTrack
+- [ ] BED + 外部 JSON 文件引用格式；长格式 TSV
 
 ## 8. 关键设计决策
 
-| 决策               | 选择                                       | 原因                                                           |
-| ------------------ | ------------------------------------------ | -------------------------------------------------------------- |
-| Track 名称         | `FeatureChartTrack`                        | 清晰表达“feature 上的 chart”                                   |
-| 数据文件格式       | Tabix 索引 TSV + JSON payload              | 按坐标随机读取，一行一个 chart，JSON 灵活                      |
-| 坐标来源           | 数据文件自身包含 chrom/start/end           | 不需要额外 BED 文件，天然可索引                                |
-| chart 高度         | `chartHeight` 像素高度                     | 用户精确控制视觉高度                                           |
-| chart 宽度         | `chartWidth` 像素宽度，与 start/end 无关   | 用户精确控制视觉宽度                                           |
-| chart 对齐         | `align: left/right/center` 相对 start/end  | 灵活锚定                                                       |
-| 绘图包             | D3 + Canvas 2D                             | 适配 JBrowse `renderToAbstractCanvas`，支持 worker 和 SVG 导出 |
-| 自定义绘图         | Drawer 注册表（模块级单例）                | 主线程和 worker 共享，避免函数序列化问题                       |
-| Plotly 支持        | 可选 `FeatureChartPlotlyRenderer`          | 需要交互/美观图表时启用，按需加载                              |
-| 数据与 drawer 关系 | 一个文件一种图表，不同 track 用不同 drawer | 清晰分离，避免一个文件里混多种数据结构                         |
-| description 格式   | Markdown + `{{variable}}` 模板             | 丰富且可复用，减少重复文本                                     |
-| 数据过载展示       | 黄色提示带，提示用户放大查看               | 避免 overcrowded 时强行渲染导致混乱                            |
+| 决策                | 选择                                       | 原因                                                           |
+| ------------------- | ------------------------------------------ | -------------------------------------------------------------- |
+| Track 名称          | `FeatureChartTrack`                        | 清晰表达“feature 上的 chart”                                   |
+| 数据文件格式        | Tabix 索引 TSV + JSON payload              | 按坐标随机读取，一行一个 chart，JSON 灵活                      |
+| 坐标来源            | 数据文件自身包含 chrom/start/end           | 不需要额外 BED 文件，天然可索引                                |
+| chart 高度          | `chartHeight` 像素高度                     | 用户精确控制视觉高度                                           |
+| chart 宽度          | `chartWidth` 像素宽度，与 start/end 无关   | 用户精确控制视觉宽度                                           |
+| chart 对齐          | `align: left/right/center` 相对 start/end  | 灵活锚定                                                       |
+| 绘图包              | D3 + Canvas 2D                             | 适配 JBrowse `renderToAbstractCanvas`，支持 worker 和 SVG 导出 |
+| 自定义绘图          | Drawer 注册表（模块级单例）                | 主线程和 worker 共享，避免函数序列化问题                       |
+| Plotly 支持         | 可选 `FeatureChartPlotlyRenderer`          | 需要交互/美观图表时启用，按需加载                              |
+| 数据与 drawer 关系  | 一个文件一种图表，不同 track 用不同 drawer | 清晰分离，避免一个文件里混多种数据结构                         |
+| description 格式    | Markdown + `{{variable}}` 模板             | 丰富且可复用，减少重复文本                                     |
+| 数据过载展示        | 黄色提示带，提示用户放大查看               | 避免 overcrowded 时强行渲染导致混乱                            |
+| 绘图参数读取        | renderer 只读自己的 `config`               | 新增 slot 不必改 display；worker 序列化面只有 `config` 一处    |
+| drawer 目录         | `Map<string,{meta,draw}>` + 稳定排序       | UI/agent 需要可枚举、可过滤的元数据，且顺序可复现              |
+| 未知 drawer         | 画占位块 + `console.warn`，不抛错          | worker 抛错会让整条 track 报错，用户看不到其他正常图表         |
+| 放大弹窗未知 drawer | MUI `Alert`                                | 静默空白无法排查，Alert 复用同一套文案                         |
+| 配色                | `colorScheme` slot + `resolveColorScheme`  | 配了要有效果；深色主题下自动切换面板与提亮 palette             |
 
 ---
 
@@ -481,15 +568,21 @@ config 覆盖。
 
 ## 10. 待确认问题
 
-1. **模板变量范围**：除了
-   `name`、`chrom`、`start`、`end`、`data.*`，还需要哪些变量？
-2. **"数据太多" 判定阈值**：默认按 chart 数量还是按像素密度？是否暴露为配置项？
-3. **Maximize Dialog 尺寸**：固定 800×400 还是可配置？
-4. **Drawer 是否需要知道自己在 maximize 模式**：大图可能需要不同布局（如显示坐标轴标签）。
-5. **第一期 drawer 范围**：是否只做 `tissueBoxPlot`，还是需要同时做 `violinPlot`
-   / `barPlot`？
+已在 WP0 收口的条目：
 
----
+1. ~~模板变量范围~~：仍为 `name` / `chrom` / `start` / `end` / `data.*`。
+2. ~~"数据太多" 判定阈值~~：按数量（`maxChartsPerView`）与像素间距（`minChartSpacingPx`）双条件，均已暴露为 renderer
+   slot。
+3. ~~Maximize Dialog 尺寸~~：固定 800×400（drawer 目录里的 `defaultSize`
+   预留给 WP2 的按 drawer 定制）。
+4. ~~Drawer 是否需要知道自己在 maximize 模式~~：`DrawerProps.isMaximize`，放大弹窗里传入
+   `true`。
+5. ~~第一期 drawer 范围~~：五个内置 drawer 均已实现（见 §2.2 目录）。
+
+仍待 WP2/WP3 决定：
+
+- 插件贡献 drawer 的扩展点形状（`drawerOptions` 如何文档化/校验）。
+- 声明式 `spec` 与 `drawer` / `track info` 的关系。
 
 ## 11. 参考文件
 

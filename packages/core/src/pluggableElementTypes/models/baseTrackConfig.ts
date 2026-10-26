@@ -163,6 +163,32 @@ export function createBaseTrackConfig(pluginManager: PluginManager) {
           type: 'boolean',
           defaultValue: false,
         },
+
+        /**
+         * #slot formatAbout.info
+         * markdown template shown at the top of the "About this track" dialog.
+         * Supports `{{path}}` interpolation of the track/assembly/session
+         * context, see https://jbrowse.org/docs/extension_points for the
+         * available namespaces. If the whole value starts with `jexl:` it is
+         * evaluated as an expression and the result is rendered as markdown.
+         */
+        info: {
+          type: 'text',
+          description:
+            'markdown template shown in the "About this track" dialog, supports {{path}} interpolation. If the value starts with "jexl:" it is evaluated as an expression',
+          defaultValue: '',
+          contextVariable: ['track', 'config', 'session', 'assembly'],
+        },
+
+        /**
+         * #slot formatAbout.showInfo
+         */
+        showInfo: {
+          type: 'boolean',
+          description:
+            'set to false to hide the track info section of the "About this track" dialog',
+          defaultValue: true,
+        },
       }),
     },
     {

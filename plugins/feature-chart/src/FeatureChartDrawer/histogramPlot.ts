@@ -1,4 +1,5 @@
-import { scaleLinear } from 'd3-scale'
+import { resolveColorScheme } from './colorSchemes.ts'
+import { scaleLinear } from './scales.ts'
 
 import type { DrawerFunction } from './types.ts'
 
@@ -7,7 +8,6 @@ interface HistogramData {
   bins?: number
 }
 
-const DEFAULT_COLOR = '#4e79a7'
 const DEFAULT_BINS = 10
 
 function normalizeValues(data: HistogramData): number[] {
@@ -32,8 +32,12 @@ function computeBins(
   const counts = Array.from({ length: binCount }, () => 0)
   for (const v of values) {
     let index = Math.floor(((v - min) / (max - min)) * binCount)
-    if (index < 0) index = 0
-    if (index >= binCount) index = binCount - 1
+    if (index < 0) {
+      index = 0
+    }
+    if (index >= binCount) {
+      index = binCount - 1
+    }
     counts[index]!++
   }
 
@@ -42,6 +46,7 @@ function computeBins(
 
 export const histogramPlotDrawer: DrawerFunction = function (props) {
   const { ctx, width, height, data } = props
+  const colorScheme = props.colorScheme ?? resolveColorScheme(props.theme)
   const values = normalizeValues(data as HistogramData)
   if (values.length === 0) {
     return
@@ -86,25 +91,25 @@ export const histogramPlotDrawer: DrawerFunction = function (props) {
     .nice()
 
   // Background panel
-  ctx.fillStyle = '#fafafa'
+  ctx.fillStyle = colorScheme.background
   ctx.fillRect(0, 0, width, height)
 
   ctx.save()
   ctx.translate(padding.left, padding.top)
 
   // Grid lines
-  ctx.strokeStyle = '#e0e0e0'
+  ctx.strokeStyle = colorScheme.grid
   ctx.lineWidth = 1
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(0, y)
     ctx.lineTo(innerWidth, y)
     ctx.stroke()
-  })
+  }
 
   // Axes
-  ctx.strokeStyle = '#333333'
+  ctx.strokeStyle = colorScheme.axis
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.moveTo(0, 0)
@@ -113,44 +118,47 @@ export const histogramPlotDrawer: DrawerFunction = function (props) {
   ctx.stroke()
 
   // Y ticks and labels
-  ctx.fillStyle = '#333333'
+  ctx.fillStyle = colorScheme.text
   ctx.font = `${Math.max(8, Math.min(12, height * 0.05))}px sans-serif`
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
-  yScale.ticks(5).forEach(tick => {
+  for (const tick of yScale.ticks(5)) {
     const y = yScale(tick)
     ctx.beginPath()
     ctx.moveTo(-4, y)
     ctx.lineTo(0, y)
     ctx.stroke()
     ctx.fillText(String(tick), -8, y)
-  })
+  }
 
   // X ticks and labels
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
-  xScale.ticks(5).forEach(tick => {
+  for (const tick of xScale.ticks(5)) {
     const x = xScale(tick)
     ctx.beginPath()
     ctx.moveTo(x, innerHeight)
     ctx.lineTo(x, innerHeight + 4)
     ctx.stroke()
     ctx.fillText(formatTick(tick), x, innerHeight + 6)
-  })
+  }
 
   // Histogram bars
-  ctx.fillStyle = DEFAULT_COLOR + '33' // 20% opacity
-  ctx.strokeStyle = DEFAULT_COLOR
+  const barColor = colorScheme.colors[0]!
+  ctx.fillStyle = `${barColor}33` // 20% opacity
+  ctx.strokeStyle = barColor
   ctx.lineWidth = 1.5
-  for (let i = 0; i < counts.length; i++) {
+  for (const [i, count] of counts.entries()) {
     const x0 = xScale(edges[i]!)
     const x1 = xScale(edges[i + 1]!)
     const barX = Math.min(x0, x1)
     const barW = Math.abs(x1 - x0)
-    const barH = innerHeight - yScale(counts[i]!)
+    const barH = innerHeight - yScale(count)
     const barY = innerHeight - barH
 
-    if (barW <= 0 || barH <= 0) continue
+    if (barW <= 0 || barH <= 0) {
+      continue
+    }
 
     ctx.fillRect(barX, barY, barW, barH)
     ctx.strokeRect(barX, barY, barW, barH)

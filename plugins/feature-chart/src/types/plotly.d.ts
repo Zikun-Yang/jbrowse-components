@@ -1,7 +1,7 @@
 declare module 'plotly.js-dist-min' {
   // Minimal type declarations for plotly.js-dist-min.
   // This package ships as a single minified UMD bundle without its own types.
-  export type PlotType = 'bar' | 'box' | 'scatter' | 'violin' | string
+  export type PlotType = string
 
   export interface Data {
     type?: PlotType
@@ -14,19 +14,24 @@ declare module 'plotly.js-dist-min' {
     [key: string]: unknown
   }
 
+  export interface PlotlyAxis {
+    tickfont?: Partial<{ size: number }>
+    automargin?: boolean
+    gridcolor?: string
+    linecolor?: string
+    zerolinecolor?: string
+    [key: string]: unknown
+  }
+
   export interface Layout {
     width?: number
     height?: number
     margin?: Partial<{ l: number; r: number; t: number; b: number }>
     showlegend?: boolean
-    xaxis?: Partial<{
-      tickfont: Partial<{ size: number }>
-      automargin: boolean
-    }>
-    yaxis?: Partial<{
-      tickfont: Partial<{ size: number }>
-      automargin: boolean
-    }>
+    xaxis?: PlotlyAxis
+    yaxis?: PlotlyAxis
+    colorway?: string[]
+    font?: Partial<{ size: number; color: string }>
     paper_bgcolor?: string
     plot_bgcolor?: string
     [key: string]: unknown
@@ -54,11 +59,13 @@ declare module 'plotly.js-dist-min' {
 
   export function purge(root: HTMLElement): Promise<void>
 
-  const Plotly: {
+  export interface PlotlyModule {
     newPlot: typeof newPlot
     react: typeof react
     purge: typeof purge
   }
+
+  const Plotly: PlotlyModule
 
   export default Plotly
 }

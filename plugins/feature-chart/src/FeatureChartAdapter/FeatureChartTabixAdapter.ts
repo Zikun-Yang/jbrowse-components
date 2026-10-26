@@ -5,8 +5,6 @@ import { openLocation } from '@jbrowse/core/util/io'
 import { ObservableCreate } from '@jbrowse/core/util/rxjs'
 import { checkStopToken } from '@jbrowse/core/util/stopToken'
 
-import configSchema from './configSchema.ts'
-
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { BaseOptions } from '@jbrowse/core/data_adapters/BaseAdapter'
@@ -147,4 +145,4 @@ export default class FeatureChartTabixAdapter extends BaseFeatureDataAdapter {
   }
 }
 
-export { configSchema }
+export { default as configSchema } from './configSchema.ts'

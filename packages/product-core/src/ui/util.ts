@@ -19,14 +19,18 @@ export function removeAttr(obj: Record<string, unknown>, attr: string) {
 /**
  * Helper to read a config value from either an MST model or plain object.
  * For MST models, uses readConfObject. For plain objects, accesses directly.
+ *
+ * `args` are forwarded to `readConfObject` so that `jexl:` config slots can be
+ * evaluated with their `contextVariable` values.
  */
 export function readConf(
   config: AnyConfigurationModel | Record<string, unknown>,
   slotPath?: string | string[],
+  args: Record<string, unknown> = {},
 ) {
   if (isStateTreeNode(config)) {
     return slotPath
-      ? readConfObject(config, slotPath as any)
+      ? readConfObject(config, slotPath as any, args)
       : getSnapshot(config)
   }
   // Plain object - access directly
