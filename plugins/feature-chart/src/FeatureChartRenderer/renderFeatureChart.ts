@@ -9,6 +9,10 @@ import {
   resolveColorScheme,
 } from '../FeatureChartDrawer/colorSchemes.ts'
 import {
+  describeFeatureChartDrawerError,
+  formatFeatureChartDrawerError,
+} from '../FeatureChartDrawer/drawerErrors.ts'
+import {
   type FeatureChartDrawerError,
   isFeatureChartDrawerResolutionError,
   resolveFeatureChartDrawer,
@@ -67,6 +71,7 @@ export async function renderFeatureChart(
     align,
     maxChartsPerView,
     minChartSpacingPx,
+    drawerOptions,
   } = settings
   const colorScheme = resolveColorScheme(theme as any, settings.colorScheme)
 
@@ -87,7 +92,13 @@ export async function renderFeatureChart(
 
   // Never throw for a bad drawer name: a worker-level throw marks the whole
   // track as failed. Draw a readable placeholder in place of the charts.
-  const drawerResolution = resolveFeatureChartDrawer(settings.drawer)
+  // The plugin manager is what makes plugin-contributed drawers visible here:
+  // in the RPC worker this is the worker's own PluginManager, which installed
+  // the same runtime plugins as the main thread.
+  const drawerResolution = resolveFeatureChartDrawer(
+    settings.drawer,
+    pluginManager,
+  )
   const drawerError = isFeatureChartDrawerResolutionError(drawerResolution)
     ? drawerResolution
     : undefined
@@ -97,7 +108,9 @@ export async function renderFeatureChart(
     ? undefined
     : drawerResolution.drawer
   if (drawerError) {
-    console.warn(`[feature-chart] ${drawerError.error}`)
+    console.warn(
+      `[feature-chart] ${formatFeatureChartDrawerError(drawerError)}`,
+    )
   }
 
   const chartItems = features
@@ -163,6 +176,7 @@ export async function renderFeatureChart(
           config,
           theme: theme as any,
           colorScheme,
+          options: drawerOptions,
         })
         ctx.restore()
       }
@@ -179,7 +193,9 @@ export async function renderFeatureChart(
       width,
       // Surfaced so the UI (or an agent) can explain the empty charts without
       // reading the worker console.
-      ...(drawerError ? { drawerError: drawerError.error } : {}),
+      ...(drawerError
+        ? { drawerError: formatFeatureChartDrawerError(drawerError) }
+        : {}),
     },
     imageData ? [imageData] : [],
   ) as FeatureChartRenderReturn
@@ -246,13 +262,8 @@ export function drawDrawerErrorPlaceholder(
   drawerError: FeatureChartDrawerError,
   colorScheme: FeatureChartColorScheme,
 ) {
-  const available = drawerError.available.slice(0, 5)
-  const lines = [
-    drawerError.error,
-    available.length > 0
-      ? `Available: ${available.join(', ')}`
-      : 'No drawers are registered',
-  ]
+  const { title, hint, available } =
+    describeFeatureChartDrawerError(drawerError)
 
   ctx.fillStyle = colorScheme.background
   ctx.fillRect(0, 0, width, height)
@@ -269,9 +280,14 @@ export function drawDrawerErrorPlaceholder(
   const bodyFont = `${Math.max(8, Math.min(11, height * 0.055))}px sans-serif`
 
   ctx.font = titleFont
-  const titleLines = wrapText(ctx, lines[0]!, width - 16)
+  const titleLines = wrapText(ctx, title, width - 16)
   ctx.font = bodyFont
-  const bodyLines = wrapText(ctx, lines[1]!, width - 16)
+  // The hint line is what tells a user this is a *missing plugin* rather than a
+  // typo, so it is drawn before the available-names list.
+  const bodyLines = [
+    ...(hint === undefined ? [] : wrapText(ctx, hint, width - 16)),
+    ...wrapText(ctx, available, width - 16),
+  ]
 
   const titleLineHeight = Math.max(11, Math.min(16, height * 0.085))
   const bodyLineHeight = Math.max(10, Math.min(14, height * 0.07))
@@ -293,7 +309,7 @@ export function drawDrawerErrorPlaceholder(
   }
 }
 
-/** Break `text` into lines that fit `maxWidth`, at most 3 lines. */
+/** Break `text` into lines that fit `maxWidth`, at most 5 lines. */
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -316,9 +332,11 @@ function wrapText(
     lines.push(current)
   }
 
-  if (lines.length > 3) {
-    const kept = lines.slice(0, 3)
-    kept[2] = `${kept[2]!.slice(0, Math.max(0, kept[2]!.length - 1))}…`
+  const maxLines = 5
+  if (lines.length > maxLines) {
+    const kept = lines.slice(0, maxLines)
+    kept[maxLines - 1] =
+      `${kept[maxLines - 1]!.slice(0, Math.max(0, kept[maxLines - 1]!.length - 1))}…`
     return kept
   }
   return lines

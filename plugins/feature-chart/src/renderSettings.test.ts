@@ -17,6 +17,7 @@ describe('resolveFeatureChartRenderSettings', () => {
     expect(resolveFeatureChartRenderSettings(null)).toEqual(
       FEATURE_CHART_RENDER_DEFAULTS,
     )
+    expect(resolveFeatureChartRenderSettings().drawerOptions).toEqual({})
   })
 
   test('reads all six chart settings from the renderer config alone', () => {
@@ -40,7 +41,29 @@ describe('resolveFeatureChartRenderSettings', () => {
       maxChartsPerView: 12,
       minChartSpacingPx: 9,
       colorScheme: 'viridis',
+      drawerOptions: {},
     })
+  })
+
+  test('reads the frozen drawerOptions slot and defaults it to an empty object', () => {
+    expect(
+      resolveFeatureChartRenderSettings(snapshot({})).drawerOptions,
+    ).toEqual({})
+
+    const options = { colorRamp: 'warm', cellGap: 2 }
+    const settings = resolveFeatureChartRenderSettings(
+      snapshot({ drawerOptions: options }),
+    )
+    expect(settings.drawerOptions).toEqual(options)
+
+    // anything that is not a plain object means "no options" rather than a
+    // crash or a leaked null into a drawer
+    for (const bogus of [null, [1, 2], 'x', 42]) {
+      expect(
+        resolveFeatureChartRenderSettings(snapshot({ drawerOptions: bogus }))
+          .drawerOptions,
+      ).toEqual({})
+    }
   })
 
   test('ignores render-prop leftovers and keeps config authoritative', () => {

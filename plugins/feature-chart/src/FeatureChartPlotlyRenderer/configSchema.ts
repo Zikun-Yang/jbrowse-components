@@ -56,6 +56,18 @@ const FeatureChartPlotlyRenderer = ConfigurationSchema(
       type: 'string',
       defaultValue: 'tableau10',
     },
+
+    /**
+     * #slot
+     * Per-drawer options (`DrawerProps.options`). Accepted here so a track can
+     * switch between this renderer and `FeatureChartRenderer` without losing
+     * its configuration. The Plotly backend does not consume drawers yet (see
+     * ARCHITECTURE.md, WP4): the slot is carried, not applied.
+     */
+    drawerOptions: {
+      type: 'frozen',
+      defaultValue: {},
+    },
   },
   { explicitlyTyped: true },
 )
