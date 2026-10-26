@@ -95,6 +95,18 @@ showDescriptions: {
     }
 ```
 
+#### slot: labelPlacement
+
+```js
+labelPlacement: {
+      type: 'stringEnum',
+      model: types.enumeration('labelPlacement', ['left', 'below']),
+      description:
+        'label placement: "left" places labels inline to the left of the feature, "below" places labels underneath the feature',
+      defaultValue: 'left',
+    }
+```
+
 #### slot: subfeatureLabels
 
 ```js

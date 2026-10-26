@@ -23,7 +23,7 @@ reference the markdown files in our repo of the checked out git tag
 #### slot: renderer
 
 ```js
-renderer: rendererConfigSchema
+renderer: pluginManager.pluggableConfigSchemaType('renderer')
 ```
 
 ### LinearFeatureChartDisplay - Derives from
