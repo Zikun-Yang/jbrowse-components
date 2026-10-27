@@ -49,6 +49,8 @@ export function violinModelFromTissues(raw: unknown) {
   }
 }
 
-export const rawViolinPlotDrawer: DrawerFunction = function (props: DrawerProps) {
-  paintChartModel(props, violinModelFromTissues(props.data))
+export const rawViolinPlotDrawer: DrawerFunction = function (
+  props: DrawerProps,
+) {
+  paintChartModel(props, props.model ?? violinModelFromTissues(props.data))
 }

@@ -29,11 +29,19 @@ export default function ChartCanvas({
   displayModel,
   width,
   height,
+  onCanvasReady,
 }: {
   feature: Feature
   displayModel: LinearFeatureChartDisplayModel
   width: number
   height: number
+  /**
+   * Handed the painted canvas (or `null` on unmount) so the dialog can export
+   * it with `toDataURL()`. The canvas keeps its own lifecycle here: the drawing
+   * effect must stay in this component, because MUI mounts dialog children in a
+   * portal after the open commit.
+   */
+  onCanvasReady?: (canvas: HTMLCanvasElement | null) => void
 }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const drawerName = getConf(displayModel, ['renderer', 'drawer']) as string
@@ -70,6 +78,7 @@ export default function ChartCanvas({
     ctx.clearRect(0, 0, width, height)
 
     if (!('drawer' in resolution)) {
+      onCanvasReady?.(null)
       return
     }
     // Same development warning as the in-track canvas: the maximize dialog is
@@ -118,6 +127,7 @@ export default function ChartCanvas({
         : { model: normalization.model }),
       isMaximize: true,
     })
+    onCanvasReady?.(canvas)
   }, [
     feature,
     displayModel,
@@ -126,6 +136,7 @@ export default function ChartCanvas({
     drawerName,
     drawerOptions,
     spec,
+    onCanvasReady,
   ])
 
   return (

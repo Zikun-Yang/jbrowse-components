@@ -5,12 +5,8 @@ import { firstValueFrom } from 'rxjs'
 import { toArray } from 'rxjs/operators'
 
 import {
-  type ChartSpec,
   type ChartSpecError,
-  SPEC_DRAWER_NAME,
   formatChartSpecError,
-  normalizeValidatedSpec,
-  validateChartSpec,
 } from '../FeatureChartDrawer/chartSpec.ts'
 import {
   type FeatureChartColorScheme,
@@ -21,20 +17,33 @@ import {
   formatFeatureChartDrawerError,
 } from '../FeatureChartDrawer/drawerErrors.ts'
 import { warnUnknownDrawerOptions } from '../FeatureChartDrawer/drawerOptions.ts'
-import {
-  type FeatureChartDrawerError,
-  isFeatureChartDrawerResolutionError,
-  resolveFeatureChartDrawer,
-} from '../FeatureChartDrawer/drawerRegistry.ts'
 import { drawPlaceholderPanel } from '../FeatureChartDrawer/placeholder.ts'
+import {
+  TOO_MANY_CHARTS_MESSAGE,
+  shouldShowChartWarning,
+} from '../chartDensity.ts'
 import { computeChartX } from '../chartGeometry.ts'
+import {
+  chartModelForData,
+  resolveTrackChartSource,
+} from '../chartModelSources.ts'
+import {
+  chartCacheKey,
+  chartCacheSupported,
+  chartCanvasBytes,
+  colorSchemeHash,
+  createChartCanvas,
+  drawerSignature,
+  getCachedChartCanvas,
+  storeChartCanvas,
+} from '../renderCache.ts'
 import { resolveFeatureChartRenderSettings } from '../renderSettings.ts'
 
+import type { FeatureChartDrawerError } from '../FeatureChartDrawer/drawerRegistry.ts'
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { BaseFeatureDataAdapter } from '@jbrowse/core/data_adapters/BaseAdapter'
 import type { RenderArgsDeserialized } from '@jbrowse/core/pluggableElementTypes/renderers/FeatureRendererType'
-import type { Feature } from '@jbrowse/core/util'
 import type { RpcResult } from '@jbrowse/core/util/librpc'
 
 export interface ChartRenderArgs extends RenderArgsDeserialized {
@@ -64,11 +73,6 @@ export type FeatureChartRenderReturn = RpcResult & {
   value: FeatureChartRenderResults
 }
 
-interface ChartItem {
-  feature: Feature
-  x: number
-}
-
 export async function renderFeatureChart(
   renderProps: ChartRenderArgs,
   pluginManager: PluginManager,
@@ -87,16 +91,17 @@ export async function renderFeatureChart(
   } = settings
   const colorScheme = resolveColorScheme(theme as any, settings.colorScheme)
 
-  // `drawer: "spec"` is validated once per render: a structural problem is the
-  // same for every chart, so it gets one track-wide placeholder instead of 40.
-  const isSpecDrawer = settings.drawer === SPEC_DRAWER_NAME
-  const specStructuralErrors: ChartSpecError[] = isSpecDrawer
-    ? validateChartSpec(settings.spec)
-    : []
-  const spec: ChartSpec | undefined =
-    isSpecDrawer && specStructuralErrors.length === 0
-      ? (settings.spec as ChartSpec)
-      : undefined
+  // The drawer/spec half of the pipeline is resolved once per render (it does
+  // not depend on the feature payload), and the model half runs per chart. Both
+  // backends use `chartModelSources.ts`, which is what makes "canvas and Plotly
+  // draw the same chart" a property of the code rather than of two agreeing
+  // implementations.
+  const source = resolveTrackChartSource({
+    drawer: settings.drawer,
+    spec: settings.spec,
+    pluginManager,
+  })
+  const specStructuralErrors: ChartSpecError[] = source.specErrors ?? []
   if (specStructuralErrors.length > 0) {
     console.warn(
       `[feature-chart] invalid chart spec: ${specStructuralErrors
@@ -125,27 +130,17 @@ export async function renderFeatureChart(
   // The plugin manager is what makes plugin-contributed drawers visible here:
   // in the RPC worker this is the worker's own PluginManager, which installed
   // the same runtime plugins as the main thread.
-  const drawerResolution = resolveFeatureChartDrawer(
-    settings.drawer,
-    pluginManager,
-  )
-  const drawerError = isFeatureChartDrawerResolutionError(drawerResolution)
-    ? drawerResolution
-    : undefined
-  // Captured outside the canvas callback: the narrowed union is not preserved
-  // inside the closure.
-  const drawer = isFeatureChartDrawerResolutionError(drawerResolution)
-    ? undefined
-    : drawerResolution.drawer
-  if (isFeatureChartDrawerResolutionError(drawerResolution)) {
+  const drawerError = source.drawerError
+  if (drawerError) {
     console.warn(
-      `[feature-chart] ${formatFeatureChartDrawerError(drawerResolution)}`,
+      `[feature-chart] ${formatFeatureChartDrawerError(drawerError)}`,
     )
-  } else {
+  } else if (source.meta) {
     // `drawerOptions` is not validated, so this is the only signal that a key
     // is misspelled or belongs to a different drawer. Development builds only.
-    warnUnknownDrawerOptions(drawerResolution.meta, drawerOptions)
+    warnUnknownDrawerOptions(source.meta, drawerOptions)
   }
+  const drawer = source.draw
 
   const chartItems = features
     .map(feature => ({
@@ -154,18 +149,37 @@ export async function renderFeatureChart(
     }))
     .sort((a, b) => a.x - b.x)
 
-  const shouldShowWarning = checkShouldShowWarning(
-    chartItems,
+  const shouldShowWarning = shouldShowChartWarning(chartItems, {
     chartWidth,
     maxChartsPerView,
     minChartSpacingPx,
-  )
+  })
+
+  // Cache: config-level feature flag, and only when this runtime can allocate a
+  // detached canvas. Everything that changes pixels is part of the key (see
+  // `renderCache.ts`), so a hit cannot show a stale chart.
+  const cacheEnabled = settings.renderCache && chartCacheSupported()
+  // `highResolutionScaling` is what `renderToAbstractCanvas` used to scale the
+  // target context, so it — not `devicePixelRatio` (absent in workers) — is the
+  // scale a cached bitmap must be rendered at to stay crisp on HiDPI screens.
+  const scaling = renderProps.highResolutionScaling
+  const dpr =
+    typeof scaling === 'number' && scaling > 0
+      ? scaling
+      : typeof devicePixelRatio === 'number'
+        ? devicePixelRatio
+        : 1
+  const themeHash = colorSchemeHash(colorScheme)
+  const signature = drawerSignature(settings.drawer, drawerOptions)
 
   const rest = await renderToAbstractCanvas(
     width,
     chartHeight,
     renderProps,
     async ctx => {
+      // A context without `drawImage` (a test recorder, a minimal canvas
+      // polyfill) cannot blit a cached chart, so it keeps the direct path.
+      const canBlit = cacheEnabled && typeof ctx.drawImage === 'function'
       if (drawerError) {
         drawDrawerErrorPlaceholder(
           ctx,
@@ -208,13 +222,14 @@ export async function renderFeatureChart(
           | undefined
 
         // Data-level spec problems are per chart: this one gets a placeholder,
-        // the rest of the track keeps painting.
-        const normalization = spec
-          ? normalizeValidatedSpec(spec, contextData?.data)
-          : undefined
+        // the rest of the track keeps painting. For a built-in drawer this is
+        // the payload → model step (the same function Plotly calls).
+        const { model, modelErrors } = chartModelForData(
+          source,
+          contextData?.data,
+        )
 
-        await drawer({
-          ctx,
+        const props = {
           width: chartWidth,
           height: chartHeight,
           data: contextData?.data,
@@ -227,12 +242,60 @@ export async function renderFeatureChart(
           theme: theme as any,
           colorScheme,
           options: drawerOptions,
-          ...(normalization?.model === undefined
-            ? normalization?.errors === undefined
-              ? {}
-              : { modelErrors: normalization.errors }
-            : { model: normalization.model }),
-        })
+          ...(model === undefined ? {} : { model }),
+          ...(modelErrors === undefined ? {} : { modelErrors }),
+        }
+
+        // Cached path: paint once into an offscreen canvas, reuse it while the
+        // key holds (feature, model, size, dpr, theme, drawer options). Pan
+        // frames then cost one `drawImage` per chart instead of a full repaint.
+        if (canBlit && model) {
+          const key = chartCacheKey({
+            featureId: item.feature.id(),
+            model,
+            width: chartWidth,
+            height: chartHeight,
+            dpr,
+            themeHash,
+            drawerSignature: signature,
+          })
+          const cached = getCachedChartCanvas(key)
+          if (cached) {
+            ctx.drawImage(
+              cached as unknown as CanvasImageSource,
+              item.x,
+              0,
+              chartWidth,
+              chartHeight,
+            )
+            ctx.restore()
+            continue
+          }
+          const offscreen = createChartCanvas(
+            chartWidth * dpr,
+            chartHeight * dpr,
+          )
+          if (offscreen) {
+            offscreen.ctx.scale(dpr, dpr)
+            await drawer({ ...props, ctx: offscreen.ctx })
+            storeChartCanvas(
+              key,
+              offscreen.canvas,
+              chartCanvasBytes(chartWidth, chartHeight, dpr),
+            )
+            ctx.drawImage(
+              offscreen.canvas as unknown as CanvasImageSource,
+              item.x,
+              0,
+              chartWidth,
+              chartHeight,
+            )
+            ctx.restore()
+            continue
+          }
+        }
+
+        await drawer({ ...props, ctx })
         ctx.restore()
       }
     },
@@ -263,33 +326,6 @@ export async function renderFeatureChart(
   ) as FeatureChartRenderReturn
 }
 
-function checkShouldShowWarning(
-  items: ChartItem[],
-  chartWidth: number,
-  maxChartsPerView: number,
-  minChartSpacingPx: number,
-): boolean {
-  if (items.length === 0) {
-    return false
-  }
-  if (items.length > maxChartsPerView) {
-    return true
-  }
-  if (items.length <= 1) {
-    return false
-  }
-
-  const sorted = [...items].sort((a, b) => a.x - b.x)
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = sorted[i - 1]!
-    const curr = sorted[i]!
-    if (curr.x - (prev.x + chartWidth) < minChartSpacingPx) {
-      return true
-    }
-  }
-  return false
-}
-
 function drawWarning(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -306,11 +342,7 @@ function drawWarning(
   ctx.font = '12px sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(
-    'Too many charts — zoom in to view individual charts',
-    width / 2,
-    height / 2,
-  )
+  ctx.fillText(TOO_MANY_CHARTS_MESSAGE, width / 2, height / 2)
 }
 
 /**

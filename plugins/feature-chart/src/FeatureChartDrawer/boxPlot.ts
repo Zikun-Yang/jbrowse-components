@@ -86,7 +86,10 @@ export function boxModelFromPrecomputed(raw: unknown) {
 export const precomputedBoxPlotDrawer: DrawerFunction = function (
   props: DrawerProps,
 ) {
-  paintChartModel(props, boxModelFromPrecomputed(props.data))
+  // The renderers resolve the model once (`chartModelSources.ts`) and hand it
+  // in, so the Plotly backend consumes the very same object. Direct callers
+  // (tests, plugins, the maximize canvas) may omit it and build their own.
+  paintChartModel(props, props.model ?? boxModelFromPrecomputed(props.data))
 }
 
 /**
@@ -134,5 +137,5 @@ export function boxModelFromTissues(raw: unknown) {
 }
 
 export const rawBoxPlotDrawer: DrawerFunction = function (props: DrawerProps) {
-  paintChartModel(props, boxModelFromTissues(props.data))
+  paintChartModel(props, props.model ?? boxModelFromTissues(props.data))
 }

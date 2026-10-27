@@ -1,12 +1,18 @@
+import { type ChartModel, datumValues } from './chartModel.ts'
 import { DEFAULT_CHART_BINS } from './chartSpec.ts'
 import { resolveColorScheme } from './colorSchemes.ts'
 import { scaleBand, scaleLinear } from './scales.ts'
-import { computeKde, median, silvermanBandwidth, summarize } from './statistics.ts'
+import {
+  computeKde,
+  median,
+  silvermanBandwidth,
+  summarize,
+} from './statistics.ts'
 
-import type { ChartModel } from './chartModel.ts'
 import type { FeatureChartColorScheme } from './colorSchemes.ts'
 import type { SummaryStats } from './statistics.ts'
 import type { DrawerProps } from './types.ts'
+import type { ThemeOptions } from '@mui/material'
 
 /**
  * The painters: one function per `ChartModel.kind`, all driven by the same
@@ -218,29 +224,19 @@ function paintBox(
     .domain(categories)
     .range([0, layout.innerWidth])
     .padding(0.3)
-  const yScale = scaleLinear().domain(yDomain).range([layout.innerHeight, 0]).nice()
+  const yScale = scaleLinear()
+    .domain(yDomain)
+    .range([layout.innerHeight, 0])
+    .nice()
 
-  drawFrame(
-    ctx,
-    width,
-    height,
-    layout,
-    yScale,
-    colorScheme,
-    model.axes.yLabel,
-  )
+  drawFrame(ctx, width, height, layout, yScale, colorScheme, model.axes.yLabel)
 
   // X labels and boxes
-  drawCategoryLabels(
-    ctx,
-    categories,
-    xScale,
-    layout.innerHeight,
-    colorScheme,
-  )
+  drawCategoryLabels(ctx, categories, xScale, layout.innerHeight, colorScheme)
   for (const [i, name] of categories.entries()) {
     const s = stats[i]!
-    const color = colors[i] ?? colorScheme.colors[i % colorScheme.colors.length]!
+    const color =
+      colors[i] ?? colorScheme.colors[i % colorScheme.colors.length]!
 
     const boxX = xScale(name) ?? 0
     const boxW = xScale.bandwidth()
@@ -338,26 +334,13 @@ function paintBar(
     .padding(0.3)
   const baselineY = yScale(0)
 
-  drawFrame(
-    ctx,
-    width,
-    height,
-    layout,
-    yScale,
-    colorScheme,
-    model.axes.yLabel,
-  )
+  drawFrame(ctx, width, height, layout, yScale, colorScheme, model.axes.yLabel)
 
   // X labels and bars
-  drawCategoryLabels(
-    ctx,
-    categories,
-    xScale,
-    layout.innerHeight,
-    colorScheme,
-  )
+  drawCategoryLabels(ctx, categories, xScale, layout.innerHeight, colorScheme)
   for (const [i, name] of categories.entries()) {
-    const color = colors[i] ?? colorScheme.colors[i % colorScheme.colors.length]!
+    const color =
+      colors[i] ?? colorScheme.colors[i % colorScheme.colors.length]!
     const barX = xScale(name) ?? 0
     const barW = xScale.bandwidth()
     const barY = yScale(values[i]!)
@@ -419,17 +402,12 @@ function paintViolin(
     .domain(categories)
     .range([0, layout.innerWidth])
     .padding(0.3)
-  const yScale = scaleLinear().domain(yDomain).range([layout.innerHeight, 0]).nice()
+  const yScale = scaleLinear()
+    .domain(yDomain)
+    .range([layout.innerHeight, 0])
+    .nice()
 
-  drawFrame(
-    ctx,
-    width,
-    height,
-    layout,
-    yScale,
-    colorScheme,
-    model.axes.yLabel,
-  )
+  drawFrame(ctx, width, height, layout, yScale, colorScheme, model.axes.yLabel)
 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
@@ -607,14 +585,209 @@ export function computeBins(
   return { edges, counts }
 }
 
+/**
+ * Palette for a model: `spec.style.colorScheme` wins over the renderer slot.
+ * Exported (beyond the drawer props) so the Plotly backend resolves colors
+ * through the same rule instead of re-deriving it.
+ */
+export function modelColorScheme(
+  model: ChartModel,
+  fallback: FeatureChartColorScheme | undefined,
+  theme?: ThemeOptions | null,
+): FeatureChartColorScheme {
+  return model.style.colorScheme
+    ? resolveColorScheme(theme, model.style.colorScheme)
+    : (fallback ?? resolveColorScheme(theme))
+}
+
 /** Palette for a model: `spec.style.colorScheme` wins over the renderer slot. */
 export function resolveModelColorScheme(
   props: DrawerProps,
   model: ChartModel,
 ): FeatureChartColorScheme {
-  return model.style.colorScheme
-    ? resolveColorScheme(props.theme, model.style.colorScheme)
-    : (props.colorScheme ?? resolveColorScheme(props.theme))
+  return modelColorScheme(model, props.colorScheme, props.theme)
+}
+
+/**
+ * Read-side view of a model: the categories, in draw order, with the numbers
+ * each painter would use.
+ *
+ * `paintChartModel()` is the write side; the Plotly backend needs the same
+ * numbers without a canvas. Both go through `statsFor()`/`computeBins()`, so
+ * "the same model" means the same categories in the same order with the same
+ * observations — which is what WP4 acceptance asserts, model-level.
+ */
+export interface ChartModelCategoryEntry {
+  name: string
+  /** Observations (box, violin). */
+  values: number[]
+  /** Quartiles, computed or precomputed (box). */
+  stats?: SummaryStats
+  /** Single number (bar). */
+  value?: number
+  /** Legacy per-datum color override, when the payload carried one. */
+  color?: string
+}
+
+export function chartModelCategories(
+  model: ChartModel,
+): ChartModelCategoryEntry[] {
+  const data = model.series[0]?.data ?? []
+  const entries: ChartModelCategoryEntry[] = []
+  switch (model.kind) {
+    case 'box':
+      for (const [index, datum] of data.entries()) {
+        const resolved = statsFor(datum)
+        if (!resolved.stats) {
+          continue
+        }
+        entries.push({
+          name: model.categories[index] ?? resolved.stats.median.toString(),
+          values: datumValues(datum),
+          stats: resolved.stats,
+          ...(resolved.color === undefined ? {} : { color: resolved.color }),
+        })
+      }
+      return entries
+    case 'violin':
+      for (const [index, datum] of data.entries()) {
+        if (datum.form !== 'grouped-values' || datum.values.length === 0) {
+          continue
+        }
+        entries.push({
+          name: model.categories[index] ?? String(index),
+          values: datum.values,
+        })
+      }
+      return entries
+    case 'bar':
+      for (const [index, datum] of data.entries()) {
+        if (datum.form !== 'category-values') {
+          continue
+        }
+        entries.push({
+          name: model.categories[index] ?? datum.value.toString(),
+          values: [datum.value],
+          value: datum.value,
+          ...(datum.color === undefined ? {} : { color: datum.color }),
+        })
+      }
+      return entries
+    case 'histogram':
+      return []
+  }
+}
+
+export interface ChartModelBins {
+  edges: number[]
+  counts: number[]
+}
+
+/**
+ * The histogram bins the canvas painter draws, so the Plotly backend can plot
+ * the same bin edges instead of asking Plotly to bin the data a second way
+ * (two binning algorithms is exactly the "two charts" problem WP4 removes).
+ */
+export function chartModelBins(model: ChartModel): ChartModelBins | undefined {
+  const datum = model.series[0]?.data[0]
+  const values = datum?.form === 'values' ? datum.values : []
+  if (values.length === 0) {
+    return undefined
+  }
+  const rawBins = model.style.bins ?? DEFAULT_CHART_BINS
+  const binCount = Math.max(1, Math.min(100, Math.round(rawBins)))
+  const bins = computeBins(values, binCount)
+  if (!Number.isFinite(Math.max(...bins.counts))) {
+    return undefined
+  }
+  return bins
+}
+
+/**
+ * Axis domains and ticks of a model — the numbers `drawFrame()`/the painters
+ * derive, exposed so the Plotly backend can pin `xaxis.range`/`yaxis.range` to
+ * the same window. Ticks are returned too: Plotly's tick algorithm would
+ * otherwise pick a different grid than the canvas for the same data.
+ */
+export interface ChartModelAxisInfo {
+  yDomain?: [number, number]
+  yTicks: number[]
+  xDomain?: [number, number]
+  xTicks: number[]
+}
+
+export function chartModelAxes(model: ChartModel): ChartModelAxisInfo {
+  const axis = (domain: [number, number] | undefined, ticks = 5) => {
+    if (!domain) {
+      return { domain: undefined, ticks: [] as number[] }
+    }
+    const scale = scaleLinear().domain(domain).range([0, 1]).nice()
+    return { domain: scale.domain(), ticks: scale.ticks(ticks) }
+  }
+
+  if (model.kind === 'histogram') {
+    const bins = chartModelBins(model)
+    if (!bins) {
+      return { yTicks: [], xTicks: [] }
+    }
+    const maxCount = Math.max(...bins.counts)
+    const x = axis([bins.edges[0]!, bins.edges[bins.edges.length - 1]!])
+    const y = axis([0, maxCount])
+    return {
+      yDomain: y.domain,
+      yTicks: y.ticks,
+      xDomain: x.domain,
+      xTicks: x.ticks,
+    }
+  }
+
+  const entries = chartModelCategories(model)
+  if (entries.length === 0) {
+    return { yTicks: [], xTicks: [] }
+  }
+
+  let domain: [number, number] | undefined
+  if (model.kind === 'box') {
+    domain = boxDomain(
+      entries.map(entry => entry.stats).filter((s): s is SummaryStats => !!s),
+    )
+  } else if (model.kind === 'bar') {
+    let min = 0
+    let max = -Infinity
+    for (const entry of entries) {
+      const value = entry.value ?? 0
+      if (value < min) {
+        min = value
+      }
+      if (value > max) {
+        max = value
+      }
+    }
+    if (Number.isFinite(max)) {
+      const padding = (max - min) * 0.05 || 1
+      domain = [min - padding, max + padding]
+    }
+  } else {
+    let min = Infinity
+    let max = -Infinity
+    for (const entry of entries) {
+      for (const value of entry.values) {
+        if (value < min) {
+          min = value
+        }
+        if (value > max) {
+          max = value
+        }
+      }
+    }
+    if (Number.isFinite(min) && Number.isFinite(max)) {
+      const padding = (max - min) * 0.05 || 1
+      domain = [min - padding, max + padding]
+    }
+  }
+
+  const y = axis(domain)
+  return { yDomain: y.domain, yTicks: y.ticks, xTicks: [] }
 }
 
 /**

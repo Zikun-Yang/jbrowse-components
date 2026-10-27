@@ -3,8 +3,8 @@
 This document is the contract other work packages build on. It covers the drawer
 catalog, the failure semantics, the config boundary, plugin-contributed drawers
 (WP2, landed), declarative chart specs and the normalized `ChartModel` (WP3,
-landed), and the seams left open for WP4 (renderer model unification) and WP5
-(agent-sdk fields).
+landed), the unified two-backend pipeline plus the render cache (WP4, landed),
+and the seams left open for WP5 (agent-sdk fields).
 
 The user-facing vocabulary is [`SPEC.md`](./SPEC.md); this file explains how it
 is built.
@@ -186,10 +186,131 @@ should be and per-chart when it should be), and the drawer owns painting. Third
 parties invoking the drawer directly must pass a model; plugin drawers keep
 reading `data`.
 
-`FeatureChartPlotlyRenderer` accepts the `spec` slot (so switching renderers
-does not lose config) and refuses to render it, with an explicit "not supported
-here" message. Unifying both backends is WP4; a Plotly-only kind would paint
-nothing in the track, which is the inconsistency WP4 exists to remove.
+Both backends consume that model (WP4): `FeatureChartPlotlyRenderer` renders
+`drawer: "spec"` through the same validator and the same `ChartModel`, so a spec
+chart looks the same in a track and in the maximized interactive view. See "One
+model, two backends" below.
+
+## One model, two backends (WP4)
+
+```
+renderer config ──▶ TrackChartSource ──▶ ChartModel (per feature) ──▶ backend
+  drawer / spec       resolved once            per chart              canvas | Plotly
+```
+
+`src/chartModelSources.ts` is the whole unification:
+
+- `resolveTrackChartSource({ drawer, spec, pluginManager })` runs **once per
+  render**: it validates a `spec` (structural errors are the same for every
+  chart) or resolves the drawer in the catalog and picks up its `buildModel`.
+- `chartModelForData(source, data)` runs **per chart**: `spec` → normalized
+  model, built-in drawer → its payload adapter (`boxModelFromPrecomputed`,
+  `barModelFromBars`, …), plugin drawer without a builder → no model
+  (`canvasOnly: true`).
+
+`FeatureChartRenderer` (worker) and `FeatureChartPlotlyRenderer` (main thread)
+both call those two functions. That is why "same data + same model ⇒ same
+categories, values and colours" is a property of the code, not of two
+implementations that happen to agree.
+
+### Drawer payload adapters (`buildModel`)
+
+A drawer entry is now `{ meta, draw, buildModel? }`. The five built-ins are
+"payload adapter + shared painter": `draw` is
+`paintChartModel(props, props.model ?? buildModel(props))`. Rendering passes the
+model in, so the adapter runs once and both backends see one object.
+
+Plugin drawers may contribute `buildModel` through `Core-featureChartDrawer`.
+Without it they are **canvas-only** and the Plotly backend says so in a notice —
+it does not invent a chart. That is deliberate: a plugin that paints with raw 2D
+calls has no declarative equivalent, and silently drawing something else is the
+exact inconsistency WP4 removes.
+
+### Plotly traces are model projections
+
+`FeatureChartPlotlyRenderer/chartTraces.ts` maps a model to traces and a layout:
+
+| model                    | trace                                                                      |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `box` + `summary-stats`  | `box` with `q1/median/q3/lowerfence/upperfence` (+ `y: [min, max]`)        |
+| `box` + `grouped-values` | `box` with the same `summarize()` numbers the canvas draws (1.5×IQR clamp) |
+| `violin`                 | `violin` with `box.visible=false`, `meanline.visible=false`                |
+| `bar`                    | one `bar` trace, per-category `marker.color`/`marker.line.color`           |
+| `histogram`              | `bar` over `computeBins()` edges/counts — Plotly's `nbinsx` is never used  |
+
+Layout pins `xaxis.categoryorder: 'array'` (+`categoryarray`) and
+`yaxis.range`/`tickvals` from `chartModelAxes()` (the painters' own padded,
+`nice()`d domain), so the interactive chart cannot sort differently or pick a
+different y window than the track.
+
+### `plotType` is a deprecated alias, not a second vocabulary
+
+Pre-WP4 configs chose the chart with `plotType` and the Plotly renderer ignored
+`drawer` entirely. Resolution order now:
+
+1. `drawer: "spec"` → spec model.
+2. `drawer` explicitly set (built-in or `plugin/drawer`) → that drawer's model.
+3. `drawer` left at the schema default (`precomputedBoxPlot`) → legacy mode:
+   `plotType` compiles to a spec (`plotTypeCompat.ts`), with one deprecation
+   warning naming the equivalent config.
+
+`scatter`/`line` have no `ChartModel` in v1 (no canvas painter), so they keep
+their legacy Plotly rendering behind `legacyPlotTypeTraces.ts` and are removed
+in v2. That file is the only non-model Plotly path and is not to be extended.
+
+## Render cache
+
+`src/renderCache.ts` keeps one `OffscreenCanvas` per chart and blits it on the
+next render. Key:
+
+```
+featureId | hash(serializeChartModel(model)) | width x height @ dpr |
+themeHash | drawer|options
+```
+
+- `modelHash` is the explicit-order JSON from `chartModel.ts`, so any visible
+  model change misses.
+- `themeHash` is the resolved palette (light/dark + `colorScheme` slot).
+- `drawer|options` covers `drawer` and `drawerOptions` changes.
+- Pan position is **not** in the key (it does not change pixels), which is what
+  makes a hit possible at all.
+
+LRU, 128 MiB budget (≈300 charts at 120×180 @ dpr 2). Capability gate:
+`OffscreenCanvas` only — the main-thread driver and jsdom keep the direct path.
+Config switch: `renderCache` (default `true`; measured gain, see below).
+
+Benchmark (`benchmark/chartRenderBenchmark.ts`, run with
+`node plugins/feature-chart/benchmark/chartRenderBenchmark.ts`): it times the
+synchronous painter work of a whole-view repaint over a 30-frame pan sequence, 5
+warmup frames, 3 repetitions, median run. It uses a recording no-op context, so
+it measures the JS the cache removes and _not_ rasterization — the browser gain
+is at least what it reports. Measured on 256-core EPYC 9554, Node 24:
+
+| charts | kind   | direct paint p50 / p95 | cached p50 / p95 | p95 gain |
+| ------ | ------ | ---------------------- | ---------------- | -------- |
+| 100    | box    | 3.69 / 4.07 ms         | 1.96 / 2.01 ms   | 50.7%    |
+| 300    | box    | 5.91 / 9.00 ms         | 4.48 / 5.24 ms   | 41.8%    |
+| 100    | violin | 22.59 / 23.16 ms       | 2.56 / 3.18 ms   | 86.3%    |
+| 300    | violin | 59.69 / 67.73 ms       | 6.18 / 8.63 ms   | 87.3%    |
+| 300    | bar    | 7.21 / 20.14 ms        | 2.07 / 5.49 ms   | 72.7%    |
+
+The default-on gate was "p95 repaint drops by more than 20%"; every kind clears
+it. Kinds whose painter is cheap relative to hashing (bar at 100 charts) gain
+least; KDE violins gain most, which is the case that made panning unusable.
+
+## Exporting a maximized chart
+
+`src/LinearFeatureChartDisplay/exportChart.ts` owns both paths:
+
+- Plotly: `relayout(node, { width, height })` then
+  `toImage(node, { format, width, height, scale: 2 })`. Setting the size first
+  is what keeps the file the size the user sees; `scale: 2` matches the canvas
+  path's device-pixel output.
+- Canvas: `toDataURL('image/png')`. SVG from a canvas is that raster wrapped in
+  an `<image>` (documented in the dialog), because a canvas has no vector form.
+
+Filenames are `<trackId>-<feature name>-<view>.<ext>`; `sanitizeFilePart()`
+keeps unicode letters, collapses everything else to `-`, and caps the length.
 
 ## Failure semantics
 
@@ -378,8 +499,10 @@ re-introducing an ESM-only dependency into the product entry points.
   (WP2's `data` + `options` remain for payload-driven and plugin drawers, so
   nothing was half-migrated). The vocabulary is frozen in `SPEC.md` and grows
   additively only.
-- **WP4 — renderer unification.** `renderSettings.ts` and the shared
-  `computeChartX` / density-warning logic are the current duplication boundary.
+- **WP4 — renderer unification (landed).** One model, two backends; the shared
+  geometry (`chartGeometry.ts`), density rule (`chartDensity.ts`) and model
+  sources (`chartModelSources.ts`) are the contract. `plotType` is a deprecated
+  alias. See "One model, two backends" and "Render cache" above.
 - **WP5 — agent-sdk.** `listFeatureChartDrawers()` (name, displayName,
   description, dataShape, defaultSize) and `listColorSchemeNames()` are the
   intended machine-readable surface. Both are sorted deterministically.
@@ -403,7 +526,13 @@ re-introducing an ESM-only dependency into the product entry points.
 | `FeatureChartDrawer/devMode.test.ts`                           | production vs development detection, including a runtime without `process` (browser bundle)                                                                                  |
 | `FeatureChartDrawer/drawerData.test.ts`                        | every reachable drawer survives `undefined`/`null`/primitive/malformed payloads and still paints the payload it declares                                                     |
 | `FeatureChartDrawer/demoDataContract.test.ts`                  | `test_data/feature-chart` files exist, every row carries the key its configured drawer reads, the drawer paints it, no demo track trips the unknown-key warning              |
-| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing                                                                                   |
+| `LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx` | Alert on unknown drawer, no alert for a valid one, maximize canvas is sized before drawing, view toggle, PNG/SVG export bytes + filename                                     |
+| `chartModelSources.test.ts`                                    | drawer/spec → model in one place: built-in presets, spec errors, canvas-only drawers, per-chart data errors                                                                  |
+| `FeatureChartPlotlyRenderer/chartTraces.test.ts`               | model → trace parity: category order, quartiles, colors, histogram bins, pinned axis window, y label                                                                         |
+| `FeatureChartPlotlyRenderer/plotTypeCompat.test.ts`            | every `plotType` shape mapping, wrapper-key unwrapping, deprecation warning once + equivalent spec                                                                           |
+| `chartDensity.test.ts`                                         | the shared threshold rule (count, spacing, 0/1-chart edge cases)                                                                                                             |
+| `renderCache.test.ts`                                          | cache key changes on every pixel-affecting input, LRU stats, capability gate, `buildModel` on all built-ins                                                                  |
+| `LinearFeatureChartDisplay/exportChart.test.ts`                | filename sanitisation, SVG document size, byte counting, anchor download, Plotly `relayout`+`toImage` args                                                                   |
 | `chartGeometry.test.ts`                                        | chart-rectangle hit test, alignment math, icon placement/clamping                                                                                                            |
 | `corePluginsRegistration.test.ts`                              | all three products depend on and register the plugin                                                                                                                         |
 
@@ -431,14 +560,26 @@ src/
   FeatureChartRenderer/
     configSchema.ts       drawer/chartWidth/chartHeight/align/... slots
     renderFeatureChart.ts canvas rendering, config-only reads, placeholder
+  chartModelSources.ts    drawer/spec → TrackChartSource → ChartModel (both backends)
+  chartDensity.ts         the shared "too many charts" rule + its wording
+  renderCache.ts          per-chart OffscreenCanvas cache (key, LRU, capability gate)
   FeatureChartPlotlyRenderer/
-    components/FeatureChartPlotlyRendering.tsx  Plotly rendering + palette
+    chartTraces.ts        ChartModel → Plotly traces + pinned layout
+    chartPresentation.ts  traces+layout for one chart (track + maximize dialog)
+    plotTypeCompat.ts     deprecated plotType → spec (+ warn once)
+    legacyPlotTypeTraces.ts  scatter/line only (removed in v2)
+    plotlyLoader.ts       the single dynamic import of plotly.js-dist-min
+    components/FeatureChartPlotlyRendering.tsx  in-track Plotly rendering
+    components/PlotlyPlot.tsx                   one Plotly element + export handle
+    components/ChartNotice.tsx                  the yellow "cannot draw" panel
   chartGeometry.ts        chart rectangle, hover hit test, icon placement
   LinearFeatureChartDisplay/
     model.ts              renderProps() only adds config/theme
     components/DisplayComponent.tsx  hover state + maximize affordance placement
-    components/ChartCanvas.tsx       the large chart drawn inside the dialog
-    components/MaximizeDialog.tsx    Alert on unknown drawer, markdown description
+    exportChart.ts                  PNG/SVG export for both backends + filenames
+    components/ChartCanvas.tsx       the large static chart inside the dialog
+    components/MaximizePlotly.tsx    the large interactive chart (same model)
+    components/MaximizeDialog.tsx    view toggle, export buttons, markdown description
 ```
 
 ## Hover and the maximize affordance

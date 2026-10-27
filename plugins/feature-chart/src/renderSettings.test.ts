@@ -20,7 +20,7 @@ describe('resolveFeatureChartRenderSettings', () => {
     expect(resolveFeatureChartRenderSettings().drawerOptions).toEqual({})
   })
 
-  test('reads all six chart settings from the renderer config alone', () => {
+  test('reads all seven chart settings from the renderer config alone', () => {
     const settings = resolveFeatureChartRenderSettings(
       snapshot({
         drawer: 'rawViolinPlot',
@@ -42,6 +42,7 @@ describe('resolveFeatureChartRenderSettings', () => {
       minChartSpacingPx: 9,
       colorScheme: 'viridis',
       drawerOptions: {},
+      renderCache: true,
       spec: {},
     })
   })

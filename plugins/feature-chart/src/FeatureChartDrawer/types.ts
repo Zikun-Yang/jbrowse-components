@@ -69,10 +69,10 @@ export interface DrawerProps {
    */
   options?: Record<string, unknown>
   /**
-   * Normalized chart model (WP3), present when the configured drawer is `spec`
-   * and this feature's payload produced one. Plugin drawers that read `data`
-   * themselves can ignore it; drawers that want the normalized form can prefer
-   * it when it is set.
+   * Normalized chart model (WP3). The renderers resolve it once per chart and
+   * pass it in, so a built-in drawer paints exactly the model the Plotly
+   * backend consumes (`buildModel` in `drawerRegistry.ts`). A drawer called
+   * directly (tests, third-party code) can omit it and builds its own.
    */
   model?: ChartModel
   /** Why `model` is absent (`drawer: "spec"` only). Drawn as a placeholder. */
@@ -85,3 +85,19 @@ export interface DrawerProps {
 }
 
 export type DrawerFunction = (props: DrawerProps) => void | Promise<void>
+
+/**
+ * A drawer's payload → `ChartModel` adapter (WP4).
+ *
+ * This is the piece that lets both backends draw the same thing: the built-in
+ * drawers are now "payload adapter + shared painter", and the Plotly backend
+ * calls the very same adapter. A plugin drawer may provide one too; without it
+ * the drawer is canvas-only and the Plotly backend says so explicitly.
+ *
+ * It must be pure and fast: it runs once per chart per render (and feeds the
+ * render cache's `modelHash`).
+ */
+export type ChartModelBuilder = (args: {
+  data: unknown
+  options?: Record<string, unknown>
+}) => ChartModel

@@ -27,6 +27,13 @@ export interface FeatureChartRenderSettings {
    */
   drawerOptions: Record<string, unknown>
   /**
+   * Reuse a per-chart offscreen canvas between redraws. Off by default on
+   * platforms without `OffscreenCanvas`/`<canvas>`; see `renderCache.ts` and the
+   * benchmark results in the WP4 issue comment for why the default is what it
+   * is.
+   */
+  renderCache: boolean
+  /**
    * Declarative chart description (`SPEC.md`), used when `drawer` is `"spec"`.
    * Passed through verbatim: validation is `normalizeFromSpec()`'s job, and one
    * of the things it must be able to report is "this is not even an object".
@@ -50,6 +57,9 @@ export const FEATURE_CHART_RENDER_DEFAULTS: FeatureChartRenderSettings = {
   minChartSpacingPx: 4,
   colorScheme: DEFAULT_COLOR_SCHEME,
   drawerOptions: EMPTY_DRAWER_OPTIONS,
+  // Measured: see `benchmark/chartRenderBenchmark.ts` and the WP4 report. The
+  // gate was "default on only if the p95 repaint drops by more than 20%".
+  renderCache: true,
   spec: EMPTY_SPEC,
 }
 
@@ -62,6 +72,10 @@ function toAlign(value: unknown): FeatureChartAlign {
   return value === 'left' || value === 'right' || value === 'center'
     ? value
     : FEATURE_CHART_RENDER_DEFAULTS.align
+}
+
+function toBoolean(value: unknown, fallback: boolean): boolean {
+  return typeof value === 'boolean' ? value : fallback
 }
 
 function toDrawerName(value: unknown): string {
@@ -144,6 +158,10 @@ export function resolveFeatureChartRenderSettings(
     colorScheme: toColorScheme(readSlot(config ?? undefined, 'colorScheme')),
     drawerOptions: toDrawerOptions(
       readSlot(config ?? undefined, 'drawerOptions'),
+    ),
+    renderCache: toBoolean(
+      readSlot(config ?? undefined, 'renderCache'),
+      FEATURE_CHART_RENDER_DEFAULTS.renderCache,
     ),
     spec: toSpec(readSlot(config ?? undefined, 'spec')),
   }

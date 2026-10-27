@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import MaximizeDialog from './MaximizeDialog.tsx'
 import { initBuiltInDrawers } from '../../FeatureChartDrawer/drawerRegistry.ts'
@@ -10,12 +10,16 @@ const mockNavToLocString = jest.fn()
 
 jest.mock('@jbrowse/core/configuration', () => ({
   getConf: jest.fn(),
+  // MaximizePlotly resolves the renderer settings from the config model; the
+  // fake config here is a plain object, so "unset" is the honest answer.
+  readConfObject: jest.fn(() => undefined),
 }))
 
 jest.mock('@jbrowse/core/util', () => ({
   // the catalog lives on the plugin manager, which the components read from the
   // MST environment; this fake display model has none
   getEnv: jest.fn(() => ({ pluginManager: undefined })),
+  getContainingTrack: jest.fn(() => ({ trackId: 'tissue_expression' })),
   getContainingView: jest.fn(() => ({
     assemblyNames: ['hg38'],
     dynamicBlocks: { contentBlocks: [] },
@@ -31,7 +35,49 @@ jest.mock('react-markdown', () => ({
   default: ({ children }: { children: string }) => children,
 }))
 
+const mockNewPlot = jest.fn().mockResolvedValue(undefined)
+const mockPurge = jest.fn().mockResolvedValue(undefined)
+const mockRelayout = jest.fn().mockResolvedValue(undefined)
+const mockToImage = jest
+  .fn()
+  .mockResolvedValue('data:image/png;base64,aGVsbG8gd29ybGQ=')
+
+jest.mock('plotly.js-dist-min', () => ({
+  __esModule: true,
+  default: {
+    newPlot: (...args: unknown[]) => mockNewPlot(...args),
+    purge: (...args: unknown[]) => mockPurge(...args),
+    relayout: (...args: unknown[]) => mockRelayout(...args),
+    toImage: (...args: unknown[]) => mockToImage(...args),
+  },
+}))
+
 const { getConf } = jest.requireMock('@jbrowse/core/configuration')
+
+/**
+ * jsdom has no 2D context. The dialog only needs the canvas to *exist and be
+ * sized* for the layout tests, and to yield a PNG for the export tests, so a
+ * recording context plus a fixed `toDataURL` is enough.
+ */
+function stubCanvas() {
+  const ctx = new Proxy(
+    { scale: () => {}, clearRect: () => {} } as Record<string, unknown>,
+    {
+      get: (target, property) =>
+        property in target ? target[property as string] : () => {},
+      set: (target, property, value) => {
+        target[property as string] = value
+        return true
+      },
+    },
+  )
+  jest
+    .spyOn(HTMLCanvasElement.prototype, 'getContext')
+    .mockImplementation((() => ctx) as never)
+  jest
+    .spyOn(HTMLCanvasElement.prototype, 'toDataURL')
+    .mockImplementation(() => `data:image/png;base64,${'A'.repeat(4000)}`)
+}
 
 function createFeature(): Feature {
   const data: Record<string, unknown> = {
@@ -193,5 +239,131 @@ describe('MaximizeDialog', () => {
 
     expect(screen.getByTestId('feature-chart-maximize-canvas')).toBeTruthy()
     expect(screen.queryByTestId('feature-chart-spec-error')).toBeNull()
+  })
+
+  test('offers both views and keeps the static canvas as the default', async () => {
+    stubCanvas()
+    getConf.mockImplementation((_model: unknown, path: unknown) => {
+      const key = Array.isArray(path) ? path.join('.') : String(path)
+      return key.includes('colorScheme') ? 'tableau10' : 'precomputedBoxPlot'
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+      />,
+    )
+
+    expect(screen.getByTestId('feature-chart-view-interactive')).toBeTruthy()
+    expect(screen.getByTestId('feature-chart-view-static')).toBeTruthy()
+    // default view is the pre-WP4 canvas: no Plotly chunk is pulled on open
+    expect(
+      await screen.findByTestId('feature-chart-maximize-canvas'),
+    ).toBeTruthy()
+    expect(mockNewPlot).not.toHaveBeenCalled()
+  })
+
+  test('exports a non-empty PNG from the static canvas', async () => {
+    stubCanvas()
+    getConf.mockImplementation((_model: unknown, path: unknown) => {
+      const key = Array.isArray(path) ? path.join('.') : String(path)
+      return key.includes('colorScheme') ? 'tableau10' : 'precomputedBoxPlot'
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+        chartWidth={320}
+        chartHeight={180}
+      />,
+    )
+
+    await screen.findByTestId('feature-chart-maximize-canvas')
+    fireEvent.click(screen.getByTestId('feature-chart-export-png'))
+
+    const status = await screen.findByTestId('feature-chart-export-status')
+    await waitFor(() => {
+      expect(Number(status.dataset.bytes)).toBeGreaterThan(0)
+    })
+    expect(status.dataset.format).toBe('png')
+    // trackId + feature name, exactly as the issue asks
+    expect(status.dataset.filename).toBe('tissue_expression-GENE1-static.png')
+  })
+
+  test('exports a non-empty SVG from the static canvas', async () => {
+    stubCanvas()
+    getConf.mockImplementation((_model: unknown, path: unknown) => {
+      const key = Array.isArray(path) ? path.join('.') : String(path)
+      return key.includes('colorScheme') ? 'tableau10' : 'precomputedBoxPlot'
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+        chartWidth={320}
+        chartHeight={180}
+      />,
+    )
+
+    await screen.findByTestId('feature-chart-maximize-canvas')
+    fireEvent.click(screen.getByTestId('feature-chart-export-svg'))
+
+    const status = await screen.findByTestId('feature-chart-export-status')
+    await waitFor(() => {
+      expect(Number(status.dataset.bytes)).toBeGreaterThan(0)
+    })
+    expect(status.dataset.format).toBe('svg')
+    expect(status.dataset.filename).toBe('tissue_expression-GENE1-static.svg')
+  })
+
+  test('exports the interactive view through Plotly toImage', async () => {
+    stubCanvas()
+    getConf.mockImplementation((_model: unknown, path: unknown) => {
+      const key = Array.isArray(path) ? path.join('.') : String(path)
+      return key.includes('colorScheme') ? 'tableau10' : 'precomputedBoxPlot'
+    })
+
+    render(
+      <MaximizeDialog
+        open
+        onClose={() => {}}
+        feature={createFeature()}
+        displayModel={displayModel}
+        chartWidth={320}
+        chartHeight={180}
+      />,
+    )
+
+    fireEvent.click(screen.getByTestId('feature-chart-view-interactive'))
+    expect(
+      await screen.findByTestId('feature-chart-maximize-plotly'),
+    ).toBeTruthy()
+    await waitFor(() => {
+      expect(mockNewPlot).toHaveBeenCalled()
+    })
+
+    fireEvent.click(screen.getByTestId('feature-chart-export-png'))
+    const status = await screen.findByTestId('feature-chart-export-status')
+    await waitFor(() => {
+      expect(Number(status.dataset.bytes)).toBeGreaterThan(0)
+    })
+    expect(status.dataset.format).toBe('png')
+    expect(status.dataset.filename).toBe(
+      'tissue_expression-GENE1-interactive.png',
+    )
+    expect(mockToImage).toHaveBeenCalled()
+    expect(mockRelayout).toHaveBeenCalledWith(expect.anything(), {
+      width: 320,
+      height: 180,
+    })
   })
 })

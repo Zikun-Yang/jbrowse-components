@@ -249,23 +249,53 @@ FeatureChartTrack (TrackType)
   `src/renderSettings.ts`）；display 只负责把 `config` 传下来
 - 通过 drawer 名称从注册表获取 drawer 函数并调用，同时把
   `resolveColorScheme(theme, colorScheme)` 的结果作为 `props.colorScheme` 传入
-- 当视图内 chart 数量超过阈值或空间过挤时，渲染"数据太多，请放大查看"的提示（黄色），不绘制单个 chart
+- 当视图内 chart 数量超过阈值或空间过挤时，渲染"数据太多，请放大查看"的提示（黄色），不绘制单个 chart（阈值语义见 §5）
 - drawer 名字无法解析时 **不抛错**：`renderToAbstractCanvas`
   里画一个占位块（错误文本 + 前 5 个可用 drawer 名），并在结果里带上
   `drawerError` 字段
+- **模型优先（WP4）**：每个 chart 的 `ChartModel` 由 `src/chartModelSources.ts`
+  解析（`drawer`/`spec` 的解析一次/render，模型转换每 chart 一次），再作为
+  `DrawerProps.model` 交给 drawer。内置 drawer 也走这条路径（`drawerRegistry`
+  里的 `buildModel`），因此 Plotly 后端拿到的**就是** canvas 画的这份模型
+- **可选渲染缓存（WP4）**：`renderCache: true`（默认）时每个 chart 画进
+  `OffscreenCanvas` 并按键
+  `(featureId, modelHash, width, height, dpr, themeHash, drawer 签名)`
+  复用，pan/zoom 时只做
+  `drawImage`；任何会改变像素的输入（主题、`drawerOptions`、resize、payload）都会换键。无
+  `OffscreenCanvas` 的运行时（主线程 driver、jsdom）自动回退到直绘
 
 ### 3.3 FeatureChartPlotlyRenderer
 
 - 继承 `FeatureRendererType`，client-side React 渲染
 - 使用 [Plotly.js](https://plotly.com/javascript/) 绘制交互式图表
-- `plotly.js-dist-min` 按需 lazy load，未使用 Plotly renderer 的 track 不会加载
-- 支持 `box`、`violin`、`bar`、`scatter`、`line` 等常见图表类型
-- 每个 feature 对应一个独立 Plotly 图表，位置计算与 canvas renderer 一致
-- 图表支持 Plotly 内置悬停、缩放等交互
-- 与 canvas renderer 一样从自身 config 读取尺寸/对齐/密度阈值与
-  `colorScheme`（共用
-  `resolveFeatureChartRenderSettings()`），并把 palette 写进 trace 颜色与
-  `layout.colorway`；深色主题会切到深色面板并提亮 palette
+- `plotly.js-dist-min` 按需 lazy load（唯一入口
+  `src/FeatureChartPlotlyRenderer/plotlyLoader.ts`），未使用 Plotly
+  renderer 的 track 不会加载该 chunk
+- **同一份 `ChartModel`**（WP4）：解析顺序是
+  1. `drawer: "spec"` → 同一套 spec 校验/归一化；
+  2. `drawer` 显式指定（内置或插件） → 该 drawer 的
+     `buildModel`，与 canvas 完全同源；插件 drawer 没有 `buildModel` 时是
+     **canvas-only**，这里显示"canvas-only，请用 FeatureChartRenderer 或补
+     `buildModel`"，而不是自己瞎画一张；
+  3. `drawer` 保持默认值 → 兼容模式：用
+     `plotType`（见下），并打印一次 deprecation 警告。
+- 映射规则（模型 → trace）：
+
+  | kind                      | trace                                                     | 说明                                       |
+  | ------------------------- | --------------------------------------------------------- | ------------------------------------------ |
+  | `box`（`summary-stats`）  | `box` + `q1/median/q3/lowerfence/upperfence`              | 分位数直接来自模型，不再让 Plotly 二次推断 |
+  | `box`（`grouped-values`） | `box` + 同一 `summarize()` 算出的八个数                   | 与 canvas 的 1.5×IQR 须一致                |
+  | `violin`                  | `violin`（`box.visible=false`、`meanline.visible=false`） | 与 canvas 的 KDE 轮廓语义对齐              |
+  | `bar`                     | 单条 `bar`，`marker.color` 逐类着色                       | 颜色序号与 canvas 一致                     |
+  | `histogram`               | `bar`，x 用 canvas 的 `computeBins()` 结果                | 不使用 Plotly 的 `nbinsx`，避免两套分箱    |
+
+- `xaxis.categoryorder: 'array'` + `yaxis.range/tickvals`
+  都从模型推导，因此**类别顺序、数值范围、颜色映射**与 canvas 一致（README/ARCHITECTURE 里的验收项）
+- `plotType` 是 **deprecated 兼容别名**，等价于设置 `spec.kind`；只在 `drawer`
+  为默认值时生效，且只警告一次（迁移示例见 §4.2、§7）
+- 与 canvas renderer 一样从自身 config 读取尺寸/对齐/密度阈值、
+  `colorScheme`、`drawer`、`drawerOptions`、`spec`（共用
+  `resolveFeatureChartRenderSettings()`）；深色主题会切到深色面板并提亮palette
 
 ### 3.4 LinearFeatureChartDisplay
 
@@ -516,8 +546,9 @@ Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
 
 ### 4.2 Plotly renderer 配置示例
 
-使用 Plotly 绘制交互式 box plot，数据格式与 `rawBoxPlot`
-一致（`{ tissues: { Brain: [...], Liver: [...] } }`）：
+Plotly renderer 与 canvas renderer 消费同一份数据契约与同一个
+`ChartModel`。**推荐写法**是显式写 `drawer`（或 `spec`），它与
+`FeatureChartRenderer` 的配置可以互换，只是绘制后端不同：
 
 ```json
 {
@@ -544,7 +575,7 @@ Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
       "type": "LinearFeatureChartDisplay",
       "renderer": {
         "type": "FeatureChartPlotlyRenderer",
-        "plotType": "box",
+        "drawer": "rawBoxPlot",
         "chartHeight": 180,
         "chartWidth": 140,
         "align": "center"
@@ -554,7 +585,53 @@ Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
 }
 ```
 
-`plotType` 可选值：`box`、`violin`、`bar`、`scatter`、`line`。
+换成声明式 spec 也可以（两种后端行为一致）：
+
+```json
+{
+  "renderer": {
+    "type": "FeatureChartPlotlyRenderer",
+    "drawer": "spec",
+    "spec": {
+      "specVersion": 1,
+      "kind": "box",
+      "data": { "form": "grouped-values", "path": "tissues" },
+      "axes": { "yLabel": "TPM" }
+    }
+  }
+}
+```
+
+#### `plotType`（deprecated）
+
+`plotType` 是 WP4 之前的 Plotly-only 开关，现在保留为 **兼容别名**：
+
+- 只在 `drawer` 保持默认值（`precomputedBoxPlot`）时生效，等价于设置
+  `spec.kind`；显式写了 `drawer` 就以 `drawer` 为准；
+- 每次页面加载打印一条 `console.warn`，并给出等价的 spec；
+- `scatter` / `line` 没有对应的 canvas
+  painter，因此在 v1 之外：仍按旧行为渲染，但同样打 deprecation 警告，v2 移除。
+
+迁移示例：
+
+```json
+// before
+{ "type": "FeatureChartPlotlyRenderer", "plotType": "violin" }
+
+// after
+{
+  "type": "FeatureChartPlotlyRenderer",
+  "drawer": "spec",
+  "spec": {
+    "specVersion": 1,
+    "kind": "violin",
+    "data": { "form": "grouped-values", "path": "tissues" }
+  }
+}
+```
+
+`renderCache` 在 Plotly
+renderer 上只是被接受（方便 track 在两种 renderer 之间切换），对 Plotly 没有作用。
 
 ### 4.3 最小配置（省略 drawer）与配色
 
@@ -599,14 +676,29 @@ Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
 
 ---
 
-## 5. "数据太多" 提示行为
+## 5. "数据太多" 提示行为（阈值语义）
 
-判定条件（可选配置，默认自适应）：
+两个阈值都是**硬阈值**：命中就不画单个 chart，而画整条 track 宽的黄色提示条（文案
+`Too many charts — zoom in to view individual charts`）。WP4 保留这一行为为默认，没有改成"只画前 N 个"——那会改变用户已经依赖的语义（"看不见图 = 请放大"），要改需单独决策。
 
-- chart 数量超过 `maxChartsPerView`
-- 或相邻 chart 的像素间距小于 `minChartSpacingPx`
+| slot                | 默认  | 含义                                                                                                                                                       |
+| ------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxChartsPerView`  | `100` | 当前视图内 chart **数量**上限。超过即提示，与宽度无关。100 个 × 120px ≈ 12000px 是"一片图能读"的经验边界，也是 canvas 一次重绘的预算上限（见 §3.2 的缓存） |
+| `minChartSpacingPx` | `4`   | 相邻 chart 的**像素间距**下限：`next.x - (prev.x + chartWidth) < 4` 即提示。4px 是"能看出这是两个图"的最小间隙；它让"缩得很小"和"图挤在一起"有同一个判据   |
 
-用户放大视图后，重新渲染单个 chart。
+判定逻辑（两个后端共用 `src/chartDensity.ts` 的
+`shouldShowChartWarning()`，避免两边阈值漂移）：
+
+- 0 个 chart：不提示（空视图不是"太多"）；
+- `count > maxChartsPerView`：提示；
+- 只有 1 个 chart：不提示（没有"相邻"）；
+- 任意相邻一对间距 `< minChartSpacingPx`：提示。
+
+用户放大视图后，条件不再成立，重新渲染单个 chart。
+
+调大 `maxChartsPerView`
+意味着一次重绘更多 chart：canvas 路径有渲染缓存后主要成本是每 chart 一次
+`drawImage`，但 Plotly 路径仍会为每个 chart 建一个 plot 实例，建议不超过 200。
 
 ---
 
@@ -629,11 +721,22 @@ Available: barPlot, histogram, precomputedBoxPlot, rawBoxPlot, rawViolinPlot
 ### 6.2 Dialog 内容
 
 - 标题：`name`
-- 上方：用同一个 drawer 以更大尺寸（如 800×400）重新绘制的 chart
+- 视图切换（WP4）：`Static`（默认，canvas 以 800×400 重绘）/
+  `Interactive`（Plotly，轨迹与轴窗口与 track 内一致，可 hover/缩放）。默认 Static 的理由：打开弹窗不应拉 Plotly
+  chunk，且 canvas-only 的插件 drawer 只有这一种视图
+- 导出（WP4）：`Export PNG` / `Export SVG`，文件名
+  `<trackId>-<feature name>-<view>.png|svg`
+  - Interactive：Plotly `toImage()`（先 `relayout`
+    显式设置宽高，`scale: 2`），SVG 是真矢量
+  - Static：canvas `toDataURL()` 出 PNG；SVG 是该栅格包一层 `<image>`
+    （canvas 没有矢量形态，UI 里已注明"要真矢量请切 Interactive"）
+  - 深色主题下背景取自同一份 palette（`colorScheme.background`），所以导出文件不会是白底
 - 下方：渲染后的 Markdown description（含模板变量替换结果）
-- 可选按钮：
+- 按钮：
   - "Zoom to region"：跳转到该 chart 的 `start/end` 区域
   - "Close"
+- 自动化钩子：`data-testid="feature-chart-export-status"` 上带 `data-format` /
+  `data-bytes` / `data-filename`，测试可断言"产物非空" 而不依赖浏览器下载目录
 
 ### 6.3 数据复用
 
@@ -662,8 +765,8 @@ Invalid chart spec (2 problems)
 
 ## 7. 实现任务清单
 
-状态（WP0、WP2、WP3 收口）：插件贡献 drawer、`drawerOptions` 与声明式 `spec`
-已完成；后续工作见 WP4（双后端统一）。
+状态（WP4 收口）：插件贡献 drawer、`drawerOptions`、声明式 `spec`
+与 "两后端同一模型"已完成；剩余见 WP5（agent-sdk / 文档站 / CI 检查）。
 
 ### Phase 0：产品接入与地基加固（已完成）
 
@@ -715,11 +818,28 @@ Invalid chart spec (2 problems)
 - [x] 放大弹窗列出全部 spec 错误；Plotly 后端给出"暂不支持"警告
 - [x] 目录 `dataShape` 词汇与 spec 对齐（旧名降级为 `any` 并 dev warn）
 
-### Phase 4：增强（后续工作包）
+### Phase 4：双后端统一与性能（已完成，WP4）
 
-- [ ] 双后端统一（WP4）
-- [ ] Plotly 与 canvas 模型统一（WP4）
+- [x] `drawerRegistry` 的每个内置 drawer 暴露 `buildModel`（payload →
+      `ChartModel`），Plotly 与 canvas 从同一函数取模型
+- [x] `src/chartModelSources.ts`：每 render 解析一次 drawer/spec，每 chart 归一化一次；worker 与主线程同一条代码路径
+- [x] Plotly trace/layout 从 `ChartModel`
+      推导（类别顺序、轴窗口、颜色、直方图分箱），删除重复的 `computeChartX`
+      / 密度判定（提取到 `chartGeometry.ts` / `chartDensity.ts`）
+- [x] `plotType` 降级为 deprecated 兼容别名（只警告一次 + 等价 spec）
+- [x] 放大视图：Interactive/Static 切换 + PNG/SVG 导出（文件名含 `trackId`
+      与 feature name，深色主题背景正确）
+- [x] 渲染缓存：`(featureId, modelHash, width, height, dpr, themeHash,     drawerOptions)`
+      键 + LRU（128 MiB）+ `renderCache` 配置开关；benchmark 见
+      `benchmark/chartRenderBenchmark.ts`
+- [x] Cypress E2E（`component_tests/app-vite`）：tabix 出图、About
+      `info`、未知 drawer / 非法 spec 占位、放大视图与导出
+
+### Phase 5：增强（后续工作包）
+
 - [ ] agent-sdk 字段（WP5）
+- [ ] （可选）`maxChartsPerView` 的"只画前 N 个"模式：需要先改 §5 的语义决策
+- [ ] （可选）服务端静态出图（`jbrowse-img` 产品线）
 - [ ] `descriptionId` + 单独 descriptions 查找表
 - [ ] 从 LGV feature 右键菜单生成 FeatureChartTrack
 - [ ] BED + 外部 JSON 文件引用格式；长格式 TSV

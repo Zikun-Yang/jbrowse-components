@@ -56,8 +56,9 @@ interface DrawerProps {
   /** `renderer.drawerOptions`, verbatim. Always an object; may be empty. */
   options?: Record<string, unknown>
   /**
-   * Normalized chart model, set when the configured drawer is `spec` (see
-   * "Feature chart specs"). Optional: a payload-driven drawer reads `data`.
+   * Normalized chart model. The renderers resolve it before calling the drawer
+   * (`buildModel`, see below), so a drawer in a track always gets one.
+   * Optional: a drawer called directly can omit it and build its own.
    */
   model?: ChartModel
   /** Why `model` is absent (`drawer: "spec"` only). */
@@ -97,6 +98,44 @@ Rules that matter in practice:
 - Colors are `colorScheme.colors` (already theme-adjusted) or plain `#rrggbb`
   strings; the built-ins append a hex alpha suffix (`color + '33'`), which only
   works for hex.
+
+### `buildModel`: let both backends draw your drawer
+
+The five built-in drawers are "payload adapter + shared painter". Their `draw`
+is `paintChartModel({ ...props, ctx }, props.model ?? buildModel(props.data))`,
+and the adapter is also registered as `buildModel`, so the Plotly backend draws
+the _same_ `ChartModel` instead of a second interpretation of the payload.
+
+A plugin drawer can do the same:
+
+```js
+{
+  name: 'myPlugin/heatmap',
+  draw: ({ ctx, width, height, model }) => paintIt(ctx, model), // your painter
+  // Optional but recommended: with it, the drawer also renders in
+  // FeatureChartPlotlyRenderer and in the maximize dialog's Interactive tab.
+  buildModel: ({ data }) => ({
+    kind: 'bar',                     // box | violin | bar | histogram
+    categories: ['A', 'B'],
+    series: [{ name: 'values', data: [
+      { form: 'category-values', value: 1 },
+      { form: 'category-values', value: 2 },
+    ] }],
+    style: {},
+    axes: {},
+  }),
+}
+```
+
+Without `buildModel` the drawer is **canvas-only**: it still works in
+`FeatureChartRenderer` and in the dialog's Static view, and
+`FeatureChartPlotlyRenderer` shows a notice explaining that the drawer provides
+no model (it never guesses). Returning a model costs ~15 lines and buys the
+interactive view, zoom and PNG/SVG export.
+
+The model shape (and the four `data.form` values) is documented in
+[Feature chart specs](./feature_chart_specs.md); `dataShape` in your catalog
+entry should use the same vocabulary.
 
 ## Contributing a drawer from a plugin
 
