@@ -23,8 +23,8 @@ const TRACK = { drawer: 0, spec: 1, unknownDrawer: 2, brokenSpec: 3 } as const
 type JbrowseState = {
   session: {
     rpcManager: { mainConfiguration: { defaultDriver?: string } }
-    tracks: { trackId?: string }[]
   }
+  jbrowse: { tracks: { trackId?: string }[] }
 }
 
 function visitFixture(query = '') {
@@ -65,7 +65,7 @@ describe('FeatureChart tracks (real worker RPC)', () => {
         'RPC driver',
       ).to.equal('WebWorkerRpcDriver')
       expect(
-        state.session.tracks
+        state.jbrowse.tracks
           .map(track => track.trackId)
           .filter(id => id?.startsWith('fc_e2e')),
       ).to.have.length(4)
