@@ -1,11 +1,20 @@
-import { barPlotDrawer } from './barPlot.ts'
-import { precomputedBoxPlotDrawer, rawBoxPlotDrawer } from './boxPlot.ts'
+import { barModelFromBars, barPlotDrawer } from './barPlot.ts'
+import {
+  boxModelFromPrecomputed,
+  boxModelFromTissues,
+  precomputedBoxPlotDrawer,
+  rawBoxPlotDrawer,
+} from './boxPlot.ts'
 import { isDevelopmentBuild } from './devMode.ts'
-import { histogramPlotDrawer } from './histogramPlot.ts'
+import {
+  histogramModelFromValues,
+  histogramPlotDrawer,
+} from './histogramPlot.ts'
 import { specDrawer } from './specDrawer.ts'
-import { rawViolinPlotDrawer } from './violinPlot.ts'
+import { rawViolinPlotDrawer, violinModelFromTissues } from './violinPlot.ts'
 
 import type {
+  ChartModelBuilder,
   DrawerFunction,
   FeatureChartDrawerDataShape,
   FeatureChartDrawerMeta,
@@ -25,6 +34,13 @@ export const FEATURE_CHART_DRAWER_EXTENSION_POINT = 'Core-featureChartDrawer'
 export interface FeatureChartDrawerEntry {
   meta: FeatureChartDrawerMeta
   draw: DrawerFunction
+  /**
+   * Optional payload → `ChartModel` adapter (WP4). Present on the five
+   * built-ins, which is what makes the Plotly backend draw the same model as
+   * the canvas painters. Absent for `spec` (the spec *is* the model) and for
+   * canvas-only plugin drawers.
+   */
+  buildModel?: ChartModelBuilder
 }
 
 /**
@@ -35,6 +51,12 @@ export interface FeatureChartDrawerEntry {
 export interface FeatureChartDrawerContribution {
   name: string
   draw: DrawerFunction
+  /**
+   * Optional: let this drawer be rendered by the Plotly backend too. Without
+   * it the drawer stays canvas-only and the interactive/maximized view says
+   * "canvas only" instead of inventing a chart.
+   */
+  buildModel?: ChartModelBuilder
   displayName?: string
   description?: string
   dataShape?: FeatureChartDrawerDataShape
@@ -45,6 +67,7 @@ export interface FeatureChartDrawerContribution {
 export interface ResolvedFeatureChartDrawer {
   drawer: DrawerFunction
   meta: FeatureChartDrawerMeta
+  buildModel?: ChartModelBuilder
 }
 
 export interface FeatureChartDrawerError {
@@ -191,8 +214,13 @@ export function registerFeatureChartDrawer(
   name: string,
   drawer: DrawerFunction,
   meta?: Partial<FeatureChartDrawerMeta>,
+  buildModel?: ChartModelBuilder,
 ) {
-  registry.set(name, { meta: normalizeMeta(name, meta), draw: drawer })
+  registry.set(name, {
+    meta: normalizeMeta(name, meta),
+    draw: drawer,
+    ...(buildModel ? { buildModel } : {}),
+  })
   catalogEpoch++
 }
 
@@ -201,6 +229,7 @@ function builtInContributions(): FeatureChartDrawerContribution[] {
   return [...registry.values()].map(entry => ({
     ...entry.meta,
     draw: entry.draw,
+    ...(entry.buildModel ? { buildModel: entry.buildModel } : {}),
   }))
 }
 
@@ -235,9 +264,11 @@ function mergeContribution(
       `drawer "${name}" was overridden by a plugin (previous implementation replaced)`,
     )
   }
+  const { buildModel } = contribution as Partial<FeatureChartDrawerContribution>
   entries.set(name, {
     meta: normalizeMeta(name, contribution as Partial<FeatureChartDrawerMeta>),
     draw,
+    ...(typeof buildModel === 'function' ? { buildModel } : {}),
   })
 }
 
@@ -429,7 +460,11 @@ export function resolveFeatureChartDrawer(
   const available = catalog.sorted.map(meta => meta.name)
   const entry = name ? catalog.entries.get(name) : undefined
   if (entry) {
-    return { drawer: entry.draw, meta: entry.meta }
+    return {
+      drawer: entry.draw,
+      meta: entry.meta,
+      ...(entry.buildModel ? { buildModel: entry.buildModel } : {}),
+    }
   }
   if (!name) {
     return {
@@ -470,45 +505,70 @@ export function isFeatureChartDrawerResolutionError(
 const NO_DRAWER_OPTIONS: Record<string, never> = {}
 
 export function initBuiltInDrawers() {
-  registerFeatureChartDrawer('precomputedBoxPlot', precomputedBoxPlotDrawer, {
-    displayName: 'Precomputed box plot',
-    description:
-      'One box per category from precomputed five-number statistics (data.boxes).',
-    dataShape: 'summary-stats',
-    defaultSize: DEFAULT_DRAWER_SIZE,
-    optionsSchema: NO_DRAWER_OPTIONS,
-  })
-  registerFeatureChartDrawer('rawBoxPlot', rawBoxPlotDrawer, {
-    displayName: 'Box plot (raw values)',
-    description:
-      'One box per group from raw observations, computing quartiles in the browser (data.tissues).',
-    dataShape: 'grouped-values',
-    defaultSize: DEFAULT_DRAWER_SIZE,
-    optionsSchema: NO_DRAWER_OPTIONS,
-  })
-  registerFeatureChartDrawer('rawViolinPlot', rawViolinPlotDrawer, {
-    displayName: 'Violin plot (raw values)',
-    description: 'KDE violin per group from raw observations (data.tissues).',
-    dataShape: 'grouped-values',
-    defaultSize: DEFAULT_DRAWER_SIZE,
-    optionsSchema: NO_DRAWER_OPTIONS,
-  })
-  registerFeatureChartDrawer('barPlot', barPlotDrawer, {
-    displayName: 'Bar plot',
-    description:
-      'One bar per category from a single numeric value (data.bars).',
-    dataShape: 'category-values',
-    defaultSize: DEFAULT_DRAWER_SIZE,
-    optionsSchema: NO_DRAWER_OPTIONS,
-  })
-  registerFeatureChartDrawer('histogram', histogramPlotDrawer, {
-    displayName: 'Histogram',
-    description:
-      'Frequency histogram of one numeric series, with automatic binning (data.values).',
-    dataShape: 'values',
-    defaultSize: DEFAULT_DRAWER_SIZE,
-    optionsSchema: NO_DRAWER_OPTIONS,
-  })
+  registerFeatureChartDrawer(
+    'precomputedBoxPlot',
+    precomputedBoxPlotDrawer,
+    {
+      displayName: 'Precomputed box plot',
+      description:
+        'One box per category from precomputed five-number statistics (data.boxes).',
+      dataShape: 'summary-stats',
+      defaultSize: DEFAULT_DRAWER_SIZE,
+      optionsSchema: NO_DRAWER_OPTIONS,
+    },
+    ({ data }) => boxModelFromPrecomputed(data),
+  )
+  registerFeatureChartDrawer(
+    'rawBoxPlot',
+    rawBoxPlotDrawer,
+    {
+      displayName: 'Box plot (raw values)',
+      description:
+        'One box per group from raw observations, computing quartiles in the browser (data.tissues).',
+      dataShape: 'grouped-values',
+      defaultSize: DEFAULT_DRAWER_SIZE,
+      optionsSchema: NO_DRAWER_OPTIONS,
+    },
+    ({ data }) => boxModelFromTissues(data),
+  )
+  registerFeatureChartDrawer(
+    'rawViolinPlot',
+    rawViolinPlotDrawer,
+    {
+      displayName: 'Violin plot (raw values)',
+      description: 'KDE violin per group from raw observations (data.tissues).',
+      dataShape: 'grouped-values',
+      defaultSize: DEFAULT_DRAWER_SIZE,
+      optionsSchema: NO_DRAWER_OPTIONS,
+    },
+    ({ data }) => violinModelFromTissues(data),
+  )
+  registerFeatureChartDrawer(
+    'barPlot',
+    barPlotDrawer,
+    {
+      displayName: 'Bar plot',
+      description:
+        'One bar per category from a single numeric value (data.bars).',
+      dataShape: 'category-values',
+      defaultSize: DEFAULT_DRAWER_SIZE,
+      optionsSchema: NO_DRAWER_OPTIONS,
+    },
+    ({ data }) => barModelFromBars(data),
+  )
+  registerFeatureChartDrawer(
+    'histogram',
+    histogramPlotDrawer,
+    {
+      displayName: 'Histogram',
+      description:
+        'Frequency histogram of one numeric series, with automatic binning (data.values).',
+      dataShape: 'values',
+      defaultSize: DEFAULT_DRAWER_SIZE,
+      optionsSchema: NO_DRAWER_OPTIONS,
+    },
+    ({ data }) => histogramModelFromValues(data),
+  )
   // The declarative renderer. Its shape depends on `renderer.spec`, so it declares
   // `any`; `SPEC.md` is the contract. It reads no `drawerOptions`: styling for a
   // spec chart lives in `spec.style`.

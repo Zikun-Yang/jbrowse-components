@@ -1,8 +1,8 @@
 # Chart spec v1 (frozen vocabulary)
 
-`spec` is a **declarative chart description**: JSON in the track config, no code.
-A config says *what* to draw; the painters live in this plugin. This is the
-supported way to get a chart that the five built-in drawers do not cover,
+`spec` is a **declarative chart description**: JSON in the track config, no
+code. A config says _what_ to draw; the painters live in this plugin. This is
+the supported way to get a chart that the five built-in drawers do not cover,
 without forking JBrowse and without a plugin.
 
 ```json
@@ -28,19 +28,20 @@ added, meanings never change. Read §9 before proposing an extension.
 ## 1. Vocabulary (v1)
 
 Four `kind` values, four `data.form` values, five legal combinations — one per
-existing built-in drawer, so **v1 draws nothing that could not be drawn before**:
+existing built-in drawer, so **v1 draws nothing that could not be drawn
+before**:
 
-| `kind`      | allowed `data.form` | equivalent legacy drawer | what it draws                                    |
-| ----------- | ------------------- | ------------------------ | ------------------------------------------------ |
-| `box`       | `grouped-values`    | `rawBoxPlot`             | box + 1.5×IQR whiskers from raw observations      |
-| `box`       | `summary-stats`     | `precomputedBoxPlot`     | box from precomputed five-number summaries        |
-| `violin`    | `grouped-values`    | `rawViolinPlot`          | kernel density violin from raw observations       |
-| `bar`       | `category-values`   | `barPlot`                | one bar per category, one number each             |
-| `histogram` | `values`            | `histogram`              | binned frequency of one flat numeric series       |
+| `kind`      | allowed `data.form` | equivalent legacy drawer | what it draws                                |
+| ----------- | ------------------- | ------------------------ | -------------------------------------------- |
+| `box`       | `grouped-values`    | `rawBoxPlot`             | box + 1.5×IQR whiskers from raw observations |
+| `box`       | `summary-stats`     | `precomputedBoxPlot`     | box from precomputed five-number summaries   |
+| `violin`    | `grouped-values`    | `rawViolinPlot`          | kernel density violin from raw observations  |
+| `bar`       | `category-values`   | `barPlot`                | one bar per category, one number each        |
+| `histogram` | `values`            | `histogram`              | binned frequency of one flat numeric series  |
 
 Any other combination is an **error**, not a silent downgrade. The validator
-answers with the exact `path`, the `allowed` list and the keys that were actually
-present (§7).
+answers with the exact `path`, the `allowed` list and the keys that were
+actually present (§7).
 
 There is exactly one spelling per term: **kebab-case**, in configs, in the
 drawer catalog (`dataShape`) and in error messages. `groupedValues` is not
@@ -62,16 +63,33 @@ The form is the shape of the data itself; there is no selector language.
 { "tissues": { "Brain": [35.06, 36.33, 43.78], "Liver": [6.46, 9.76, 15.41] } }
 ```
 
-**`summary-stats`** — array of five-number summaries (`name` + `min`/`q1`/`median`/`q3`/`max`):
+**`summary-stats`** — array of five-number summaries (`name` +
+`min`/`q1`/`median`/`q3`/`max`):
 
 ```json
-{ "boxes": [{ "name": "Brain", "min": 40.13, "q1": 41.49, "median": 49.99, "q3": 53.38, "max": 54.58 }] }
+{
+  "boxes": [
+    {
+      "name": "Brain",
+      "min": 40.13,
+      "q1": 41.49,
+      "median": 49.99,
+      "q3": 53.38,
+      "max": 54.58
+    }
+  ]
+}
 ```
 
 **`category-values`** — array of `{ name, value }`:
 
 ```json
-{ "bars": [{ "name": "Brain", "value": 42 }, { "name": "Liver", "value": 18 }] }
+{
+  "bars": [
+    { "name": "Brain", "value": 42 },
+    { "name": "Liver", "value": 18 }
+  ]
+}
 ```
 
 **`values`** — one flat array of numbers (no categories):
@@ -92,12 +110,12 @@ never an exception (§7).
 
 Dot notation pointing at the form inside the row's `data` JSON:
 
-| `path`             | resolves to                                    |
-| ------------------ | ---------------------------------------------- |
-| `""` or omitted    | the `data` object itself (root)                |
-| `"tissues"`        | `data.tissues`                                 |
-| `"payload.by.tissue"` | `data.payload.by.tissue`                    |
-| `"rows.0.values"`  | `data.rows[0].values` (numeric = array index)  |
+| `path`                | resolves to                                   |
+| --------------------- | --------------------------------------------- |
+| `""` or omitted       | the `data` object itself (root)               |
+| `"tissues"`           | `data.tissues`                                |
+| `"payload.by.tissue"` | `data.payload.by.tissue`                      |
+| `"rows.0.values"`     | `data.rows[0].values` (numeric = array index) |
 
 That is the whole grammar. No wildcards, no expressions, no JSONPath
 (`$..values` is an error, and it says so). A path that does not resolve reports
@@ -106,14 +124,14 @@ what makes "shape mismatch" debuggable without reading source code.
 
 ## 4. `style`
 
-| field         | type   | applies to         | notes                                                          |
-| ------------- | ------ | ------------------ | -------------------------------------------------------------- |
-| `colorScheme` | string | all kinds          | `tableau10` (default), `viridis`, `set2`, `dark2`, `blues`      |
-| `bins`        | number | `histogram` only    | integer 1–100, default 10                                       |
+| field         | type   | applies to       | notes                                                      |
+| ------------- | ------ | ---------------- | ---------------------------------------------------------- |
+| `colorScheme` | string | all kinds        | `tableau10` (default), `viridis`, `set2`, `dark2`, `blues` |
+| `bins`        | number | `histogram` only | integer 1–100, default 10                                  |
 
 `style.colorScheme` wins over the renderer's `colorScheme` slot; when it is
-absent the renderer slot applies. Unknown palette names fall back to
-`tableau10` and warn once (the same rule as the renderer slot).
+absent the renderer slot applies. Unknown palette names fall back to `tableau10`
+and warn once (the same rule as the renderer slot).
 
 Deliberately absent in v1: per-item `color` (the palette covers it; the legacy
 `precomputedBoxPlot`/`barPlot` data may still carry `color` per entry),
@@ -122,9 +140,9 @@ change anything is a dead config — WP0 had to remove one of those).
 
 ## 5. `axes`
 
-| field    | type   | notes                                                       |
-| -------- | ------ | ----------------------------------------------------------- |
-| `yLabel` | string | rotated label on the left edge; ~14px extra left margin      |
+| field    | type   | notes                                                   |
+| -------- | ------ | ------------------------------------------------------- |
+| `yLabel` | string | rotated label on the left edge; ~14px extra left margin |
 
 `yLabel` is the only thing v1 adds to what the old painters could draw. With no
 `yLabel`, a spec chart is pixel-identical to its legacy equivalent; with one,
@@ -150,7 +168,11 @@ Update BioSeek / JBrowse to render this chart.
 1. Box plot from raw observations, one group per tissue:
 
 ```json
-{ "specVersion": 1, "kind": "box", "data": { "form": "grouped-values", "path": "tissues" } }
+{
+  "specVersion": 1,
+  "kind": "box",
+  "data": { "form": "grouped-values", "path": "tissues" }
+}
 ```
 
 2. Box plot from precomputed statistics, with a unit label:
@@ -178,7 +200,11 @@ Update BioSeek / JBrowse to render this chart.
 4. Bar plot of one number per category:
 
 ```json
-{ "specVersion": 1, "kind": "bar", "data": { "form": "category-values", "path": "bars" } }
+{
+  "specVersion": 1,
+  "kind": "bar",
+  "data": { "form": "category-values", "path": "bars" }
+}
 ```
 
 5. Histogram of one flat series, 16 bins:
@@ -196,7 +222,11 @@ Update BioSeek / JBrowse to render this chart.
 6. A **wrong** spec, and what it reports (this is an acceptance test):
 
 ```json
-{ "specVersion": 1, "kind": "violin", "data": { "form": "summary-stats", "path": "boxes" } }
+{
+  "specVersion": 1,
+  "kind": "violin",
+  "data": { "form": "summary-stats", "path": "boxes" }
+}
 ```
 
 ```
@@ -223,18 +253,19 @@ Invalid chart spec: spec.kind "violin" does not accept data.form "summary-stats"
   combination) are detected once per render: the canvas draws a placeholder
   across the render width and the RPC result carries `specError`, exactly like
   the unknown-drawer case in WP0/WP2.
-- **Data** errors (the path does not resolve in *this* feature's payload) are
+- **Data** errors (the path does not resolve in _this_ feature's payload) are
   per chart: that chart gets a small placeholder with the first error; other
   charts on the track keep painting.
-- The maximize dialog lists **all** errors in an MUI `Alert`, not just the first.
+- The maximize dialog lists **all** errors in an MUI `Alert`, not just the
+  first.
 - Nothing here fails a track. In the RPC worker a throw is not caught per chart;
   it marks the whole track as errored.
 
 ## 9. Evolution rules (v1 → later)
 
 1. **Additive only.** New optional fields, new `kind` values, new `form` values.
-   An existing field never changes meaning, and a `specVersion: 1` document keeps
-   parsing and rendering identically in every later build.
+   An existing field never changes meaning, and a `specVersion: 1` document
+   keeps parsing and rendering identically in every later build.
 2. **A new `kind` needs a canvas painter in the same change.** The rule that
    produced v1 stays in force: a kind that only Plotly can draw would paint
    nothing in the track and show a chart in the dialog — exactly the
@@ -242,37 +273,46 @@ Invalid chart spec: spec.kind "violin" does not accept data.form "summary-stats"
 3. **`transform` (data expressions) is not added until a real dataset cannot be
    expressed with the four forms.** TSV producers already write one of the four
    shapes (`precomputedBoxPlot` exists precisely because someone did); adding a
-   worker-side expression evaluator buys nothing today and costs an error surface.
+   worker-side expression evaluator buys nothing today and costs an error
+   surface.
 4. **Multi-series** arrives as an optional array field (`series[]`) with the
-   single-series document meaning "one series". The internal `ChartModel` already
-   keeps a length-1 `series` array for this reason, so consumers do not break.
+   single-series document meaning "one series". The internal `ChartModel`
+   already keeps a length-1 `series` array for this reason, so consumers do not
+   break.
 5. **Nothing is removed.** A field that turns out to be a bad idea is deprecated
    in the docs, kept parsing, and stops being rendered only when a major version
    bump lands with a migration note.
 
 Trigger table (unchanged from the WP3 decision):
 
-| Excluded                 | Why                                                                                       | When                                                       |
-| ------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `scatter` / `line`       | no canvas painter today; Plotly-only kinds paint nothing in the track                     | with a canvas painter (v1.1)                               |
-| `transform` / `jexl:`    | no dataset needs it; adds worker-side evaluation and error surface                        | first dataset the four forms cannot express                |
-| multi-series / `series[]`| every painter is a single `scaleBand`; drawing only the first series is silently wrong     | when a painter supports grouping (additive field)          |
-| `heatmap` / `matrix`     | no painter                                                                                | v1.2 candidate                                             |
-| `title`                  | the track already shows the name; a title in a 120px chart is noise                        | never                                                      |
-| per-item `color`         | the palette covers it; legacy drawers still honour `color` in their own data               | a real request with a real config                          |
+| Excluded                  | Why                                                                                    | When                                              |
+| ------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `scatter` / `line`        | no canvas painter today; Plotly-only kinds paint nothing in the track                  | with a canvas painter (v1.1)                      |
+| `transform` / `jexl:`     | no dataset needs it; adds worker-side evaluation and error surface                     | first dataset the four forms cannot express       |
+| multi-series / `series[]` | every painter is a single `scaleBand`; drawing only the first series is silently wrong | when a painter supports grouping (additive field) |
+| `heatmap` / `matrix`      | no painter                                                                             | v1.2 candidate                                    |
+| `title`                   | the track already shows the name; a title in a 120px chart is noise                    | never                                             |
+| per-item `color`          | the palette covers it; legacy drawers still honour `color` in their own data           | a real request with a real config                 |
 
 ## 10. Renderer support
 
-| renderer                    | `drawer: "spec"`                                                        |
-| --------------------------- | ----------------------------------------------------------------------- |
-| `FeatureChartRenderer`      | supported — in the RPC worker, like every other drawer                   |
-| `FeatureChartPlotlyRenderer`| **not supported yet.** Renders an explicit warning; it does not fake it. |
+| renderer                     | `drawer: "spec"`                                |
+| ---------------------------- | ----------------------------------------------- |
+| `FeatureChartRenderer`       | supported — canvas, in the RPC worker           |
+| `FeatureChartPlotlyRenderer` | supported — same model, interactive, exportable |
 
-The Plotly backend has its **own** data contract (it reads
-`{ "<category>": number[] | number }` or `{ x, y }` straight off `data` and has
-no notion of `tissues`/`boxes`/`bars`/`values`). Unifying the two backends is
-WP4; until then the two contracts are documented separately and neither pretends
-to understand the other.
+Both backends run the same validator and the same `normalizeFromSpec()`, so a
+spec chart has the same categories, values, colours and axis window in the track
+and in the maximized interactive view (WP4). Plotly is not a second vocabulary:
+its deprecated `plotType` knob compiles to `spec.kind` (see
+[`FeatureChartTrack.md`](./FeatureChartTrack.md) §4.2), and the two kinds it
+still supports without a model — `scatter` and `line` — have no canvas painter
+and are therefore outside this spec (removed in v2).
+
+There is still one honest difference: Plotly and canvas compute their own
+margins and font metrics, so the same chart is not pixel-identical between the
+two backends. The contract is the _model_, not the pixels; visual parity is
+sampled, not asserted.
 
 ## 11. Minimal JSON Schema (for agents)
 
@@ -295,7 +335,12 @@ reports, before the config is ever loaded.
       "additionalProperties": false,
       "properties": {
         "form": {
-          "enum": ["grouped-values", "summary-stats", "category-values", "values"]
+          "enum": [
+            "grouped-values",
+            "summary-stats",
+            "category-values",
+            "values"
+          ]
         },
         "path": { "type": "string", "pattern": "^$|^[^.[\\]]+(\\.[^.[\\]]+)*$" }
       }
@@ -321,7 +366,11 @@ reports, before the config is ever loaded.
       "if": { "properties": { "kind": { "const": "box" } } },
       "then": {
         "properties": {
-          "data": { "properties": { "form": { "enum": ["grouped-values", "summary-stats"] } } }
+          "data": {
+            "properties": {
+              "form": { "enum": ["grouped-values", "summary-stats"] }
+            }
+          }
         }
       }
     },
@@ -355,16 +404,16 @@ reports, before the config is ever loaded.
 
 ## 12. Where this is implemented
 
-| concern                                   | file                                                     |
-| ----------------------------------------- | -------------------------------------------------------- |
-| vocabulary, legality matrix, validator    | `src/FeatureChartDrawer/chartSpec.ts`                    |
-| normalized model, stable hash             | `src/FeatureChartDrawer/chartModel.ts`                   |
-| painters (one per `kind`)                 | `src/FeatureChartDrawer/painters.ts`                     |
-| legacy drawers → model adapters           | `src/FeatureChartDrawer/legacyDrawers.ts`                |
-| `spec` config slot, `drawer: "spec"` pool | `src/renderSettings.ts`, `src/FeatureChartRenderer/*`     |
+| concern                                   | file                                                  |
+| ----------------------------------------- | ----------------------------------------------------- |
+| vocabulary, legality matrix, validator    | `src/FeatureChartDrawer/chartSpec.ts`                 |
+| normalized model, stable hash             | `src/FeatureChartDrawer/chartModel.ts`                |
+| painters (one per `kind`)                 | `src/FeatureChartDrawer/painters.ts`                  |
+| legacy drawers → model adapters           | `src/FeatureChartDrawer/legacyDrawers.ts`             |
+| `spec` config slot, `drawer: "spec"` pool | `src/renderSettings.ts`, `src/FeatureChartRenderer/*` |
 
 Tests that pin this document: `chartSpec.test.ts` (forms, legality matrix, the
-four error classes), `chartModel.test.ts` (stable hash),
-`painters.test.ts` (yLabel margins, empty input),
-`specEquivalence.test.ts` (every legacy drawer == its spec preset, pixel for
-pixel), `demoDataContract.test.ts` (the shipped demo spec tracks render).
+four error classes), `chartModel.test.ts` (stable hash), `painters.test.ts`
+(yLabel margins, empty input), `specEquivalence.test.ts` (every legacy drawer ==
+its spec preset, pixel for pixel), `demoDataContract.test.ts` (the shipped demo
+spec tracks render).

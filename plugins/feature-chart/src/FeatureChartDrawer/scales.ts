@@ -83,6 +83,8 @@ export function scaleBand(): BandScale {
 
 export interface LinearScale {
   (value: number): number
+  /** d3 semantics: no argument reads the domain, one argument sets it. */
+  domain(): [number, number]
   domain(domain: [number, number]): LinearScale
   range(range: [number, number]): LinearScale
   /** Round the domain outward to visually nice values (d3 default: 10 ticks). */
@@ -142,10 +144,15 @@ export function scaleLinear(): LinearScale {
     return r0 + ((value - d0) / (d1 - d0)) * (r1 - r0)
   }) as LinearScale
 
-  scale.domain = nextDomain => {
+  scale.domain = ((nextDomain?: [number, number]) => {
+    if (nextDomain === undefined) {
+      // Read path (d3-compatible). WP4 needs it to report the *nicked* domain
+      // after `.nice()`, so both backends can pin the same axis window.
+      return domain
+    }
     domain = nextDomain
     return scale
-  }
+  }) as LinearScale['domain']
   scale.range = nextRange => {
     range = nextRange
     return scale

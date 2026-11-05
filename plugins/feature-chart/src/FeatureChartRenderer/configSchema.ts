@@ -103,6 +103,25 @@ const FeatureChartRenderer = ConfigurationSchema(
 
     /**
      * #slot
+     * Keep one offscreen canvas per chart and blit it on pan/zoom instead of
+     * repainting (`pan` is the hot path: the whole view re-renders on every
+     * frame). The cache key includes the feature, the normalized model, the
+     * chart size, the device pixel ratio, the resolved theme/palette and
+     * `drawer` + `drawerOptions`, so changing any of those repaints instead of
+     * showing a stale chart. Ignored on runtimes without `OffscreenCanvas` or
+     * `<canvas>`, where the renderer paints directly.
+     *
+     * Defaults to `true`: the benchmark in the WP4 report shows the p95 repaint
+     * dropping by more than half for a 300-chart view. Set it to `false` to get
+     * the pre-WP4 direct-paint path (the rollback switch).
+     */
+    renderCache: {
+      type: 'boolean',
+      defaultValue: true,
+    },
+
+    /**
+     * #slot
      * Palette used by the built-in drawers. One of `tableau10`, `viridis`,
      * `set2`, `dark2`, `blues` (see `listColorSchemeNames()`).
      */

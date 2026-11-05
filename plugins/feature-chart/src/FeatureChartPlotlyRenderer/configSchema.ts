@@ -36,6 +36,33 @@ const FeatureChartPlotlyRenderer = ConfigurationSchema(
 
     /**
      * #slot
+     * **Deprecated.** Kept as a compatibility alias for `spec.kind`, so a track
+     * written before the two backends were unified keeps rendering. It is only
+     * consulted when `drawer` is left at its default; any explicit `drawer`
+     * (including `"spec"`) wins, and using `plotType` logs one deprecation
+     * warning with the equivalent spec.
+     *
+     * Migration:
+     *
+     * ```json
+     * // before
+     * { "type": "FeatureChartPlotlyRenderer", "plotType": "violin" }
+     *
+     * // after
+     * {
+     *   "type": "FeatureChartPlotlyRenderer",
+     *   "drawer": "spec",
+     *   "spec": {
+     *     "specVersion": 1,
+     *     "kind": "violin",
+     *     "data": { "form": "grouped-values", "path": "tissues" }
+     *   }
+     * }
+     * ```
+     *
+     * `scatter` and `line` have no `ChartModel` in the v1 vocabulary (no canvas
+     * painter exists for them); they keep their legacy Plotly rendering under
+     * the same warning and are removed in v2.
      */
     plotType: {
       type: 'stringEnum',
@@ -59,10 +86,8 @@ const FeatureChartPlotlyRenderer = ConfigurationSchema(
 
     /**
      * #slot
-     * Per-drawer options (`DrawerProps.options`). Accepted here so a track can
-     * switch between this renderer and `FeatureChartRenderer` without losing
-     * its configuration. The Plotly backend does not consume drawers yet (see
-     * ARCHITECTURE.md, WP4): the slot is carried, not applied.
+     * Per-drawer options (`DrawerProps.options`), passed to the same drawer
+     * model builder the canvas renderer uses (see `drawerRegistry.ts`).
      */
     drawerOptions: {
       type: 'frozen',
@@ -71,16 +96,25 @@ const FeatureChartPlotlyRenderer = ConfigurationSchema(
 
     /**
      * #slot
-     * Declarative chart description (`plugins/feature-chart/SPEC.md`). Accepted
-     * on this renderer so switching renderers keeps a track's configuration
-     * intact, but **the Plotly backend does not render specs yet**: with
-     * `drawer: "spec"` it shows an explicit "not supported here" warning
-     * instead of pretending (unifying both backends is WP4). Use
-     * `FeatureChartRenderer` for spec charts.
+     * Declarative chart description (`plugins/feature-chart/SPEC.md`), rendered
+     * when `drawer` is `"spec"` — now by *both* backends, from the same
+     * normalized `ChartModel`, so a spec chart looks the same in a track and in
+     * the interactive/maximized view.
      */
     spec: {
       type: 'frozen',
       defaultValue: {},
+    },
+
+    /**
+     * #slot
+     * Accepted so a track can switch between `FeatureChartRenderer` and this
+     * renderer without losing configuration. Plotly keeps its own plot
+     * instances (no canvas blitting), so this slot has no effect here.
+     */
+    renderCache: {
+      type: 'boolean',
+      defaultValue: true,
     },
   },
   { explicitlyTyped: true },

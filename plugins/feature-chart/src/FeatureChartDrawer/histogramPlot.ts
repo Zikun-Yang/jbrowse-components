@@ -46,6 +46,8 @@ export function histogramModelFromValues(raw: unknown) {
   }
 }
 
-export const histogramPlotDrawer: DrawerFunction = function (props: DrawerProps) {
-  paintChartModel(props, histogramModelFromValues(props.data))
+export const histogramPlotDrawer: DrawerFunction = function (
+  props: DrawerProps,
+) {
+  paintChartModel(props, props.model ?? histogramModelFromValues(props.data))
 }

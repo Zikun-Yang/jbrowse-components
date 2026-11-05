@@ -58,5 +58,5 @@ export function barModelFromBars(raw: unknown) {
 }
 
 export const barPlotDrawer: DrawerFunction = function (props: DrawerProps) {
-  paintChartModel(props, barModelFromBars(props.data))
+  paintChartModel(props, props.model ?? barModelFromBars(props.data))
 }
