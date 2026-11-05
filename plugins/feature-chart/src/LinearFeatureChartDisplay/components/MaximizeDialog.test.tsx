@@ -155,7 +155,7 @@ describe('MaximizeDialog', () => {
     )
 
     const alert = await screen.findByTestId('feature-chart-spec-error')
-    const text = alert.textContent ?? ''
+    const text = alert.textContent
     // both the illegal combination and the unknown palette, not just the first
     expect(text).toContain('2 problems')
     expect(text).toContain('spec.data.form')
