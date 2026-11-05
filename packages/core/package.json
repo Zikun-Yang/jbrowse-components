@@ -99,6 +99,7 @@
     "./util/colord": "./src/util/colord.ts",
     "./util/compositeMap": "./src/util/compositeMap.ts",
     "./util/convertCodingSequenceToPeptides": "./src/util/convertCodingSequenceToPeptides.ts",
+    "./util/devMode": "./src/util/devMode.ts",
     "./util/flatbush": "./src/util/flatbush/index.ts",
     "./util/formatFastaStrings": "./src/util/formatFastaStrings.ts",
     "./util/io": "./src/util/io/index.ts",
@@ -508,6 +509,10 @@
         "types": "./esm/util/convertCodingSequenceToPeptides.d.ts",
         "import": "./esm/util/convertCodingSequenceToPeptides.js"
       },
+      "./util/devMode": {
+        "types": "./esm/util/devMode.d.ts",
+        "import": "./esm/util/devMode.js"
+      },
       "./util/flatbush": {
         "types": "./esm/util/flatbush/index.d.ts",
         "import": "./esm/util/flatbush/index.js"
@@ -879,6 +884,9 @@
         ],
         "util/convertCodingSequenceToPeptides": [
           "esm/util/convertCodingSequenceToPeptides.d.ts"
+        ],
+        "util/devMode": [
+          "esm/util/devMode.d.ts"
         ],
         "util/flatbush": [
           "esm/util/flatbush/index.d.ts"
