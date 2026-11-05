@@ -2,11 +2,11 @@ import Plugin from '@jbrowse/core/Plugin'
 
 import FeatureChartAdapterF from './FeatureChartAdapter/index.ts'
 import { initBuiltInDrawers } from './FeatureChartDrawer/drawerRegistry.ts'
-import { installFeatureChartAgentSurface } from './agentSurface.ts'
 import FeatureChartPlotlyRendererF from './FeatureChartPlotlyRenderer/index.ts'
 import FeatureChartRendererF from './FeatureChartRenderer/index.ts'
 import FeatureChartTrackF from './FeatureChartTrack/index.ts'
 import LinearFeatureChartDisplayF from './LinearFeatureChartDisplay/index.ts'
+import { installFeatureChartAgentSurface } from './agentSurface.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 

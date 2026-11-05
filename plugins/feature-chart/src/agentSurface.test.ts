@@ -5,18 +5,18 @@ import PluginManager from '@jbrowse/core/PluginManager'
 import LinearGenomeViewPlugin from '@jbrowse/plugin-linear-genome-view'
 
 import {
-  FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
-  clearFeatureChartDrawerCache,
-  initBuiltInDrawers,
-  listFeatureChartDrawerCatalog,
-} from './FeatureChartDrawer/drawerRegistry.ts'
-import {
   CHART_SPEC_SCHEMA_EXTENSION_POINT,
   chartSpecSchema,
 } from './FeatureChartDrawer/chartSpecSchema.ts'
+import {
+  FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
+  clearFeatureChartDrawerCache,
+  initBuiltInDrawers,
+} from './FeatureChartDrawer/drawerRegistry.ts'
 import { installFeatureChartAgentSurface } from './agentSurface.ts'
 import FeatureChartPlugin from './index.ts'
 
+import type { FeatureChartDrawerCatalogEntry } from './FeatureChartDrawer/drawerRegistry.ts'
 import type { DrawerFunction } from './FeatureChartDrawer/types.ts'
 import type { PluginConstructor } from '@jbrowse/core/Plugin'
 
@@ -73,10 +73,7 @@ describe('chartSpecSchema', () => {
     })
     expect(schema.bins).toEqual({ min: 1, max: 100, default: 10 })
     expect(schema.colorSchemes.length).toBeGreaterThan(0)
-    const properties = schema.properties as Record<
-      string,
-      { enum?: unknown[] }
-    >
+    const properties = schema.properties as Record<string, { enum?: unknown[] }>
     expect(properties.kind?.enum).toEqual(schema.kinds)
     expect(properties.data).toBeDefined()
   })
@@ -104,7 +101,7 @@ describe('agent surface extension points', () => {
     const catalog = pluginManager.evaluateExtensionPoint(
       FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
       [],
-    ) as ReturnType<typeof listFeatureChartDrawerCatalog>
+    ) as FeatureChartDrawerCatalogEntry[]
 
     // every built-in is listed, flagged as shipped-with-the-plugin
     const names = catalog.map(entry => entry.name)
@@ -132,7 +129,7 @@ describe('agent surface extension points', () => {
     const catalog = pluginManager.evaluateExtensionPoint(
       FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
       [],
-    ) as ReturnType<typeof listFeatureChartDrawerCatalog>
+    ) as FeatureChartDrawerCatalogEntry[]
 
     expect(catalog.find(entry => entry.name === 'fake/heatmap')).toMatchObject({
       name: 'fake/heatmap',
@@ -146,7 +143,7 @@ describe('agent surface extension points', () => {
     const catalog = pluginManager.evaluateExtensionPoint(
       FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
       [],
-    ) as ReturnType<typeof listFeatureChartDrawerCatalog>
+    ) as FeatureChartDrawerCatalogEntry[]
 
     // the entry stays, but the implementation users get is the plugin's
     expect(catalog.filter(entry => entry.name === 'barPlot')).toHaveLength(1)
@@ -166,7 +163,10 @@ describe('agent surface extension points', () => {
     // this is what the SDK uses to tell "plugin not loaded" from "no drawers"
     const bare = new PluginManager([]).createPluggableElements().configure()
     expect(
-      bare.evaluateExtensionPoint(FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT, []),
+      bare.evaluateExtensionPoint(
+        FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
+        [],
+      ),
     ).toEqual([])
     expect(
       bare.evaluateExtensionPoint(CHART_SPEC_SCHEMA_EXTENSION_POINT, null),

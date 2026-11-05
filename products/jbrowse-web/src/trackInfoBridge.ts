@@ -2,8 +2,8 @@ import { resolveTrackInfo } from '@jbrowse/product-core'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
-import type { ResolvedTrackInfo } from '@jbrowse/product-core'
 import type { AbstractSessionModel } from '@jbrowse/core/util'
+import type { ResolvedTrackInfo } from '@jbrowse/product-core'
 
 declare global {
   interface Window {

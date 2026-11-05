@@ -250,8 +250,8 @@ pluginManager.addToExtensionPoint(
 )
 ```
 
-See also: [`formatAbout.info`](/docs/config/FormatAbout) on the track and on the
-root config.
+See also: [`formatAbout.info`](/docs/config/formatabout/) on the track and on
+the root config.
 
 ### Core-replaceWidget
 
@@ -820,9 +820,9 @@ avoid collisions.
 
 ## Extension points provided by JBrowse plugins
 
-| Extension point           | Producer                        | Contract                                                                                                                                                |
-| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Core-featureChartDrawer` | `@jbrowse/plugin-feature-chart` | Receives the registered drawer list, returns the full list. Append with `[...drawers, myDrawer]`. See [feature chart drawers](./feature_chart_drawers). |
+| Extension point           | Producer                        | Contract                                                                                                                                                                      |
+| ------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Core-featureChartDrawer` | `@jbrowse/plugin-feature-chart` | Receives the registered drawer list, returns the full list. Append with `[...drawers, myDrawer]`. See [feature chart drawers](/docs/developer_guides/feature_chart_drawers/). |
 
 The `Core-featureChartDrawer` extension point is evaluated per `PluginManager`
 and cached, so a drawer contributed here is visible both on the main thread and

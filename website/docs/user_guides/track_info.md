@@ -122,8 +122,8 @@ at, not the markdown.
 
 ## Reading it as an agent
 
-`@jbrowse/agent-sdk` exposes the same rendered text through the
-[tracks API](https://github.com/GMOD/jbrowse-components/blob/main/products/jbrowse-agent/README.md):
+`@jbrowse/agent-sdk` exposes the same rendered text through its tracks API (see
+`products/jbrowse-agent/README.md` in the repository):
 
 ```js
 const track = await jbrowse.track('gtex_tpm')

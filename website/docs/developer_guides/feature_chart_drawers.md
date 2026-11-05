@@ -10,11 +10,11 @@ version in the maximize dialog. **A "drawer" is the function that paints one
 chart.** This page is the contract for writing your own and shipping it as a
 plugin, without forking JBrowse.
 
-Read [`FeatureChartTrack`](../config/FeatureChartTrack) for the TSV data format,
-the built-in drawer list and config examples, and
+Read [`FeatureChartTrack`](/docs/config/featurecharttrack/) for the TSV data
+format, the built-in drawer list and config examples, and
 `plugins/feature-chart/ARCHITECTURE.md` in the repository for the internal
 design. Coming from a pre-WP4 config? See
-[Migrating feature chart configs](./feature_chart_migration).
+[Migrating feature chart configs](/docs/developer_guides/feature_chart_migration/).
 
 ## Three ways to change what a chart looks like
 
@@ -28,7 +28,8 @@ design. Coming from a pre-WP4 config? See
 The `spec` row is the declarative one —
 `{"kind": "box", "data": {"form": "grouped-values", "path": "tissues"}}` instead
 of a drawer name. It covers what the five built-in drawers cover, with no code
-in the config; see [Feature chart specs](./feature_chart_specs).
+in the config; see
+[Feature chart specs](/docs/developer_guides/feature_chart_specs/).
 
 This page is the last row.
 
@@ -135,8 +136,8 @@ no model (it never guesses). Returning a model costs ~15 lines and buys the
 interactive view, zoom and PNG/SVG export.
 
 The model shape (and the four `data.form` values) is documented in
-[Feature chart specs](./feature_chart_specs.md); `dataShape` in your catalog
-entry should use the same vocabulary.
+[Feature chart specs](/docs/developer_guides/feature_chart_specs.md);
+`dataShape` in your catalog entry should use the same vocabulary.
 
 ## Contributing a drawer from a plugin
 
@@ -277,10 +278,10 @@ The catalog is published as **data**, not only as a function, so callers that
 cannot import this package can still enumerate it. The plugin registers two
 extension points during `install()`:
 
-| extension point                  | payload                                                                                                       |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `Core-featureChartDrawerCatalog` | `listFeatureChartDrawerCatalog(pluginManager)` — the catalog rows plus `builtin`                              |
-| `Core-featureChartSpecSchema`    | `chartSpecSchema()` — the v1 spec vocabulary (see the [chart spec reference](/docs/config_guides/chart_spec)) |
+| extension point                  | payload                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `Core-featureChartDrawerCatalog` | `listFeatureChartDrawerCatalog(pluginManager)` — the catalog rows plus `builtin`                               |
+| `Core-featureChartSpecSchema`    | `chartSpecSchema()` — the v1 spec vocabulary (see the [chart spec reference](/docs/config_guides/chart_spec/)) |
 
 ```js
 // inside a script executed by jbrowse-agent: no imports, no bundler
@@ -409,7 +410,7 @@ The same message appears in the maximize dialog as an `Alert`, so a broken
   affordance, so prefer a drawer unless you really need interactivity.
 - **A chart the built-ins cannot express but the spec vocabulary can** →
   `renderer.drawer: "spec"` plus a `spec` block; no code, no plugin. See
-  [Feature chart specs](./feature_chart_specs).
+  [Feature chart specs](/docs/developer_guides/feature_chart_specs/).
 - **A chart kind the built-ins cannot express and you want it in every track** →
   a drawer is still the right unit; a first-class `DrawerType`
   (`pluginManager.addDrawerType`) is deliberately not implemented yet. It

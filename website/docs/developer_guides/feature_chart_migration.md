@@ -128,12 +128,12 @@ messages.
 
 ## 5. New slots (nothing to migrate, but worth knowing)
 
-| slot            | since | what it does                                                                                                        |
-| --------------- | ----- | ------------------------------------------------------------------------------------------------------------------- |
-| `drawerOptions` | WP2   | arbitrary JSON handed to the drawer (`DrawerProps.options`); not validated, the drawer clamps.                      |
-| `spec`          | WP3   | declarative chart, read only when `drawer: "spec"`. See the [chart spec reference](/docs/config_guides/chart_spec). |
-| `renderCache`   | WP4   | reuses the painted chart between re-renders (keyed on data, size, DPR, theme, drawer options).                      |
-| `colorScheme`   | WP1   | palette for the built-in drawers; the Plotly backend honours it too.                                                |
+| slot            | since | what it does                                                                                                         |
+| --------------- | ----- | -------------------------------------------------------------------------------------------------------------------- |
+| `drawerOptions` | WP2   | arbitrary JSON handed to the drawer (`DrawerProps.options`); not validated, the drawer clamps.                       |
+| `spec`          | WP3   | declarative chart, read only when `drawer: "spec"`. See the [chart spec reference](/docs/config_guides/chart_spec/). |
+| `renderCache`   | WP4   | reuses the painted chart between re-renders (keyed on data, size, DPR, theme, drawer options).                       |
+| `colorScheme`   | WP1   | palette for the built-in drawers; the Plotly backend honours it too.                                                 |
 
 `drawerOptions` keys a drawer does not read produce a development warning (once
 per key) — that is the migration signal for a typo'd option name.
@@ -162,6 +162,7 @@ per key) — that is the migration signal for a typo'd option name.
 | `scatter`  | —           | not in v1 (legacy Plotly only, removed in v2)                  |
 | `line`     | —           | not in v1 (legacy Plotly only, removed in v2)                  |
 
-See also: [Feature chart drawers](./feature_chart_drawers),
-[Feature chart specs](./feature_chart_specs),
-[`FeatureChartTrack`](/docs/config/FeatureChartTrack).
+See also:
+[Feature chart drawers](/docs/developer_guides/feature_chart_drawers/),
+[Feature chart specs](/docs/developer_guides/feature_chart_specs/),
+[`FeatureChartTrack`](/docs/config/featurecharttrack/).

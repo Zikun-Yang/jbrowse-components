@@ -1,3 +1,5 @@
+import { isDevelopmentBuild } from '@jbrowse/core/util/devMode'
+
 import { barModelFromBars, barPlotDrawer } from './barPlot.ts'
 import {
   boxModelFromPrecomputed,
@@ -5,7 +7,6 @@ import {
   precomputedBoxPlotDrawer,
   rawBoxPlotDrawer,
 } from './boxPlot.ts'
-import { isDevelopmentBuild } from '@jbrowse/core/util/devMode'
 import {
   histogramModelFromValues,
   histogramPlotDrawer,

@@ -23,10 +23,9 @@ naming a drawer:
 
 No code in the config, so a spec can travel in a shared session or be written by
 a script or a model. This page is the table-ized reference; the normative
-contract with rationale is
-[`plugins/feature-chart/SPEC.md`](https://github.com/GMOD/jbrowse-components/blob/main/plugins/feature-chart/SPEC.md),
+contract with rationale is `plugins/feature-chart/SPEC.md` in the repository,
 and the narrative introduction is
-[Feature chart specs](../developer_guides/feature_chart_specs).
+[Feature chart specs](/docs/developer_guides/feature_chart_specs/).
 
 `spec` is read **only** when `renderer.drawer` is exactly `"spec"`.
 
@@ -176,11 +175,10 @@ validator enforces:
 | `jbrowse.chartDrawers()`    | the drawer catalog (`name`, `displayName`, `description`, `dataShape`, `builtin`)                    |
 | `jbrowse.chartDrawer(name)` | one catalog row, or `UNKNOWN_DRAWER` with the available names                                        |
 
-See the
-[agent SDK guide](https://github.com/GMOD/jbrowse-components/blob/main/products/jbrowse-agent/README.md)
-for the script-level usage, and
-[Feature chart drawers](../developer_guides/feature_chart_drawers) for writing a
-drawer instead of a spec.
+See `products/jbrowse-agent/README.md` in the repository for the script-level
+usage, and
+[Feature chart drawers](/docs/developer_guides/feature_chart_drawers/) for
+writing a drawer instead of a spec.
 
 Coming from a pre-WP4 config with `plotType`? See
-[Migrating to chart specs](../developer_guides/feature_chart_migration).
+[Migrating to chart specs](/docs/developer_guides/feature_chart_migration/).
