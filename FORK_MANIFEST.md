@@ -5,7 +5,7 @@
 Files this fork changes relative to upstream, measured from the last merged
 upstream commit `ffe7382b8`.
 
-Totals: 902 paths — added 361, modified 447, deleted 93, renamed 1.
+Totals: 925 paths — added 364, modified 467, deleted 93, renamed 1.
 
 Read this together with [FORK.md](./FORK.md), which explains the changes and
 judges what upstream would accept. Regenerate with
@@ -102,17 +102,13 @@ judges what upstream would accept. Regenerate with
 - `M` `packages/core/src/assemblyManager/assembly.ts`
 - `M` `packages/core/src/assemblyManager/assemblyConfigSchema.ts`
 - `M` `packages/core/src/BaseFeatureWidget/BaseFeatureDetail/BaseCard.tsx`
-- `M`
-  `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/dialogs/HelpDialog.tsx`
-- `M`
-  `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/dialogs/SequenceFeatureMenu.tsx`
-- `M`
-  `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/SequenceFeaturePanel.tsx`
+- `M` `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/dialogs/HelpDialog.tsx`
+- `M` `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/dialogs/SequenceFeatureMenu.tsx`
+- `M` `packages/core/src/BaseFeatureWidget/SequenceFeatureDetails/SequenceFeaturePanel.tsx`
 - `M` `packages/core/src/CorePlugin.ts`
 - `M` `packages/core/src/pluggableElementTypes/models/baseTrackConfig.ts`
 - `M` `packages/core/src/pluggableElementTypes/models/BaseTrackModel.ts`
-- `M`
-  `packages/core/src/pluggableElementTypes/models/components/SaveTrackData.tsx`
+- `M` `packages/core/src/pluggableElementTypes/models/components/SaveTrackData.tsx`
 - `M` `packages/core/src/pluggableElementTypes/ViewType.ts`
 - `M` `packages/core/src/pluggableElementTypes/WidgetType.ts`
 - `M` `packages/core/src/ReExports/list.ts`
@@ -192,16 +188,13 @@ judges what upstream would accept. Regenerate with
 - `M` `plugins/alignments/src/AlignmentsFeatureDetail/index.ts`
 - `M` `plugins/alignments/src/LinearAlignmentsDisplay/model.ts`
 - `M` `plugins/alignments/src/LinearPileupDisplay/model.ts`
-- `M`
-  `plugins/alignments/src/LinearPileupDisplay/SharedLinearPileupDisplayMixin.ts`
-- `M`
-  `plugins/alignments/src/LinearReadCloudDisplay/components/LinearReadCloudReactComponent.tsx`
+- `M` `plugins/alignments/src/LinearPileupDisplay/SharedLinearPileupDisplayMixin.ts`
+- `M` `plugins/alignments/src/LinearReadCloudDisplay/components/LinearReadCloudReactComponent.tsx`
 - `M` `plugins/alignments/src/LinearReadCloudDisplay/model.ts`
 - `M` `plugins/alignments/src/LinearReadCloudDisplay/renderSvg.tsx`
 - `M` `plugins/alignments/src/LinearSNPCoverageDisplay/components/arcUtils.ts`
 - `M` `plugins/alignments/src/LinearSNPCoverageDisplay/components/renderSvg.tsx`
-- `M`
-  `plugins/alignments/src/LinearSNPCoverageDisplay/components/SashimiArcs.tsx`
+- `M` `plugins/alignments/src/LinearSNPCoverageDisplay/components/SashimiArcs.tsx`
 - `M` `plugins/alignments/src/LinearSNPCoverageDisplay/model.ts`
 - `M` `plugins/alignments/src/PileupRenderer/components/PileupRendering.tsx`
 - `M` `plugins/alignments/src/shared/menuItems.ts`
@@ -217,8 +210,7 @@ judges what upstream would accept. Regenerate with
 ## plugins/bed (5)
 
 - `M` `plugins/bed/src/BedAdapter/__snapshots__/BedAdapter.test.ts.snap`
-- `M`
-  `plugins/bed/src/BedTabixAdapter/__snapshots__/BedTabixAdapter.test.ts.snap`
+- `M` `plugins/bed/src/BedTabixAdapter/__snapshots__/BedTabixAdapter.test.ts.snap`
 - `M` `plugins/bed/src/BigBedAdapter/__snapshots__/BigBedAdapter.test.ts.snap`
 - `M` `plugins/bed/src/util.test.ts`
 - `M` `plugins/bed/src/util.ts`
@@ -226,38 +218,25 @@ judges what upstream would accept. Regenerate with
 ## plugins/breakpoint-split-view (8)
 
 - `M` `plugins/breakpoint-split-view/package.json`
-- `M`
-  `plugins/breakpoint-split-view/src/BreakpointAlignmentsFeatureDetail/index.ts`
-- `M`
-  `plugins/breakpoint-split-view/src/BreakpointSplitView/components/ExportSvgDialog.tsx`
-- `M`
-  `plugins/breakpoint-split-view/src/BreakpointSplitView/components/Header.tsx`
+- `M` `plugins/breakpoint-split-view/src/BreakpointAlignmentsFeatureDetail/index.ts`
+- `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/components/ExportSvgDialog.tsx`
+- `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/components/Header.tsx`
 - `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/index.ts`
 - `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/model.ts`
-- `M`
-  `plugins/breakpoint-split-view/src/BreakpointSplitView/svgcomponents/SVGBreakpointSplitView.tsx`
+- `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/svgcomponents/SVGBreakpointSplitView.tsx`
 - `M` `plugins/breakpoint-split-view/src/BreakpointSplitView/types.ts`
 
 ## plugins/canvas (32)
 
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-compact-display-mode-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-gene-with-multiple-transcripts-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-gene-with-transcript-and-cds-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-longest-transcript-mode-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-multiple-overlapping-features-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-reduced-representation-mode-with-gene-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-simple-box-feature-rendering-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-transcript-arrows-on-forward-and-reverse-strand-1-snap.png`
-- `M`
-  `plugins/canvas/src/CanvasFeatureRenderer/__snapshots__/CanvasFeatureRenderer.test.ts.snap`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-compact-display-mode-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-gene-with-multiple-transcripts-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-gene-with-transcript-and-cds-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-longest-transcript-mode-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-multiple-overlapping-features-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-reduced-representation-mode-with-gene-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-simple-box-feature-rendering-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__image_snapshots__/canvas-feature-renderer-test-ts-canvas-feature-renderer-canvas-snapshots-transcript-arrows-on-forward-and-reverse-strand-1-snap.png`
+- `M` `plugins/canvas/src/CanvasFeatureRenderer/__snapshots__/CanvasFeatureRenderer.test.ts.snap`
 - `M` `plugins/canvas/src/CanvasFeatureRenderer/CanvasFeatureRenderer.test.ts`
 - `M` `plugins/canvas/src/CanvasFeatureRenderer/CanvasFeatureRendering.tsx`
 - `A` `plugins/canvas/src/CanvasFeatureRenderer/colorScheme.test.ts`
@@ -295,109 +274,65 @@ judges what upstream would accept. Regenerate with
 
 ## plugins/comparative-adapters (7)
 
-- `M`
-  `plugins/comparative-adapters/src/ComparativeAddTrackComponent/ComparativeAddTrackComponent.tsx`
-- `M`
-  `plugins/comparative-adapters/src/MCScanAddTrackComponent/MCScanAddTrackComponent.tsx`
+- `M` `plugins/comparative-adapters/src/ComparativeAddTrackComponent/ComparativeAddTrackComponent.tsx`
+- `M` `plugins/comparative-adapters/src/MCScanAddTrackComponent/MCScanAddTrackComponent.tsx`
 - `M` `plugins/comparative-adapters/src/PAFAdapter/PAFAdapter.test.ts`
 - `M` `plugins/comparative-adapters/src/PAFAdapter/PAFAdapter.ts`
-- `A`
-  `plugins/comparative-adapters/src/PAFAdapter/test_data/peach_grape_cigar.paf`
-- `M`
-  `plugins/comparative-adapters/src/PairwiseIndexedPAFAdapter/PairwiseIndexedPAFAdapter.test.ts`
-- `M`
-  `plugins/comparative-adapters/src/PairwiseIndexedPAFAdapter/PairwiseIndexedPAFAdapter.ts`
+- `A` `plugins/comparative-adapters/src/PAFAdapter/test_data/peach_grape_cigar.paf`
+- `M` `plugins/comparative-adapters/src/PairwiseIndexedPAFAdapter/PairwiseIndexedPAFAdapter.test.ts`
+- `M` `plugins/comparative-adapters/src/PairwiseIndexedPAFAdapter/PairwiseIndexedPAFAdapter.ts`
 
 ## plugins/config (7)
 
 - `M` `plugins/config/package.json`
-- `M`
-  `plugins/config/src/ConfigurationEditorWidget/components/CallbackEditor.tsx`
-- `M`
-  `plugins/config/src/ConfigurationEditorWidget/components/ConfigurationEditor.tsx`
-- `M`
-  `plugins/config/src/ConfigurationEditorWidget/components/NumberMapEditor.tsx`
+- `M` `plugins/config/src/ConfigurationEditorWidget/components/CallbackEditor.tsx`
+- `M` `plugins/config/src/ConfigurationEditorWidget/components/ConfigurationEditor.tsx`
+- `M` `plugins/config/src/ConfigurationEditorWidget/components/NumberMapEditor.tsx`
 - `M` `plugins/config/src/ConfigurationEditorWidget/components/SlotEditor.tsx`
-- `M`
-  `plugins/config/src/ConfigurationEditorWidget/components/StringArrayEditor.tsx`
-- `M`
-  `plugins/config/src/ConfigurationEditorWidget/components/StringArrayMapEditor.tsx`
+- `M` `plugins/config/src/ConfigurationEditorWidget/components/StringArrayEditor.tsx`
+- `M` `plugins/config/src/ConfigurationEditorWidget/components/StringArrayMapEditor.tsx`
 
 ## plugins/data-management (39)
 
 - `M` `plugins/data-management/package.json`
-- `M`
-  `plugins/data-management/src/AddTrackWidget/components/AddTrackWidget.test.tsx`
+- `M` `plugins/data-management/src/AddTrackWidget/components/AddTrackWidget.test.tsx`
 - `M` `plugins/data-management/src/AddTrackWidget/components/ConfirmTrack.tsx`
-- `M`
-  `plugins/data-management/src/AddTrackWidget/components/TextIndexingConfig.tsx`
+- `M` `plugins/data-management/src/AddTrackWidget/components/TextIndexingConfig.tsx`
 - `M` `plugins/data-management/src/AssemblyManager/AssemblyTable.tsx`
 - `M` `plugins/data-management/src/FacetedSelector/components/FacetedHeader.tsx`
-- `M`
-  `plugins/data-management/src/FacetedSelector/components/FacetedSelector.tsx`
+- `M` `plugins/data-management/src/FacetedSelector/components/FacetedSelector.tsx`
 - `M` `plugins/data-management/src/FacetedSelector/components/FacetFilter.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/__snapshots__/HierarchicalTrackSelector.test.tsx.snap`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/AutoSizer.tsx`
-- `A`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/CardTrackSelector.tsx`
-- `M`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/ClearableSearchField.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/DefaultFolderDialog.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/CloseConnectionDialog.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/DeleteConnectionDialog.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/ManageConnectionsDialog.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/ToggleConnectionsDialog.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalFab.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalTrackSelector.test.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalTrackSelector.tsx`
-- `M`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/ShoppingCart.tsx`
-- `R`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/TrackSelectorTrackMenu.tsx`
-  (from
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackSelectorTrackMenu.tsx`)
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/DropdownTrackSelector.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/FavoriteTracks.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HamburgerMenu.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HierarchicalHeader.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HierarchicalTree.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/RecentlyUsedTracks.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/SharedTooltip.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackCategory.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackLabel.tsx`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/trackListStyles.ts`
-- `D`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TreeItem.tsx`
-- `M`
-  `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/util.ts`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/__snapshots__/HierarchicalTrackSelector.test.tsx.snap`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/AutoSizer.tsx`
+- `A` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/CardTrackSelector.tsx`
+- `M` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/ClearableSearchField.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/DefaultFolderDialog.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/CloseConnectionDialog.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/DeleteConnectionDialog.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/ManageConnectionsDialog.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/dialogs/ToggleConnectionsDialog.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalFab.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalTrackSelector.test.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/HierarchicalTrackSelector.tsx`
+- `M` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/ShoppingCart.tsx`
+- `R` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/TrackSelectorTrackMenu.tsx` (from `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackSelectorTrackMenu.tsx`)
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/DropdownTrackSelector.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/FavoriteTracks.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HamburgerMenu.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HierarchicalHeader.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/HierarchicalTree.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/RecentlyUsedTracks.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/SharedTooltip.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackCategory.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TrackLabel.tsx`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/trackListStyles.ts`
+- `D` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/tree/TreeItem.tsx`
+- `M` `plugins/data-management/src/HierarchicalTrackSelectorWidget/components/util.ts`
 - `M` `plugins/data-management/src/HierarchicalTrackSelectorWidget/index.ts`
-- `M`
-  `plugins/data-management/src/PluginStoreWidget/components/AddCustomPluginDialog.tsx`
-- `M`
-  `plugins/data-management/src/PluginStoreWidget/components/InstalledPlugin.tsx`
+- `M` `plugins/data-management/src/PluginStoreWidget/components/AddCustomPluginDialog.tsx`
+- `M` `plugins/data-management/src/PluginStoreWidget/components/InstalledPlugin.tsx`
 - `M` `plugins/data-management/src/PluginStoreWidget/components/PluginCard.tsx`
-- `M`
-  `plugins/data-management/src/PluginStoreWidget/components/PluginStoreWidget.tsx`
+- `M` `plugins/data-management/src/PluginStoreWidget/components/PluginStoreWidget.tsx`
 
 ## plugins/dotplot-view (14)
 
@@ -407,18 +342,16 @@ judges what upstream would accept. Regenerate with
 - `M` `plugins/dotplot-view/src/DotplotView/components/ColorBySelector.tsx`
 - `M` `plugins/dotplot-view/src/DotplotView/components/DotplotControls.tsx`
 - `M` `plugins/dotplot-view/src/DotplotView/components/ExportSvgDialog.tsx`
-- `M`
-  `plugins/dotplot-view/src/DotplotView/components/ImportForm/ImportSyntenyTrackSelector.tsx`
+- `M` `plugins/dotplot-view/src/DotplotView/components/ImportForm/ImportSyntenyTrackSelector.tsx`
 - `M` `plugins/dotplot-view/src/DotplotView/components/ImportForm/index.tsx`
-- `M`
-  `plugins/dotplot-view/src/DotplotView/components/ImportForm/selectors/SwapAssemblies.tsx`
+- `M` `plugins/dotplot-view/src/DotplotView/components/ImportForm/selectors/SwapAssemblies.tsx`
 - `M` `plugins/dotplot-view/src/DotplotView/components/PanButtons.tsx`
 - `M` `plugins/dotplot-view/src/DotplotView/index.ts`
 - `M` `plugins/dotplot-view/src/DotplotView/model.ts`
 - `M` `plugins/dotplot-view/src/DotplotView/svgcomponents/SVGDotplotView.tsx`
 - `M` `plugins/dotplot-view/src/index.ts`
 
-## plugins/feature-chart (102)
+## plugins/feature-chart (103)
 
 - `A` `plugins/feature-chart/ARCHITECTURE.md`
 - `A` `plugins/feature-chart/benchmark/chartRenderBenchmark.ts`
@@ -437,10 +370,8 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/feature-chart/src/corePluginsRegistration.test.ts`
 - `A` `plugins/feature-chart/src/cypressSpecContracts.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartAdapter/configSchema.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.test.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.ts`
+- `A` `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.ts`
 - `A` `plugins/feature-chart/src/FeatureChartAdapter/index.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/barPlot.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/barPlot.ts`
@@ -467,10 +398,8 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/painters.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/painters.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/placeholder.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartDrawer/pluginDrawerRegistry.test.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartDrawer/renderMarkdownTemplate.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartDrawer/pluginDrawerRegistry.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartDrawer/renderMarkdownTemplate.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/renderMarkdownTemplate.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/samplePlugin.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/scales.test.ts`
@@ -481,57 +410,39 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/types.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/violinPlot.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartDrawer/violinPlot.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartPresentation.test.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartPresentation.ts`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartPresentation.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartPresentation.ts`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartTraces.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/chartTraces.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/ChartNotice.tsx`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/FeatureChartPlotlyRendering.test.tsx`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/FeatureChartPlotlyRendering.tsx`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/PlotlyPlot.test.tsx`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/PlotlyPlot.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/ChartNotice.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/FeatureChartPlotlyRendering.test.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/FeatureChartPlotlyRendering.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/PlotlyPlot.test.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/components/PlotlyPlot.tsx`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/configSchema.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/FeatureChartPlotlyRenderer.ts`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/FeatureChartPlotlyRenderer.ts`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/index.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/legacyPlotTypeTraces.ts`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/legacyPlotTypeTraces.ts`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/plotlyLoader.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartPlotlyRenderer/plotTypeCompat.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/plotTypeCompat.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartPlotlyRenderer/plotTypeCompat.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartRenderer/__snapshots__/renderFeatureChart.test.ts.snap`
-- `A`
-  `plugins/feature-chart/src/FeatureChartRenderer/components/FeatureChartRendering.tsx`
+- `A` `plugins/feature-chart/src/FeatureChartRenderer/__snapshots__/renderFeatureChart.test.ts.snap`
+- `A` `plugins/feature-chart/src/FeatureChartRenderer/components/FeatureChartRendering.tsx`
 - `A` `plugins/feature-chart/src/FeatureChartRenderer/configSchema.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartRenderer/configSchema.ts`
 - `A` `plugins/feature-chart/src/FeatureChartRenderer/FeatureChartRenderer.ts`
 - `A` `plugins/feature-chart/src/FeatureChartRenderer/index.ts`
-- `A`
-  `plugins/feature-chart/src/FeatureChartRenderer/renderFeatureChart.test.ts`
+- `A` `plugins/feature-chart/src/FeatureChartRenderer/renderFeatureChart.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartRenderer/renderFeatureChart.ts`
 - `A` `plugins/feature-chart/src/FeatureChartTrack/index.ts`
 - `A` `plugins/feature-chart/src/index.ts`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/ChartCanvas.tsx`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/DisplayComponent.tsx`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizeDialog.tsx`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizePlotly.tsx`
-- `A`
-  `plugins/feature-chart/src/LinearFeatureChartDisplay/components/Tooltip.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/ChartCanvas.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/DisplayComponent.test.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/DisplayComponent.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizeDialog.test.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizeDialog.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/MaximizePlotly.tsx`
+- `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/components/Tooltip.tsx`
 - `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/configSchema.ts`
 - `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/exportChart.test.ts`
 - `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/exportChart.ts`
@@ -548,10 +459,8 @@ judges what upstream would accept. Regenerate with
 
 ## plugins/gccontent (6)
 
-- `M`
-  `plugins/gccontent/src/LinearGCContentDisplay/components/EditGCContentParams.tsx`
-- `A`
-  `plugins/gccontent/src/LinearGCContentDisplay/components/GCContentDisplayComponent.tsx`
+- `M` `plugins/gccontent/src/LinearGCContentDisplay/components/EditGCContentParams.tsx`
+- `A` `plugins/gccontent/src/LinearGCContentDisplay/components/GCContentDisplayComponent.tsx`
 - `M` `plugins/gccontent/src/LinearGCContentDisplay/config1.ts`
 - `M` `plugins/gccontent/src/LinearGCContentDisplay/index.ts`
 - `M` `plugins/gccontent/src/LinearGCContentDisplay/shared.ts`
@@ -560,20 +469,13 @@ judges what upstream would accept. Regenerate with
 ## plugins/grid-bookmark (9)
 
 - `M` `plugins/grid-bookmark/package.json`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/AssemblySelector.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ExportBookmarksDialog.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ImportBookmarksDialog.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ShareBookmarksDialog.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/GridBookmarkWidget.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/Highlight/Highlight.tsx`
-- `M`
-  `plugins/grid-bookmark/src/GridBookmarkWidget/components/Highlight/OverviewHighlight.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/AssemblySelector.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ExportBookmarksDialog.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ImportBookmarksDialog.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/dialogs/ShareBookmarksDialog.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/GridBookmarkWidget.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/Highlight/Highlight.tsx`
+- `M` `plugins/grid-bookmark/src/GridBookmarkWidget/components/Highlight/OverviewHighlight.tsx`
 - `M` `plugins/grid-bookmark/src/index.ts`
 
 ## plugins/jobs-management (3)
@@ -587,95 +489,61 @@ judges what upstream would accept. Regenerate with
 - `M` `plugins/linear-comparative-view/package.json`
 - `M` `plugins/linear-comparative-view/src/index.ts`
 - `M` `plugins/linear-comparative-view/src/LGVSyntenyDisplay/model.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeDisplay/stateModelFactory.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/ColorBySelector.tsx`
-- `A`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/FollowCoverageSlider.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/Header.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/LinearComparativeRenderArea.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/LinearComparativeView.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/MinLengthSlider.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/OpacitySlider.tsx`
-- `A`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/SnappingSlider.test.tsx`
-- `A`
-  `plugins/linear-comparative-view/src/LinearComparativeView/components/SnappingSlider.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeDisplay/stateModelFactory.ts`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/ColorBySelector.tsx`
+- `A` `plugins/linear-comparative-view/src/LinearComparativeView/components/FollowCoverageSlider.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/Header.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/LinearComparativeRenderArea.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/LinearComparativeView.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/MinLengthSlider.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearComparativeView/components/OpacitySlider.tsx`
+- `A` `plugins/linear-comparative-view/src/LinearComparativeView/components/SnappingSlider.test.tsx`
+- `A` `plugins/linear-comparative-view/src/LinearComparativeView/components/SnappingSlider.tsx`
 - `M` `plugins/linear-comparative-view/src/LinearComparativeView/index.ts`
 - `M` `plugins/linear-comparative-view/src/LinearComparativeView/model.ts`
 - `D` `plugins/linear-comparative-view/src/LinearReadVsRef/index.ts`
 - `D` `plugins/linear-comparative-view/src/LinearReadVsRef/LinearReadVsRef.tsx`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/afterAttach.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyDisplay/components/LinearSyntenyRendering.tsx`
-- `A`
-  `plugins/linear-comparative-view/src/LinearSyntenyDisplay/components/SyntenyColorLegend.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyDisplay/drawCigarClickMap.ts`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/components/LinearSyntenyRendering.tsx`
+- `A` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/components/SyntenyColorLegend.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/drawCigarClickMap.ts`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/drawRef.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyDisplay/drawSyntenyUtils.ts`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/drawSyntenyUtils.ts`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyDisplay/model.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ExportSvgDialog.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/ImportSyntenyPreConfigured.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/LeftPanel.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/LinearSyntenyImportForm.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/selectors/StandardFormatSelector.tsx`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/selectors/SwapAssemblies.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ExportSvgDialog.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/ImportSyntenyPreConfigured.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/LeftPanel.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/LinearSyntenyImportForm.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/selectors/StandardFormatSelector.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/components/ImportForm/selectors/SwapAssemblies.tsx`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyView/index.ts`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyView/model.ts`
-- `M`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/svgcomponents/SVGLinearSyntenyView.tsx`
+- `M` `plugins/linear-comparative-view/src/LinearSyntenyView/svgcomponents/SVGLinearSyntenyView.tsx`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyView/types.ts`
-- `A`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/util/followSynteny.test.ts`
-- `A`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/util/followSynteny.ts`
-- `A`
-  `plugins/linear-comparative-view/src/LinearSyntenyView/util/syntenyColors.test.ts`
+- `A` `plugins/linear-comparative-view/src/LinearSyntenyView/util/followSynteny.test.ts`
+- `A` `plugins/linear-comparative-view/src/LinearSyntenyView/util/followSynteny.ts`
+- `A` `plugins/linear-comparative-view/src/LinearSyntenyView/util/syntenyColors.test.ts`
 - `M` `plugins/linear-comparative-view/src/LinearSyntenyViewHelper/index.tsx`
 - `M` `plugins/linear-comparative-view/src/SyntenyFeatureDetail/index.ts`
 
 ## plugins/linear-genome-view (67)
 
 - `M` `plugins/linear-genome-view/package.json`
-- `M`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/BaseLinearDisplay.tsx`
-- `M`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/BlockErrorMessage.tsx`
-- `D`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/CollapseIntronsDialog.tsx`
-- `D`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/TranscriptTable.tsx`
-- `D`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/util.test.ts`
-- `D`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/util.ts`
-- `M`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/FloatingLabels.tsx`
-- `A`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/components/LoadingOverlay.test.tsx`
+- `M` `plugins/linear-genome-view/src/BaseLinearDisplay/components/BaseLinearDisplay.tsx`
+- `M` `plugins/linear-genome-view/src/BaseLinearDisplay/components/BlockErrorMessage.tsx`
+- `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/CollapseIntronsDialog.tsx`
+- `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/TranscriptTable.tsx`
+- `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/util.test.ts`
+- `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/CollapseIntronsDialog/util.ts`
+- `M` `plugins/linear-genome-view/src/BaseLinearDisplay/components/FloatingLabels.tsx`
+- `A` `plugins/linear-genome-view/src/BaseLinearDisplay/components/LoadingOverlay.test.tsx`
 - `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/MenuPage.tsx`
 - `D` `plugins/linear-genome-view/src/BaseLinearDisplay/components/types.ts`
 - `M` `plugins/linear-genome-view/src/BaseLinearDisplay/components/util.ts`
 - `M` `plugins/linear-genome-view/src/BaseLinearDisplay/index.ts`
 - `M` `plugins/linear-genome-view/src/BaseLinearDisplay/model.ts`
-- `M`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/models/serverSideRenderedBlock.ts`
-- `M`
-  `plugins/linear-genome-view/src/BaseLinearDisplay/models/SvgFloatingLabels.tsx`
+- `M` `plugins/linear-genome-view/src/BaseLinearDisplay/models/serverSideRenderedBlock.ts`
+- `M` `plugins/linear-genome-view/src/BaseLinearDisplay/models/SvgFloatingLabels.tsx`
 - `M` `plugins/linear-genome-view/src/BaseLinearDisplay/models/util.ts`
 - `M` `plugins/linear-genome-view/src/BaseLinearDisplay/types.ts`
 - `D` `plugins/linear-genome-view/src/BaseLinearDisplay/util.test.ts`
@@ -685,78 +553,47 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/linear-genome-view/src/LinearBasicDisplay/colorLegend.ts`
 - `A` `plugins/linear-genome-view/src/LinearBasicDisplay/model.test.ts`
 - `M` `plugins/linear-genome-view/src/LinearBasicDisplay/model.ts`
-- `M`
-  `plugins/linear-genome-view/src/LinearFeatureDisplay/components/AddFiltersDialog.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearFeatureDisplay/components/SetMaxHeightDialog.tsx`
+- `M` `plugins/linear-genome-view/src/LinearFeatureDisplay/components/AddFiltersDialog.tsx`
+- `M` `plugins/linear-genome-view/src/LinearFeatureDisplay/components/SetMaxHeightDialog.tsx`
 - `M` `plugins/linear-genome-view/src/LinearFeatureDisplay/model.test.ts`
 - `M` `plugins/linear-genome-view/src/LinearFeatureDisplay/model.ts`
-- `A`
-  `plugins/linear-genome-view/src/LinearFeatureDisplay/trackOverrides.test.ts`
+- `A` `plugins/linear-genome-view/src/LinearFeatureDisplay/trackOverrides.test.ts`
 - `A` `plugins/linear-genome-view/src/LinearFeatureDisplay/trackOverrides.ts`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/components/Cytobands.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/ExportSvgDialog.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/GetSequenceDialog.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderPanControls.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderTrackSelectorButton.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderZoomControls.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/ExportSvgDialog.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/GetSequenceDialog.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderPanControls.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderTrackSelectorButton.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/HeaderZoomControls.tsx`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/components/Highlight.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/ImportForm.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/LinearGenomeViewContainer.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/MiniControls.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/NoTracksActiveButton.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewHighlight.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewRubberband.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewRubberbandHoverTooltip.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebar.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebarPolygon.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebarTickLabels.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/RefNameAutocomplete/EndAdornment.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/Rubberband.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/RubberbandSpan.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx`
-- `D`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabel.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelContainer.tsx`
-- `D`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelDragHandle.tsx`
-- `D`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelMenu.tsx`
-- `A`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/trackMenuItems.ts`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/TracksContainer.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/components/VerticalGuide.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/ImportForm.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/LinearGenomeViewContainer.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/MiniControls.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/NoTracksActiveButton.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewHighlight.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewRubberband.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewRubberbandHoverTooltip.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebar.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebarPolygon.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/OverviewScalebarTickLabels.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/RefNameAutocomplete/EndAdornment.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/Rubberband.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/RubberbandSpan.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/TrackContainer.tsx`
+- `D` `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabel.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelContainer.tsx`
+- `D` `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelDragHandle.tsx`
+- `D` `plugins/linear-genome-view/src/LinearGenomeView/components/TrackLabelMenu.tsx`
+- `A` `plugins/linear-genome-view/src/LinearGenomeView/components/trackMenuItems.ts`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/TracksContainer.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/components/VerticalGuide.tsx`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/consts.ts`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/index.test.ts`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/index.ts`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/menuItems.ts`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/model.ts`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/svgcomponents/SVGHeader.tsx`
-- `M`
-  `plugins/linear-genome-view/src/LinearGenomeView/svgcomponents/SVGLinearGenomeView.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/svgcomponents/SVGHeader.tsx`
+- `M` `plugins/linear-genome-view/src/LinearGenomeView/svgcomponents/SVGLinearGenomeView.tsx`
 - `M` `plugins/linear-genome-view/src/LinearGenomeView/types.ts`
 
 ## plugins/lollipop (2)
@@ -814,8 +651,7 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/single-cell/src/SingleCellAdapter/index.ts`
 - `A` `plugins/single-cell/src/SingleCellAdapter/SingleCellBamAdapter.test.ts`
 - `A` `plugins/single-cell/src/SingleCellAdapter/SingleCellBamAdapter.ts`
-- `A`
-  `plugins/single-cell/src/SingleCellAdapter/SingleCellBamAdapterConfigSchema.ts`
+- `A` `plugins/single-cell/src/SingleCellAdapter/SingleCellBamAdapterConfigSchema.ts`
 - `A` `plugins/single-cell/src/SingleCellAdapter/SingleCellZarrAdapter.test.ts`
 - `A` `plugins/single-cell/src/SingleCellAdapter/SingleCellZarrAdapter.ts`
 - `A` `plugins/single-cell/src/SingleCellAdapter/zarr.d.ts`
@@ -827,10 +663,8 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/single-cell/src/SingleCellView/components/CenterPlot.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/colorUtils.test.ts`
 - `A` `plugins/single-cell/src/SingleCellView/components/colorUtils.ts`
-- `A`
-  `plugins/single-cell/src/SingleCellView/components/CreateGeneSetDialog.tsx`
-- `A`
-  `plugins/single-cell/src/SingleCellView/components/CustomPaletteDialog.tsx`
+- `A` `plugins/single-cell/src/SingleCellView/components/CreateGeneSetDialog.tsx`
+- `A` `plugins/single-cell/src/SingleCellView/components/CustomPaletteDialog.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/drawPointsRegl.ts`
 - `A` `plugins/single-cell/src/SingleCellView/components/EmbeddingCanvas.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/embeddingUtils.test.ts`
@@ -838,10 +672,8 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/single-cell/src/SingleCellView/components/ExpandArrowsIcon.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/FeatureRow.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/HistogramBrush.tsx`
-- `A`
-  `plugins/single-cell/src/SingleCellView/components/HistogramTransformToggle.test.tsx`
-- `A`
-  `plugins/single-cell/src/SingleCellView/components/HistogramTransformToggle.tsx`
+- `A` `plugins/single-cell/src/SingleCellView/components/HistogramTransformToggle.test.tsx`
+- `A` `plugins/single-cell/src/SingleCellView/components/HistogramTransformToggle.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/ImportForm.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/LabelOverlay.tsx`
 - `A` `plugins/single-cell/src/SingleCellView/components/lassoMath.test.ts`
@@ -857,14 +689,11 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/single-cell/src/SingleCellView/index.ts`
 - `A` `plugins/single-cell/src/SingleCellView/model.test.ts`
 - `A` `plugins/single-cell/src/SingleCellView/model.ts`
-- `A`
-  `plugins/single-cell/src/SingleCellView/SingleCellAlignmentsTrack/index.ts`
+- `A` `plugins/single-cell/src/SingleCellView/SingleCellAlignmentsTrack/index.ts`
 - `A` `plugins/single-cell/src/SingleCellView/SingleCellPileupDisplay/index.ts`
 - `A` `plugins/single-cell/src/SingleCellView/SingleCellPileupDisplay/model.ts`
-- `A`
-  `plugins/single-cell/src/SingleCellView/SingleCellSNPCoverageDisplay/index.ts`
-- `A`
-  `plugins/single-cell/src/SingleCellView/SingleCellSNPCoverageDisplay/model.ts`
+- `A` `plugins/single-cell/src/SingleCellView/SingleCellSNPCoverageDisplay/index.ts`
+- `A` `plugins/single-cell/src/SingleCellView/SingleCellSNPCoverageDisplay/model.ts`
 - `A` `plugins/single-cell/src/zarr.d.ts`
 - `A` `plugins/single-cell/tsconfig.build.esm.json`
 
@@ -893,8 +722,7 @@ judges what upstream would accept. Regenerate with
 - `M` `plugins/variants/src/shared/components/SourcesGridHeader.tsx`
 - `M` `plugins/variants/src/shared/MultiVariantBaseModel.ts`
 - `M` `plugins/variants/src/VariantFeatureWidget/index.ts`
-- `M`
-  `plugins/variants/src/VariantFeatureWidget/VariantSampleGrid/VariantSampleGrid.tsx`
+- `M` `plugins/variants/src/VariantFeatureWidget/VariantSampleGrid/VariantSampleGrid.tsx`
 
 ## plugins/wiggle (73)
 
@@ -935,39 +763,27 @@ judges what upstream would accept. Regenerate with
 - `D` `plugins/wiggle/src/d3-hierarchy2/treemap/sliceDice.ts`
 - `D` `plugins/wiggle/src/d3-hierarchy2/treemap/squarify.ts`
 - `M` `plugins/wiggle/src/index.ts`
-- `M`
-  `plugins/wiggle/src/LinearWiggleDisplay/components/WiggleDisplayComponent.tsx`
+- `M` `plugins/wiggle/src/LinearWiggleDisplay/components/WiggleDisplayComponent.tsx`
 - `M` `plugins/wiggle/src/LinearWiggleDisplay/model.ts`
 - `M` `plugins/wiggle/src/LinearWiggleDisplay/renderSvg.tsx`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/ColorLegend.tsx`
-- `M`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/FullHeightScaleBar.tsx`
-- `M`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/IndividualScaleBars.tsx`
+- `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/FullHeightScaleBar.tsx`
+- `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/IndividualScaleBars.tsx`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/LegendItem.tsx`
-- `M`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/LegendItemText.tsx`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleColorLegend.tsx`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleLegendBar.tsx`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleLegendBarWrapper.tsx`
+- `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/LegendItemText.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleColorLegend.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleLegendBar.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/MultiWiggleLegendBarWrapper.tsx`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/SourcesGrid.tsx`
 - `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/SvgTree.tsx`
 - `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/TreeSidebar.tsx`
 - `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/treeTypes.ts`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/util.ts`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/types.ts`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialog.tsx`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialogAuto.tsx`
-- `D`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialogManual.tsx`
-- `M`
-  `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleDisplayComponent.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/types.ts`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialog.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialogAuto.tsx`
+- `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleClusterDialog/WiggleClusterDialogManual.tsx`
+- `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/components/WiggleDisplayComponent.tsx`
 - `D` `plugins/wiggle/src/MultiLinearWiggleDisplay/makeSidebarSvg.tsx`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/model.ts`
 - `M` `plugins/wiggle/src/MultiLinearWiggleDisplay/renderSvg.tsx`
@@ -999,24 +815,15 @@ judges what upstream would accept. Regenerate with
 
 - `M` `products/jbrowse-desktop/package.json`
 - `M` `products/jbrowse-desktop/src/components/PreferencesDialog.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/GenomesDataTable.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/getColumnDefinitions.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/SearchField.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/FavoriteGenomesPanel.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/LeftSidePanel.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/QuickstartPanel.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/recentSessions/RecentSessionCard.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/recentSessions/RecentSessionsPanel.tsx`
-- `M`
-  `products/jbrowse-desktop/src/components/StartScreen/recentSessions/SessionNameCell.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/GenomesDataTable.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/getColumnDefinitions.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/availableGenomes/SearchField.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/FavoriteGenomesPanel.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/LeftSidePanel.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/leftSidePanel/QuickstartPanel.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/recentSessions/RecentSessionCard.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/recentSessions/RecentSessionsPanel.tsx`
+- `M` `products/jbrowse-desktop/src/components/StartScreen/recentSessions/SessionNameCell.tsx`
 - `M` `products/jbrowse-desktop/src/components/StartScreen/StarIcon.tsx`
 - `M` `products/jbrowse-desktop/src/components/StartScreen/types.ts`
 - `M` `products/jbrowse-desktop/src/components/StartScreen/util.tsx`
@@ -1036,14 +843,12 @@ judges what upstream would accept. Regenerate with
 ## products/jbrowse-react-circular-genome-view (2)
 
 - `M` `products/jbrowse-react-circular-genome-view/package.json`
-- `M`
-  `products/jbrowse-react-circular-genome-view/src/createModel/createSessionModel.ts`
+- `M` `products/jbrowse-react-circular-genome-view/src/createModel/createSessionModel.ts`
 
 ## products/jbrowse-react-linear-genome-view (2)
 
 - `M` `products/jbrowse-react-linear-genome-view/package.json`
-- `M`
-  `products/jbrowse-react-linear-genome-view/src/createModel/createSessionModel.ts`
+- `M` `products/jbrowse-react-linear-genome-view/src/createModel/createSessionModel.ts`
 
 ## products/jbrowse-web (128)
 
@@ -1064,21 +869,15 @@ judges what upstream would accept. Regenerate with
 - `A` `products/jbrowse-web/public/subconfig/mouse_mm39.json`
 - `A` `products/jbrowse-web/public/subconfig/orangutan_mPonAbe1v2.0_pri.json`
 - `A` `products/jbrowse-web/public/subconfig/orangutan_mPonPyg2v2.0_pri.json`
-- `A`
-  `products/jbrowse-web/public/subconfig/seg_chimpanzee_mPanTro3v2.0_pri--pcht_spacer_example.json`
-- `A`
-  `products/jbrowse-web/public/subconfig/seg_chimpanzee_mPanTro3v2.0_pri--telo_subtelo_eu_example.json`
-- `A`
-  `products/jbrowse-web/public/subconfig/templates/human_to_macaque_synteny.json`
-- `A`
-  `products/jbrowse-web/public/subconfig/templates/human_to_macaque_synteny.png`
+- `A` `products/jbrowse-web/public/subconfig/seg_chimpanzee_mPanTro3v2.0_pri--pcht_spacer_example.json`
+- `A` `products/jbrowse-web/public/subconfig/seg_chimpanzee_mPanTro3v2.0_pri--telo_subtelo_eu_example.json`
+- `A` `products/jbrowse-web/public/subconfig/templates/human_to_macaque_synteny.json`
+- `A` `products/jbrowse-web/public/subconfig/templates/human_to_macaque_synteny.png`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/.zgroup`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/.zgroup`
-- `A`
-  `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/cell_type/.zarray`
+- `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/cell_type/.zarray`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/cell_type/0`
-- `A`
-  `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/leiden/.zarray`
+- `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/leiden/.zarray`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/__categories/leiden/0`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/.zgroup`
 - `A` `products/jbrowse-web/public/test_pbmc.zarr/obs/cell_type/.zarray`
@@ -1111,55 +910,32 @@ judges what upstream would accept. Regenerate with
 - `M` `products/jbrowse-web/src/rootModel/rootModel.ts`
 - `M` `products/jbrowse-web/src/SessionLoader.test.ts`
 - `M` `products/jbrowse-web/src/SessionLoader.ts`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/breakpoint_split_view_snapshot.svg`
-- `A`
-  `products/jbrowse-web/src/tests/__image_snapshots__/configuration-editor-test-tsx-change-color-on-track-2-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/copy-and-delete-test-tsx-copy-and-delete-track-in-admin-mode-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/copy-and-delete-test-tsx-copy-and-delete-track-to-session-tracks-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/breakpoint_split_view_snapshot.svg`
+- `A` `products/jbrowse-web/src/tests/__image_snapshots__/configuration-editor-test-tsx-change-color-on-track-2-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/copy-and-delete-test-tsx-copy-and-delete-track-in-admin-mode-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/copy-and-delete-test-tsx-copy-and-delete-track-to-session-tracks-1-snap.png`
 - `M` `products/jbrowse-web/src/tests/__image_snapshots__/dotplot_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/j-browse-test-tsx-assembly-aliases-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/lgv_error_alignment_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/lgv_error_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/lgv_gridlines_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/j-browse-test-tsx-assembly-aliases-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/lgv_error_alignment_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/lgv_error_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/lgv_gridlines_snapshot.svg`
 - `M` `products/jbrowse-web/src/tests/__image_snapshots__/lgv_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/lgv-synteny-test-tsx-nav-to-synteny-from-feature-details-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowdensity-track-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowline-track-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowxy-track-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-xyplot-track-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/reversed_region_labels_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/subfeature-labels-test-tsx-toggle-subfeature-labels-to-below-and-verify-eden-1-label-appears-1-snap.png`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/synteny_gridlines_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/lgv-synteny-test-tsx-nav-to-synteny-from-feature-details-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowdensity-track-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowline-track-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-multirowxy-track-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/multi-big-wig-test-tsx-open-a-multibigwig-xyplot-track-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/reversed_region_labels_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/subfeature-labels-test-tsx-toggle-subfeature-labels-to-below-and-verify-eden-1-label-appears-1-snap.png`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/synteny_gridlines_snapshot.svg`
 - `M` `products/jbrowse-web/src/tests/__image_snapshots__/synteny_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__image_snapshots__/vcf_cluster_snapshot.svg`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ExportSvgBreakpointSplitView.test.tsx.snap`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ExportSvgDotplot.test.tsx.snap`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ExportSvgError.test.tsx.snap`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ExportSvgLinearGenomeView.test.tsx.snap`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ExportSvgLinearSyntenyView.test.tsx.snap`
-- `M`
-  `products/jbrowse-web/src/tests/__snapshots__/ReversedRegionLabels.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__image_snapshots__/vcf_cluster_snapshot.svg`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ExportSvgBreakpointSplitView.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ExportSvgDotplot.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ExportSvgError.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ExportSvgLinearGenomeView.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ExportSvgLinearSyntenyView.test.tsx.snap`
+- `M` `products/jbrowse-web/src/tests/__snapshots__/ReversedRegionLabels.test.tsx.snap`
 - `M` `products/jbrowse-web/src/tests/__snapshots__/VcfCluster.test.tsx.snap`
 - `M` `products/jbrowse-web/src/tests/AddTrackWidget.test.tsx`
 - `M` `products/jbrowse-web/src/tests/AlignmentsColorBy.test.tsx`
@@ -1269,17 +1045,39 @@ judges what upstream would accept. Regenerate with
 - `A` `website/docs/developer_guides/feature_chart_migration.md`
 - `A` `website/docs/developer_guides/feature_chart_specs.md`
 
-## website/docs/models (9)
+## website/docs/models (31)
 
 - `M` `website/docs/models/Assembly.md`
+- `A` `website/docs/models/AutoTrackHeightSessionMixin.md`
+- `M` `website/docs/models/BaseLinearDisplay.md`
+- `M` `website/docs/models/BaseWebSession.md`
+- `M` `website/docs/models/DockviewLayoutMixin.md`
+- `M` `website/docs/models/DotplotView.md`
+- `M` `website/docs/models/JBrowseWebRootModel.md`
+- `M` `website/docs/models/LGVSyntenyDisplay.md`
 - `M` `website/docs/models/LinearBasicDisplay.md`
+- `M` `website/docs/models/LinearComparativeDisplay.md`
+- `M` `website/docs/models/LinearComparativeView.md`
 - `M` `website/docs/models/LinearFeatureDisplay.md`
+- `M` `website/docs/models/LinearGCContentDisplay.md`
+- `M` `website/docs/models/LinearGenomeView.md`
+- `M` `website/docs/models/LinearPileupDisplay.md`
 - `M` `website/docs/models/LinearSNPCoverageDisplay.md`
+- `M` `website/docs/models/LinearSyntenyDisplay.md`
 - `M` `website/docs/models/LinearSyntenyView.md`
+- `M` `website/docs/models/LinearVariantMatrixDisplay.md`
+- `M` `website/docs/models/LinearWiggleDisplay.md`
 - `M` `website/docs/models/MultiLinearWiggleDisplay.md`
+- `M` `website/docs/models/MultipleViewsSessionMixin.md`
+- `M` `website/docs/models/SharedGCContentModel.md`
+- `M` `website/docs/models/SharedLDModel.md`
+- `M` `website/docs/models/SharedLinearPileupDisplayMixin.md`
 - `A` `website/docs/models/SingleCellPileupDisplay.md`
 - `A` `website/docs/models/SingleCellSNPCoverageDisplay.md`
 - `A` `website/docs/models/SingleCellView.md`
+- `M` `website/docs/models/SpreadsheetView.md`
+- `M` `website/docs/models/SvInspectorView.md`
+- `A` `website/docs/models/YScaleBarSessionMixin.md`
 
 ## website/docs/user_guides (1)
 
