@@ -43,6 +43,68 @@ declare namespace jbrowse {
     category: string[]
     /** shown in at least one view */
     open: boolean
+    /**
+     * Rendered `formatAbout.info` markdown (track template, else the site-wide
+     * root default). Absent — not empty — when the track has no info, or when
+     * the host app does not publish the track-info bridge (only jbrowse-web
+     * does).
+     */
+    info?: string
+    /** `info` with markdown markers removed, for pasting into a prompt. */
+    infoText?: string
+  }
+
+  /** One row of the feature-chart drawer catalog. */
+  interface ChartDrawerInfo {
+    /** exact name to put in `renderer.drawer` (plugin drawers: 'plugin/name') */
+    name: string
+    displayName: string
+    /** one sentence: what it draws and which data shape it consumes */
+    description: string
+    /** coarse payload shape this drawer reads */
+    dataShape:
+      | 'summary-stats'
+      | 'grouped-values'
+      | 'category-values'
+      | 'values'
+      | 'any'
+    /**
+     * true when both the name and the implementation ship with BioSeek. A
+     * plugin that shadows a built-in name keeps the name but reports false —
+     * do not assume built-in behaviour from a familiar name.
+     */
+    builtin: boolean
+    /**
+     * Documentation hint for the `drawerOptions` keys this drawer reads. NOT a
+     * validation contract: the config editor does not validate against it and
+     * every drawer must default/clamp its own options.
+     */
+    optionsSchema?: unknown
+    /** preferred chart size in px, reused by the maximize dialog */
+    defaultSize?: { width: number; height: number }
+  }
+
+  /**
+   * The v1 chart spec vocabulary (`renderer.spec`), generated from the same
+   * constants the validator enforces. Descriptive: only the validator decides
+   * whether a spec renders.
+   */
+  interface ChartSpecSchema {
+    $id: string
+    title: string
+    description: string
+    /** where a spec lives in a config, e.g. 'tracks[].renderer.spec' */
+    configPath: string
+    specVersion: number
+    kinds: string[]
+    dataForms: string[]
+    /** which `data.form` values each `kind` accepts */
+    kindDataForms: Record<string, string[]>
+    /** `style.bins`, histogram only */
+    bins: { min: number; max: number; default: number }
+    /** valid `style.colorScheme` names */
+    colorSchemes: string[]
+    properties: Record<string, unknown>
   }
 
   interface AssemblyInfo {
@@ -91,8 +153,12 @@ declare namespace jbrowse {
      * List configured tracks (open or hidden). Results are capped at
      * `opts.limit` (default 50); when capped, a warning is attached to the
      * digest — narrow with a filter instead of paging.
+     * Pass `opts.info: false` to skip the track-info render (digest does).
      */
-    tracks(filter?: TrackFilter, opts?: { limit?: number }): TrackInfo[]
+    tracks(
+      filter?: TrackFilter,
+      opts?: { limit?: number; info?: boolean },
+    ): TrackInfo[]
 
     /**
      * Find one track by exact id or fuzzy name.
@@ -100,6 +166,31 @@ declare namespace jbrowse {
      * pick from `error.candidates` and retry.
      */
     track(idOrName: string): TrackInfo
+
+    /**
+     * The feature-chart drawer catalog, read from the running app's plugin
+     * manager: built-ins plus plugin contributions, sorted by name.
+     *
+     * Throws FEATURE_CHART_UNAVAILABLE when the feature-chart plugin surface is
+     * not registered on this page (e.g. an embedded circular-genome view).
+     */
+    chartDrawers(): ChartDrawerInfo[]
+
+    /**
+     * One catalog entry by exact drawer name. Throws UNKNOWN_DRAWER with the
+     * available names when the name is wrong.
+     */
+    chartDrawer(name: string): ChartDrawerInfo
+
+    /**
+     * The v1 chart spec vocabulary for `renderer.spec` — kinds, data forms, the
+     * kind × data-form legality matrix, bins range and palette names.
+     * Write a spec from this, then load the config and let the validator report
+     * problems (a bad spec draws a placeholder, it never breaks the track).
+     *
+     * Throws FEATURE_CHART_UNAVAILABLE when the plugin surface is not present.
+     */
+    chartSpecSchema(): ChartSpecSchema
 
     /** List assemblies configured in this session. */
     assemblies(): AssemblyInfo[]
@@ -221,7 +312,9 @@ declare namespace jbrowse {
      * as JSON, restorable via the UI's session import.
      * With path: saves to disk. Without: returns the snapshot object.
      */
-    exportSession(path?: string): Promise<Record<string, unknown> | { saved: string }>
+    exportSession(
+      path?: string,
+    ): Promise<Record<string, unknown> | { saved: string }>
 
     /**
      * Save a screenshot to the out dir (PNG).
@@ -280,14 +373,19 @@ declare namespace jbrowse {
 
     /**
      * Verify every internal contract the SDK relies on (session handle,
-     * DOM anchors, blockState shape, loading-decoy filtering, bridges).
+     * DOM anchors, blockState shape, loading-decoy filtering, bridges,
+     * track-info bridge, feature-chart catalog/spec surface).
      * Read-only — run it at the start of a session; a named failed check
      * beats silently degraded output. Some checks need an open view with
      * a shown track to be meaningful (they report "skip" otherwise).
      */
     selfTest(): {
       ok: boolean
-      checks: { name: string; status: 'pass' | 'fail' | 'skip'; detail?: string }[]
+      checks: {
+        name: string
+        status: 'pass' | 'fail' | 'skip'
+        detail?: string
+      }[]
     }
   }
 }
@@ -295,4 +393,7 @@ declare namespace jbrowse {
 /** The object injected into every script executed by jbrowse-agent. */
 declare const jbrowse: jbrowse.Agent
 
+// this file is a module so that `declare namespace` stays private to it; there
+// is nothing to export (the runtime code lives in src/index.js)
+// eslint-disable-next-line unicorn/require-module-specifiers
 export {}

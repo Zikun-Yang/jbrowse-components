@@ -83,6 +83,15 @@ Get view IDs for a specific panel
 (panelId: string) => never[] | (IMSTArray<ISimpleType<string>> & IStateTreeNode<IArrayType<ISimpleType<string>>>)
 ```
 
+#### getter: getPanelIdForView
+
+Get the panel ID that contains a specific view
+
+```js
+// type
+(viewId: string) => string | undefined
+```
+
 ### DockviewLayoutMixin - Actions
 
 #### action: setDockviewLayout
@@ -137,6 +146,15 @@ Remove a panel and all its view assignments
 ```js
 // type signature
 removePanel: (panelId: string) => void
+```
+
+#### action: clearPanelViewAssignments
+
+Clear all panel-view assignments
+
+```js
+// type signature
+clearPanelViewAssignments: () => void
 ```
 
 #### action: moveViewUpInPanel

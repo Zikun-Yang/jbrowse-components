@@ -27,7 +27,7 @@ export default class SingleCellPlugin extends Plugin {
     /**
      * #slot
      * Preset single-cell datasets shown in the SingleCellView import form.
-     * Each entry should have { name: string, uri: string }.
+     * Each entry needs a `name` and a `uri`; see the SingleCellView import form.
      */
     datasets: {
       type: 'frozen',

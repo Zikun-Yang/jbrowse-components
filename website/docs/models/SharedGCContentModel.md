@@ -28,6 +28,9 @@ extends
 
 #### property: windowSize
 
+manual window size in bp set by the user, undefined means "size the windows from
+the view", see windowSizeSetting
+
 ```js
 // type signature
 IMaybe<ISimpleType<number>>
@@ -44,6 +47,47 @@ IMaybe<ISimpleType<number>>
 windowDelta: types.maybe(types.number)
 ```
 
+### SharedGCContentModel - Getters
+
+#### getter: windowSizeFromView
+
+window size in bp for the current view: one window per
+GC_CONTENT_PIXELS_PER_WINDOW screen pixels, so the resolution grows as the view
+zooms out and the number of windows across the view follows the view width
+
+```js
+// type
+number
+```
+
+#### getter: windowSizeSetting
+
+a windowSize of 0 (the default for the GC content display on the reference
+sequence track) means the windows are sized from the view
+
+```js
+// type
+number
+```
+
+#### getter: windowDeltaSetting
+
+```js
+// type
+number
+```
+
+#### getter: trackLabelLeftText
+
+the window size and step size in bp, shown at the left end of the track label
+row (see plugins/linear-genome-view TrackLabelContainer) so that the resolution
+behind the plot is readable without opening the track menu
+
+```js
+// type
+string
+```
+
 ### SharedGCContentModel - Methods
 
 #### method: adapterProps
@@ -54,4 +98,22 @@ a GCContentAdapter
 ```js
 // type signature
 adapterProps: () => any
+```
+
+### SharedGCContentModel - Actions
+
+#### action: setGCContentParams
+
+```js
+// type signature
+setGCContentParams: ({ windowSize, windowDelta, }: { windowSize?: number | undefined; windowDelta?: number | undefined; }) => void
+```
+
+#### action: resetGCContentParams
+
+drop the manual window size and size the windows from the view again
+
+```js
+// type signature
+resetGCContentParams: () => void
 ```

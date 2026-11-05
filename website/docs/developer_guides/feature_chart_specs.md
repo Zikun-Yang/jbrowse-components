@@ -27,7 +27,7 @@ vocabulary is frozen at v1 and defined normatively in
 
 `spec` is read **only** when `renderer.drawer` is `"spec"`. Every other drawer
 value (`rawBoxPlot`, `samplePlugin/heatmap`, …) keeps its own contract — see
-[Feature chart drawers](./feature_chart_drawers).
+[Feature chart drawers](/docs/developer_guides/feature_chart_drawers/).
 
 ## Vocabulary
 
@@ -194,5 +194,6 @@ Every error carries `path`, `message` and, where it applies, `allowed` and
 `actualKeys`, so a repair loop does not have to read this page.
 
 A browser plugin cannot import the package — a bundled copy is a different
-module instance, see [Feature chart drawers](./feature_chart_drawers). For
+module instance, see
+[Feature chart drawers](/docs/developer_guides/feature_chart_drawers/). For
 those, the JSON Schema and the runtime placeholder are the contract.

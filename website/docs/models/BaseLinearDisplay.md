@@ -105,6 +105,17 @@ block
 number
 ```
 
+#### getter: autoHeightEnabled
+
+whether the display participates in the global auto-size-track-height behavior.
+subclasses whose height is managed elsewhere (e.g. the pileup sub-display of an
+alignments display) override to false
+
+```js
+// type
+boolean
+```
+
 #### getter: TooltipComponent
 
 ```js
@@ -235,13 +246,6 @@ getFeatureById: (featureId: string, parentFeatureId?: string | undefined) => Fea
 trackMenuItems: () => MenuItem[]
 ```
 
-#### method: contextMenuItems
-
-```js
-// type signature
-contextMenuItems: () => MenuItem[]
-```
-
 #### method: renderingProps
 
 props for the renderer's React "Rendering" component - client-side only, never
@@ -291,13 +295,6 @@ deleteBlock: (key: string) => void
 selectFeature: (feature: Feature) => void
 ```
 
-#### action: navToFeature
-
-```js
-// type signature
-navToFeature: (feature: Feature) => void
-```
-
 #### action: clearFeatureSelection
 
 ```js
@@ -317,13 +314,6 @@ setFeatureIdUnderMouse: (feature?: string | undefined) => void
 ```js
 // type signature
 setSubfeatureIdUnderMouse: (subfeatureId?: string | undefined) => void
-```
-
-#### action: setContextMenuFeature
-
-```js
-// type signature
-setContextMenuFeature: (feature?: Feature | undefined) => void
 ```
 
 #### action: setMouseoverExtraInformation
@@ -362,14 +352,4 @@ to RPC if not found locally (e.g., for canvas renderer).
 ```js
 // type signature
 selectFeatureById: (featureId: string, parentFeatureId?: string | undefined, topLevelFeatureId?: string | undefined) => Promise<void>
-```
-
-#### action: setContextMenuFeatureById
-
-Set context menu feature by ID, looking up in features map and subfeatures.
-Falls back to RPC if not found locally (e.g., for canvas renderer).
-
-```js
-// type signature
-setContextMenuFeatureById: (featureId: string, parentFeatureId?: string | undefined, topLevelFeatureId?: string | undefined) => Promise<void>
 ```

@@ -10,10 +10,11 @@ version in the maximize dialog. **A "drawer" is the function that paints one
 chart.** This page is the contract for writing your own and shipping it as a
 plugin, without forking JBrowse.
 
-Read [`FeatureChartTrack`](../config/FeatureChartTrack) for the TSV data format,
-the built-in drawer list and config examples, and
+Read [`FeatureChartTrack`](/docs/config/featurecharttrack/) for the TSV data
+format, the built-in drawer list and config examples, and
 `plugins/feature-chart/ARCHITECTURE.md` in the repository for the internal
-design.
+design. Coming from a pre-WP4 config? See
+[Migrating feature chart configs](/docs/developer_guides/feature_chart_migration/).
 
 ## Three ways to change what a chart looks like
 
@@ -27,7 +28,8 @@ design.
 The `spec` row is the declarative one —
 `{"kind": "box", "data": {"form": "grouped-values", "path": "tissues"}}` instead
 of a drawer name. It covers what the five built-in drawers cover, with no code
-in the config; see [Feature chart specs](./feature_chart_specs).
+in the config; see
+[Feature chart specs](/docs/developer_guides/feature_chart_specs/).
 
 This page is the last row.
 
@@ -134,8 +136,8 @@ no model (it never guesses). Returning a model costs ~15 lines and buys the
 interactive view, zoom and PNG/SVG export.
 
 The model shape (and the four `data.form` values) is documented in
-[Feature chart specs](./feature_chart_specs.md); `dataShape` in your catalog
-entry should use the same vocabulary.
+[Feature chart specs](/docs/developer_guides/feature_chart_specs.md);
+`dataShape` in your catalog entry should use the same vocabulary.
 
 ## Contributing a drawer from a plugin
 
@@ -270,6 +272,38 @@ const resolution = resolveFeatureChartDrawer('myPlugin/heatmap', pluginManager)
   renderer paints a placeholder. That is deliberate — a worker-level throw marks
   the whole track as failed.
 
+### Discovering the catalog from an agent or a tool
+
+The catalog is published as **data**, not only as a function, so callers that
+cannot import this package can still enumerate it. The plugin registers two
+extension points during `install()`:
+
+| extension point                  | payload                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `Core-featureChartDrawerCatalog` | `listFeatureChartDrawerCatalog(pluginManager)` — the catalog rows plus `builtin`                               |
+| `Core-featureChartSpecSchema`    | `chartSpecSchema()` — the v1 spec vocabulary (see the [chart spec reference](/docs/config_guides/chart_spec/)) |
+
+```js
+// inside a script executed by jbrowse-agent: no imports, no bundler
+const pm = window.JBrowseRootModel.pluginManager
+pm.evaluateExtensionPoint('Core-featureChartDrawerCatalog', [])
+// [{ name: 'barPlot', displayName: 'Bar plot', dataShape: 'category-values',
+//    description: '…', builtin: true }, …,
+//  { name: 'samplePlugin/heatmap', builtin: false, … }]
+```
+
+`@jbrowse/agent-sdk` wraps exactly this as `jbrowse.chartDrawers()`,
+`jbrowse.chartDrawer(name)` and `jbrowse.chartSpecSchema()`, and its
+`selfTest()` fails when a loaded `FeatureChartTrack` publishes no catalog. The
+practical effect for plugin authors: **the description and `optionsSchema` you
+write are what an agent sees when it decides whether your drawer fits the
+data**, so write `description` as "what it draws and which data shape it
+consumes", and keep `optionsSchema` to the keys your `draw` actually reads.
+
+`builtin` is `false` when the implementation came from a plugin — including a
+plugin that shadows a built-in name — so an agent never assumes built-in
+behaviour from a familiar name.
+
 ### Main thread vs worker
 
 `FeatureChartPlugin` is part of every product's `corePlugins`, and the RPC
@@ -376,7 +410,7 @@ The same message appears in the maximize dialog as an `Alert`, so a broken
   affordance, so prefer a drawer unless you really need interactivity.
 - **A chart the built-ins cannot express but the spec vocabulary can** →
   `renderer.drawer: "spec"` plus a `spec` block; no code, no plugin. See
-  [Feature chart specs](./feature_chart_specs).
+  [Feature chart specs](/docs/developer_guides/feature_chart_specs/).
 - **A chart kind the built-ins cannot express and you want it in every track** →
   a drawer is still the right unit; a first-class `DrawerType`
   (`pluginManager.addDrawerType`) is deliberately not implemented yet. It

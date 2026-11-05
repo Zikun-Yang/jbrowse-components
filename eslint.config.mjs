@@ -57,6 +57,14 @@ export default defineConfig(
       // Worker polyfills (plain JS files)
       '**/workerPolyfill.js',
 
+      // @jbrowse/agent-sdk is plain JS injected into the page verbatim (no build
+      // step, no TS project), so typescript-eslint cannot parse it
+      'packages/agent-sdk/src/*.js',
+
+      // fork scripts are plain ESM run by node directly
+      'scripts/check-core-plugins.mjs',
+      'scripts/fork-manifest.mjs',
+
       // AWS Lambda functions
       'products/jbrowse-aws-lambda-functions',
 

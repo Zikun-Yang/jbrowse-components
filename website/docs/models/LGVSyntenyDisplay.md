@@ -49,13 +49,6 @@ configuration: ConfigurationReference(schema)
 
 ### LGVSyntenyDisplay - Methods
 
-#### method: contextMenuItems
-
-```js
-// type signature
-contextMenuItems: () => MenuItem[]
-```
-
 #### method: trackMenuItems
 
 ```js

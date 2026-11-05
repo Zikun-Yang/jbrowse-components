@@ -127,6 +127,21 @@ jobs:
             git diff packages/core/package.json
             exit 1
           fi
+      # Fork addition (FORK.md): the config schema docs and the per-product plugin
+      # lists are derived, so a hand edit drifts silently. Both checks are cheap:
+      # they rerun one generator and one script, not a build.
+      - name: Check generated config docs are up-to-date
+        run: |
+          pnpm configdocs
+          pnpm prettier --write website/docs/config > /dev/null
+          if ! git diff --quiet website/docs/config; then
+            echo "Error: website/docs/config is out of date!"
+            echo "Run 'pnpm configdocs && pnpm prettier --write website/docs/config' and commit the result."
+            git diff --stat website/docs/config
+            exit 1
+          fi
+      - name: Check corePlugins consistency across products
+        run: node scripts/check-core-plugins.mjs --verbose
       - name: Lint codebase
         run: pnpm lint
 

@@ -21,7 +21,8 @@ describe('isDevelopmentBuild', () => {
 
   // The regression this guards: webpack substitutes `process.env.NODE_ENV` at
   // build time but does not polyfill `process`, so a `typeof process` guard made
-  // every development warning dead code in the browser.
+  // every development warning dead code in the browser (WP2 hit this in
+  // feature-chart, WP5 moved the guard here so core and plugins share it).
   test('treats a runtime without `process` as a development build', () => {
     const originalProcess = globalThis.process
     // @ts-expect-error - simulating a browser bundle without a `process` shim

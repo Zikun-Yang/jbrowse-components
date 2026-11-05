@@ -35,7 +35,11 @@ describe('agent-sdk host contracts (source sentinels)', () => {
     const src = read(
       'plugins/linear-genome-view/src/BaseLinearDisplay/models/serverSideRenderedBlock.ts',
     )
-    for (const field of ['filled', 'isRenderingPending', 'blockStatusMessage']) {
+    for (const field of [
+      'filled',
+      'isRenderingPending',
+      'blockStatusMessage',
+    ]) {
       expect(src).toContain(field)
     }
   })
@@ -46,5 +50,30 @@ describe('agent-sdk host contracts (source sentinels)', () => {
     )
     expect(src).toContain('Loading')
     expect(src).toMatch(/opacity:\s*0/)
+  })
+})
+
+describe('agent-sdk public surface (source sentinels)', () => {
+  it('jbrowse-web installs the track-info bridge the SDK reads', () => {
+    // the SDK is plain JS and cannot import the markdown/jexl pipeline, so it
+    // reads the resolver the About dialog uses through this one global
+    const bridge = read('products/jbrowse-web/src/trackInfoBridge.ts')
+    expect(bridge).toContain('__jbrowseTrackInfo')
+    expect(bridge).toContain('resolveTrackInfo')
+    expect(read('products/jbrowse-web/src/components/JBrowse.tsx')).toContain(
+      'installTrackInfoBridge',
+    )
+  })
+
+  it('feature-chart publishes the extension points chartDrawers()/chartSpecSchema() read', () => {
+    expect(
+      read('plugins/feature-chart/src/FeatureChartDrawer/drawerRegistry.ts'),
+    ).toContain("'Core-featureChartDrawerCatalog'")
+    expect(
+      read('plugins/feature-chart/src/FeatureChartDrawer/chartSpecSchema.ts'),
+    ).toContain("'Core-featureChartSpecSchema'")
+    expect(read('plugins/feature-chart/src/index.ts')).toContain(
+      'installFeatureChartAgentSurface',
+    )
   })
 })

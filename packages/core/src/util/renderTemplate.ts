@@ -9,18 +9,14 @@
  * result to this function).
  */
 
+import { isDevelopmentBuild } from './devMode.ts'
+
 export type TemplateContext = Record<string, unknown>
 
 const variableRegex = /\{\{\s*([\w.-]+)\s*\}\}/g
 
 /** warn about unknown variables only once per path, and only in dev */
 const warnedPaths = new Set<string>()
-
-function isDevelopment() {
-  // `process` is not available in every runtime (webpack replaces
-  // `process.env.NODE_ENV` statically at build time), so guard the access
-  return typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
-}
 
 /**
  * Resolve a dotted path (e.g. `track.metadata.source`, `items.0.value`) in the
@@ -90,7 +86,7 @@ export function renderTemplate(
   return template.replace(variableRegex, (_match, path: string) => {
     const value = resolveTemplatePath(context, path)
     if (value === undefined) {
-      if (isDevelopment() && !warnedPaths.has(path)) {
+      if (isDevelopmentBuild() && !warnedPaths.has(path)) {
         warnedPaths.add(path)
         console.warn(
           `renderTemplate: no value for template variable "{{${path}}}"`,

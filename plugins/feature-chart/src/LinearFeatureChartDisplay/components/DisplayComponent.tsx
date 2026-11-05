@@ -26,6 +26,7 @@ const DisplayComponent = observer(function DisplayComponent({
   model: LinearFeatureChartDisplayModel
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogFeature, setDialogFeature] = useState<Feature>()
   const [hoveredFeature, setHoveredFeature] = useState<Feature>()
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -90,6 +91,12 @@ const DisplayComponent = observer(function DisplayComponent({
           aria-label={`Maximize chart ${feature.get('name') ?? ''}`.trim()}
           data-testid="feature-chart-maximize"
           onClick={() => {
+            // Snapshot the feature: the dialog lives in a portal, so moving the
+            // pointer to its buttons leaves this wrapper and clears the hover
+            // state. Without the snapshot the chart vanished from the dialog
+            // (and the dialog shrank under the pointer) exactly when the user
+            // reached for Export.
+            setDialogFeature(feature)
             setDialogOpen(true)
           }}
           style={{
@@ -109,8 +116,9 @@ const DisplayComponent = observer(function DisplayComponent({
         open={dialogOpen}
         onClose={() => {
           setDialogOpen(false)
+          setDialogFeature(undefined)
         }}
-        feature={feature}
+        feature={dialogFeature ?? feature}
         displayModel={model}
       />
     </div>

@@ -258,13 +258,6 @@ jexlFiltersSetting: types.maybe(types.array(types.string))
 string
 ```
 
-#### getter: prefersOffset
-
-```js
-// type
-boolean
-```
-
 #### getter: rendererTypeName
 
 ```js

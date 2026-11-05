@@ -73,6 +73,17 @@ sortedBy: types.frozen<SortedBy | undefined>()
 
 ### LinearPileupDisplay - Getters
 
+#### getter: autoHeightEnabled
+
+height is allocated by the parent LinearAlignmentsDisplay (PileupHeight
+autorun), so the generic BaseLinearDisplay auto-height autorun must not grow
+this display itself
+
+```js
+// type
+boolean
+```
+
 #### getter: modificationThreshold
 
 ```js
@@ -136,7 +147,7 @@ showSubMenuItems: () => ({ label: string; type: "subMenu"; subMenu: { label: str
 
 ```js
 // type signature
-trackMenuItems: () => readonly [...MenuItem[], { readonly label: "Sort by..."; readonly icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; }; readonly disabled: boolean; readonly subMenu: readonly [......[]]; }, { ...; }, { ...; }]
+trackMenuItems: () => readonly [...MenuItem[], { readonly label: "Sort by..."; readonly icon: ForwardRefExoticComponent<Omit<SvgIconProps, "ref"> & RefAttributes<SVGSVGElement>>; readonly disabled: boolean; readonly subMenu: readonly [......[]]; }, { ...; }, { ...; }]
 ```
 
 ### LinearPileupDisplay - Actions

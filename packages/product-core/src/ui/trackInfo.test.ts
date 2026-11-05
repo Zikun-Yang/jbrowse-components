@@ -444,3 +444,42 @@ describe('formatAbout config snapshot', () => {
     )
   })
 })
+
+describe('resolveTrackInfo plain text', () => {
+  test('infoText is the markdown-free version of info', () => {
+    const config = makeTrackConfig({
+      formatAbout: {
+        info: '## {{track.name}}\n\n**source**: {{track.metadata.source}}',
+      },
+    })
+    const { info, infoText } = resolveTrackInfo(
+      config,
+      makeSession(),
+      pluginManager,
+    )
+    expect(info).toBe('## Tissue expression\n\n**source**: GEO')
+    expect(infoText).toBe('Tissue expression\n\nsource: GEO')
+  })
+
+  test('infoText stays empty when there is nothing to show', () => {
+    const { info, infoText } = resolveTrackInfo(
+      makeTrackConfig({}),
+      makeSession(),
+      pluginManager,
+    )
+    expect(info).toBe('')
+    expect(infoText).toBe('')
+  })
+
+  test('infoText is independent of showInfo: the panel can be hidden and the text still resolve', () => {
+    // the agent SDK must be able to read a description that the UI intentionally
+    // keeps out of the dialog
+    const config = makeTrackConfig({
+      formatAbout: { info: 'kept', showInfo: false },
+    })
+    const resolved = resolveTrackInfo(config, makeSession(), pluginManager)
+    expect(resolved.visible).toBe(false)
+    expect(resolved.info).toBe('kept')
+    expect(resolved.infoText).toBe('kept')
+  })
+})

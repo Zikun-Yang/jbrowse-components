@@ -23,7 +23,7 @@ reference the markdown files in our repo of the checked out git tag
 #### slot: datasets
 
 Preset single-cell datasets shown in the SingleCellView import form. Each entry
-should have { name: string, uri: string }.
+needs a `name` and a `uri`; see the SingleCellView import form.
 
 ```js
 datasets: {

@@ -1,4 +1,4 @@
-import { isDevelopmentBuild } from './devMode.ts'
+import { isDevelopmentBuild } from '@jbrowse/core/util/devMode'
 
 import type { FeatureChartDrawerMeta } from './types.ts'
 

@@ -1,3 +1,5 @@
+import { isDevelopmentBuild } from '@jbrowse/core/util/devMode'
+
 import { barModelFromBars, barPlotDrawer } from './barPlot.ts'
 import {
   boxModelFromPrecomputed,
@@ -5,7 +7,6 @@ import {
   precomputedBoxPlotDrawer,
   rawBoxPlotDrawer,
 } from './boxPlot.ts'
-import { isDevelopmentBuild } from './devMode.ts'
 import {
   histogramModelFromValues,
   histogramPlotDrawer,
@@ -29,6 +30,15 @@ import type PluginManager from '@jbrowse/core/PluginManager'
  * `drawers => [...drawers, myDrawer]`.
  */
 export const FEATURE_CHART_DRAWER_EXTENSION_POINT = 'Core-featureChartDrawer'
+
+/**
+ * Extension point that publishes the drawer catalog (`listFeatureChartDrawerCatalog`)
+ * as plain data through the `PluginManager`. `@jbrowse/agent-sdk`
+ * (`chartDrawers()`) reads it that way — it is injected into the page as plain
+ * JS and cannot import this module. See `agentSurface.ts`.
+ */
+export const FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT =
+  'Core-featureChartDrawerCatalog'
 
 /** Registered drawer: serializable catalog entry plus its draw function. */
 export interface FeatureChartDrawerEntry {
@@ -400,6 +410,36 @@ export function listFeatureChartDrawerNames(
   pluginManager?: PluginManager | null,
 ): string[] {
   return getCatalog(pluginManager).sorted.map(meta => meta.name)
+}
+
+/** One catalog row for agents: the public metadata plus where it came from. */
+export interface FeatureChartDrawerCatalogEntry extends FeatureChartDrawerMeta {
+  /**
+   * `true` when both the name and the implementation ship with this plugin,
+   * `false` for plugin contributions. A plugin that shadows a built-in name
+   * keeps the entry but reports `builtin: false`: an agent must not assume the
+   * built-in behaviour just because the name is familiar.
+   */
+  builtin: boolean
+}
+
+/**
+ * The catalog in the shape `@jbrowse/agent-sdk` exposes as `chartDrawers()`:
+ * built-ins plus plugin contributions, sorted by name, each row carrying
+ * `builtin` so an agent can tell "shipped with BioSeek" from "came from a
+ * plugin the user loaded".
+ */
+export function listFeatureChartDrawerCatalog(
+  pluginManager?: PluginManager | null,
+): FeatureChartDrawerCatalogEntry[] {
+  const { entries, sorted } = getCatalog(pluginManager)
+  return sorted.map(meta => {
+    const builtIn = registry.get(meta.name)
+    return {
+      ...meta,
+      builtin: !!builtIn && entries.get(meta.name)?.draw === builtIn.draw,
+    }
+  })
 }
 
 function bareName(name: string) {

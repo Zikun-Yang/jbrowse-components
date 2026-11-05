@@ -71,6 +71,45 @@ false
 linkViews: false
 ```
 
+#### property: followSynteny
+
+when enabled, navigating in one sub-view re-centers the other sub-views on the
+syntenically corresponding position
+
+```js
+// type signature
+false
+// code
+followSynteny: false
+```
+
+#### property: followCumulativePct
+
+when followSynteny maps a window onto multiple chromosomes, keep only the top
+chromosomes (by aligned overlap, descending) whose cumulative overlap reaches
+this percentage of the total, filtering out spurious repeat-induced hits; 100
+keeps all
+
+```js
+// type signature
+number
+// code
+followCumulativePct: 90
+```
+
+#### property: rainbowAnchor
+
+index of the sub-view whose genome anchors rainbow (query position) coloring:
+features in every synteny display are colored by where they map onto this
+genome's coordinates
+
+```js
+// type signature
+number
+// code
+rainbowAnchor: 0
+```
+
 #### property: interactiveOverlay
 
 ```js
@@ -167,6 +206,16 @@ boolean
 
 ### LinearComparativeView - Methods
 
+#### method: followFromView
+
+synteny-aware follow: re-center other sub-views after a navigation in the given
+source sub-view. no-op here, overridden by LinearSyntenyView
+
+```js
+// type signature
+followFromView: (_source: unknown) => Promise<void>
+```
+
 #### method: headerMenuItems
 
 includes a subset of view menu options because the full list is a little
@@ -192,6 +241,13 @@ rubberBandMenuItems: () => { label: string; onClick: () => void; }[]
 ```
 
 ### LinearComparativeView - Actions
+
+#### action: setLastNavSource
+
+```js
+// type signature
+setLastNavSource: (source: unknown) => void
+```
 
 #### action: setWidth
 
@@ -233,6 +289,55 @@ setLevelHeight: (newHeight: number, level?: number) => any
 ```js
 // type signature
 setLinkViews: (arg: boolean) => void
+```
+
+#### action: setFollowSynteny
+
+```js
+// type signature
+setFollowSynteny: (arg: boolean) => void
+```
+
+#### action: setFollowCumulativePct
+
+```js
+// type signature
+setFollowCumulativePct: (arg: number) => void
+```
+
+#### action: setRainbowAnchor
+
+```js
+// type signature
+setRainbowAnchor: (arg: number) => void
+```
+
+#### action: incFollowing
+
+```js
+// type signature
+incFollowing: () => void
+```
+
+#### action: decFollowing
+
+```js
+// type signature
+decFollowing: () => void
+```
+
+#### action: incFollowSeq
+
+```js
+// type signature
+incFollowSeq: () => number
+```
+
+#### action: setLastApplied
+
+```js
+// type signature
+setLastApplied: (id: string, val: { refName: string; coord: number; }) => void
 ```
 
 #### action: setShowDynamicControls

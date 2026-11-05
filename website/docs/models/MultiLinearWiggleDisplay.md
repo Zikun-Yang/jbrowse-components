@@ -124,14 +124,17 @@ their track is drawn with the color. sort of a stylistic choice
 boolean
 ```
 
-#### getter: prefersOffset
+#### getter: multiRowColor
 
-positions multi-row below the tracklabel even if using overlap tracklabels for
-everything else
+color of a source in a multi-row renderer that doesn't set its own color. a
+multi-row wiggle draws one sample per row, so it uses the same color a
+single-sample wiggle track uses for positive scores (the posColor of the
+renderer config, #292421 by default) instead of the hardcoded blue it used
+before, which made every row look the same anyway
 
 ```js
 // type
-boolean
+string
 ```
 
 #### getter: sourcesWithoutLayout
@@ -174,27 +177,6 @@ boolean
 ```js
 // type
 boolean
-```
-
-#### getter: root
-
-```js
-// type
-any
-```
-
-#### getter: totalHeight
-
-```js
-// type
-number
-```
-
-#### getter: hierarchy
-
-```js
-// type
-any
 ```
 
 #### getter: ticks
@@ -261,7 +243,7 @@ renderProps: () => any
 
 ```js
 // type signature
-renderingProps: () => { displayModel: { id: string; type: "MultiLinearWiggleDisplay"; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; ... 23 more ...; } & ... 38 more ... & IStateTreeNode<...>; }
+renderingProps: () => { displayModel: { id: string; type: "MultiLinearWiggleDisplay"; rpcDriverName: string | undefined; heightPreConfig: number | undefined; userBpPerPxLimit: number | undefined; ... 19 more ...; showSidebar: boolean; } & ... 37 more ... & IStateTreeNode<...>; }
 ```
 
 #### method: trackMenuItems

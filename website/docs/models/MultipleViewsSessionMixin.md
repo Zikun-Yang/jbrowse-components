@@ -38,30 +38,6 @@ views: types.array(
         )
 ```
 
-#### property: stickyViewHeaders
-
-```js
-// type signature
-IOptionalIType<ISimpleType<boolean>, [undefined]>
-// code
-stickyViewHeaders: types.optional(types.boolean, () =>
-          localStorageGetBoolean('stickyViewHeaders', true),
-        )
-```
-
-#### property: useWorkspaces
-
-enables the dockview-based tabbed/tiled workspace layout
-
-```js
-// type signature
-IOptionalIType<ISimpleType<boolean>, [undefined]>
-// code
-useWorkspaces: types.optional(types.boolean, () =>
-          localStorageGetBoolean('useWorkspaces', false),
-        )
-```
-
 ### MultipleViewsSessionMixin - Actions
 
 #### action: moveViewDown
@@ -104,18 +80,4 @@ addView: (typeName: string, initialState?: {}) => any
 ```js
 // type signature
 removeView: (view: IBaseViewModel) => void
-```
-
-#### action: setStickyViewHeaders
-
-```js
-// type signature
-setStickyViewHeaders: (sticky: boolean) => void
-```
-
-#### action: setUseWorkspaces
-
-```js
-// type signature
-setUseWorkspaces: (useWorkspaces: boolean) => void
 ```
