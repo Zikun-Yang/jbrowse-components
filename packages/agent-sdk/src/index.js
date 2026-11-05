@@ -14,6 +14,13 @@
 
   var DEFAULT_TRACK_LIMIT = 50
 
+  /** warnings collected during one script execution (drained by digest()) */
+  var warnings = []
+
+  function warn(msg) {
+    warnings.push(msg)
+  }
+
   function fail(code, message, hint, candidates) {
     var err = new Error(code + ': ' + message + (hint ? '\nhint: ' + hint : ''))
     err.code = code
@@ -128,8 +135,56 @@
     return ids
   }
 
-  function trackInfo(conf, openIds) {
-    return freeze({
+  // ── track info text ──────────────────────────────────────────────────────
+
+  var warnedInfoBridge = false
+
+  /**
+   * Resolve `formatAbout.info` for a track config through the host bridge.
+   *
+   * The SDK is plain JS injected into the page and cannot import the
+   * markdown/jexl pipeline, so the app publishes the resolver the About dialog
+   * itself uses (`window.__jbrowseTrackInfo`, see
+   * `products/jbrowse-web/src/trackInfoBridge.ts`). One implementation means the
+   * agent can never describe a track differently from the UI.
+   *
+   * Returns null when the host has no bridge or the track has no info: callers
+   * omit the fields instead of writing empty strings into a prompt.
+   */
+  function trackInfoText(conf) {
+    var bridge = window.__jbrowseTrackInfo
+    if (typeof bridge !== 'function') {
+      return null
+    }
+    try {
+      var resolved = bridge(conf)
+      if (
+        !resolved ||
+        typeof resolved.info !== 'string' ||
+        resolved.info.trim() === ''
+      ) {
+        return null
+      }
+      return {
+        info: resolved.info,
+        infoText:
+          typeof resolved.infoText === 'string' ? resolved.infoText : undefined,
+      }
+    } catch (e) {
+      if (!warnedInfoBridge) {
+        warnedInfoBridge = true
+        warn(
+          'trackInfo(): the host track-info bridge threw (' +
+            String((e && e.message) || e) +
+            ') — info/infoText omitted',
+        )
+      }
+      return null
+    }
+  }
+
+  function trackInfo(conf, openIds, skipInfo) {
+    var info = {
       id: conf.trackId,
       name: conf.name,
       type: conf.type,
@@ -137,7 +192,17 @@
       assemblyNames: toArray(conf.assemblyNames),
       category: toArray(conf.category),
       open: !!(openIds || openTrackIds())[conf.trackId],
-    })
+    }
+    if (!skipInfo) {
+      var text = trackInfoText(conf)
+      if (text) {
+        info.info = text.info
+        if (text.infoText !== undefined) {
+          info.infoText = text.infoText
+        }
+      }
+    }
+    return freeze(info)
   }
 
   function allTrackConfs() {
@@ -295,6 +360,75 @@
     })
   }
 
+  // ── feature chart catalog (the agent surface of the plugin) ──────────────
+
+  // Published by @jbrowse/plugin-feature-chart through the PluginManager. The
+  // SDK cannot import the plugin (it is injected as plain JS), so an extension
+  // point is the one channel that works — and it means the catalog an agent
+  // reads is the same one the renderer resolves drawer names with.
+  var DRAWER_CATALOG_EXTENSION_POINT = 'Core-featureChartDrawerCatalog'
+  var SPEC_SCHEMA_EXTENSION_POINT = 'Core-featureChartSpecSchema'
+
+  function pluginManager() {
+    var root = window.JBrowseRootModel
+    return (root && root.pluginManager) || null
+  }
+
+  /**
+   * Evaluate a data extension point. `null` means nobody registered it, which is
+   * how "the plugin is not loaded here" is told apart from "the plugin has no
+   * drawers" — an empty result must never look like a valid empty catalog.
+   */
+  function evaluateSurface(name) {
+    var pm = pluginManager()
+    if (!pm || typeof pm.evaluateExtensionPoint !== 'function') {
+      return null
+    }
+    try {
+      var value = pm.evaluateExtensionPoint(name, null)
+      return value === undefined ? null : value
+    } catch (e) {
+      return null
+    }
+  }
+
+  function chartDrawerCatalog() {
+    var rows = evaluateSurface(DRAWER_CATALOG_EXTENSION_POINT)
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return null
+    }
+    return rows.map(function (row) {
+      var out = {
+        name: row.name,
+        displayName: row.displayName,
+        description: row.description,
+        dataShape: row.dataShape,
+        builtin: !!row.builtin,
+      }
+      // documentation-only hint from the drawer, never validated by the config
+      // editor — keep it plain JSON so it survives structuredClone
+      if (row.optionsSchema !== undefined) {
+        out.optionsSchema = safeSerialize(row.optionsSchema, 4)
+      }
+      if (row.defaultSize) {
+        out.defaultSize = {
+          width: row.defaultSize.width,
+          height: row.defaultSize.height,
+        }
+      }
+      return out
+    })
+  }
+
+  function featureChartUnavailable(hint) {
+    fail(
+      'FEATURE_CHART_UNAVAILABLE',
+      'the feature-chart plugin surface is not registered on this page',
+      hint ||
+        'chart drawers and chart specs only exist where @jbrowse/plugin-feature-chart is loaded',
+    )
+  }
+
   // ── idle detection ─────────────────────────────────────────────────────────
   // JBrowse has no global busy flag; loading states are heterogeneous. Two
   // complementary signal sources:
@@ -403,12 +537,6 @@
   // ── the agent ────────────────────────────────────────────────────────────
 
   function createAgent() {
-    var warnings = []
-
-    function warn(msg) {
-      warnings.push(msg)
-    }
-
     /** the routed app shell only renders views on the 'workspace' route */
     function ensureWorkspaceRoute() {
       var s = session()
@@ -418,10 +546,37 @@
     }
 
     /** resolve fuzzy id/name to a TrackInfo, throwing with candidates */
+    /**
+     * Attach `info`/`infoText` to an already built TrackInfo.
+     *
+     * Called once per returned track (never for the whole candidate list): the
+     * host bridge runs a markdown+jexl render, and resolving one track by name
+     * must not render the info of every other track in the session.
+     */
+    function attachInfo(info, conf) {
+      if (!conf) {
+        return info
+      }
+      var text = trackInfoText(conf)
+      if (!text) {
+        return info
+      }
+      var out = {}
+      for (var k in info) {
+        out[k] = info[k]
+      }
+      out.info = text.info
+      if (text.infoText !== undefined) {
+        out.infoText = text.infoText
+      }
+      return freeze(out)
+    }
+
     function resolveTrackInfo(idOrName) {
       var openIds = openTrackIds()
-      var infos = allTrackConfs().map(function (c) {
-        return trackInfo(c, openIds)
+      var confs = allTrackConfs()
+      var infos = confs.map(function (c) {
+        return trackInfo(c, openIds, true)
       })
       var needle = String(idOrName).toLowerCase()
       var exact = infos.filter(function (t) {
@@ -438,10 +593,10 @@
       })
       var found = exact[0] || nameMatch[0]
       if (found) {
-        return found
+        return attachInfo(found, confs[infos.indexOf(found)])
       }
       if (fuzzy.length === 1) {
-        return fuzzy[0]
+        return attachInfo(fuzzy[0], confs[infos.indexOf(fuzzy[0])])
       }
       if (fuzzy.length > 1) {
         fail(
@@ -537,17 +692,23 @@
       },
 
       /**
-       * All configured tracks (open or not).
+       * All configured tracks (open or not). Each entry carries the rendered
+       * track info when the track has any (`formatAbout.info`):
+       * `info` is the markdown source, `infoText` is the same text with the
+       * markdown markers removed. Both are absent, not empty, for a track
+       * without info.
        * filter: { open?: boolean, name?: string (substring, case-insensitive),
        *           type?: string, assembly?: string }
-       * opts:   { limit?: number } (default 50)
+       * opts:   { limit?: number (default 50), info?: boolean (default true) }
+       *         Pass info: false to skip the markdown render (digest() does).
        */
       tracks: function (filter, opts) {
         var limit = (opts && opts.limit) || DEFAULT_TRACK_LIMIT
+        var skipInfo = !!(opts && opts.info === false)
         var openIds = openTrackIds()
         var all = allTrackConfs()
           .map(function (c) {
-            return trackInfo(c, openIds)
+            return trackInfo(c, openIds, skipInfo)
           })
           .filter(function (info) {
             return matchesFilter(info, filter)
@@ -568,6 +729,65 @@
       /** One track by exact id or fuzzy name. Errors list candidates. */
       track: function (idOrName) {
         return resolveTrackInfo(idOrName)
+      },
+
+      /**
+       * The chart drawer catalog: built-ins plus whatever plugins contributed,
+       * sorted by name. Each entry is
+       * { name, displayName, description, dataShape, builtin, optionsSchema?, defaultSize? }.
+       * `optionsSchema` is a documentation hint (what the drawer reads from
+       * `drawerOptions`), NOT a validation contract. `builtin: false` means the
+       * implementation came from a loaded plugin — do not assume built-in
+       * behaviour from a familiar name.
+       * throws FEATURE_CHART_UNAVAILABLE when the plugin is not loaded.
+       */
+      chartDrawers: function () {
+        var rows = chartDrawerCatalog()
+        if (!rows) {
+          featureChartUnavailable(
+            'call viewTypes()/tracks() to see what this page loaded; the catalog is published by @jbrowse/plugin-feature-chart',
+          )
+        }
+        return freeze(rows)
+      },
+
+      /**
+       * One catalog entry by exact drawer name (same shape as chartDrawers()).
+       * Throws UNKNOWN_DRAWER with the available names when the name is wrong.
+       */
+      chartDrawer: function (name) {
+        var rows = chartDrawerCatalog()
+        if (!rows) {
+          featureChartUnavailable()
+        }
+        var matches = rows.filter(function (row) {
+          return row.name === name
+        })
+        if (matches[0]) {
+          return matches[0]
+        }
+        fail(
+          'UNKNOWN_DRAWER',
+          "no chart drawer named '" + name + "'",
+          'call chartDrawers() to list the catalog; plugin drawers are named "pluginName/drawerName"',
+          rows.map(function (row) {
+            return row.name
+          }),
+        )
+      },
+
+      /**
+       * The v1 chart spec vocabulary as a JSON-Schema-subset document
+       * ({ kinds, dataForms, kindDataForms, bins, colorSchemes, properties, … }),
+       * generated from the same constants the validator enforces.
+       * throws FEATURE_CHART_UNAVAILABLE when the plugin is not loaded.
+       */
+      chartSpecSchema: function () {
+        var schema = evaluateSurface(SPEC_SCHEMA_EXTENSION_POINT)
+        if (!schema || typeof schema !== 'object') {
+          featureChartUnavailable()
+        }
+        return freeze(safeSerialize(schema, 8))
       },
 
       /**
@@ -652,7 +872,7 @@
       digest: function () {
         var views = api.views()
         var active = views[0]
-        var open = api.tracks({ open: true }, { limit: 100 })
+        var open = api.tracks({ open: true }, { limit: 100, info: false })
         var digest = {
           viewCount: views.length,
           activeView: active
@@ -1210,6 +1430,87 @@
           )
         })
 
+        check('track-info-bridge', function () {
+          if (typeof window.__jbrowseTrackInfo !== 'function') {
+            return (
+              'skip: the host app does not install window.__jbrowseTrackInfo; ' +
+              'trackInfo().info/infoText are omitted (only jbrowse-web publishes it)'
+            )
+          }
+          var confs = allTrackConfs()
+          if (confs.length === 0) {
+            return 'skip: no tracks configured, nothing to resolve info for'
+          }
+          var resolvable = 0
+          for (var i = 0; i < confs.length; i++) {
+            var resolved = window.__jbrowseTrackInfo(confs[i])
+            if (resolved && typeof resolved.info === 'string') {
+              resolvable++
+            }
+          }
+          return (
+            resolvable > 0 ||
+            'the bridge returned no string `info` for any of ' +
+              confs.length +
+              ' tracks (did resolveTrackInfo change shape?)'
+          )
+        })
+
+        check('feature-chart-catalog', function () {
+          var pm = pluginManager()
+          if (!pm || typeof pm.getElementTypesInGroup !== 'function') {
+            return 'skip: no pluginManager to enumerate track types'
+          }
+          var loaded = pm.getElementTypesInGroup('track').some(function (el) {
+            return el && el.name === 'FeatureChartTrack'
+          })
+          var rows = chartDrawerCatalog()
+          if (!loaded) {
+            return rows
+              ? 'a drawer catalog is published but FeatureChartTrack is not registered'
+              : 'skip: feature-chart is not loaded in this app'
+          }
+          if (!rows) {
+            return (
+              'FeatureChartTrack is registered but ' +
+              DRAWER_CATALOG_EXTENSION_POINT +
+              ' has no catalog — chartDrawers() would report nothing'
+            )
+          }
+          var incomplete = rows.filter(function (row) {
+            return !row.name || !row.description
+          })
+          if (incomplete.length > 0) {
+            return incomplete.length + ' catalog row(s) are missing name/description'
+          }
+          return rows.some(function (row) {
+            return row.builtin
+          })
+            ? true
+            : 'the catalog lists no built-in drawers'
+        })
+
+        check('chart-spec-schema', function () {
+          var schema = evaluateSurface(SPEC_SCHEMA_EXTENSION_POINT)
+          if (!schema) {
+            var pm = pluginManager()
+            var loaded =
+              pm &&
+              typeof pm.getElementTypesInGroup === 'function' &&
+              pm.getElementTypesInGroup('track').some(function (el) {
+                return el && el.name === 'FeatureChartTrack'
+              })
+            return loaded
+              ? SPEC_SCHEMA_EXTENSION_POINT +
+                  ' is unregistered — chartSpecSchema() would throw'
+              : 'skip: feature-chart is not loaded in this app'
+          }
+          return (
+            (Array.isArray(schema.kinds) && schema.kinds.length > 0) ||
+            'chart spec schema has no kinds'
+          )
+        })
+
         check('workspace-anchor', function () {
           if (document.querySelector('[data-testid="workspace-views"]')) {
             return true
@@ -1371,11 +1672,18 @@
     var HELP = {
       views: 'views(): list all views — [{ id, type, displayName, assemblyNames, regions, trackIds }]',
       tracks:
-        'tracks(filter?, opts?): list configured tracks — [{ id, name, type, adapter, assemblyNames, category, open }]\n' +
+        'tracks(filter?, opts?): list configured tracks — [{ id, name, type, adapter, assemblyNames, category, open, info?, infoText? }]\n' +
+        '  info/infoText are the rendered formatAbout.info (markdown / markdown stripped) and are absent when the track has none\n' +
         '  filter: { open?: boolean, name?: substring, type?: string, assembly?: string }\n' +
-        '  opts: { limit?: number } default 50',
+        '  opts: { limit?: number, info?: boolean } default 50, info true',
       track:
-        'track(idOrName): one track by exact id or fuzzy name. Throws with candidates on no/ambiguous match.',
+        'track(idOrName): one track by exact id or fuzzy name (same fields as tracks(), including info/infoText). Throws with candidates on no/ambiguous match.',
+      chartDrawers:
+        'chartDrawers(): the FeatureChart drawer catalog — [{ name, displayName, description, dataShape, builtin, optionsSchema?, defaultSize? }] (built-ins + plugin drawers). optionsSchema is a hint, not a contract. Throws FEATURE_CHART_UNAVAILABLE when the plugin is not loaded.',
+      chartDrawer:
+        'chartDrawer(name): one catalog entry by exact name. Throws UNKNOWN_DRAWER with the available names when the name is wrong.',
+      chartSpecSchema:
+        'chartSpecSchema(): the v1 chart spec vocabulary as JSON ({ kinds, dataForms, kindDataForms, bins, colorSchemes, properties }) — write renderer.spec from this, then load the config. Throws FEATURE_CHART_UNAVAILABLE when the plugin is not loaded.',
       assemblies: 'assemblies(): configured assemblies — [{ name, displayName, aliases }]',
       refNames:
         'refNames(assemblyName, opts?): reference sequence names of an assembly (T2T assemblies use accessions, not "chr1"). opts: { limit? } default 100.',
@@ -1405,7 +1713,7 @@
         'waitForIdle(opts?): wait until no loading indicators remain in the workspace (failed/empty renders count as done). opts: { timeoutMs?: 30000, quietMs?: 500, pollMs?: 200 }. Returns { idle, waitedMs, stillLoading? }',
       sleep: 'sleep(ms): wait — useful after interactions that trigger async rendering.',
       selfTest:
-        'selfTest(): verify every internal contract the SDK relies on (session handle, DOM anchors, blockState shape, loading-decoy filtering, bridges). Read-only; run it at the start of a session. Returns { ok, checks: [{ name, status: pass|fail|skip, detail? }] }.',
+        'selfTest(): verify every internal contract the SDK relies on (session handle, DOM anchors, blockState shape, loading-decoy filtering, bridges, track-info bridge, feature-chart catalog/spec surface). Read-only; run it at the start of a session. Returns { ok, checks: [{ name, status: pass|fail|skip, detail? }] }.',
       help: 'help(method?): list methods or show details for one.',
     }
 
