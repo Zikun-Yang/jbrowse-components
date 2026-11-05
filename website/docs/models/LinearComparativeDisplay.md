@@ -107,6 +107,15 @@ controlled by a reaction
 setRendered: (args?: { features: Feature[]; } | undefined) => void
 ```
 
+#### action: setMateRendered
+
+controlled by a reaction
+
+```js
+// type signature
+setMateRendered: (args?: { features: Feature[]; } | undefined) => void
+```
+
 #### action: setError
 
 controlled by a reaction

@@ -35,8 +35,7 @@ export function installFeatureChartAgentSurface(pluginManager: PluginManager) {
     FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
     () => listFeatureChartDrawerCatalog(pluginManager),
   )
-  pluginManager.addToExtensionPoint(
-    CHART_SPEC_SCHEMA_EXTENSION_POINT,
-    () => chartSpecSchema(),
+  pluginManager.addToExtensionPoint(CHART_SPEC_SCHEMA_EXTENSION_POINT, () =>
+    chartSpecSchema(),
   )
 }

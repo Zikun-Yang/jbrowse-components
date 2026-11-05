@@ -415,6 +415,18 @@ string
 continuousPalette: 'viridis'
 ```
 
+#### property: quantileColoring
+
+When true, map continuous color-by values to the palette using quantiles instead
+of a linear min-to-max mapping.
+
+```js
+// type signature
+false
+// code
+quantileColoring: false
+```
+
 #### property: customCategoricalPalettes
 
 User-defined categorical palettes: name -> array of hex colors
@@ -660,6 +672,13 @@ setCategoricalPalette: (palette: string) => void
 ```js
 // type signature
 setContinuousPalette: (palette: string) => void
+```
+
+#### action: setQuantileColoring
+
+```js
+// type signature
+setQuantileColoring: (value: boolean) => void
 ```
 
 #### action: addCustomCategoricalPalette

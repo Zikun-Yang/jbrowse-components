@@ -49,7 +49,9 @@ function makePluginManager({ drawers, specSchema, trackTypes } = {}) {
       return null
     },
     getElementTypesInGroup(group) {
-      return group === 'track' ? (trackTypes ?? [{ name: 'FeatureChartTrack' }]) : []
+      return group === 'track'
+        ? (trackTypes ?? [{ name: 'FeatureChartTrack' }])
+        : []
     },
     getViewElements() {
       return []
@@ -84,7 +86,10 @@ describe('trackInfo: legacy fields', () => {
   test('track() by name keeps the legacy fields and candidate errors', () => {
     window.JBrowseSession = makeSession()
     const agent = createAgent()
-    expect(agent.track('genes')).toMatchObject({ id: 'genes', type: 'FeatureTrack' })
+    expect(agent.track('genes')).toMatchObject({
+      id: 'genes',
+      type: 'FeatureTrack',
+    })
     expect(() => agent.track('nope')).toThrow(/TRACK_NOT_FOUND/)
   })
 })
@@ -292,7 +297,9 @@ describe('selfTest() covers the new surface', () => {
   test('skips the feature-chart checks in an app without the plugin (e.g. cgv)', () => {
     window.JBrowseSession = makeSession()
     window.JBrowseRootModel = {
-      pluginManager: makePluginManager({ trackTypes: [{ name: 'FeatureTrack' }] }),
+      pluginManager: makePluginManager({
+        trackTypes: [{ name: 'FeatureTrack' }],
+      }),
     }
     const result = createAgent().selfTest()
     const byName = Object.fromEntries(

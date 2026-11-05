@@ -113,7 +113,7 @@ any
 
 ```js
 // type signature
-menuItems: () => { label: string; icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; }; onClick: () => void; }[]
+menuItems: () => { label: string; icon: ForwardRefExoticComponent<Omit<SvgIconProps, "ref"> & RefAttributes<SVGSVGElement>>; onClick: () => void; }[]
 ```
 
 ### SpreadsheetView - Actions

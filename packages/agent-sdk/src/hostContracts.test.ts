@@ -35,7 +35,11 @@ describe('agent-sdk host contracts (source sentinels)', () => {
     const src = read(
       'plugins/linear-genome-view/src/BaseLinearDisplay/models/serverSideRenderedBlock.ts',
     )
-    for (const field of ['filled', 'isRenderingPending', 'blockStatusMessage']) {
+    for (const field of [
+      'filled',
+      'isRenderingPending',
+      'blockStatusMessage',
+    ]) {
       expect(src).toContain(field)
     }
   })

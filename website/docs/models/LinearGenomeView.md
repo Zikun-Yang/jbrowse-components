@@ -305,29 +305,11 @@ string[]
 
 #### getter: isTopLevelView
 
-checking if lgv is a 'top-level' view is used for toggling pin track capability,
-sticky positioning
+checking if lgv is a 'top-level' view is used for toggling pin track capability
 
 ```js
 // type
 boolean
-```
-
-#### getter: stickyViewHeaders
-
-only uses sticky view headers when it is a 'top-level' view and session allows
-it
-
-```js
-// type
-boolean
-```
-
-#### getter: rubberbandTop
-
-```js
-// type
-number
 ```
 
 #### getter: assembliesNotFound
@@ -514,16 +496,6 @@ boolean
 ```js
 // type
 boolean
-```
-
-#### getter: cytobandOffset
-
-the cytoband is displayed to the right of the chromosome name, and that offset
-is calculated manually with this method
-
-```js
-// type
-number
 ```
 
 #### getter: staticBlocks

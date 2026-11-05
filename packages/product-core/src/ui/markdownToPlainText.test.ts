@@ -41,9 +41,7 @@ describe('markdownToPlainText', () => {
       markdownToPlainText(
         'see [GTEx](https://gtexportal.org) and <b>bold</b> and <https://jbrowse.org>',
       ),
-    ).toBe(
-      'see GTEx (https://gtexportal.org) and bold and https://jbrowse.org',
-    )
+    ).toBe('see GTEx (https://gtexportal.org) and bold and https://jbrowse.org')
   })
 
   test('renders images as alt text plus url', () => {

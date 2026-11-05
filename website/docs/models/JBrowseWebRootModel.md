@@ -109,6 +109,26 @@ setDefaultSession: () => void
 activateSession: (id: string) => Promise<void>
 ```
 
+#### action: duplicateSavedSession
+
+```js
+// type signature
+duplicateSavedSession: (id: string) => Promise<void>
+```
+
+#### action: activateTemplate
+
+Instantiate a session template (from the `preConfiguredSessions` config slot) as
+a new session, leaving the current session untouched. Templates written by hand
+can use the "session spec" shorthand (views without `id`, tracks as trackId
+strings — same as the URL `spec-` format); exported session snapshots are used
+as-is.
+
+```js
+// type signature
+activateTemplate: (template: Record<string, unknown> & { name: string; }) => void
+```
+
 #### action: favoriteSavedSession
 
 ```js

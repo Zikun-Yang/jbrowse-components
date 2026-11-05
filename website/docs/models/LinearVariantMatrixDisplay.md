@@ -53,15 +53,6 @@ lineZoneHeight: types.optional(types.number, 20)
 string
 ```
 
-#### getter: prefersOffset
-
-positions multi-row below the tracklabel even if using overlap tracklabels
-
-```js
-// type
-boolean
-```
-
 #### getter: featureWidgetType
 
 ```js

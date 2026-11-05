@@ -241,15 +241,6 @@ string
 
 ### SharedLinearPileupDisplayMixin - Methods
 
-#### method: copyFeatureToClipboard
-
-uses copy-to-clipboard and generates notification
-
-```js
-// type signature
-copyFeatureToClipboard: (feature: Feature) => Promise<void>
-```
-
 #### method: legendItems
 
 Returns legend items based on current colorBy setting
@@ -266,13 +257,6 @@ legendItems: (theme: Theme) => LegendItem[]
 showSubMenuItems: () => ({ label: string; type: "subMenu"; subMenu: { label: string; type: "radio"; checked: boolean | undefined; onClick: () => void; }[]; } | { label: string; type: string; checked: boolean | undefined; onClick: () => void; })[]
 ```
 
-#### method: contextMenuItems
-
-```js
-// type signature
-contextMenuItems: () => { label: string; icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; }; onClick: () => void; }[]
-```
-
 #### method: adapterRenderProps
 
 ```js
@@ -284,7 +268,7 @@ adapterRenderProps: () => any
 
 ```js
 // type signature
-renderingProps: () => { onFeatureClick(_: unknown, featureId?: string | undefined): Promise<void>; onClick(): void; onFeatureContextMenu(_: unknown, featureId?: string | undefined): Promise<void>; displayModel: { ...; } & ... 3 more ... & IStateTreeNode<...>; }
+renderingProps: () => { onFeatureClick(_: unknown, featureId?: string | undefined): Promise<void>; onClick(): void; displayModel: { id: string; type: string; rpcDriverName: string | undefined; } & NonEmptyObject & { ...; } & { ...; } & IStateTreeNode<...>; }
 ```
 
 #### method: colorSchemeSubMenuItems

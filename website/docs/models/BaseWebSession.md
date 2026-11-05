@@ -55,6 +55,26 @@ sessionPlugins: types.array(
       )
 ```
 
+#### property: activeView
+
+the currently active UI view/page. intentionally not persisted in session
+snapshots so reloading starts in workspace mode.
+
+```js
+// type signature
+IOptionalIType<ISimpleType<"landing" | "workspace" | "recents" | "settings">, [undefined]>
+// code
+activeView: types.optional(
+        types.enumeration([
+          'landing',
+          'workspace',
+          'recents',
+          'settings',
+        ] as const),
+        'workspace',
+      )
+```
+
 ### BaseWebSession - Getters
 
 #### getter: tracks
@@ -62,6 +82,13 @@ sessionPlugins: types.array(
 ```js
 // type
 ({ [x: string]: any; } & NonEmptyObject & { setSubschema(slotName: string, data: Record<string, unknown>): Record<string, unknown> | ({ [x: string]: any; } & NonEmptyObject & ... & IStateTreeNode<...>); } & IStateTreeNode<...>)[]
+```
+
+#### getter: showRecentsDashboard
+
+```js
+// type
+boolean
 ```
 
 #### getter: root
@@ -137,6 +164,16 @@ TextSearchManager
 any
 ```
 
+#### getter: sessionTemplates
+
+session templates from the `preConfiguredSessions` config slot, shown on the
+Recents page
+
+```js
+// type
+{ name: string; description?: string | undefined; image?: string | undefined; }[]
+```
+
 #### getter: previousAutosaveId
 
 ```js
@@ -204,6 +241,20 @@ menus: () => Menu[]
 setName: (str: string) => void
 ```
 
+#### action: setActiveView
+
+```js
+// type signature
+setActiveView: (view: ActiveView) => void
+```
+
+#### action: setShowRecentsDashboard
+
+```js
+// type signature
+setShowRecentsDashboard: (show: boolean) => void
+```
+
 #### action: addAssemblyConf
 
 ```js
@@ -265,6 +316,20 @@ renameCurrentSession: (sessionName: string) => any
 ```js
 // type signature
 duplicateCurrentSession: () => any
+```
+
+#### action: duplicateSavedSession
+
+```js
+// type signature
+duplicateSavedSession: (id: string) => any
+```
+
+#### action: activateTemplate
+
+```js
+// type signature
+activateTemplate: (template: { name: string; }) => any
 ```
 
 #### action: activateSession

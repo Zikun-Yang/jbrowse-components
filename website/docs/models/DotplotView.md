@@ -304,7 +304,7 @@ renderProps: () => any
 
 ```js
 // type signature
-menuItems: () => ({ label: string; icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; }; onClick: () => void; } | { label: string; onClick: () => Widget; icon: (props: SvgIconProps) => Element; })[]
+menuItems: () => { label: string; icon: ForwardRefExoticComponent<Omit<SvgIconProps, "ref"> & RefAttributes<SVGSVGElement>>; onClick: () => void; }[]
 ```
 
 ### DotplotView - Actions

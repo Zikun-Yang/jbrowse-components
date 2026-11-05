@@ -267,13 +267,6 @@ Custom renderSvg that includes sashimi arcs
 renderSvg: (opts: ExportSvgDisplayOptions) => Promise<Element>
 ```
 
-#### method: contextMenuItems
-
-```js
-// type signature
-contextMenuItems: () => never[]
-```
-
 #### method: trackMenuItems
 
 ```js

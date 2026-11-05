@@ -21,3 +21,20 @@ reference the markdown files in our repo of the checked out git tag
 ## Docs
 
 base model `SharedGCContentModel`
+
+### LinearGCContentDisplay - Properties
+
+#### property: autoSwitchGCContent
+
+true when the reference sequence display handed the track over automatically
+because the view was zoomed out too far to render bases (see
+plugins/sequence/src/LinearReferenceSequenceDisplay/model.ts). only then does
+this display hand the track back when zoomed in again: a GC content display
+picked by hand stays put.
+
+```js
+// type signature
+IMaybe<ISimpleType<boolean>>
+// code
+autoSwitchGCContent: types.maybe(types.boolean)
+```

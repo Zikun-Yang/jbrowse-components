@@ -57,9 +57,9 @@ drawCIGARMatchesOnly: false
 
 ```js
 // type signature
-false
+true
 // code
-drawCurves: false
+drawCurves: true
 ```
 
 #### property: drawLocationMarkers
@@ -141,6 +141,18 @@ headerMenuItems: () => (MenuDivider | MenuSubHeader | NormalMenuItem | CheckboxM
 menuItems: () => (MenuDivider | MenuSubHeader | NormalMenuItem | CheckboxMenuItem | RadioMenuItem | SubMenuItem | { ...; })[]
 ```
 
+#### method: followFromView
+
+synteny-aware follow: after a navigation in `source`, lift its visible window
+through each level's synteny alignments (exact per-base mapping of every
+overlapping block, merged into one envelope per target chromosome) and make the
+other sub-views display the mapped regions
+
+```js
+// type signature
+followFromView: (source: unknown) => Promise<void>
+```
+
 ### LinearSyntenyView - Actions
 
 #### action: importFormRemoveRow
@@ -211,4 +223,11 @@ setInit: (init?: LinearSyntenyViewInit | undefined) => void
 ```js
 // type signature
 exportSvg: (opts: ExportSvgOptions) => Promise<void>
+```
+
+#### action: setFollowPending
+
+```js
+// type signature
+setFollowPending: (val: boolean) => void
 ```

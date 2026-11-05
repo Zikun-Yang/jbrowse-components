@@ -67,7 +67,11 @@
           // unfrozen is fine, outputs are already detached copies
         }
       }
-    } else if (value && value.constructor === Object && !Object.isFrozen(value)) {
+    } else if (
+      value &&
+      value.constructor === Object &&
+      !Object.isFrozen(value)
+    ) {
       for (var k in value) {
         freeze(value[k])
       }
@@ -276,8 +280,7 @@
       return subs
         .map(function (sv) {
           var loc = visibleLocOf(sv)
-          var asm =
-            sv.assemblyNames && toArray(sv.assemblyNames)[0]
+          var asm = sv.assemblyNames && toArray(sv.assemblyNames)[0]
           return loc ? loc + (asm ? ' (' + asm + ')' : '') : null
         })
         .filter(Boolean)
@@ -487,7 +490,11 @@
               if (!bs || typeof bs.entries !== 'function') {
                 return
               }
-              for (var e = bs.entries(), it = e.next(); !it.done; it = e.next()) {
+              for (
+                var e = bs.entries(), it = e.next();
+                !it.done;
+                it = e.next()
+              ) {
                 var key = it.value[0]
                 var b = it.value[1]
                 if (b.error || b.message) {
@@ -495,8 +502,13 @@
                 }
                 if (!b.filled || b.isRenderingPending || b.blockStatusMessage) {
                   hits.push(
-                    'block ' + String(key).slice(-30) +
-                      (!b.filled ? ' unfilled' : b.isRenderingPending ? ' rendering' : ' busy'),
+                    'block ' +
+                      String(key).slice(-30) +
+                      (!b.filled
+                        ? ' unfilled'
+                        : b.isRenderingPending
+                          ? ' rendering'
+                          : ' busy'),
                   )
                 }
               }
@@ -633,7 +645,9 @@
             // view.tracks entries are containers; the stateful display
             // model (setColorBy & friends) is entry.displays[0]
             var display =
-              entry.displays && entry.displays.length ? entry.displays[0] : entry
+              entry.displays && entry.displays.length
+                ? entry.displays[0]
+                : entry
             return { view: views[i], entry: entry, display: display }
           }
         }
@@ -662,7 +676,9 @@
 
     /** setter name for a state slot: 'colorBy' -> 'setColorBy' */
     function setterFor(slot) {
-      return 'set' + String(slot).charAt(0).toUpperCase() + String(slot).slice(1)
+      return (
+        'set' + String(slot).charAt(0).toUpperCase() + String(slot).slice(1)
+      )
     }
 
     /** parse "ref:start-end" into a Region object (0-based half-open) */
@@ -928,7 +944,10 @@
         var assembly = opts && opts.assembly
         var locStr = String(loc)
         var nav
-        if (/:/.test(locStr) || typeof target.navToSearchString !== 'function') {
+        if (
+          /:/.test(locStr) ||
+          typeof target.navToSearchString !== 'function'
+        ) {
           // coordinate string → plain loc parsing
           nav = Promise.resolve(target.navToLocString(locStr, assembly))
         } else {
@@ -1028,16 +1047,14 @@
         }
         ensureWorkspaceRoute()
         target.showTrack(info.id)
-        return api
-          .sleep((opts && opts.settleMs) || 1000)
-          .then(function () {
-            return trackInfo(
-              allTrackConfs().find(function (c) {
-                return c.trackId === info.id
-              }),
-              openTrackIds(),
-            )
-          })
+        return api.sleep((opts && opts.settleMs) || 1000).then(function () {
+          return trackInfo(
+            allTrackConfs().find(function (c) {
+              return c.trackId === info.id
+            }),
+            openTrackIds(),
+          )
+        })
       },
 
       /**
@@ -1050,7 +1067,9 @@
         if (!found) {
           fail(
             'TRACK_NOT_SHOWN',
-            "track '" + info.id + "' is not shown" +
+            "track '" +
+              info.id +
+              "' is not shown" +
               (opts && opts.view ? " in view '" + opts.view + "'" : ''),
             'call tracks({ open: true }) to see what is shown',
           )
@@ -1202,8 +1221,7 @@
           )
         }
         var format =
-          (opts && opts.format) ||
-          (/\.png$/i.test(path) ? 'png' : 'svg')
+          (opts && opts.format) || (/\.png$/i.test(path) ? 'png' : 'svg')
         var doExport = function () {
           var saved = window.__jbrowseBridgeArmDownload(String(path))
           target.exportSvg({
@@ -1481,7 +1499,9 @@
             return !row.name || !row.description
           })
           if (incomplete.length > 0) {
-            return incomplete.length + ' catalog row(s) are missing name/description'
+            return (
+              incomplete.length + ' catalog row(s) are missing name/description'
+            )
           }
           return rows.some(function (row) {
             return row.builtin
@@ -1538,7 +1558,9 @@
           var missing = []
           vs.forEach(function (v) {
             if (
-              !document.querySelector('[data-testid="view-container-' + v.id + '"]')
+              !document.querySelector(
+                '[data-testid="view-container-' + v.id + '"]',
+              )
             ) {
               missing.push(v.id)
             }
@@ -1670,7 +1692,8 @@
     }
 
     var HELP = {
-      views: 'views(): list all views — [{ id, type, displayName, assemblyNames, regions, trackIds }]',
+      views:
+        'views(): list all views — [{ id, type, displayName, assemblyNames, regions, trackIds }]',
       tracks:
         'tracks(filter?, opts?): list configured tracks — [{ id, name, type, adapter, assemblyNames, category, open, info?, infoText? }]\n' +
         '  info/infoText are the rendered formatAbout.info (markdown / markdown stripped) and are absent when the track has none\n' +
@@ -1684,10 +1707,12 @@
         'chartDrawer(name): one catalog entry by exact name. Throws UNKNOWN_DRAWER with the available names when the name is wrong.',
       chartSpecSchema:
         'chartSpecSchema(): the v1 chart spec vocabulary as JSON ({ kinds, dataForms, kindDataForms, bins, colorSchemes, properties }) — write renderer.spec from this, then load the config. Throws FEATURE_CHART_UNAVAILABLE when the plugin is not loaded.',
-      assemblies: 'assemblies(): configured assemblies — [{ name, displayName, aliases }]',
+      assemblies:
+        'assemblies(): configured assemblies — [{ name, displayName, aliases }]',
       refNames:
         'refNames(assemblyName, opts?): reference sequence names of an assembly (T2T assemblies use accessions, not "chr1"). opts: { limit? } default 100.',
-      digest: 'digest(): compact state summary { viewCount, activeView, openTracks, warnings? }',
+      digest:
+        'digest(): compact state summary { viewCount, activeView, openTracks, warnings? }',
       goto: 'goto(loc, opts?): navigate first linear view to "chr1:10000-20000" (coordinate) or a bare gene/feature name like "NPEPPS" (text index search; assembly must have a text search adapter); opens a LinearGenomeView if none exists. opts: { assembly?, settleMs? } default 1000.',
       openView:
         'openView(typeName?, opts?): open a new view (default LinearGenomeView). opts: { loc?, assembly?, settleMs?, init? — extra addView snapshot, e.g. multi-way synteny { init: { views: [{loc, assembly, tracks?}], tracks?: string[][] } } }. Returns ViewInfo.',
@@ -1704,14 +1729,15 @@
       features:
         'features(trackRef, "ref:start-end", opts?): query a track\'s data adapter directly (no UI). opts: { assembly?, limit? } default 100. Returns feature JSON array.',
       exportView:
-        'exportView(path, opts?): export a view with JBrowse\'s own renderer (not a screenshot). .svg = vector, .png = raster. Waits for loading to finish first (opts.noWait to skip). opts: { view?, format? }. Returns saved path.',
+        "exportView(path, opts?): export a view with JBrowse's own renderer (not a screenshot). .svg = vector, .png = raster. Waits for loading to finish first (opts.noWait to skip). opts: { view?, format? }. Returns saved path.",
       exportSession:
         'exportSession(path?): full session state as JSON. With path saves to disk; without returns the snapshot object.',
       screenshot:
         'screenshot(path, opts?): save PNG to the out dir. Default: the whole workspace area (all views together). Waits for loading to finish first (opts.noWait to skip; timeoutMs/quietMs tune the wait). opts: { view?: viewId — one view only, selector?: css, fullPage?: true }',
       waitForIdle:
         'waitForIdle(opts?): wait until no loading indicators remain in the workspace (failed/empty renders count as done). opts: { timeoutMs?: 30000, quietMs?: 500, pollMs?: 200 }. Returns { idle, waitedMs, stillLoading? }',
-      sleep: 'sleep(ms): wait — useful after interactions that trigger async rendering.',
+      sleep:
+        'sleep(ms): wait — useful after interactions that trigger async rendering.',
       selfTest:
         'selfTest(): verify every internal contract the SDK relies on (session handle, DOM anchors, blockState shape, loading-decoy filtering, bridges, track-info bridge, feature-chart catalog/spec surface). Read-only; run it at the start of a session. Returns { ok, checks: [{ name, status: pass|fail|skip, detail? }] }.',
       help: 'help(method?): list methods or show details for one.',

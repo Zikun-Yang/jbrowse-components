@@ -52,7 +52,7 @@ color scheme to use for rendering synteny features
 // type signature
 IOptionalIType<ISimpleType<string>, [undefined]>
 // code
-colorBy: types.optional(types.string, 'default')
+colorBy: types.optional(types.string, 'strand')
 ```
 
 #### property: alpha
@@ -116,15 +116,6 @@ boolean
 { [k: string]: FeatPos; }
 ```
 
-#### getter: colorSchemeConfig
-
-cached color scheme config based on colorBy
-
-```js
-// type
-{ cigarColors: { I: string; N: string; D: string; X: string; M: string; '=': string; }; } | { posColor: string; negColor: string; cigarColors: { I: string; N: string; D: string; X: string; M: string; '=': string; }; } | { ...; }
-```
-
 #### getter: colorMapWithAlpha
 
 cached CIGAR colors with alpha applied
@@ -145,20 +136,22 @@ string
 
 #### getter: negColorWithAlpha
 
-cached negative strand color with alpha
+cached negative strand color with alpha; tracks the session theme's primary
+color so inversions stand out in the deployment's brand color
 
 ```js
 // type
 string
 ```
 
-#### getter: queryColorWithAlphaMap
+#### getter: themePrimaryHue
 
-cached query colors with alpha - returns a function that caches results
+hue of the session theme's primary color, used as the low end of the identity
+color scale and the inversion color; cached per theme color
 
 ```js
 // type
-(queryName: string) => string
+number
 ```
 
 #### getter: queryTotalLengths

@@ -413,8 +413,7 @@ export function listFeatureChartDrawerNames(
 }
 
 /** One catalog row for agents: the public metadata plus where it came from. */
-export interface FeatureChartDrawerCatalogEntry
-  extends FeatureChartDrawerMeta {
+export interface FeatureChartDrawerCatalogEntry extends FeatureChartDrawerMeta {
   /**
    * `true` when both the name and the implementation ship with this plugin,
    * `false` for plugin contributions. A plugin that shadows a built-in name
