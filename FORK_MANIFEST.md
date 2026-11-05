@@ -5,7 +5,7 @@
 Files this fork changes relative to upstream, measured from the last merged
 upstream commit `ffe7382b8`.
 
-Totals: 900 paths — added 359, modified 447, deleted 93, renamed 1.
+Totals: 902 paths — added 361, modified 447, deleted 93, renamed 1.
 
 Read this together with [FORK.md](./FORK.md), which explains the changes and
 judges what upstream would accept. Regenerate with
@@ -351,7 +351,7 @@ judges what upstream would accept. Regenerate with
 - `M` `plugins/dotplot-view/src/DotplotView/svgcomponents/SVGDotplotView.tsx`
 - `M` `plugins/dotplot-view/src/index.ts`
 
-## plugins/feature-chart (100)
+## plugins/feature-chart (102)
 
 - `A` `plugins/feature-chart/ARCHITECTURE.md`
 - `A` `plugins/feature-chart/benchmark/chartRenderBenchmark.ts`
@@ -368,6 +368,7 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/feature-chart/src/chartModelSources.test.ts`
 - `A` `plugins/feature-chart/src/chartModelSources.ts`
 - `A` `plugins/feature-chart/src/corePluginsRegistration.test.ts`
+- `A` `plugins/feature-chart/src/cypressSpecContracts.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartAdapter/configSchema.ts`
 - `A` `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.test.ts`
 - `A` `plugins/feature-chart/src/FeatureChartAdapter/FeatureChartTabixAdapter.ts`
@@ -447,6 +448,7 @@ judges what upstream would accept. Regenerate with
 - `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/index.ts`
 - `A` `plugins/feature-chart/src/LinearFeatureChartDisplay/model.ts`
 - `A` `plugins/feature-chart/src/pluginInstall.test.ts`
+- `A` `plugins/feature-chart/src/productMatrix.test.ts`
 - `A` `plugins/feature-chart/src/renderCache.test.ts`
 - `A` `plugins/feature-chart/src/renderCache.ts`
 - `A` `plugins/feature-chart/src/renderSettings.test.ts`
