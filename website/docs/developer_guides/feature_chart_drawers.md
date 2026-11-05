@@ -13,7 +13,8 @@ plugin, without forking JBrowse.
 Read [`FeatureChartTrack`](../config/FeatureChartTrack) for the TSV data format,
 the built-in drawer list and config examples, and
 `plugins/feature-chart/ARCHITECTURE.md` in the repository for the internal
-design.
+design. Coming from a pre-WP4 config? See
+[Migrating feature chart configs](./feature_chart_migration).
 
 ## Three ways to change what a chart looks like
 
@@ -269,6 +270,38 @@ const resolution = resolveFeatureChartDrawer('myPlugin/heatmap', pluginManager)
   `{ error, available, missingPlugin?, pluginLoaded?, suggestions? }` and the
   renderer paints a placeholder. That is deliberate — a worker-level throw marks
   the whole track as failed.
+
+### Discovering the catalog from an agent or a tool
+
+The catalog is published as **data**, not only as a function, so callers that
+cannot import this package can still enumerate it. The plugin registers two
+extension points during `install()`:
+
+| extension point                  | payload                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `Core-featureChartDrawerCatalog` | `listFeatureChartDrawerCatalog(pluginManager)` — the catalog rows plus `builtin`                              |
+| `Core-featureChartSpecSchema`    | `chartSpecSchema()` — the v1 spec vocabulary (see the [chart spec reference](/docs/config_guides/chart_spec)) |
+
+```js
+// inside a script executed by jbrowse-agent: no imports, no bundler
+const pm = window.JBrowseRootModel.pluginManager
+pm.evaluateExtensionPoint('Core-featureChartDrawerCatalog', [])
+// [{ name: 'barPlot', displayName: 'Bar plot', dataShape: 'category-values',
+//    description: '…', builtin: true }, …,
+//  { name: 'samplePlugin/heatmap', builtin: false, … }]
+```
+
+`@jbrowse/agent-sdk` wraps exactly this as `jbrowse.chartDrawers()`,
+`jbrowse.chartDrawer(name)` and `jbrowse.chartSpecSchema()`, and its
+`selfTest()` fails when a loaded `FeatureChartTrack` publishes no catalog. The
+practical effect for plugin authors: **the description and `optionsSchema` you
+write are what an agent sees when it decides whether your drawer fits the
+data**, so write `description` as "what it draws and which data shape it
+consumes", and keep `optionsSchema` to the keys your `draw` actually reads.
+
+`builtin` is `false` when the implementation came from a plugin — including a
+plugin that shadows a built-in name — so an agent never assumes built-in
+behaviour from a familiar name.
 
 ### Main thread vs worker
 
