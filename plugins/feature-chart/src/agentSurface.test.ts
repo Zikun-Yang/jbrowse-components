@@ -33,7 +33,7 @@ function configure(...plugins: PluginConstructor[]) {
 
 /** no-build style plugin contributing one drawer, exactly as in the dev guide */
 function createDrawerPlugin(name: string, drawerName: string) {
-  return class FakeDrawerPlugin {
+  class FakeDrawerPlugin {
     pluginName = name
     install(pluginManager: PluginManager) {
       pluginManager.addToExtensionPoint(
@@ -46,6 +46,9 @@ function createDrawerPlugin(name: string, drawerName: string) {
     }
     configure() {}
   }
+  // a plain class, not `extends Plugin`: that is what a no-build JS plugin
+  // looks like, and the constructor type is the only thing tsc complains about
+  return FakeDrawerPlugin as unknown as PluginConstructor
 }
 
 beforeEach(() => {

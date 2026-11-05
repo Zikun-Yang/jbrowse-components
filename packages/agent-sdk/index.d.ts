@@ -312,7 +312,9 @@ declare namespace jbrowse {
      * as JSON, restorable via the UI's session import.
      * With path: saves to disk. Without: returns the snapshot object.
      */
-    exportSession(path?: string): Promise<Record<string, unknown> | { saved: string }>
+    exportSession(
+      path?: string,
+    ): Promise<Record<string, unknown> | { saved: string }>
 
     /**
      * Save a screenshot to the out dir (PNG).
@@ -379,7 +381,11 @@ declare namespace jbrowse {
      */
     selfTest(): {
       ok: boolean
-      checks: { name: string; status: 'pass' | 'fail' | 'skip'; detail?: string }[]
+      checks: {
+        name: string
+        status: 'pass' | 'fail' | 'skip'
+        detail?: string
+      }[]
     }
   }
 }
@@ -387,4 +393,7 @@ declare namespace jbrowse {
 /** The object injected into every script executed by jbrowse-agent. */
 declare const jbrowse: jbrowse.Agent
 
+// this file is a module so that `declare namespace` stays private to it; there
+// is nothing to export (the runtime code lives in src/index.js)
+// eslint-disable-next-line unicorn/require-module-specifiers
 export {}
