@@ -57,7 +57,11 @@ declare module 'plotly.js-dist-min' {
     config?: Partial<Config>,
   ): Promise<void>
 
-  export function purge(root: HTMLElement): Promise<void>
+  /**
+   * Best-effort teardown. `plotly.js-dist-min` returns `void` here, while newer
+   * builds return a promise, so callers must accept both (see `purgeQuietly`).
+   */
+  export function purge(root: HTMLElement): void | Promise<void>
 
   /** Options accepted by `Plotly.toImage()` (subset we use). */
   export interface ToImageOptions {

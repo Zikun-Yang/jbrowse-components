@@ -10,6 +10,26 @@ import type {
 } from 'plotly.js-dist-min'
 
 /**
+ * `Plotly.purge()` is best-effort teardown: in `plotly.js-dist-min` it returns
+ * `undefined` (older builds) or a promise (newer ones), so calling `.catch` on
+ * it throws `purge(...).catch is not a function` from inside the effect cleanup,
+ * which React surfaces as a render error in the track. Accept both shapes and
+ * never let teardown take the track down.
+ */
+function purgeQuietly(plotly: PlotlyModule, node: HTMLElement) {
+  try {
+    const result: unknown = plotly.purge(node)
+    if (result && typeof (result as Promise<void>).catch === 'function') {
+      void (result as Promise<void>).catch(() => {
+        // purge after unmount is best-effort; Plotly throws on a detached node
+      })
+    }
+  } catch {
+    // purge after unmount is best-effort; Plotly throws on a detached node
+  }
+}
+
+/**
  * The Plotly element: one `newPlot`, one `purge`, and an optional handle the
  * maximize dialog uses for `toImage`. The loader and the handle type live in
  * `plotlyLoader.ts` so this module only exports a component.
@@ -65,9 +85,7 @@ export default function PlotlyPlot({
     return () => {
       disposed = true
       onPlotReady?.(null)
-      plotly.purge(node).catch(() => {
-        // purge after unmount is best-effort; Plotly throws on a detached node
-      })
+      purgeQuietly(plotly, node)
     }
     // `traces`/`layout` are memoized by the callers on the model hash.
   }, [plotly, traces, layout, onPlotReady])
