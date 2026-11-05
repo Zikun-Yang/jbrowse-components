@@ -86,3 +86,18 @@ drawerOptions: {
       defaultValue: {},
     }
 ```
+
+#### slot: spec
+
+Declarative chart description (`plugins/feature-chart/SPEC.md`). Accepted on
+this renderer so switching renderers keeps a track's configuration intact, but
+**the Plotly backend does not render specs yet**: with `drawer: "spec"` it shows
+an explicit "not supported here" warning instead of pretending (unifying both
+backends is WP4). Use `FeatureChartRenderer` for spec charts.
+
+```js
+spec: {
+      type: 'frozen',
+      defaultValue: {},
+    }
+```

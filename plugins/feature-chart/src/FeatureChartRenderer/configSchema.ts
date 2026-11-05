@@ -13,7 +13,7 @@ const FeatureChartRenderer = ConfigurationSchema(
      * #slot
      * Name of the drawer that paints each chart. Either one of the built-in
      * drawers (`precomputedBoxPlot`, `rawBoxPlot`, `rawViolinPlot`, `barPlot`,
-     * `histogram`), or a drawer contributed by a plugin as
+     * `histogram`, `spec`), or a drawer contributed by a plugin as
      * `<pluginName>/<drawerName>` through the `Core-featureChartDrawer`
      * extension point. Unknown names render a placeholder instead of failing
      * the track; a placeholder that says "missing plugin" usually means the
@@ -33,6 +33,29 @@ const FeatureChartRenderer = ConfigurationSchema(
      * and clamps out-of-range values itself.
      */
     drawerOptions: {
+      type: 'frozen',
+      defaultValue: {},
+    },
+
+    /**
+     * #slot
+     * Declarative chart description, read only when `drawer` is `"spec"`:
+     *
+     * ```json
+     * { "specVersion": 1, "kind": "box", "data": { "form": "grouped-values", "path": "tissues" } }
+     * ```
+     *
+     * The v1 vocabulary is frozen and documented in
+     * `plugins/feature-chart/SPEC.md`: four `kind` values (`box`, `violin`,
+     * `bar`, `histogram`), four `data.form` values and the five legal
+     * combinations between them. Nothing here is executable code, so a spec can
+     * travel in a shared session.
+     *
+     * Invalid specs render a readable placeholder and, in the maximize dialog, a
+     * list of every problem (`path` + `allowed` + the keys actually present) —
+     * they never fail the track.
+     */
+    spec: {
       type: 'frozen',
       defaultValue: {},
     },

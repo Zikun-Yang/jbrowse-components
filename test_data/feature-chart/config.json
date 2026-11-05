@@ -47,7 +47,12 @@
             "fc_plugin_heatmap",
             "fc_plugin_dots",
             "fc_broken",
-            "fc_missing_plugin"
+            "fc_missing_plugin",
+            "fc_spec_box_plain",
+            "fc_spec_box",
+            "fc_spec_bar",
+            "fc_spec_hist",
+            "fc_spec_broken"
           ]
         }
       }
@@ -312,6 +317,186 @@
             "type": "FeatureChartRenderer",
             "drawer": "notLoadedPlugin/heatmap",
             "chartWidth": 160,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_spec_box",
+      "name": "FC · spec box (summary-stats + yLabel)",
+      "category": ["Feature chart demo"],
+      "description": "`drawer: \"spec\"`: the same chart as `fc_precomputed`, described declaratively (kind box, data.form summary-stats, path boxes) plus an axes.yLabel the legacy drawer cannot draw. See plugins/feature-chart/SPEC.md.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/precomputed-box.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_spec_box-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "spec",
+            "spec": {
+              "specVersion": 1,
+              "kind": "box",
+              "data": {
+                "form": "summary-stats",
+                "path": "boxes"
+              },
+              "axes": {
+                "yLabel": "TPM"
+              },
+              "style": {
+                "colorScheme": "tableau10"
+              }
+            },
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_spec_bar",
+      "name": "FC · spec bar (category-values)",
+      "category": ["Feature chart demo"],
+      "description": "Same bars as `fc_bar`, but described in the config: kind bar, data.form category-values, path bars, palette picked in spec.style.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/bars.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_spec_bar-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "spec",
+            "spec": {
+              "specVersion": 1,
+              "kind": "bar",
+              "data": {
+                "form": "category-values",
+                "path": "bars"
+              },
+              "style": {
+                "colorScheme": "set2"
+              }
+            },
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_spec_hist",
+      "name": "FC · spec histogram (values, 16 bins)",
+      "category": ["Feature chart demo"],
+      "description": "kind histogram with spec.style.bins = 16 (the legacy `histogram` drawer always used 10) and a yLabel.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/histogram.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_spec_hist-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "spec",
+            "spec": {
+              "specVersion": 1,
+              "kind": "histogram",
+              "data": {
+                "form": "values",
+                "path": "values"
+              },
+              "style": {
+                "bins": 16
+              },
+              "axes": {
+                "yLabel": "genes"
+              }
+            },
+            "chartWidth": 120,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_spec_broken",
+      "name": "FC · invalid spec (failure semantics)",
+      "category": ["Feature chart demo"],
+      "description": "kind violin with data.form summary-stats: an illegal combination. Must render a placeholder naming the path and the allowed forms, and the maximize dialog must list the problem. The track itself stays alive.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/precomputed-box.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_spec_broken-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "spec",
+            "spec": {
+              "specVersion": 1,
+              "kind": "violin",
+              "data": {
+                "form": "summary-stats",
+                "path": "boxes"
+              }
+            },
+            "chartWidth": 160,
+            "chartHeight": 180,
+            "align": "left"
+          }
+        }
+      ]
+    },
+    {
+      "type": "FeatureChartTrack",
+      "trackId": "fc_spec_box_plain",
+      "name": "FC · spec box (no yLabel, pixel-identical to legacy)",
+      "category": ["Feature chart demo"],
+      "description": "Same adapter, same data and same geometry as `fc_precomputed`, but described by a spec instead of the `precomputedBoxPlot` drawer. The two tracks must be pixel-identical: that is what 'v1 adds nothing the old painters could not draw' means. `fc_spec_box` is the same spec plus `axes.yLabel`.",
+      "assemblyNames": ["volvox"],
+      "adapter": {
+        "type": "FeatureChartTabixAdapter",
+        "uri": "/test_data/feature-chart/precomputed-box.tsv.gz"
+      },
+      "displays": [
+        {
+          "type": "LinearFeatureChartDisplay",
+          "displayId": "fc_spec_box_plain-LinearFeatureChartDisplay",
+          "renderer": {
+            "type": "FeatureChartRenderer",
+            "drawer": "spec",
+            "spec": {
+              "specVersion": 1,
+              "kind": "box",
+              "data": {
+                "form": "summary-stats",
+                "path": "boxes"
+              }
+            },
+            "chartWidth": 120,
             "chartHeight": 180,
             "align": "left"
           }

@@ -113,7 +113,7 @@ describe('test_data/feature-chart/plugins/sampleChartDrawers.js', () => {
       pluginManager,
     )
     expect(heatmap?.displayName).toBe('Sample heatmap')
-    expect(heatmap?.dataShape).toBe('tissues')
+    expect(heatmap?.dataShape).toBe('grouped-values')
     expect(heatmap?.optionsSchema).toEqual(
       expect.objectContaining({ colorRamp: expect.any(String) }),
     )

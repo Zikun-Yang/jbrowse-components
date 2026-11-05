@@ -39,6 +39,25 @@ export {
   formatFeatureChartDrawerError,
 } from './FeatureChartDrawer/drawerErrors.ts'
 export {
+  CHART_DATA_FORMS,
+  CHART_KINDS,
+  CHART_KIND_DATA_FORMS,
+  CHART_SPEC_VERSION,
+  SPEC_DRAWER_NAME,
+  formatChartSpecError,
+  formatChartSpecErrors,
+  normalizeFromSpec,
+  normalizeValidatedSpec,
+  resolveDataPath,
+  validateChartSpec,
+} from './FeatureChartDrawer/chartSpec.ts'
+export {
+  chartModelForm,
+  chartModelHash,
+  serializeChartModel,
+} from './FeatureChartDrawer/chartModel.ts'
+export { paintChartModel } from './FeatureChartDrawer/painters.ts'
+export {
   DEFAULT_COLOR_SCHEME,
   listColorSchemeNames,
   resolveColorScheme,
@@ -50,6 +69,20 @@ export type {
   FeatureChartDrawerMeta,
 } from './FeatureChartDrawer/types.ts'
 export type { FeatureChartColorScheme } from './FeatureChartDrawer/colorSchemes.ts'
+export type {
+  ChartAxes,
+  ChartDataForm,
+  ChartDatum,
+  ChartKind,
+  ChartModel,
+  ChartSeries,
+  ChartStyle,
+} from './FeatureChartDrawer/chartModel.ts'
+export type {
+  ChartSpec,
+  ChartSpecError,
+  ChartSpecNormalization,
+} from './FeatureChartDrawer/chartSpec.ts'
 export type {
   FeatureChartDrawerContribution,
   FeatureChartDrawerEntry,

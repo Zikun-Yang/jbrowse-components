@@ -6,8 +6,8 @@
  * `website/docs/developer_guides/feature_chart_drawers.md` for the contract.
  *
  * Data contract: the demo TSV rows carry
- * `data.tissues = { <tissue>: [values...] }`, so both drawers accept the
- * `tissues` data shape.
+ * `data.tissues = { <tissue>: [values...] }`, so both drawers declare the
+ * `grouped-values` data shape (`plugins/feature-chart/SPEC.md` §2).
  */
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
@@ -116,7 +116,7 @@ export default class SampleChartDrawers {
         displayName: 'Sample heatmap',
         description:
           'One column per group, one cell per observation, colored by value (data.tissues).',
-        dataShape: 'tissues',
+        dataShape: 'grouped-values',
         optionsSchema: {
           colorRamp: 'cool | warm | mono',
           cellGap: 'number (px, 0-6)',
@@ -129,7 +129,7 @@ export default class SampleChartDrawers {
         displayName: 'Sample dot plot',
         description:
           'Every observation as a dot, one band per group (data.tissues).',
-        dataShape: 'tissues',
+        dataShape: 'grouped-values',
         optionsSchema: {
           dotRadius: 'number (px, 0.5-6)',
           jitter: 'number (0-1)',

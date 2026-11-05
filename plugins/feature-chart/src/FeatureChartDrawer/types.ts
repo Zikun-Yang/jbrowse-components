@@ -1,3 +1,5 @@
+import type { ChartModel } from './chartModel.ts'
+import type { ChartSpecError } from './chartSpec.ts'
 import type { FeatureChartColorScheme } from './colorSchemes.ts'
 import type { AnyConfigurationModel } from '@jbrowse/core/configuration'
 import type { Feature } from '@jbrowse/core/util'
@@ -7,11 +9,15 @@ import type { ThemeOptions } from '@mui/material'
 /**
  * Coarse description of the JSON payload a drawer expects, used by UI and
  * agents to filter the drawer catalog before rendering anything.
+ *
+ * WP3 aligned these names with the chart-spec vocabulary (`SPEC.md` §1), so the
+ * catalog and the config cannot describe the same data shape with two spellings.
  */
 export type FeatureChartDrawerDataShape =
-  | 'tissues'
-  | 'matrix'
-  | 'series'
+  | 'summary-stats'
+  | 'grouped-values'
+  | 'category-values'
+  | 'values'
   | 'any'
 
 /**
@@ -62,6 +68,15 @@ export interface DrawerProps {
    * values, see the developer guide.
    */
   options?: Record<string, unknown>
+  /**
+   * Normalized chart model (WP3), present when the configured drawer is `spec`
+   * and this feature's payload produced one. Plugin drawers that read `data`
+   * themselves can ignore it; drawers that want the normalized form can prefer
+   * it when it is set.
+   */
+  model?: ChartModel
+  /** Why `model` is absent (`drawer: "spec"` only). Drawn as a placeholder. */
+  modelErrors?: ChartSpecError[]
   /**
    * True when the drawer is rendering inside the maximize detail dialog,
    * where more space is available for axes, labels, etc.

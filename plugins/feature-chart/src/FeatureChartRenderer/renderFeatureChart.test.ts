@@ -393,6 +393,149 @@ describe('renderFeatureChart', () => {
   })
 })
 
+describe('drawer: "spec"', () => {
+  const validSpec = {
+    specVersion: 1,
+    kind: 'box',
+    data: { form: 'grouped-values', path: 'tissues' },
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    initBuiltInDrawers()
+  })
+
+  test('normalizes the spec per chart and hands the drawer a model', async () => {
+    // Overriding the built-in `spec` lets the test observe the props without
+    // depending on the painter, exactly like the other spy tests here.
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('spec', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'spec', spec: validSpec }),
+      {} as any,
+    )
+
+    expect(seen).toHaveLength(1)
+    expect(seen[0]!.model?.kind).toBe('box')
+    expect(seen[0]!.model?.categories).toEqual(['Brain'])
+    expect(seen[0]!.modelErrors).toBeUndefined()
+    expect(result.value.specError).toBeUndefined()
+    expect(result.value.drawerError).toBeUndefined()
+  })
+
+  test('a structurally invalid spec is reported once, not drawn per chart', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const draw = jest.fn()
+    registerFeatureChartDrawer('spec', draw)
+    mockAdapter([createFeature('f1', 100, 200), createFeature('f2', 400, 500)])
+
+    const result = await renderFeatureChart(
+      createRenderProps({
+        drawer: 'spec',
+        spec: {
+          specVersion: 1,
+          kind: 'violin',
+          data: { form: 'summary-stats', path: 'boxes' },
+        },
+      }),
+      {} as any,
+    )
+
+    expect(draw).not.toHaveBeenCalled()
+    expect(result.value.specError).toContain('spec.data.form')
+    expect(result.value.specError).toContain('grouped-values')
+    // the track stays alive: a placeholder was painted for the whole width
+    expect(result.value.imageData).toEqual(expect.any(Object))
+    expect(result.value.features).toHaveLength(2)
+  })
+
+  test('a data-level problem is per chart: the rest keeps painting', async () => {
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('spec', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([
+      createFeature('with-data', 100, 200),
+      new SimpleFeature({
+        id: 'no-payload',
+        data: { refName: 'chr1', start: 400, end: 500, name: 'GENE_B' },
+      }),
+    ])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'spec', spec: validSpec }),
+      {} as any,
+    )
+
+    expect(seen).toHaveLength(2)
+    expect(seen[0]!.model).toBeDefined()
+    expect(seen[1]!.model).toBeUndefined()
+    expect(seen[1]!.modelErrors?.[0]?.path).toBe('spec.data.path')
+    // a missing path in one row is not a track-wide failure
+    expect(result.value.specError).toBeUndefined()
+  })
+
+  test('the real spec drawer paints the chart (worker path)', async () => {
+    initBuiltInDrawers()
+    mockAdapter([createFeature('f1', 100, 200)])
+
+    const result = await renderFeatureChart(
+      createRenderProps({ drawer: 'spec', spec: validSpec }),
+      {} as any,
+    )
+
+    expect(result.value.specError).toBeUndefined()
+    expect(result.value.drawerError).toBeUndefined()
+    expect(result.value.imageData).toEqual(expect.any(Object))
+  })
+
+  test('the spec slot reaches the renderer through a real config model', async () => {
+    const config = getSubType(FeatureChartRendererSchema).create({
+      drawer: 'spec',
+      spec: {
+        specVersion: 1,
+        kind: 'bar',
+        data: { form: 'category-values', path: 'bars' },
+        axes: { yLabel: 'TPM' },
+      },
+    })
+    const seen: DrawerProps[] = []
+    registerFeatureChartDrawer('spec', props => {
+      seen.push(props)
+      props.ctx.fillRect(0, 0, 1, 1)
+    })
+    mockAdapter([
+      new SimpleFeature({
+        id: 'bars',
+        data: {
+          refName: 'chr1',
+          start: 100,
+          end: 200,
+          name: 'GENE_A',
+          contextData: {
+            data: { bars: [{ name: 'Brain', value: 42 }] },
+            name: 'GENE_A',
+          },
+        },
+      }),
+    ])
+
+    const renderProps = createRenderProps()
+    renderProps.config = config
+    await renderFeatureChart(renderProps, {} as any)
+
+    expect(seen[0]!.model?.kind).toBe('bar')
+    expect(seen[0]!.model?.categories).toEqual(['Brain'])
+    expect(seen[0]!.model?.axes).toEqual({ yLabel: 'TPM' })
+  })
+})
+
 describe('computeChartX', () => {
   const region = {
     refName: 'chr1',

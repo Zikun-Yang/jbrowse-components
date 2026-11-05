@@ -50,6 +50,7 @@ describe('FeatureChartPlugin install', () => {
       'precomputedBoxPlot',
       'rawBoxPlot',
       'rawViolinPlot',
+      'spec',
     ])
   })
 })

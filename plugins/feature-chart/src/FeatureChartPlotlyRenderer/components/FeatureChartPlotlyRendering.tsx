@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { readConfObject } from '@jbrowse/core/configuration'
 import { observer } from 'mobx-react'
 
+import { SPEC_DRAWER_NAME } from '../../FeatureChartDrawer/chartSpec.ts'
 import {
   type FeatureChartColorScheme,
   resolveColorScheme,
@@ -294,7 +295,28 @@ const FeatureChartPlotlyRendering = observer(
           overflow: 'hidden',
         }}
       >
-        {showWarning ? (
+        {settings.drawer === SPEC_DRAWER_NAME ? (
+          // `spec` is a canvas-only contract (canvas painters + worker path). Saying
+          // so here is the whole point of the WP3 decision: no silent blank chart.
+          <div
+            data-testid="feature-chart-plotly-spec-unsupported"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              backgroundColor: '#fff9c4',
+              color: '#856404',
+              border: '1px solid #f9a825',
+              fontSize: 12,
+              padding: 8,
+              textAlign: 'center',
+            }}
+          >
+            The Plotly renderer does not support chart specs yet — use
+            FeatureChartRenderer for drawer: "spec".
+          </div>
+        ) : showWarning ? (
           <div
             style={{
               display: 'flex',

@@ -14,6 +14,7 @@ export interface RecordingContext {
   font: string
   textAlign: string
   textBaseline: string
+  globalAlpha: number
   paintCount: number
   calls: string[]
   beginPath: () => void
@@ -29,6 +30,8 @@ export interface RecordingContext {
   moveTo: () => void
   lineTo: () => void
   translate: () => void
+  rotate: () => void
+  measureText: (text: string) => { width: number }
   save: () => void
   restore: () => void
 }
@@ -50,6 +53,7 @@ export function createRecordingContext(): RecordingContext {
     font: '',
     textAlign: '',
     textBaseline: '',
+    globalAlpha: 1,
     paintCount: 0,
     calls: [],
     beginPath: record('beginPath', false),
@@ -65,6 +69,9 @@ export function createRecordingContext(): RecordingContext {
     moveTo: record('moveTo', false),
     lineTo: record('lineTo', false),
     translate: record('translate', false),
+    rotate: record('rotate', false),
+    // 5px per character is enough for `wrapText` to break lines predictably.
+    measureText: (text: string) => ({ width: text.length * 5 }),
     save: record('save', false),
     restore: record('restore', false),
   }
@@ -92,8 +99,102 @@ export function createDrawerProps(
 }
 
 /** Draw once and report how many painting operations landed on the canvas. */
-export function paintCountFor(draw: DrawerFunction, data: unknown) {
+export function paintCountFor(
+  draw: DrawerFunction,
+  data: unknown,
+  extra: Partial<DrawerProps> = {},
+) {
   const ctx = createRecordingContext()
-  void draw(createDrawerProps(ctx, data))
+  void draw(createDrawerProps(ctx, data, extra))
   return ctx.paintCount
+}
+
+/**
+ * Context that records every drawing call **with its arguments and with the
+ * canvas state at the time**, which is what "the legacy drawer and its spec
+ * equivalent render the same picture" actually means.
+ *
+ * `paintCount` cannot tell `fillRect(0,0,10,10)` from `fillRect(80,160,5,5)`.
+ */
+export interface TracingContext {
+  ctx: CanvasRenderingContext2D
+  events: unknown[]
+}
+
+const TRACED_METHODS = [
+  'beginPath',
+  'closePath',
+  'arc',
+  'rect',
+  'clip',
+  'fill',
+  'fillRect',
+  'stroke',
+  'strokeRect',
+  'fillText',
+  'moveTo',
+  'lineTo',
+  'translate',
+  'rotate',
+  'save',
+  'restore',
+] as const
+
+const TRACED_STATE = [
+  'fillStyle',
+  'strokeStyle',
+  'lineWidth',
+  'font',
+  'textAlign',
+  'textBaseline',
+  'globalAlpha',
+] as const
+
+export function createTracingContext(): TracingContext {
+  const events: unknown[] = []
+  const state: Record<string, unknown> = {
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '',
+    textAlign: 'start',
+    textBaseline: 'alphabetic',
+    globalAlpha: 1,
+  }
+  const target: Record<string, unknown> = {}
+
+  for (const key of TRACED_STATE) {
+    Object.defineProperty(target, key, {
+      get: () => state[key],
+      set: (value: unknown) => {
+        state[key] = value
+        events.push([`set:${key}`, value])
+      },
+      enumerable: true,
+      configurable: true,
+    })
+  }
+
+  for (const name of TRACED_METHODS) {
+    target[name] = (...args: unknown[]) => {
+      events.push([name, ...args])
+    }
+  }
+  target.measureText = (text: string) => ({ width: text.length * 5 })
+
+  return { ctx: target as unknown as CanvasRenderingContext2D, events }
+}
+
+/** Draw once and return the full trace. */
+export function traceDraw(
+  draw: DrawerFunction,
+  data: unknown,
+  extra: Partial<DrawerProps> = {},
+): unknown[] {
+  const { ctx, events } = createTracingContext()
+  void draw({
+    ...createDrawerProps(createRecordingContext(), data, extra),
+    ctx,
+  })
+  return events
 }

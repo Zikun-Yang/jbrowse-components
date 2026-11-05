@@ -7,6 +7,7 @@ import LinearGenomeViewPlugin from '@jbrowse/plugin-linear-genome-view'
 // @ts-expect-error - plain JS example without types, on purpose
 import SampleChartDrawersModule from '../../../../test_data/feature-chart/plugins/sampleChartDrawers.js'
 import FeatureChartPlugin from '../index.ts'
+import { normalizeFromSpec, validateChartSpec } from './chartSpec.ts'
 import { findUnknownDrawerOptions } from './drawerOptions.ts'
 import {
   clearFeatureChartDrawerCache,
@@ -43,16 +44,29 @@ const REQUIRED_DATA_KEY: Record<string, string> = {
   'samplePlugin/dotPlot': 'tissues',
 }
 
+/**
+ * Spec-driven demo tracks are validated through `normalizeFromSpec` instead of a
+ * single payload key: a spec says where its data lives (`data.path`), and the
+ * point of the demo is that this path really resolves in the shipped TSVs.
+ */
+const SPEC_DRIVEN = 'spec'
+
 /** Tracks that exist to prove failure semantics; they must not resolve. */
 const EXPECTED_ERRORS: Record<string, { missingPlugin?: string }> = {
   fc_broken: {},
   fc_missing_plugin: { missingPlugin: 'notLoadedPlugin' },
 }
 
+/** Tracks whose spec is deliberately invalid: they must report, not render. */
+const EXPECTED_SPEC_ERRORS: Record<string, string> = {
+  fc_spec_broken: 'does not accept data.form',
+}
+
 interface DemoTrack {
   trackId: string
   drawerName: string
   drawerOptions?: unknown
+  spec?: unknown
   dataUri: string
 }
 
@@ -61,7 +75,9 @@ interface DemoConfig {
   tracks: {
     trackId: string
     adapter: { uri?: string; dataLocation?: { uri?: string } }
-    displays: { renderer: { drawer?: string; drawerOptions?: unknown } }[]
+    displays: {
+      renderer: { drawer?: string; drawerOptions?: unknown; spec?: unknown }
+    }[]
   }[]
 }
 
@@ -84,6 +100,7 @@ function demoTracks(): DemoTrack[] {
       // purpose: the demo's first track omits `drawer` to prove the default.
       drawerName: renderer.drawer ?? 'precomputedBoxPlot',
       drawerOptions: renderer.drawerOptions,
+      spec: renderer.spec,
       dataUri: (track.adapter.uri ?? track.adapter.dataLocation?.uri)!,
     }
   })
@@ -148,7 +165,9 @@ describe('test_data/feature-chart: the data each configured drawer needs', () =>
     const catalog = listFeatureChartDrawers(createPluginManager())
       .map(meta => meta.name)
       .sort()
-    expect(catalog).toEqual(Object.keys(REQUIRED_DATA_KEY).sort())
+    expect(catalog).toEqual(
+      [...Object.keys(REQUIRED_DATA_KEY), SPEC_DRIVEN].sort(),
+    )
   })
 
   test.each(demoTracks().map(track => [track.trackId, track] as const))(
@@ -193,9 +212,42 @@ describe('test_data/feature-chart: the data each configured drawer needs', () =>
         )
       }
 
-      const requiredKey = REQUIRED_DATA_KEY[track.drawerName]!
       const rows = readRows(files.plain)
       expect(rows.length).toBeGreaterThan(0)
+
+      // Spec-driven tracks: every row must normalize cleanly and paint.
+      if (track.drawerName === SPEC_DRIVEN) {
+        const expectedSpecError = EXPECTED_SPEC_ERRORS[track.trackId]
+        if (expectedSpecError) {
+          const messages = validateChartSpec(track.spec)
+            .map(error => error.message)
+            .join('; ')
+          expect([track.trackId, messages.includes(expectedSpecError)]).toEqual(
+            [track.trackId, true],
+          )
+          return
+        }
+        for (const row of rows) {
+          const normalization = normalizeFromSpec(track.spec, row.data)
+          expect([track.trackId, normalization.errors]).toEqual([
+            track.trackId,
+            [],
+          ])
+          expect([
+            track.trackId,
+            paintCountFor(resolution.drawer, row.data, {
+               
+              model: (normalization as any).model,
+            }) > 0,
+          ]).toEqual([track.trackId, true])
+        }
+        expect(
+          findUnknownDrawerOptions(resolution.meta, track.drawerOptions),
+        ).toEqual([])
+        return
+      }
+
+      const requiredKey = REQUIRED_DATA_KEY[track.drawerName]!
 
       for (const row of rows) {
         // 2. every row carries the payload key this drawer reads

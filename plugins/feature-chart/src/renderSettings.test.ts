@@ -42,6 +42,7 @@ describe('resolveFeatureChartRenderSettings', () => {
       minChartSpacingPx: 9,
       colorScheme: 'viridis',
       drawerOptions: {},
+      spec: {},
     })
   })
 
