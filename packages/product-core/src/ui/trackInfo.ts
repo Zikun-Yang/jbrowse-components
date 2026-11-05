@@ -3,6 +3,7 @@ import { stringToJexlExpression } from '@jbrowse/core/util/jexlStrings'
 import { renderTemplate } from '@jbrowse/core/util/renderTemplate'
 import { isStateTreeNode } from '@jbrowse/mobx-state-tree'
 
+import { markdownToPlainText } from './markdownToPlainText.ts'
 import { generateDisplayableConfig, readConf, removeAttr } from './util.ts'
 
 import type PluginManager from '@jbrowse/core/PluginManager'
@@ -48,6 +49,12 @@ export interface TrackInfoContext {
 export interface ResolvedTrackInfo {
   /** rendered markdown, empty string when no template is configured */
   info: string
+  /**
+   * `info` with the markdown markers removed, for callers that put the text
+   * into a prompt (agent SDK `trackInfo().infoText`) instead of a web page.
+   * Empty exactly when `info` is empty.
+   */
+  infoText: string
   /** whether the "Track info" panel should be shown */
   visible: boolean
   /** whether local URIs should be hidden in the about dialog */
@@ -299,6 +306,7 @@ export function resolveTrackInfo(
 
   return {
     info,
+    infoText: markdownToPlainText(info),
     visible:
       trackShowsInfo !== false && rootShowsInfo !== false && info.trim() !== '',
     hideUris,

@@ -38,7 +38,7 @@ function getTrackInfo(
     return resolveTrackInfo(config, session, pluginManager)
   } catch (e) {
     console.error('failed to resolve the track info panel', e)
-    return { info: '', visible: false, hideUris: false }
+    return { info: '', infoText: '', visible: false, hideUris: false }
   }
 }
 

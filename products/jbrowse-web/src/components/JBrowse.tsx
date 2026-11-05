@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import FileHandleRestoreBanner from './FileHandleRestoreBanner.tsx'
 import SettingsCards from './SettingsCards.tsx'
 import ShareButton from './ShareButton.tsx'
+import { installTrackInfoBridge } from '../trackInfoBridge.ts'
 import { readQueryParams, setQueryParams } from '../useQueryParam.ts'
 
 import type { WebSessionModel } from '../sessionModel/index.ts'
@@ -79,7 +80,10 @@ const JBrowse = observer(function JBrowse({
     window.JBrowseRootModel = rootModel
     // @ts-expect-error
     window.JBrowseSession = session
-  }, [id, rootModel, session])
+    // the agent SDK reads track info through this, so it sees exactly what the
+    // About dialog renders
+    installTrackInfoBridge({ session, pluginManager })
+  }, [id, rootModel, session, pluginManager])
 
   useEffect(() => {
     return adminKey
