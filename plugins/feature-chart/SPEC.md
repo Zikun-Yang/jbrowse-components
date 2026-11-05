@@ -319,6 +319,16 @@ sampled, not asserted.
 Hand this to a model that writes configs; it rejects every mistake the validator
 reports, before the config is ever loaded.
 
+This block is generated from the same constants the validator enforces and is
+published at runtime as `jbrowse.chartSpecSchema()` in `@jbrowse/agent-sdk`
+(`chartSpecSchema.ts`). A test compares this document with the generator, so the
+block and `CHART_KINDS` / `CHART_DATA_FORMS` / `CHART_KIND_DATA_FORMS` cannot
+drift.
+
+Two rules here are stricter than the runtime validator — the `path` pattern and
+`axes.yLabel` `maxLength` — on purpose: a config that passes this schema always
+loads, and the extra strictness is a lint hint, not a new runtime rule.
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -336,8 +346,8 @@ reports, before the config is ever loaded.
       "properties": {
         "form": {
           "enum": [
-            "grouped-values",
             "summary-stats",
+            "grouped-values",
             "category-values",
             "values"
           ]
@@ -355,7 +365,7 @@ reports, before the config is ever loaded.
       "additionalProperties": false,
       "properties": {
         "colorScheme": {
-          "enum": ["tableau10", "viridis", "set2", "dark2", "blues"]
+          "enum": ["blues", "dark2", "set2", "tableau10", "viridis"]
         },
         "bins": { "type": "integer", "minimum": 1, "maximum": 100 }
       }

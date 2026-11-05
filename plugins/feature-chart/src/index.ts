@@ -2,6 +2,7 @@ import Plugin from '@jbrowse/core/Plugin'
 
 import FeatureChartAdapterF from './FeatureChartAdapter/index.ts'
 import { initBuiltInDrawers } from './FeatureChartDrawer/drawerRegistry.ts'
+import { installFeatureChartAgentSurface } from './agentSurface.ts'
 import FeatureChartPlotlyRendererF from './FeatureChartPlotlyRenderer/index.ts'
 import FeatureChartRendererF from './FeatureChartRenderer/index.ts'
 import FeatureChartTrackF from './FeatureChartTrack/index.ts'
@@ -19,21 +20,32 @@ export default class FeatureChartPlugin extends Plugin {
     LinearFeatureChartDisplayF(pluginManager)
     FeatureChartTrackF(pluginManager)
     initBuiltInDrawers()
+    installFeatureChartAgentSurface(pluginManager)
   }
 }
 
 export {
+  FEATURE_CHART_DRAWER_CATALOG_EXTENSION_POINT,
   FEATURE_CHART_DRAWER_EXTENSION_POINT,
   clearFeatureChartDrawerCache,
   getFeatureChartDrawer,
   getFeatureChartDrawerMeta,
   initBuiltInDrawers,
   isFeatureChartDrawerResolutionError,
+  listFeatureChartDrawerCatalog,
   listFeatureChartDrawerNames,
   listFeatureChartDrawers,
   registerFeatureChartDrawer,
   resolveFeatureChartDrawer,
 } from './FeatureChartDrawer/drawerRegistry.ts'
+export type { FeatureChartDrawerCatalogEntry } from './FeatureChartDrawer/drawerRegistry.ts'
+export {
+  CHART_SPEC_SCHEMA_EXTENSION_POINT,
+  CHART_SPEC_SCHEMA_ID,
+  chartSpecSchema,
+} from './FeatureChartDrawer/chartSpecSchema.ts'
+export type { ChartSpecSchema } from './FeatureChartDrawer/chartSpecSchema.ts'
+export { installFeatureChartAgentSurface } from './agentSurface.ts'
 export {
   describeFeatureChartDrawerError,
   formatFeatureChartDrawerError,
