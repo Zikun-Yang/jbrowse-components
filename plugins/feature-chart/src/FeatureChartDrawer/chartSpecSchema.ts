@@ -44,7 +44,7 @@ export const CHART_SPEC_SCHEMA_EXTENSION_POINT = 'Core-featureChartSpecSchema'
 export const CHART_SPEC_Y_LABEL_MAX_LENGTH = 64
 
 /** Dotted-path shape hint used by the JSON Schema (not enforced at runtime). */
-export const CHART_SPEC_DATA_PATH_PATTERN = '^$|^[^.[\\]]+(\\.[^.[\\]]+)*$'
+export const CHART_SPEC_DATA_PATH_PATTERN = String.raw`^$|^[^.[\]]+(\.[^.[\]]+)*$`
 
 export interface ChartSpecJsonSchema {
   $schema: string
@@ -142,6 +142,8 @@ export function chartSpecSchema(): ChartSpecSchema {
       const allowed = CHART_KIND_DATA_FORMS[kind]
       return {
         if: { properties: { kind: { const: kind } } },
+        // `then` is the JSON Schema keyword; the lint rule is about promises
+        // eslint-disable-next-line unicorn/no-thenable
         then: {
           properties: {
             data: {
