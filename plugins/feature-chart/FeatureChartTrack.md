@@ -292,7 +292,8 @@ FeatureChartTrack (TrackType)
 - `xaxis.categoryorder: 'array'` + `yaxis.range/tickvals`
   都从模型推导，因此**类别顺序、数值范围、颜色映射**与 canvas 一致（README/ARCHITECTURE 里的验收项）
 - `plotType` 是 **deprecated 兼容别名**，等价于设置 `spec.kind`；只在 `drawer`
-  为默认值时生效，且只警告一次（迁移示例见 §4.2、§7）
+  为默认值时**作为兜底**生效（该 drawer 能为这份 payload 建出模型时以 drawer
+  为准，否则轨道里和放大视图里会出现两种图），且只警告一次（迁移示例见 §4.2、§7）
 - 与 canvas renderer 一样从自身 config 读取尺寸/对齐/密度阈值、
   `colorScheme`、`drawer`、`drawerOptions`、`spec`（共用
   `resolveFeatureChartRenderSettings()`）；深色主题会切到深色面板并提亮palette

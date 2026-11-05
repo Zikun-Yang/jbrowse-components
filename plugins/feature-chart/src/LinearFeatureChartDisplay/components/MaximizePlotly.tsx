@@ -47,13 +47,16 @@ export default function MaximizePlotly({
 
   const useLegacyPlotType =
     settings.drawer === FEATURE_CHART_RENDER_DEFAULTS.drawer
-  const source: TrackChartSource = useLegacyPlotType
-    ? { drawer: settings.drawer, canvasOnly: false }
-    : resolveTrackChartSource({
-        drawer: settings.drawer,
-        spec: settings.spec,
-        pluginManager,
-      })
+  // Resolve the drawer even in legacy mode: `presentChart` gives the drawer's
+  // model the first chance and only falls back to `plotType` when the payload
+  // has no model (see `chartPresentation.ts`). Without this, a track that omits
+  // `drawer` drew fine in the track and claimed "plotType does not recognize
+  // this payload" here.
+  const source: TrackChartSource = resolveTrackChartSource({
+    drawer: settings.drawer,
+    spec: settings.spec,
+    pluginManager,
+  })
   // One chart: no memo needed, and no disabled React rules for the compiler.
   const presentation = presentChart({
     source,

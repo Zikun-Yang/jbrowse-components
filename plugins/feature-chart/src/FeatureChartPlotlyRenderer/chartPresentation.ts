@@ -61,6 +61,31 @@ export function presentChart({
   plotType = 'box',
 }: ChartPresentationInput): ChartPresentation {
   if (useLegacyPlotType) {
+    // `drawer` left at its default means "`plotType` decides" (the deprecated
+    // pre-WP0 contract). The drawer still gets the first chance: a payload the
+    // configured drawer can model must draw here exactly as it draws in the
+    // track, because the maximize dialog's Interactive view is "the same chart,
+    // bigger". Only when no model can be built (the category maps and `{x,y}`
+    // payloads `plotType` was written for) does the legacy path take over.
+    if (!source.canvasOnly) {
+      const presentation = presentModel({
+        source,
+        data,
+        name,
+        width,
+        height,
+        fontSize,
+        theme,
+        themeColorScheme,
+        interactive,
+      })
+      // A gap-free model is not enough: `precomputedBoxPlot.buildModel()` on a
+      // category map yields a model with zero categories, which would draw an
+      // empty axis instead of the chart `plotType` can still make from it.
+      if (presentation.layout && presentation.traces.length > 0) {
+        return presentation
+      }
+    }
     return presentLegacyPlotType({
       data,
       name,
@@ -73,6 +98,30 @@ export function presentChart({
     })
   }
 
+  return presentModel({
+    source,
+    data,
+    name,
+    width,
+    height,
+    fontSize,
+    theme,
+    themeColorScheme,
+    interactive,
+  })
+}
+
+/** The model path shared by both backends: drawer/spec model → traces + layout. */
+function presentModel({
+  source,
+  data,
+  width,
+  height,
+  fontSize,
+  theme,
+  themeColorScheme,
+  interactive = false,
+}: ChartPresentationInput): ChartPresentation {
   if (source.canvasOnly) {
     return {
       traces: [],

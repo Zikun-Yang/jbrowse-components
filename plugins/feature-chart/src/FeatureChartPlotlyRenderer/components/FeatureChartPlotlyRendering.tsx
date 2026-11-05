@@ -98,19 +98,18 @@ const FeatureChartPlotlyRendering = observer(
       settings.drawer === FEATURE_CHART_RENDER_DEFAULTS.drawer
 
     const pluginManager = pluginManagerFor(displayModel)
-    // In legacy mode the drawer is deliberately not consulted: `plotType` was
-    // the only knob the pre-WP4 renderer read, so resolving (and possibly
-    // failing on) a drawer it never used would be a new error path.
+    // Resolve the drawer even in legacy mode: `presentChart` gives the drawer's
+    // model the first chance and only falls back to `plotType` for payloads no
+    // drawer can model (see `chartPresentation.ts`). Resolving never throws, so
+    // an unknown drawer still falls through to the legacy path.
     const source: TrackChartSource = useMemo(
       () =>
-        useLegacyPlotType
-          ? { drawer: settings.drawer, canvasOnly: false }
-          : resolveTrackChartSource({
-              drawer: settings.drawer,
-              spec: settings.spec,
-              pluginManager,
-            }),
-      [useLegacyPlotType, settings.drawer, settings.spec, pluginManager],
+        resolveTrackChartSource({
+          drawer: settings.drawer,
+          spec: settings.spec,
+          pluginManager,
+        }),
+      [settings.drawer, settings.spec, pluginManager],
     )
 
     useEffect(() => {

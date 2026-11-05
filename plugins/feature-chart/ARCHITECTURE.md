@@ -250,8 +250,13 @@ Pre-WP4 configs chose the chart with `plotType` and the Plotly renderer ignored
 
 1. `drawer: "spec"` → spec model.
 2. `drawer` explicitly set (built-in or `plugin/drawer`) → that drawer's model.
-3. `drawer` left at the schema default (`precomputedBoxPlot`) → legacy mode:
-   `plotType` compiles to a spec (`plotTypeCompat.ts`), with one deprecation
+3. `drawer` left at the schema default (`precomputedBoxPlot`) → legacy mode,
+   **but the configured drawer still gets the first chance**: when it can build
+   a `ChartModel` that produces traces, that model is drawn, so a track that
+   omits `drawer` renders the same chart in the track and in the dialog's
+   Interactive view. Only when no model can be made from the payload (the
+   category maps and `{x, y}` payloads `plotType` was written for) does
+   `plotType` compile to a spec (`plotTypeCompat.ts`), with one deprecation
    warning naming the equivalent config.
 
 `scatter`/`line` have no `ChartModel` in v1 (no canvas painter), so they keep
